@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "生产环境 API 密钥：",
   "setup_wizard.prod_key_placeholder": "prod_...（暂时可选）",
   "setup_wizard.show_keys_button": "显示密钥",
-  "setup_wizard.subtitle": "请在下方粘贴您的 EasyPost API 密钥。密钥将使用 Windows DPAPI 加密，仅存储在本机您的 Windows 登录账户下——绝不以明文形式保存，也绝不发送至除 EasyPost API 以外的任何地方。",
+  "setup_wizard.subtitle": "请在下方粘贴您的 EasyPost API 密钥。密钥会安全存储在本机操作系统的凭据管理器中——绝不以明文形式保存，也绝不发送至除 EasyPost API 以外的任何地方。",
   "setup_wizard.test_key_label": "测试环境 API 密钥：",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>连接您的 EasyPost 账户</h2>",

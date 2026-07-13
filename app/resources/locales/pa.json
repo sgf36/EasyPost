@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "ਉਤਪਾਦਨ API ਕੁੰਜੀ:",
   "setup_wizard.prod_key_placeholder": "prod_... (ਹੁਣ ਲਈ ਵਿਕਲਪਿਕ)",
   "setup_wizard.show_keys_button": "ਕੁੰਜੀਆਂ ਦਿਖਾਓ",
-  "setup_wizard.subtitle": "ਹੇਠਾਂ ਆਪਣੀ EasyPost API ਕੁੰਜੀ(ਆਂ) ਪੇਸਟ ਕਰੋ। ਇਹ Windows DPAPI ਨਾਲ ਇਨਕ੍ਰਿਪਟ ਕੀਤੀਆਂ ਜਾਂਦੀਆਂ ਹਨ ਅਤੇ ਸਿਰਫ਼ ਇਸ ਮਸ਼ੀਨ 'ਤੇ, ਤੁਹਾਡੇ Windows ਲਾਗਇਨ ਅਧੀਨ ਸੰਭਾਲੀਆਂ ਜਾਂਦੀਆਂ ਹਨ — ਕਦੇ ਵੀ ਸਾਦੇ ਟੈਕਸਟ ਵਿੱਚ ਨਹੀਂ, ਕਦੇ ਵੀ EasyPost ਦੇ API ਤੋਂ ਬਿਨਾਂ ਕਿਤੇ ਹੋਰ ਨਹੀਂ ਭੇਜੀਆਂ ਜਾਂਦੀਆਂ।",
+  "setup_wizard.subtitle": "ਹੇਠਾਂ ਆਪਣੀ EasyPost API ਕੁੰਜੀ(ਆਂ) ਪੇਸਟ ਕਰੋ। ਇਹ ਇਸ ਮਸ਼ੀਨ 'ਤੇ ਤੁਹਾਡੇ ਓਪਰੇਟਿੰਗ ਸਿਸਟਮ ਦੇ ਕ੍ਰੈਡੈਂਸ਼ੀਅਲ ਮੈਨੇਜਰ ਵਿੱਚ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਸੰਭਾਲੀਆਂ ਜਾਂਦੀਆਂ ਹਨ — ਕਦੇ ਵੀ ਸਾਦੇ ਟੈਕਸਟ ਵਿੱਚ ਨਹੀਂ, ਕਦੇ ਵੀ EasyPost ਦੇ API ਤੋਂ ਬਿਨਾਂ ਕਿਤੇ ਹੋਰ ਨਹੀਂ ਭੇਜੀਆਂ ਜਾਂਦੀਆਂ।",
   "setup_wizard.test_key_label": "ਟੈਸਟ API ਕੁੰਜੀ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>ਆਪਣਾ EasyPost ਖਾਤਾ ਜੋੜੋ</h2>",

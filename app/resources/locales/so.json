@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Furaha API-ga Dhabta ah:",
   "setup_wizard.prod_key_placeholder": "prod_... (ikhtiyaari hadda)",
   "setup_wizard.show_keys_button": "Muuji Furayaasha",
-  "setup_wizard.subtitle": "Ku dheji furayaasha API-ga EasyPost hoos. Waxaa lagu sifeeyaa Windows DPAPI oo kaliya lagu kaydiyaa mishiinkan, hoos ka socda gelitaankaaga Windows — waligeed qoraal cad kuma jiraan, mana loo dirin meel aan ahayn API-ga EasyPost.",
+  "setup_wizard.subtitle": "Ku dheji furayaasha API-ga EasyPost hoos. Waxaa si ammaan ah loogu kaydiyaa maamulaha xogta xaqiijinta (credential manager) ee nidaamka hawlgalka mishiinkan — waligeed qoraal cad kuma jiraan, mana loo dirin meel aan ahayn API-ga EasyPost.",
   "setup_wizard.test_key_label": "Furaha API-ga Tijaabada:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Ku Xir Akoonkaaga EasyPost</h2>",

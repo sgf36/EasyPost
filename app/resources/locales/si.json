@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "නිෂ්පාදන API යතුර:",
   "setup_wizard.prod_key_placeholder": "prod_... (දැනට විකල්ප)",
   "setup_wizard.show_keys_button": "යතුරු පෙන්වන්න",
-  "setup_wizard.subtitle": "ඔබේ EasyPost API යතුරු(ය) පහත ඇලවන්න. ඒවා Windows DPAPI සමඟ සංකේතනය කර ඔබේ Windows පිවිසුම යටතේ මෙම පරිගණකයේ පමණක් ගබඩා කෙරේ — කිසි විටෙකත් සරල පෙළ ලෙස නොව, EasyPost හි API හැර වෙනත් කිසිදු තැනකට නොයවයි.",
+  "setup_wizard.subtitle": "ඔබේ EasyPost API යතුරු(ය) පහත ඇලවන්න. ඒවා මෙම පරිගණකයේ ඔබේ මෙහෙයුම් පද්ධතියේ අක්තපත්‍ර කළමනාකරු තුළ ආරක්ෂිතව ගබඩා කෙරේ — කිසි විටෙකත් සරල පෙළ ලෙස නොව, EasyPost හි API හැර වෙනත් කිසිදු තැනකට නොයවයි.",
   "setup_wizard.test_key_label": "පරීක්ෂණ API යතුර:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>ඔබේ EasyPost ගිණුම සම්බන්ධ කරන්න</h2>",

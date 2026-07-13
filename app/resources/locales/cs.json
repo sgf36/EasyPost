@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Produkční API klíč:",
   "setup_wizard.prod_key_placeholder": "prod_... (zatím nepovinné)",
   "setup_wizard.show_keys_button": "Zobrazit klíče",
-  "setup_wizard.subtitle": "Níže vložte svůj API klíč (klíče) EasyPost. Jsou šifrovány pomocí Windows DPAPI a uloženy pouze v tomto počítači pod vaším přihlášením do Windows — nikdy v čitelné podobě, nikdy neodesílány nikam jinam než na API EasyPost.",
+  "setup_wizard.subtitle": "Níže vložte svůj API klíč (klíče) EasyPost. Jsou bezpečně uloženy ve správci přihlašovacích údajů vašeho operačního systému na tomto počítači — nikdy v čitelné podobě, nikdy neodesílány nikam jinam než na API EasyPost.",
   "setup_wizard.test_key_label": "Testovací API klíč:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Připojte svůj účet EasyPost</h2>",

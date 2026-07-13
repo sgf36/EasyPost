@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Khóa API sản xuất:",
   "setup_wizard.prod_key_placeholder": "prod_... (tùy chọn, có thể bỏ trống bây giờ)",
   "setup_wizard.show_keys_button": "Hiện khóa",
-  "setup_wizard.subtitle": "Dán khóa API EasyPost của bạn vào bên dưới. Khóa được mã hóa bằng Windows DPAPI và chỉ được lưu trên máy này, dưới tài khoản đăng nhập Windows của bạn — không bao giờ ở dạng văn bản thuần túy, không bao giờ gửi đi đâu ngoài API của EasyPost.",
+  "setup_wizard.subtitle": "Dán khóa API EasyPost của bạn vào bên dưới. Khóa được lưu trữ an toàn trong trình quản lý thông tin xác thực của hệ điều hành trên máy này — không bao giờ ở dạng văn bản thuần túy, không bao giờ gửi đi đâu ngoài API của EasyPost.",
   "setup_wizard.test_key_label": "Khóa API thử nghiệm:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Kết Nối Tài Khoản EasyPost Của Bạn</h2>",

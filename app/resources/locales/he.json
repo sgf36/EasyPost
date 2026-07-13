@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "מפתח API לייצור:",
   "setup_wizard.prod_key_placeholder": "prod_... (רשות בשלב זה)",
   "setup_wizard.show_keys_button": "הצג מפתחות",
-  "setup_wizard.subtitle": "הדבק/י למטה את מפתח/י ה-API של EasyPost. הם מוצפנים באמצעות Windows DPAPI ונשמרים אך ורק במחשב זה, תחת חשבון ה-Windows שלך — לעולם לא כטקסט גלוי, ולעולם לא נשלחים לשום מקום מלבד ה-API של EasyPost.",
+  "setup_wizard.subtitle": "הדבק/י למטה את מפתח/י ה-API של EasyPost. הם נשמרים בצורה מאובטחת במנהל האישורים של מערכת ההפעלה במחשב זה — לעולם לא כטקסט גלוי, ולעולם לא נשלחים לשום מקום מלבד ה-API של EasyPost.",
   "setup_wizard.test_key_label": "מפתח API לבדיקה:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>חבר את חשבון ה-EasyPost שלך</h2>",

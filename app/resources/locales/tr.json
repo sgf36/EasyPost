@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Üretim API anahtarı:",
   "setup_wizard.prod_key_placeholder": "prod_... (şimdilik isteğe bağlı)",
   "setup_wizard.show_keys_button": "Anahtarları göster",
-  "setup_wizard.subtitle": "EasyPost API anahtarlarınızı aşağıya yapıştırın. Bu anahtarlar Windows DPAPI ile şifrelenir ve yalnızca bu makinede, Windows oturumunuz altında saklanır — hiçbir zaman düz metin olarak tutulmaz, EasyPost API'si dışında hiçbir yere gönderilmez.",
+  "setup_wizard.subtitle": "EasyPost API anahtarlarınızı aşağıya yapıştırın. Bu anahtarlar, bu makinedeki işletim sisteminizin kimlik bilgisi yöneticisinde güvenli şekilde saklanır — hiçbir zaman düz metin olarak tutulmaz, EasyPost API'si dışında hiçbir yere gönderilmez.",
   "setup_wizard.test_key_label": "Test API anahtarı:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>EasyPost hesabınızı bağlayın</h2>",

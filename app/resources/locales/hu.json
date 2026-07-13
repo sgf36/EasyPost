@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Éles API-kulcs:",
   "setup_wizard.prod_key_placeholder": "prod_... (egyelőre nem kötelező)",
   "setup_wizard.show_keys_button": "Kulcsok megjelenítése",
-  "setup_wizard.subtitle": "Illessze be az EasyPost API-kulcsát (kulcsait) alább. Ezek Windows DPAPI-val titkosítva, kizárólag ezen a gépen, az Ön Windows-bejelentkezése alatt kerülnek tárolásra — soha nem egyszerű szövegként, és soha nem küldjük el máshova, csak az EasyPost API-jának.",
+  "setup_wizard.subtitle": "Illessze be az EasyPost API-kulcsát (kulcsait) alább. Ezek biztonságosan, az operációs rendszer hitelesítőadat-kezelőjében kerülnek tárolásra ezen a gépen — soha nem egyszerű szövegként, és soha nem küldjük el máshova, csak az EasyPost API-jának.",
   "setup_wizard.test_key_label": "Teszt API-kulcs:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>EasyPost-fiók összekapcsolása</h2>",

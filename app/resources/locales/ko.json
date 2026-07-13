@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "프로덕션 API 키:",
   "setup_wizard.prod_key_placeholder": "prod_...(지금은 선택 사항)",
   "setup_wizard.show_keys_button": "키 표시",
-  "setup_wizard.subtitle": "아래에 EasyPost API 키를 붙여넣으십시오. 이 키는 Windows DPAPI로 암호화되어 현재 Windows 로그인 아래 이 기기에만 저장되며, 평문으로 저장되거나 EasyPost API 이외의 곳으로 전송되지 않습니다.",
+  "setup_wizard.subtitle": "아래에 EasyPost API 키를 붙여넣으십시오. 이 키는 이 기기의 운영체제 자격 증명 관리자에 안전하게 저장되며, 평문으로 저장되거나 EasyPost API 이외의 곳으로 전송되지 않습니다.",
   "setup_wizard.test_key_label": "테스트 API 키:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>EasyPost 계정 연결</h2>",

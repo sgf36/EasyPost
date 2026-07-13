@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Chave de API de produção:",
   "setup_wizard.prod_key_placeholder": "prod_... (opcional por enquanto)",
   "setup_wizard.show_keys_button": "Mostrar chaves",
-  "setup_wizard.subtitle": "Cole abaixo sua(s) chave(s) de API do EasyPost. Elas são criptografadas com o Windows DPAPI e armazenadas apenas nesta máquina, sob seu login do Windows — nunca em texto simples, nunca enviadas a nenhum lugar além da API do EasyPost.",
+  "setup_wizard.subtitle": "Cole abaixo sua(s) chave(s) de API do EasyPost. Elas são armazenadas com segurança no gerenciador de credenciais do sistema operacional nesta máquina — nunca em texto simples, nunca enviadas a nenhum lugar além da API do EasyPost.",
   "setup_wizard.test_key_label": "Chave de API de teste:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Conecte sua conta EasyPost</h2>",

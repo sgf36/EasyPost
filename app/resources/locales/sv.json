@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Produktions-API-nyckel:",
   "setup_wizard.prod_key_placeholder": "prod_... (valfritt för tillfället)",
   "setup_wizard.show_keys_button": "Visa nycklar",
-  "setup_wizard.subtitle": "Klistra in din/dina EasyPost-API-nyckel/nycklar nedan. De krypteras med Windows DPAPI och lagras endast på denna dator, under din Windows-inloggning — aldrig i klartext, aldrig skickade någon annanstans än till EasyPosts API.",
+  "setup_wizard.subtitle": "Klistra in din/dina EasyPost-API-nyckel/nycklar nedan. De lagras säkert i operativsystemets autentiseringshanterare på den här datorn — aldrig i klartext, aldrig skickade någon annanstans än till EasyPosts API.",
   "setup_wizard.test_key_label": "Test-API-nyckel:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Anslut ditt EasyPost-konto</h2>",

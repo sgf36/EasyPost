@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Cheie API producție:",
   "setup_wizard.prod_key_placeholder": "prod_... (opțional deocamdată)",
   "setup_wizard.show_keys_button": "Afișează cheile",
-  "setup_wizard.subtitle": "Inserează mai jos cheia (cheile) API EasyPost. Acestea sunt criptate cu Windows DPAPI și stocate doar pe acest calculator, sub contul tău Windows — niciodată în text simplu, niciodată trimise altundeva decât către API-ul EasyPost.",
+  "setup_wizard.subtitle": "Inserează mai jos cheia (cheile) API EasyPost. Acestea sunt stocate în siguranță în managerul de acreditări al sistemului de operare de pe acest calculator — niciodată în text simplu, niciodată trimise altundeva decât către API-ul EasyPost.",
   "setup_wizard.test_key_label": "Cheie API test:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Conectează-ți contul EasyPost</h2>",

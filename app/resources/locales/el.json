@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Κλειδί API παραγωγής:",
   "setup_wizard.prod_key_placeholder": "prod_... (προαιρετικό προς το παρόν)",
   "setup_wizard.show_keys_button": "Εμφάνιση κλειδιών",
-  "setup_wizard.subtitle": "Επικολλήστε παρακάτω το/τα κλειδί/ά API EasyPost. Κρυπτογραφούνται με το Windows DPAPI και αποθηκεύονται μόνο σε αυτόν τον υπολογιστή, υπό τον λογαριασμό σύνδεσής σας στα Windows — ποτέ σε απλό κείμενο, ποτέ δεν αποστέλλονται πουθενά αλλού εκτός από το API του EasyPost.",
+  "setup_wizard.subtitle": "Επικολλήστε παρακάτω το/τα κλειδί/ά API EasyPost. Αποθηκεύονται με ασφάλεια στη διαχείριση διαπιστευτηρίων του λειτουργικού σας συστήματος σε αυτόν τον υπολογιστή — ποτέ σε απλό κείμενο, ποτέ δεν αποστέλλονται πουθενά αλλού εκτός από το API του EasyPost.",
   "setup_wizard.test_key_label": "Κλειδί API δοκιμής:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Συνδέστε τον λογαριασμό σας EasyPost</h2>",

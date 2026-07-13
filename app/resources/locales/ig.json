@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Igodo API Mmepụta:",
   "setup_wizard.prod_key_placeholder": "prod_... (nhọrọ ugbu a)",
   "setup_wizard.show_keys_button": "Gosi igodo",
-  "setup_wizard.subtitle": "Tinye igodo API EasyPost gị n'okpuru a. A na-eji Windows DPAPI ezochi ha ma chekwaa ha naanị na igwe kọmputa a, n'okpuru njite Windows gị — ọ dịghị mgbe ọ bụla dị ka ederede a doro anya, ọ dịghịkwa mgbe a na-ezigara ya ebe ọ bụla ma ọ bụghị API EasyPost.",
+  "setup_wizard.subtitle": "Tinye igodo API EasyPost gị n'okpuru a. A na-echekwa ha nke ọma na ngwa njikwa nzuzo nke sistemụ arụmọrụ gị naanị na igwe kọmputa a — ọ dịghị mgbe ọ bụla dị ka ederede a doro anya, ọ dịghịkwa mgbe a na-ezigara ya ebe ọ bụla ma ọ bụghị API EasyPost.",
   "setup_wizard.test_key_label": "Igodo API Nnwale:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Jikọọ akaụntụ EasyPost gị</h2>",
