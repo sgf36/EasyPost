@@ -16,7 +16,7 @@ MODE_TEST = "test"
 MODE_PRODUCTION = "production"
 
 # Stripe Payment Link for optional donations (public URL, not a secret).
-DONATION_URL = "https://donate.stripe.com/4gM5kFajM6ya1wM2Qv0gw00"
+DONATION_URL = "https://donate.stripe.com/aFabJ38bEaOq1wMgHl0gw01"
 
 
 def ensure_app_data_dir() -> Path:
