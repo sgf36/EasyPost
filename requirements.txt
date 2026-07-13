@@ -1,0 +1,5 @@
+easypost>=10.3.0
+PySide6>=6.7.0
+requests>=2.31.0
+keyring>=24.0.0
+platformdirs>=4.0.0

@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+
+      - name: Build with PyInstaller
+        run: pyinstaller packaging/build_exe.spec --noconfirm --distpath dist --workpath build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EasyPostDesktop-${{ matrix.os }}
+          path: dist/*
