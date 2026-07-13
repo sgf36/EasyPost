@@ -40,12 +40,43 @@ money asks for confirmation while in production mode.
   AI-generated (not professionally reviewed) — open an issue if something
   reads wrong.
 
-## Note on tracking updates
+## Tracking updates: polling vs. real-time webhook push
 
-This is a desktop app with no public URL, so EasyPost can't push webhook
-events to it directly. Tracking updates are pulled by polling instead (every
-5 minutes, or on demand via "Refresh all now"). A future version could add a
-webhook receiver behind an ngrok/Cloudflare tunnel if push updates matter.
+By default, tracking updates are pulled by polling EasyPost every 5 minutes
+(or on demand via "Refresh all now") — this always works, no setup required,
+and stays on regardless of the option below.
+
+For instant push updates instead of waiting on the poll, Settings has an
+**opt-in, off-by-default** "Real-time tracking (advanced)" toggle. Turning
+it on:
+
+1. Starts a local HTTP server bound to `127.0.0.1` only (never exposed
+   directly on your LAN).
+2. Opens a [Cloudflare Quick Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/)
+   (`cloudflared tunnel --url ...`) — zero signup, an anonymous
+   `https://*.trycloudflare.com` URL is what actually makes the local server
+   internet-reachable; the tunnel connects out to it, so the port is never
+   opened on your router/firewall.
+3. Registers (or updates) an EasyPost webhook pointed at that URL, using a
+   locally-generated secret (stored in your OS credential vault) to verify
+   every incoming request's HMAC signature via the SDK's built-in
+   `easypost.util.validate_webhook` — unsigned or mis-signed requests are
+   rejected with 401 before touching anything.
+
+**Requires `cloudflared` installed and on your PATH** — the app deliberately
+does not auto-download and execute a fetched binary. Install it with:
+- Windows: `winget install --id Cloudflare.cloudflared`
+- macOS: `brew install cloudflared`
+- Linux: see [Cloudflare's install docs](https://pkg.cloudflare.com/index.html) for your distro, or grab a release binary from [github.com/cloudflare/cloudflared/releases](https://github.com/cloudflare/cloudflared/releases)
+
+If `cloudflared` isn't found, Settings shows the install command instead of
+silently failing. Since Cloudflare Quick Tunnels are an anonymous, best
+-effort service (not a guaranteed-uptime product) and the URL changes every
+time the tunnel restarts, the app re-registers the webhook's URL with
+EasyPost on every launch while this is enabled. Turning the toggle back off
+deletes the EasyPost webhook registration for a clean teardown; merely
+closing the app leaves it registered against a now-dead URL until you either
+relaunch (which re-points it) or explicitly disable it.
 
 ## Running tests
 

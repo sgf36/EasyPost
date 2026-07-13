@@ -6,6 +6,7 @@ and don't need OS keyring protection — a plain JSON file is simpler.
 
 import json
 from dataclasses import asdict, dataclass
+from typing import Optional
 
 from app.config import SETTINGS_PATH, ensure_app_data_dir
 
@@ -16,6 +17,10 @@ DEFAULT_LOCALE = "en"
 class AppSettings:
     locale: str = DEFAULT_LOCALE
     donation_banner_dismissed: bool = False
+    # Webhook push-update feature (off by default — see app/core/webhook_manager.py).
+    webhook_enabled: bool = False
+    webhook_id: Optional[str] = None
+    webhook_port: Optional[int] = None
 
 
 def load_settings() -> AppSettings:

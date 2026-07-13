@@ -11,6 +11,8 @@ from PySide6.QtWidgets import (
 
 from app.config import APP_NAME
 from app.core.client import client_manager
+from app.core.settings import load_settings
+from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
 from app.ui.views.address_book_view import AddressBookView
 from app.ui.views.batch_view import BatchView
@@ -24,6 +26,7 @@ from app.ui.views.reports_view import ReportsView
 from app.ui.views.settings_view import SettingsView
 from app.ui.views.setup_wizard import SetupWizard
 from app.ui.views.tracking_view import TrackingView
+from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.donation_banner import DonationBanner
 from app.ui.widgets.mode_banner import ModeBanner
 
@@ -36,6 +39,7 @@ class MainWindow(QMainWindow):
 
         self._root_stack = QStackedWidget()
         self.setCentralWidget(self._root_stack)
+        self._pending_webhook_task = None
 
         self._setup_wizard = SetupWizard()
         self._setup_wizard.setup_complete.connect(self._show_app_shell)
@@ -47,6 +51,7 @@ class MainWindow(QMainWindow):
         client_manager.reload()
         if client_manager.credentials.active_key():
             self._root_stack.setCurrentWidget(self._app_shell)
+            self._maybe_resume_webhook()
         else:
             self._root_stack.setCurrentWidget(self._setup_wizard)
 
@@ -141,3 +146,11 @@ class MainWindow(QMainWindow):
         client_manager.reload()
         self._mode_banner.refresh()
         self._root_stack.setCurrentWidget(self._app_shell)
+        self._maybe_resume_webhook()
+
+    def _maybe_resume_webhook(self) -> None:
+        """Re-starts the webhook push-update tunnel on launch if it was
+        left enabled last session (see app/core/webhook_manager.py) —
+        off by default, opt-in only."""
+        if load_settings().webhook_enabled:
+            self._pending_webhook_task = run_async(webhook_manager.start, self)
