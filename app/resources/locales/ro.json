@@ -294,5 +294,19 @@
   "tracking.refreshing_button": "Se actualizează…",
   "tracking.table_group_title": "Expedieri urmărite",
   "tracking.title": "Urmărire",
-  "tracking.tracking_number_placeholder": "Număr de urmărire"
+  "tracking.tracking_number_placeholder": "Număr de urmărire",
+  "address_book.col_verified": "Verificat",
+  "address_book.verification_failed_confirm_body": "Această adresă nu a putut fi verificată:\n{error}\n\nSalvezi oricum?",
+  "address_book.saved_unverified_title": "Salvată fără verificare",
+  "address_book.saved_unverified_body": "Adresă salvată. EasyPost nu a putut-o verifica, așa că verifică din nou detaliile înainte de expediere.",
+  "address_book.state_label_province": "Provincie:",
+  "address_book.state_label_county": "Județ:",
+  "address_book.state_label_state_territory": "Stat/Teritoriu:",
+  "address_book.state_label_prefecture": "Prefectură:",
+  "address_book.state_label_region": "Regiune:",
+  "address_book.state_label_canton": "Canton:",
+  "address_book.state_label_emirate": "Emirat:",
+  "address_book.state_label_default": "Stat/Provincie/Regiune:",
+  "address_book.postal_label_zip": "Cod ZIP:",
+  "address_book.postal_label_postal": "Cod poștal:"
 }

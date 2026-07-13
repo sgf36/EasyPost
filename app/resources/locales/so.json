@@ -294,5 +294,19 @@
   "tracking.refreshing_button": "Waa la cusboonaysiinayaa…",
   "tracking.table_group_title": "Shixnadaha La Raadraacayo",
   "tracking.title": "Raadraaca",
-  "tracking.tracking_number_placeholder": "Lambarka Raadraaca"
+  "tracking.tracking_number_placeholder": "Lambarka Raadraaca",
+  "address_book.col_verified": "La Xaqiijiyay",
+  "address_book.verification_failed_confirm_body": "Cinwaankan lama xaqiijin karin:\n{error}\n\nMa kaydinaysaa sidaas oo kale?",
+  "address_book.saved_unverified_title": "La Kaydiyay Iyada oo Aan La Xaqiijin",
+  "address_book.saved_unverified_body": "Cinwaanka waa la kaydiyay. EasyPost lama xaqiijin karin, sidaa darteed hubi faahfaahinta ka hor inta aadan rarin.",
+  "address_book.state_label_province": "Gobolka:",
+  "address_book.state_label_county": "Degmada:",
+  "address_book.state_label_state_territory": "Gobolka/Dhulka:",
+  "address_book.state_label_prefecture": "Perefektarka:",
+  "address_book.state_label_region": "Aagga:",
+  "address_book.state_label_canton": "Kantoonka:",
+  "address_book.state_label_emirate": "Imaaraadka:",
+  "address_book.state_label_default": "Gobolka/Aagga/Dhulka:",
+  "address_book.postal_label_zip": "Koodhka ZIP-ka:",
+  "address_book.postal_label_postal": "Koodhka Boostada:"
 }

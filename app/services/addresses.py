@@ -27,11 +27,15 @@ class AddressRecord:
 
 
 class AddressVerificationError(RuntimeError):
-    """Raised when EasyPost reports the address could not be verified."""
+    """Raised when EasyPost reports the address could not be verified. The
+    address is still created on EasyPost's side (we use non-strict `verify`
+    rather than `verify_strict`, specifically so this always carries a real
+    address the caller can choose to save anyway)."""
 
-    def __init__(self, messages: list[str]) -> None:
+    def __init__(self, messages: list[str], address) -> None:
         super().__init__("; ".join(messages) or "Address could not be verified.")
         self.messages = messages
+        self.address = address
 
 
 def verify_address(
@@ -46,14 +50,14 @@ def verify_address(
     country: str,
     phone: str = "",
     email: str = "",
-    strict: bool = True,
 ):
     """Create + verify an address via EasyPost. Returns the EasyPost Address
-    object on success; raises AddressVerificationError on verification failure.
+    object on success; raises AddressVerificationError (carrying that same
+    address, for an explicit user override) on verification failure.
     """
     client = client_manager.get_client()
     address = client.address.create(
-        verify_strict=strict,
+        verify=True,
         name=name or None,
         company=company or None,
         street1=street1,
@@ -71,12 +75,14 @@ def verify_address(
     if delivery and not delivery.get("success", True):
         errors = delivery.get("errors") or []
         messages = [e.get("message", "Unknown verification error") for e in errors]
-        raise AddressVerificationError(messages)
+        raise AddressVerificationError(messages, address)
 
     return address
 
 
-def save_address_locally(address, *, label: Optional[str] = None, favorite: bool = False) -> None:
+def save_address_locally(
+    address, *, label: Optional[str] = None, favorite: bool = False, verified: bool = True
+) -> None:
     mode = client_manager.active_mode
     with db_cursor() as cur:
         cur.execute(
@@ -86,7 +92,8 @@ def save_address_locally(address, *, label: Optional[str] = None, favorite: bool
                 state, zip, country, phone, email, verified, is_favorite
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
-                label=excluded.label, is_favorite=excluded.is_favorite
+                label=excluded.label, is_favorite=excluded.is_favorite,
+                verified=excluded.verified
             """,
             (
                 address.id,
@@ -102,7 +109,7 @@ def save_address_locally(address, *, label: Optional[str] = None, favorite: bool
                 getattr(address, "country", None),
                 getattr(address, "phone", None),
                 getattr(address, "email", None),
-                1,
+                1 if verified else 0,
                 1 if favorite else 0,
             ),
         )
