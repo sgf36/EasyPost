@@ -106,11 +106,15 @@ $env:EASYPOST_TEST_API_KEY = "test_..."
 .venv\Scripts\python.exe -m PyInstaller packaging\build_exe.spec --noconfirm
 ```
 
-Output: `dist\EasyPostDesktop\EasyPostDesktop.exe` (a folder, not a single
-file — see below for why). Copy the whole `EasyPostDesktop` folder anywhere
-and run the exe inside it without the dev environment. GitHub Actions builds
-this automatically for both Windows and macOS on every push — see the
-**Actions** tab for downloadable artifacts.
+Output:
+- Windows: `dist\EasyPostDesktop\EasyPostDesktop.exe` (a folder, not a single
+  file — see below for why). Copy the whole `EasyPostDesktop` folder anywhere
+  and run the exe inside it without the dev environment.
+- macOS: `dist/EasyPostDesktop.app` — a proper app bundle with the icon set,
+  ready to drag into `/Applications`.
+
+GitHub Actions builds both automatically on every push — see the **Actions**
+tab for downloadable artifacts.
 
 ### Windows SmartScreen warning
 

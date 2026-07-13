@@ -8,6 +8,8 @@ APP_NAME = "EasyPost Desktop"
 APP_DIR_NAME = "EasyPostDesktop"
 KEYRING_SERVICE_NAME = "EasyPostDesktop"
 
+ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
+
 APP_DATA_DIR = Path(platformdirs.user_data_dir(APP_DIR_NAME, appauthor=False))
 DATABASE_PATH = APP_DATA_DIR / "easypost_desktop.sqlite3"
 SETTINGS_PATH = APP_DATA_DIR / "settings.json"

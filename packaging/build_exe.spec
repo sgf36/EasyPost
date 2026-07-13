@@ -10,10 +10,12 @@
 # README's "Windows SmartScreen warning" section for the full picture —
 # this alone does not eliminate the warning, only code signing does that).
 
+import sys
 from pathlib import Path
 
 block_cipher = None
 project_root = Path(SPECPATH).parent
+icons_dir = project_root / "packaging" / "icons"
 
 a = Analysis(
     [str(project_root / "app" / "main.py")],
@@ -21,6 +23,7 @@ a = Analysis(
     binaries=[],
     datas=[
         (str(project_root / "app" / "resources" / "locales"), "app/resources/locales"),
+        (str(project_root / "app" / "resources" / "icons"), "app/resources/icons"),
     ],
     hiddenimports=[],
     hookspath=[],
@@ -48,6 +51,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=str(icons_dir / "app_icon.ico"),
 )
 
 coll = COLLECT(
@@ -60,3 +64,14 @@ coll = COLLECT(
     upx_exclude=[],
     name="EasyPostDesktop",
 )
+
+# Wraps the onedir output into a real, Finder-icon-able EasyPostDesktop.app
+# bundle on macOS. Meaningless on Windows (BUNDLE is a no-op there), so only
+# invoke it when actually building on macOS.
+if sys.platform == "darwin":
+    app = BUNDLE(
+        coll,
+        name="EasyPostDesktop.app",
+        icon=str(icons_dir / "app_icon.icns"),
+        bundle_identifier="com.spencerfields.easypostdesktop",
+    )
