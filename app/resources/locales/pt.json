@@ -294,5 +294,19 @@
   "tracking.refreshing_button": "Atualizando…",
   "tracking.table_group_title": "Envios rastreados",
   "tracking.title": "Rastreamento",
-  "tracking.tracking_number_placeholder": "Número de rastreamento"
+  "tracking.tracking_number_placeholder": "Número de rastreamento",
+  "address_book.col_verified": "Verificado",
+  "address_book.verification_failed_confirm_body": "Não foi possível verificar este endereço:\n{error}\n\nSalvar mesmo assim?",
+  "address_book.saved_unverified_title": "Salvo sem verificação",
+  "address_book.saved_unverified_body": "Endereço salvo. O EasyPost não conseguiu verificá-lo, então verifique os detalhes antes de enviar.",
+  "address_book.state_label_province": "Província:",
+  "address_book.state_label_county": "Condado:",
+  "address_book.state_label_state_territory": "Estado/Território:",
+  "address_book.state_label_prefecture": "Prefeitura:",
+  "address_book.state_label_region": "Região:",
+  "address_book.state_label_canton": "Cantão:",
+  "address_book.state_label_emirate": "Emirado:",
+  "address_book.state_label_default": "Estado/Província/Região:",
+  "address_book.postal_label_zip": "CEP:",
+  "address_book.postal_label_postal": "Código postal:"
 }

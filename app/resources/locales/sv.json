@@ -294,5 +294,19 @@
   "tracking.refreshing_button": "Uppdaterar…",
   "tracking.table_group_title": "Spårade sändningar",
   "tracking.title": "Spårning",
-  "tracking.tracking_number_placeholder": "Spårningsnummer"
+  "tracking.tracking_number_placeholder": "Spårningsnummer",
+  "address_book.col_verified": "Verifierad",
+  "address_book.verification_failed_confirm_body": "Den här adressen kunde inte verifieras:\n{error}\n\nSpara ändå?",
+  "address_book.saved_unverified_title": "Sparad utan verifiering",
+  "address_book.saved_unverified_body": "Adressen har sparats. EasyPost kunde inte verifiera den, så dubbelkolla uppgifterna innan du skickar.",
+  "address_book.state_label_province": "Provins:",
+  "address_book.state_label_county": "Grevskap:",
+  "address_book.state_label_state_territory": "Delstat/Territorium:",
+  "address_book.state_label_prefecture": "Prefektur:",
+  "address_book.state_label_region": "Region:",
+  "address_book.state_label_canton": "Kanton:",
+  "address_book.state_label_emirate": "Emirat:",
+  "address_book.state_label_default": "Delstat/Provins/Region:",
+  "address_book.postal_label_zip": "Zip-kod:",
+  "address_book.postal_label_postal": "Postnummer:"
 }

@@ -294,5 +294,19 @@
   "tracking.refreshing_button": "Обновление…",
   "tracking.table_group_title": "Отслеживаемые отправления",
   "tracking.title": "Отслеживание",
-  "tracking.tracking_number_placeholder": "Номер отслеживания"
+  "tracking.tracking_number_placeholder": "Номер отслеживания",
+  "address_book.col_verified": "Проверен",
+  "address_book.verification_failed_confirm_body": "Не удалось проверить этот адрес:\n{error}\n\nВсё равно сохранить?",
+  "address_book.saved_unverified_title": "Сохранено без проверки",
+  "address_book.saved_unverified_body": "Адрес сохранён. EasyPost не удалось его проверить, поэтому перепроверьте данные перед отправкой.",
+  "address_book.state_label_province": "Провинция:",
+  "address_book.state_label_county": "Графство:",
+  "address_book.state_label_state_territory": "Штат/Территория:",
+  "address_book.state_label_prefecture": "Префектура:",
+  "address_book.state_label_region": "Область:",
+  "address_book.state_label_canton": "Кантон:",
+  "address_book.state_label_emirate": "Эмират:",
+  "address_book.state_label_default": "Штат/Провинция/Область:",
+  "address_book.postal_label_zip": "Индекс:",
+  "address_book.postal_label_postal": "Почтовый индекс:"
 }

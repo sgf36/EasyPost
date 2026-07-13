@@ -294,5 +294,19 @@
   "tracking.refreshing_button": "නැවුම් කරමින්…",
   "tracking.table_group_title": "ලුහුබැඳුම් එවුම්",
   "tracking.title": "ලුහුබැඳීම",
-  "tracking.tracking_number_placeholder": "ලුහුබැඳීමේ අංකය"
+  "tracking.tracking_number_placeholder": "ලුහුබැඳීමේ අංකය",
+  "address_book.col_verified": "තහවුරු කළ",
+  "address_book.verification_failed_confirm_body": "මෙම ලිපිනය තහවුරු කළ නොහැකි විය:\n{error}\n\nඔබ එසේ වුවත් සුරකින්නද?",
+  "address_book.saved_unverified_title": "තහවුරු නොකර සුරකින ලදී",
+  "address_book.saved_unverified_body": "ලිපිනය සුරකින ලදී. EasyPost එය තහවුරු කළ නොහැකි විය, එබැවින් යැවීමට පෙර විස්තර දෙවරක් පරීක්ෂා කරන්න.",
+  "address_book.state_label_province": "පළාත:",
+  "address_book.state_label_county": "දිස්ත්‍රික්කය:",
+  "address_book.state_label_state_territory": "ප්‍රාන්තය/ප්‍රදේශය:",
+  "address_book.state_label_prefecture": "ප්‍රිෆෙක්චරය:",
+  "address_book.state_label_region": "කලාපය:",
+  "address_book.state_label_canton": "කැන්ටනය:",
+  "address_book.state_label_emirate": "එමීර් රාජ්‍යය:",
+  "address_book.state_label_default": "ප්‍රාන්තය/පළාත/කලාපය:",
+  "address_book.postal_label_zip": "තැපැල් කේතය:",
+  "address_book.postal_label_postal": "තැපැල් කේතය:"
 }
