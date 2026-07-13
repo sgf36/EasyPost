@@ -52,7 +52,9 @@ jobs:
       # (see README's "Windows SmartScreen warning" section) — everything
       # else in this workflow already works either way.
       - name: Sign Windows build
-        if: matrix.os == 'windows-latest' && secrets.WINDOWS_CODE_SIGNING_CERT_BASE64 != ''
+        if: matrix.os == 'windows-latest' && env.HAS_SIGNING_CERT == 'true'
+        env:
+          HAS_SIGNING_CERT: ${{ secrets.WINDOWS_CODE_SIGNING_CERT_BASE64 != '' }}
         shell: pwsh
         run: |
           $bytes = [Convert]::FromBase64String("${{ secrets.WINDOWS_CODE_SIGNING_CERT_BASE64 }}")
