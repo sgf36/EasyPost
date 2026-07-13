@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Production API key:",
   "setup_wizard.prod_key_placeholder": "prod_... (optional for now)",
   "setup_wizard.show_keys_button": "Show keys",
-  "setup_wizard.subtitle": "Paste your EasyPost API key(s) below. They are encrypted with Windows DPAPI and stored only on this machine, under your Windows login — never in plain text, never sent anywhere but EasyPost's API.",
+  "setup_wizard.subtitle": "Paste your EasyPost API key(s) below. They are stored securely in your operating system's credential manager on this machine — never in plain text, never sent anywhere but EasyPost's API.",
   "setup_wizard.test_key_label": "Test API key:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Connect your EasyPost account</h2>",

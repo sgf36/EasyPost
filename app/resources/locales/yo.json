@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Kọ́kọ́rọ́ API ìṣelọ́pọ̀:",
   "setup_wizard.prod_key_placeholder": "prod_... (àṣàyàn fún ìsinsìnyí)",
   "setup_wizard.show_keys_button": "Ṣàfihàn àwọn kọ́kọ́rọ́",
-  "setup_wizard.subtitle": "Fi kọ́kọ́rọ́(àwọn) API EasyPost rẹ sílẹ̀ nísàlẹ̀. Wọ́n fi Windows DPAPI pa wọ́n mọ́ wọ́n sì ń wà ní pamọ́ sórí ẹ̀rọ yìí nìkan, lábẹ́ àkàǹtì Windows rẹ — wọn kì í ṣàfihàn gẹ́gẹ́ bí ọ̀rọ̀ tí ó ṣí payá rí, wọn kì í sì fi ránṣẹ́ sí ibi kan mìíràn bí kò ṣe sí API EasyPost.",
+  "setup_wizard.subtitle": "Fi kọ́kọ́rọ́(àwọn) API EasyPost rẹ sílẹ̀ nísàlẹ̀. A ó fi pamọ́ wọ́n láìléwu nínú alábojútó ẹ̀rí ìjẹ́rìísí ti ẹ̀rọ ìṣiṣẹ́ lórí ẹ̀rọ yìí — wọn kì í ṣàfihàn gẹ́gẹ́ bí ọ̀rọ̀ tí ó ṣí payá rí, wọn kì í sì fi ránṣẹ́ sí ibi kan mìíràn bí kò ṣe sí API EasyPost.",
   "setup_wizard.test_key_label": "Kọ́kọ́rọ́ API ìdánwò:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Sopọ̀ àkàǹtì EasyPost rẹ</h2>",

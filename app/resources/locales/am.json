@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "የምርት API ቁልፍ:",
   "setup_wizard.prod_key_placeholder": "prod_... (ለአሁኑ አማራጭ)",
   "setup_wizard.show_keys_button": "ቁልፎችን አሳይ",
-  "setup_wizard.subtitle": "የEasyPost API ቁልፍ(ጎችዎን) ከዚህ በታች ይለጥፉ። በWindows DPAPI የተመሰጠሩ ሲሆኑ የሚቀመጡት በዚህ መሳሪያ ላይ ብቻ፣ በWindows መግቢያዎ ስር ነው — ፈጽሞ በግልጽ ጽሁፍ አይቀመጡም፣ ፈጽሞ ከEasyPost API ውጪ ወደ ሌላ ቦታ አይላኩም።",
+  "setup_wizard.subtitle": "የEasyPost API ቁልፍ(ጎችዎን) ከዚህ በታች ይለጥፉ። እነዚህ በዚህ መሳሪያ ላይ ባለው የስርዓተ ክወናዎ የይለፍ መረጃ አስተዳዳሪ ውስጥ በጥንቃቄ ይቀመጣሉ — ፈጽሞ በግልጽ ጽሁፍ አይቀመጡም፣ ከEasyPost's API ውጪ ወደ ሌላ ቦታ ፈጽሞ አይላኩም።",
   "setup_wizard.test_key_label": "የሙከራ API ቁልፍ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>የEasyPost መለያዎን ያገናኙ</h2>",

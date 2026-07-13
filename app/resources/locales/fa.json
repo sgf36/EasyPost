@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "کلید API تولید:",
   "setup_wizard.prod_key_placeholder": "prod_... (فعلاً اختیاری)",
   "setup_wizard.show_keys_button": "نمایش کلیدها",
-  "setup_wizard.subtitle": "کلید(های) API خود در EasyPost را در زیر جای‌گذاری کنید. این کلیدها با Windows DPAPI رمزگذاری می‌شوند و فقط روی همین دستگاه، زیر حساب کاربری ویندوز شما ذخیره می‌شوند — هرگز به‌صورت متن ساده ذخیره نمی‌شوند و هرگز به جایی جز API مربوط به EasyPost ارسال نمی‌شوند.",
+  "setup_wizard.subtitle": "کلید(های) API خود در EasyPost را در زیر جای‌گذاری کنید. این کلیدها به‌طور امن در مدیر اعتبارنامه سیستم‌عامل شما روی همین دستگاه ذخیره می‌شوند — هرگز به‌صورت متن ساده ذخیره نمی‌شوند و هرگز به جایی جز API مربوط به EasyPost ارسال نمی‌شوند.",
   "setup_wizard.test_key_label": "کلید API آزمایشی:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>اتصال حساب EasyPost شما</h2>",

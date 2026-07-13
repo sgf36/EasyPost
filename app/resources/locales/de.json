@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Produktions-API-Schlüssel:",
   "setup_wizard.prod_key_placeholder": "prod_... (vorerst optional)",
   "setup_wizard.show_keys_button": "Schlüssel anzeigen",
-  "setup_wizard.subtitle": "Fügen Sie unten Ihre EasyPost-API-Schlüssel ein. Sie werden mit Windows DPAPI verschlüsselt und nur auf diesem Gerät unter Ihrem Windows-Konto gespeichert — niemals im Klartext, niemals an andere Stellen als die EasyPost-API übertragen.",
+  "setup_wizard.subtitle": "Fügen Sie unten Ihre EasyPost-API-Schlüssel ein. Sie werden sicher im Anmeldeinformations-Manager Ihres Betriebssystems auf diesem Gerät gespeichert — niemals im Klartext, niemals an andere Stellen als die EasyPost-API übertragen.",
   "setup_wizard.test_key_label": "Test-API-Schlüssel:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Ihr EasyPost-Konto verbinden</h2>",

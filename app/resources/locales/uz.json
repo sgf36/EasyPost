@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Ishlab chiqarish API kaliti:",
   "setup_wizard.prod_key_placeholder": "prod_... (hozircha ixtiyoriy)",
   "setup_wizard.show_keys_button": "Kalitlarni ko'rsatish",
-  "setup_wizard.subtitle": "EasyPost API kalit(lar)ingizni quyida joylashtiring. Ular Windows DPAPI yordamida shifrlanadi va faqat shu kompyuterda, Windows hisobingiz ostida saqlanadi — hech qachon oddiy matn shaklida emas, hech qachon EasyPost API'sidan boshqa joyga yuborilmaydi.",
+  "setup_wizard.subtitle": "EasyPost API kalit(lar)ingizni quyida joylashtiring. Ular shu kompyuterdagi operatsion tizimning hisob maʼlumotlari menejerida xavfsiz saqlanadi — hech qachon oddiy matn shaklida emas, hech qachon EasyPost API'sidan boshqa joyga yuborilmaydi.",
   "setup_wizard.test_key_label": "Sinov API kaliti:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>EasyPost hisobingizni ulang</h2>",

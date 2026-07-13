@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "مفتاح API للإنتاج:",
   "setup_wizard.prod_key_placeholder": "prod_... (اختياري في الوقت الحالي)",
   "setup_wizard.show_keys_button": "إظهار المفاتيح",
-  "setup_wizard.subtitle": "الصق مفتاح (مفاتيح) API الخاص بـ EasyPost أدناه. يتم تشفيرها باستخدام Windows DPAPI وتخزينها على هذا الجهاز فقط، ضمن حساب تسجيل الدخول الخاص بك في Windows — لا تُخزَّن أبداً كنص عادي، ولا تُرسَل إلى أي جهة سوى واجهة برمجة تطبيقات EasyPost.",
+  "setup_wizard.subtitle": "الصق مفتاح (مفاتيح) API الخاص بـ EasyPost أدناه. يتم تخزينها بأمان في مدير بيانات الاعتماد الخاص بنظام التشغيل على هذا الجهاز — لا تُخزَّن أبداً كنص عادي، ولا تُرسَل إلى أي جهة سوى واجهة برمجة تطبيقات EasyPost.",
   "setup_wizard.test_key_label": "مفتاح API للاختبار:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>ربط حساب EasyPost الخاص بك</h2>",

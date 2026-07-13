@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "പ്രൊഡക്ഷൻ API കീ:",
   "setup_wizard.prod_key_placeholder": "prod_... (ഇപ്പോൾ ഐച്ഛികം)",
   "setup_wizard.show_keys_button": "കീകൾ കാണിക്കുക",
-  "setup_wizard.subtitle": "നിങ്ങളുടെ EasyPost API കീ(കൾ) താഴെ ഒട്ടിക്കുക. അവ Windows DPAPI ഉപയോഗിച്ച് എൻക്രിപ്റ്റ് ചെയ്ത് നിങ്ങളുടെ Windows ലോഗിനിൽ ഈ കമ്പ്യൂട്ടറിൽ മാത്രം സൂക്ഷിക്കുന്നു — ഒരിക്കലും പ്ലെയിൻ ടെക്സ്റ്റായി അല്ല, EasyPost-ന്റെ API അല്ലാതെ മറ്റെവിടേക്കും അയക്കുന്നില്ല.",
+  "setup_wizard.subtitle": "നിങ്ങളുടെ EasyPost API കീ(കൾ) താഴെ ഒട്ടിക്കുക. അവ ഈ കമ്പ്യൂട്ടറിൽ നിങ്ങളുടെ ഓപ്പറേറ്റിംഗ് സിസ്റ്റത്തിന്റെ ക്രെഡൻഷ്യൽ മാനേജറിൽ സുരക്ഷിതമായി സൂക്ഷിക്കുന്നു — ഒരിക്കലും പ്ലെയിൻ ടെക്സ്റ്റായി അല്ല, EasyPost-ന്റെ API അല്ലാതെ മറ്റെവിടേക്കും അയക്കുന്നില്ല.",
   "setup_wizard.test_key_label": "ടെസ്റ്റ് API കീ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>നിങ്ങളുടെ EasyPost അക്കൗണ്ട് ബന്ധിപ്പിക്കുക</h2>",

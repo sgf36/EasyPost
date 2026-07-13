@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Maɓallin API na gaskiya:",
   "setup_wizard.prod_key_placeholder": "prod_... (na zaɓi a yanzu)",
   "setup_wizard.show_keys_button": "Nuna maɓallan",
-  "setup_wizard.subtitle": "Manna maɓallan API na EasyPost naku a ƙasa. Ana ɓoye su da Windows DPAPI kuma ana ajiye su kawai a wannan na'urar, ƙarƙashin shigar Windows naku — ba a taɓa ajiye su a rubuce a fili ba, kuma ba a aika su zuwa ko'ina sai API na EasyPost.",
+  "setup_wizard.subtitle": "Manna maɓallan API na EasyPost naku a ƙasa. Ana ajiye su lafiya a cikin mai sarrafa shaidar tsarin aiki naku a wannan na'urar — ba a taɓa ajiye su a rubuce a fili ba, kuma ba a aika su zuwa ko'ina sai API na EasyPost.",
   "setup_wizard.test_key_label": "Maɓallin API na gwaji:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Haɗa asusun EasyPost naku</h2>",

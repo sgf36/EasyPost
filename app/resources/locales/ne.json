@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "उत्पादन API कुञ्जी:",
   "setup_wizard.prod_key_placeholder": "prod_... (अहिलेका लागि वैकल्पिक)",
   "setup_wizard.show_keys_button": "कुञ्जीहरू देखाउनुहोस्",
-  "setup_wizard.subtitle": "तल आफ्नो EasyPost API कुञ्जी(हरू) पेस्ट गर्नुहोस्। तिनीहरू Windows DPAPI बाट इन्क्रिप्ट गरिन्छन् र तपाईंको Windows लगइनअन्तर्गत यही मेसिनमा मात्र भण्डारण गरिन्छन् — कहिल्यै सादा पाठमा होइन, EasyPost को API बाहेक अन्य कतै पठाइँदैन।",
+  "setup_wizard.subtitle": "तल आफ्नो EasyPost API कुञ्जी(हरू) पेस्ट गर्नुहोस्। तिनीहरू यही मेसिनमा तपाईंको अपरेटिङ सिस्टमको क्रेडेन्सियल म्यानेजरमा सुरक्षित रूपमा भण्डारण गरिन्छन् — कहिल्यै सादा पाठमा होइन, EasyPost को API बाहेक अन्य कतै पठाइँदैन।",
   "setup_wizard.test_key_label": "परीक्षण API कुञ्जी:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>आफ्नो EasyPost खाता जडान गर्नुहोस्</h2>",

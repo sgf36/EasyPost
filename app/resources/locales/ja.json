@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "本番APIキー:",
   "setup_wizard.prod_key_placeholder": "prod_...(現時点では任意)",
   "setup_wizard.show_keys_button": "キーを表示",
-  "setup_wizard.subtitle": "以下にEasyPost APIキーを貼り付けてください。キーはWindows DPAPIで暗号化され、Windowsログイン情報の下でこの端末にのみ保存されます — 平文で保存されることはなく、EasyPostのAPI以外へ送信されることもありません。",
+  "setup_wizard.subtitle": "以下にEasyPost APIキーを貼り付けてください。キーはこの端末のオペレーティングシステムの資格情報マネージャーに安全に保存されます — 平文で保存されることはなく、EasyPostのAPI以外へ送信されることもありません。",
   "setup_wizard.test_key_label": "テストAPIキー:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>EasyPostアカウントを連携</h2>",

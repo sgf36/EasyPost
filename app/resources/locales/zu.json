@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Ikhiya le-API yokusebenza:",
   "setup_wizard.prod_key_placeholder": "prod_... (akuphoqelekile okwamanje)",
   "setup_wizard.show_keys_button": "Bonisa amakhiya",
-  "setup_wizard.subtitle": "Namathisela ikhiya/amakhiya akho e-EasyPost API ngezansi. Abethelwe nge-Windows DPAPI futhi agcinwe kuphela kule mshini, ngaphansi kokungena kwakho kwe-Windows — awakaze abhalwe ngombhalo ovulekile, awakaze athunyelwe kwenye indawo ngaphandle kwe-API ye-EasyPost.",
+  "setup_wizard.subtitle": "Namathisela ikhiya/amakhiya akho e-EasyPost API ngezansi. Agcinwa ngokuphepha kusiphathimanejala samukelo lwesistimu yokusebenza kule mshini — awakaze abhalwe ngombhalo ovulekile, awakaze athunyelwe kwenye indawo ngaphandle kwe-API ye-EasyPost.",
   "setup_wizard.test_key_label": "Ikhiya le-API yokuhlola:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Xhuma i-akhawunti yakho ye-EasyPost</h2>",

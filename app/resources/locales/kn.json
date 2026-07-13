@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "ಪ್ರೊಡಕ್ಷನ್ API ಕೀ:",
   "setup_wizard.prod_key_placeholder": "prod_... (ಸದ್ಯಕ್ಕೆ ಐಚ್ಛಿಕ)",
   "setup_wizard.show_keys_button": "ಕೀಗಳನ್ನು ತೋರಿಸಿ",
-  "setup_wizard.subtitle": "ನಿಮ್ಮ EasyPost API ಕೀ(ಗಳನ್ನು) ಕೆಳಗೆ ಅಂಟಿಸಿ. ಇವುಗಳನ್ನು Windows DPAPI ಯೊಂದಿಗೆ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿ ನಿಮ್ಮ Windows ಲಾಗಿನ್ ಅಡಿಯಲ್ಲಿ ಈ ಸಾಧನದಲ್ಲಿ ಮಾತ್ರ ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ — ಎಂದಿಗೂ ಸರಳ ಪಠ್ಯದಲ್ಲಿ ಅಲ್ಲ, EasyPost ನ API ಹೊರತುಪಡಿಸಿ ಬೇರೆಲ್ಲಿಗೂ ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ.",
+  "setup_wizard.subtitle": "ನಿಮ್ಮ EasyPost API ಕೀ(ಗಳನ್ನು) ಕೆಳಗೆ ಅಂಟಿಸಿ. ಇವುಗಳನ್ನು ಈ ಸಾಧನದಲ್ಲಿ ನಿಮ್ಮ ಆಪರೇಟಿಂಗ್ ಸಿಸ್ಟಂನ ಕ್ರೆಡೆನ್ಷಿಯಲ್ ಮ್ಯಾನೇಜರ್‌ನಲ್ಲಿ ಸುರಕ್ಷಿತವಾಗಿ ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ — ಎಂದಿಗೂ ಸರಳ ಪಠ್ಯದಲ್ಲಿ ಅಲ್ಲ, EasyPost ನ API ಹೊರತುಪಡಿಸಿ ಬೇರೆಲ್ಲಿಗೂ ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ.",
   "setup_wizard.test_key_label": "ಟೆಸ್ಟ್ API ಕೀ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>ನಿಮ್ಮ EasyPost ಖಾತೆಯನ್ನು ಸಂಪರ್ಕಿಸಿ</h2>",

@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Productie-API-sleutel:",
   "setup_wizard.prod_key_placeholder": "prod_... (voorlopig optioneel)",
   "setup_wizard.show_keys_button": "Sleutels tonen",
-  "setup_wizard.subtitle": "Plak hieronder uw EasyPost-API-sleutel(s). Deze worden versleuteld met Windows DPAPI en alleen op deze computer opgeslagen, onder uw Windows-account — nooit in platte tekst, nooit verzonden naar iets anders dan de API van EasyPost.",
+  "setup_wizard.subtitle": "Plak hieronder uw EasyPost-API-sleutel(s). Deze worden veilig opgeslagen in de credential manager van uw besturingssysteem op deze computer — nooit in platte tekst, nooit verzonden naar iets anders dan de API van EasyPost.",
   "setup_wizard.test_key_label": "Test-API-sleutel:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Uw EasyPost-account koppelen</h2>",

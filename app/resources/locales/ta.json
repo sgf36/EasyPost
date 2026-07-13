@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "உற்பத்தி API கீ:",
   "setup_wizard.prod_key_placeholder": "prod_... (தற்போதைக்கு விருப்பத்தேர்வு)",
   "setup_wizard.show_keys_button": "கீகளைக் காட்டு",
-  "setup_wizard.subtitle": "உங்கள் EasyPost API கீ(கள்)யை கீழே ஒட்டவும். அவை Windows DPAPI மூலம் குறியாக்கம் செய்யப்பட்டு, உங்கள் Windows உள்நுழைவின் கீழ் இந்தக் கணினியில் மட்டுமே சேமிக்கப்படுகின்றன — வெறும் உரையில் ஒருபோதும் இல்லை, EasyPost இன் API தவிர வேறு எங்கும் அனுப்பப்படாது.",
+  "setup_wizard.subtitle": "உங்கள் EasyPost API கீ(கள்)யை கீழே ஒட்டவும். அவை இந்தக் கணினியில் உங்கள் இயக்க முறைமையின் நற்சான்று மேலாளரில் பாதுகாப்பாக சேமிக்கப்படுகின்றன — வெறும் உரையில் ஒருபோதும் இல்லை, EasyPost இன் API தவிர வேறு எங்கும் அனுப்பப்படாது.",
   "setup_wizard.test_key_label": "சோதனை API கீ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>உங்கள் EasyPost கணக்கை இணைக்கவும்</h2>",

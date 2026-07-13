@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Produkcyjny klucz API:",
   "setup_wizard.prod_key_placeholder": "prod_... (opcjonalnie na razie)",
   "setup_wizard.show_keys_button": "Pokaż klucze",
-  "setup_wizard.subtitle": "Wklej poniżej swój klucz(e) API EasyPost. Są one szyfrowane za pomocą Windows DPAPI i przechowywane wyłącznie na tym komputerze, w ramach Twojego konta Windows — nigdy jako zwykły tekst, nigdy nie są wysyłane nigdzie poza API EasyPost.",
+  "setup_wizard.subtitle": "Wklej poniżej swój klucz(e) API EasyPost. Są one bezpiecznie przechowywane w menedżerze poświadczeń systemu operacyjnego na tym komputerze — nigdy jako zwykły tekst, nigdy nie są wysyłane nigdzie poza API EasyPost.",
   "setup_wizard.test_key_label": "Testowy klucz API:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Połącz swoje konto EasyPost</h2>",

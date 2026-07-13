@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Proizvodni API ključ:",
   "setup_wizard.prod_key_placeholder": "prod_... (za sada neobavezno)",
   "setup_wizard.show_keys_button": "Prikaži ključeve",
-  "setup_wizard.subtitle": "Zalijepite svoje EasyPost API ključeve u nastavku. Šifrirani su Windows DPAPI-jem i pohranjeni isključivo na ovom računalu, pod vašom Windows prijavom — nikad u obliku običnog teksta, nikad poslani nikamo osim EasyPost API-ju.",
+  "setup_wizard.subtitle": "Zalijepite svoje EasyPost API ključeve u nastavku. Sigurno se pohranjuju u upravitelju vjerodajnicama vašeg operacijskog sustava na ovom računalu — nikad u obliku običnog teksta, nikad poslani nikamo osim EasyPost API-ju.",
   "setup_wizard.test_key_label": "Testni API ključ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Povežite svoj EasyPost račun</h2>",

@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "คีย์ API สำหรับใช้งานจริง:",
   "setup_wizard.prod_key_placeholder": "prod_... (ไม่บังคับในตอนนี้)",
   "setup_wizard.show_keys_button": "แสดงคีย์",
-  "setup_wizard.subtitle": "วางคีย์ API ของ EasyPost ด้านล่างนี้ คีย์จะถูกเข้ารหัสด้วย Windows DPAPI และจัดเก็บไว้บนเครื่องนี้ภายใต้บัญชีผู้ใช้ Windows ของคุณเท่านั้น — จะไม่ถูกจัดเก็บเป็นข้อความธรรมดา และไม่ถูกส่งไปที่ใดนอกจาก API ของ EasyPost",
+  "setup_wizard.subtitle": "วางคีย์ API ของ EasyPost ด้านล่างนี้ คีย์จะถูกจัดเก็บอย่างปลอดภัยในตัวจัดการข้อมูลรับรอง (credential manager) ของระบบปฏิบัติการบนเครื่องนี้ — จะไม่ถูกจัดเก็บเป็นข้อความธรรมดา และไม่ถูกส่งไปที่ใดนอกจาก API ของ EasyPost",
   "setup_wizard.test_key_label": "คีย์ API สำหรับทดสอบ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>เชื่อมต่อบัญชี EasyPost ของคุณ</h2>",

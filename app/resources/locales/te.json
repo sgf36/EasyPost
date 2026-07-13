@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "ప్రొడక్షన్ API కీ:",
   "setup_wizard.prod_key_placeholder": "prod_... (ప్రస్తుతానికి ఐచ్ఛికం)",
   "setup_wizard.show_keys_button": "కీలను చూపించు",
-  "setup_wizard.subtitle": "మీ EasyPost API కీ(లు)ను క్రింద పేస్ట్ చేయండి. అవి Windows DPAPIతో ఎన్‌క్రిప్ట్ చేయబడి, మీ Windows లాగిన్ కింద ఈ మెషీన్‌లో మాత్రమే నిల్వ చేయబడతాయి — ఎప్పుడూ సాదా టెక్స్ట్‌లో ఉండవు, EasyPost API తప్ప మరెక్కడికీ పంపబడవు.",
+  "setup_wizard.subtitle": "మీ EasyPost API కీ(లు)ను క్రింద పేస్ట్ చేయండి. అవి ఈ మెషీన్‌లో మీ ఆపరేటింగ్ సిస్టమ్ క్రెడెన్షియల్ మేనేజర్‌లో సురక్షితంగా నిల్వ చేయబడతాయి — ఎప్పుడూ సాదా టెక్స్ట్‌లో ఉండవు, EasyPost API తప్ప మరెక్కడికీ పంపబడవు.",
   "setup_wizard.test_key_label": "టెస్ట్ API కీ:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>మీ EasyPost ఖాతాను కనెక్ట్ చేయండి</h2>",

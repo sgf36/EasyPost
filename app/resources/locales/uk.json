@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Робочий ключ API:",
   "setup_wizard.prod_key_placeholder": "prod_... (поки що необов'язково)",
   "setup_wizard.show_keys_button": "Показати ключі",
-  "setup_wizard.subtitle": "Вставте нижче ваш ключ(і) API EasyPost. Вони шифруються за допомогою Windows DPAPI та зберігаються лише на цьому комп'ютері, під вашим обліковим записом Windows — ніколи у вигляді звичайного тексту, ніколи не надсилаються нікуди, крім API EasyPost.",
+  "setup_wizard.subtitle": "Вставте нижче ваш ключ(і) API EasyPost. Вони надійно зберігаються в диспетчері облікових даних операційної системи на цьому комп'ютері — ніколи у вигляді звичайного тексту, ніколи не надсилаються нікуди, крім API EasyPost.",
   "setup_wizard.test_key_label": "Тестовий ключ API:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Підключіть свій обліковий запис EasyPost</h2>",

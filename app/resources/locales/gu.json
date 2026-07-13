@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "પ્રોડક્શન API કી:",
   "setup_wizard.prod_key_placeholder": "prod_... (હાલ માટે વૈકલ્પિક)",
   "setup_wizard.show_keys_button": "કી બતાવો",
-  "setup_wizard.subtitle": "નીચે તમારી EasyPost API કી(ઓ) પેસ્ટ કરો. તે Windows DPAPI વડે એન્ક્રિપ્ટ કરવામાં આવે છે અને ફક્ત આ મશીન પર, તમારા Windows લોગિન હેઠળ સંગ્રહિત થાય છે — ક્યારેય સાદા લખાણમાં નહીં, ક્યારેય EasyPost ના API સિવાય ક્યાંય મોકલવામાં આવતી નથી.",
+  "setup_wizard.subtitle": "નીચે તમારી EasyPost API કી(ઓ) પેસ્ટ કરો. તે તમારી ઓપરેટિંગ સિસ્ટમના ક્રેડેન્શિયલ મેનેજરમાં આ મશીન પર સુરક્ષિત રીતે સંગ્રહિત થાય છે — ક્યારેય સાદા લખાણમાં નહીં, ક્યારેય EasyPost ના API સિવાય ક્યાંય મોકલવામાં આવતી નથી.",
   "setup_wizard.test_key_label": "ટેસ્ટ API કી:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>તમારું EasyPost ખાતું જોડો</h2>",

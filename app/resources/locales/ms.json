@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Kunci API pengeluaran:",
   "setup_wizard.prod_key_placeholder": "prod_... (pilihan buat masa ini)",
   "setup_wizard.show_keys_button": "Tunjukkan kunci",
-  "setup_wizard.subtitle": "Tampalkan kunci API EasyPost anda di bawah. Kunci ini disulitkan dengan Windows DPAPI dan disimpan hanya pada mesin ini, di bawah log masuk Windows anda — tidak pernah dalam teks biasa, tidak pernah dihantar ke mana-mana selain API EasyPost.",
+  "setup_wizard.subtitle": "Tampalkan kunci API EasyPost anda di bawah. Kunci ini disimpan dengan selamat dalam pengurus kelayakan sistem pengendalian pada mesin ini — tidak pernah dalam teks biasa, tidak pernah dihantar ke mana-mana selain API EasyPost.",
   "setup_wizard.test_key_label": "Kunci API ujian:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Sambungkan akaun EasyPost anda</h2>",

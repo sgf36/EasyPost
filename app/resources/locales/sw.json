@@ -267,7 +267,7 @@
   "setup_wizard.prod_key_label": "Funguo ya API ya uzalishaji:",
   "setup_wizard.prod_key_placeholder": "prod_... (si lazima kwa sasa)",
   "setup_wizard.show_keys_button": "Onyesha funguo",
-  "setup_wizard.subtitle": "Bandika funguo yako/za API za EasyPost hapa chini. Zimesimbwa kwa Windows DPAPI na kuhifadhiwa tu kwenye kompyuta hii, chini ya akaunti yako ya Windows — kamwe kama maandishi wazi, kamwe hazitumwi popote isipokuwa API ya EasyPost.",
+  "setup_wizard.subtitle": "Bandika funguo yako/za API za EasyPost hapa chini. Zinahifadhiwa kwa usalama katika kidhibiti cha vitambulisho cha mfumo wa uendeshaji kwenye kompyuta hii — kamwe kama maandishi wazi, kamwe hazitumwi popote isipokuwa API ya EasyPost.",
   "setup_wizard.test_key_label": "Funguo ya API ya jaribio:",
   "setup_wizard.test_key_placeholder": "test_...",
   "setup_wizard.title": "<h2>Unganisha akaunti yako ya EasyPost</h2>",
