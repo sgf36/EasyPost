@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import threading
 import urllib.error
 import urllib.request
 
@@ -28,13 +29,25 @@ def _post(port: int, path: str, body: bytes, signature: str | None):
 
 
 def test_valid_signature_returns_200_and_dispatches_event():
+    # do_POST calls on_event() after send_response()/end_headers(), in the
+    # server's request-handling thread. There's no barrier guaranteeing that
+    # call completes before urlopen() returns in this (client) thread, so
+    # asserting on `received` immediately after the HTTP call is a race —
+    # wait on an Event the callback sets instead of relying on timing.
     received = []
-    receiver = WebhookReceiver(webhook_secret=SECRET, on_event=received.append)
+    event_processed = threading.Event()
+
+    def on_event(event):
+        received.append(event)
+        event_processed.set()
+
+    receiver = WebhookReceiver(webhook_secret=SECRET, on_event=on_event)
     port = receiver.start(port=0)
     try:
         body = json.dumps({"description": "tracker.updated", "result": {"id": "trk_123"}}).encode()
         status = _post(port, WEBHOOK_PATH, body, _sign(body))
         assert status == 200
+        assert event_processed.wait(timeout=5), "on_event was not called within timeout"
         assert received == [{"description": "tracker.updated", "result": {"id": "trk_123"}}]
     finally:
         receiver.stop()
