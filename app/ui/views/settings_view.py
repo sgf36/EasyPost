@@ -3,6 +3,7 @@
 import webbrowser
 
 from PySide6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QFormLayout,
     QGroupBox,
@@ -18,12 +19,20 @@ from PySide6.QtWidgets import (
 from app.config import DONATION_URL
 from app.core.credential_store import load_credentials, save_credentials
 from app.core.settings import load_settings, save_settings
+from app.core.webhook_manager import (
+    STATE_ERROR,
+    STATE_RUNNING,
+    STATE_STARTING,
+    webhook_manager,
+)
 from app.i18n import SUPPORTED_LOCALES, tr
+from app.ui.widgets.async_worker import run_async
 
 
 class SettingsView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        self._pending_webhook_task = None
 
         title = QLabel(tr("settings.title"))
 
@@ -53,6 +62,7 @@ class SettingsView(QWidget):
         layout.addLayout(form)
         layout.addLayout(button_row)
         layout.addWidget(self._build_language_group())
+        layout.addWidget(self._build_webhook_group())
         layout.addWidget(self._build_support_group())
         layout.addStretch(1)
 
@@ -84,6 +94,47 @@ class SettingsView(QWidget):
         settings = load_settings()
         settings.locale = code
         save_settings(settings)
+
+    def _build_webhook_group(self) -> QGroupBox:
+        group = QGroupBox(tr("settings.webhook_group_title"))
+
+        self._webhook_checkbox = QCheckBox(tr("settings.webhook_checkbox_label"))
+        self._webhook_checkbox.setChecked(load_settings().webhook_enabled)
+        self._webhook_checkbox.toggled.connect(self._on_webhook_toggled)
+
+        self._webhook_status_label = QLabel()
+        self._webhook_status_label.setWordWrap(True)
+        webhook_manager.state_changed.connect(self._on_webhook_state_changed)
+        self._update_webhook_status_label(webhook_manager.state, webhook_manager.detail)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self._webhook_checkbox)
+        layout.addWidget(self._webhook_status_label)
+        group.setLayout(layout)
+        return group
+
+    def _on_webhook_toggled(self, checked: bool) -> None:
+        if checked:
+            self._pending_webhook_task = run_async(webhook_manager.start, self)
+        else:
+            self._pending_webhook_task = run_async(webhook_manager.stop, self)
+
+    def _on_webhook_state_changed(self, state: str, detail: str) -> None:
+        self._update_webhook_status_label(state, detail)
+        self._webhook_checkbox.blockSignals(True)
+        self._webhook_checkbox.setChecked(state in (STATE_RUNNING, STATE_STARTING))
+        self._webhook_checkbox.blockSignals(False)
+
+    def _update_webhook_status_label(self, state: str, detail: str) -> None:
+        if state == STATE_RUNNING:
+            text = tr("settings.webhook_status_running", url=detail)
+        elif state == STATE_STARTING:
+            text = tr("settings.webhook_status_starting")
+        elif state == STATE_ERROR:
+            text = tr("settings.webhook_status_error", error=detail)
+        else:
+            text = tr("settings.webhook_status_stopped")
+        self._webhook_status_label.setText(text)
 
     def _build_support_group(self) -> QGroupBox:
         group = QGroupBox(tr("settings.support_group_title"))

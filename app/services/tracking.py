@@ -19,6 +19,14 @@ def retrieve_tracker(tracker_id: str):
     return client.tracker.retrieve(tracker_id)
 
 
+def _get(obj, key: str, default=None):
+    """Reads `key` from either an EasyPost SDK object (attribute access) or
+    a plain dict (as delivered by a parsed webhook event payload)."""
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
+
+
 def save_tracker_locally(tracker) -> None:
     mode = client_manager.active_mode
     with db_cursor() as cur:
@@ -33,13 +41,13 @@ def save_tracker_locally(tracker) -> None:
                 last_checked_at=datetime('now')
             """,
             (
-                tracker.id,
+                _get(tracker, "id"),
                 mode,
-                getattr(tracker, "tracking_code", None),
-                getattr(tracker, "carrier", None),
-                getattr(tracker, "status", None),
-                getattr(tracker, "est_delivery_date", None),
-                getattr(tracker, "shipment_id", None),
+                _get(tracker, "tracking_code"),
+                _get(tracker, "carrier"),
+                _get(tracker, "status"),
+                _get(tracker, "est_delivery_date"),
+                _get(tracker, "shipment_id"),
             ),
         )
 

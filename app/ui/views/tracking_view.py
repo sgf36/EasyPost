@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
 from app.services.tracking import create_tracker, list_trackers, refresh_all_trackers, save_tracker_locally
 from app.ui.widgets.async_worker import run_async
@@ -44,6 +45,10 @@ class TrackingView(QWidget):
         self._poll_timer = QTimer(self)
         self._poll_timer.timeout.connect(self._refresh_all)
         self._poll_timer.start(_POLL_INTERVAL_MS)
+
+        # Instant refresh when a webhook push update lands (see
+        # app/core/webhook_manager.py); polling above stays as the fallback.
+        webhook_manager.tracker_updated.connect(lambda _tracking_id: self.refresh_table())
 
     def _build_add_group(self) -> QGroupBox:
         group = QGroupBox(tr("tracking.add_group_title"))
