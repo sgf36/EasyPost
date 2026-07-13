@@ -26,9 +26,14 @@ money asks for confirmation while in production mode.
 
 ## Features
 
-- **Address Book** — verify and save addresses via EasyPost.
+- **Address Book** — verify and save addresses via EasyPost, with a
+  filterable country dropdown (197 countries, type to narrow the list) that
+  relabels the state/postal fields to match local convention (Province,
+  County, Prefecture, Postal Code, etc.). If EasyPost can't verify an
+  address, you're asked whether to save it anyway rather than being blocked.
 - **Create Shipment** — shop live carrier rates and buy/save/print labels.
-- **Tracking** — add tracking numbers, auto-refreshed every 5 minutes.
+- **Tracking** — add tracking numbers, auto-refreshed every 5 minutes by
+  default, or instantly via an opt-in real-time webhook push — see below.
 - **History** — browse purchased shipments, request refunds, add insurance.
 - **Insurance** — insure a shipment bought outside EasyPost by tracking code.
 - **Pickups** — schedule/buy/cancel carrier pickups for purchased shipments.
@@ -39,6 +44,9 @@ money asks for confirmation while in production mode.
 - **50 languages** — pick one in Settings; restart to apply. Translations are
   AI-generated (not professionally reviewed) — open an issue if something
   reads wrong.
+- **Support the project** — an optional, dismissible donation banner (and a
+  permanent link in Settings) points to a Stripe-hosted "pay what you want"
+  page. Purely optional; nothing in the app depends on it.
 
 ## Tracking updates: polling vs. real-time webhook push
 
