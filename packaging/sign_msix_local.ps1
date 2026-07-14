@@ -55,7 +55,11 @@ try {
         [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($pfxPassword))
 
     Write-Host "Signing $MsixPath..."
-    & $signtool.FullName sign /fd SHA256 /a /f $pfxPath /p $plainPassword $MsixPath
+    # No /a: it makes signtool enumerate every registered certificate
+    # provider (including third-party ones like Certum SimplySign, if
+    # installed), which can pop an unrelated login prompt. /f + /p already
+    # specify the exact certificate, so /a adds nothing here.
+    & $signtool.FullName sign /fd SHA256 /f $pfxPath /p $plainPassword $MsixPath
     if ($LASTEXITCODE -ne 0) {
         throw "signtool exited with code $LASTEXITCODE"
     }
