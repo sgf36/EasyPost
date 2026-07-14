@@ -134,14 +134,19 @@ blue "Windows protected your PC" SmartScreen prompt. This is expected for
 **any** new, low-download-volume executable from an unrecognized publisher —
 it isn't specific to this app, and it isn't a sign the build is unsafe.
 
-**What actually fixes it:** a paid code-signing certificate (from a CA like
-DigiCert/SSL.com, or Microsoft's cheaper Trusted Signing service) applied to
-every release. Signing an executable is what lets Windows attribute it to a
-real, verified publisher and build reputation over time. This repo's build
-doesn't do that yet since it requires purchasing a certificate under a real
-identity — `.github/workflows/build.yml` already has a signing step wired
-up and ready to go (currently a no-op) for whenever `WINDOWS_CODE_SIGNING_CERT_BASE64`
-and `WINDOWS_CODE_SIGNING_CERT_PASSWORD` repo secrets are added.
+**What actually fixes it:** a code-signing certificate applied to every
+release. Signing an executable is what lets Windows attribute it to a real,
+verified publisher and build reputation over time. This repo signs through
+[Azure Artifact Signing](https://azure.microsoft.com/products/artifact-signing/)
+(an Azure "Artifact Signing Account" named `EasyPostDesktop`) — cheaper than a
+traditional CA-issued certificate, but it still requires completing Microsoft's
+one-time organization identity validation before a certificate profile can be
+issued. `.github/workflows/build.yml` already has the signing step fully wired
+up (via `azure/login` OIDC + `azure/artifact-signing-action`, no client secret
+stored anywhere) but it stays a no-op until the repo variable
+`AZURE_SIGNING_READY` is set to `true` — flip that on once identity validation
+is approved and a certificate profile named exactly `EasyPostDesktop` exists
+under that Artifact Signing Account.
 
 **What this repo does to reduce false positives in the meantime:**
 - The build uses PyInstaller's `--onedir` mode rather than `--onefile`.
