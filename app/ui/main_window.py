@@ -20,6 +20,7 @@ from app.ui.views.claims_view import ClaimsView
 from app.ui.views.create_shipment_view import CreateShipmentView
 from app.ui.views.dashboard_view import DashboardView
 from app.ui.views.history_view import HistoryView
+from app.ui.views.hts_lookup_view import HtsLookupView
 from app.ui.views.insurance_view import InsuranceView
 from app.ui.views.pickups_view import PickupsView
 from app.ui.views.reports_view import ReportsView
@@ -84,6 +85,7 @@ class MainWindow(QMainWindow):
                 tr("main_window.nav_claims"),
                 tr("main_window.nav_batch_shipments"),
                 tr("main_window.nav_reports"),
+                tr("main_window.nav_hts_lookup"),
                 tr("main_window.nav_settings"),
             ]
         )
@@ -100,6 +102,7 @@ class MainWindow(QMainWindow):
         self._claims_view = ClaimsView()
         self._batch_view = BatchView()
         self._reports_view = ReportsView()
+        self._hts_lookup_view = HtsLookupView()
         self._settings_view = SettingsView()
         self._view_stack.addWidget(self._dashboard_view)
         self._view_stack.addWidget(self._address_book_view)
@@ -111,6 +114,7 @@ class MainWindow(QMainWindow):
         self._view_stack.addWidget(self._claims_view)
         self._view_stack.addWidget(self._batch_view)
         self._view_stack.addWidget(self._reports_view)
+        self._view_stack.addWidget(self._hts_lookup_view)
         self._view_stack.addWidget(self._settings_view)
 
         body_layout.addWidget(self._nav)
@@ -139,7 +143,7 @@ class MainWindow(QMainWindow):
             self._batch_view.refresh_address_choices()
         elif index == 9:  # Reports
             self._reports_view.refresh()
-        elif index == 10:  # Settings
+        elif index == 11:  # Settings
             self._settings_view.refresh()
 
     def _show_app_shell(self) -> None:

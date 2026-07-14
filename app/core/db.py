@@ -90,6 +90,24 @@ CREATE TABLE IF NOT EXISTS batches (
     source_csv TEXT,
     created_at TEXT DEFAULT (datetime('now'))
 );
+
+-- HTS codes are global reference data (not test/production specific), so
+-- unlike the tables above this has no `mode` column. Best-effort cache of
+-- past live USITC lookups (app/services/hts_lookup.py) — a fallback for
+-- offline/rate-limited searches, not a system of record, so no uniqueness
+-- constraint on htsno (USITC's data legitimately repeats/nests htsno across
+-- hierarchy levels).
+CREATE TABLE IF NOT EXISTS hts_cache (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    htsno TEXT,
+    description TEXT,
+    general_rate TEXT,
+    special_rate TEXT,
+    other_rate TEXT,
+    units TEXT,
+    indent INTEGER,
+    cached_at TEXT DEFAULT (datetime('now'))
+);
 """
 
 
