@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.core.countries import COUNTRIES, postal_label_kind_for, state_label_kind_for
+from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.addresses import (
     AddressVerificationError,
@@ -56,6 +57,7 @@ class AddressBookView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._pending_task = None
+        self._editing_address_id = None
 
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"<h2>{tr('address_book.title')}</h2>"))
@@ -67,6 +69,7 @@ class AddressBookView(QWidget):
 
     def _build_form_group(self) -> QGroupBox:
         group = QGroupBox(tr("address_book.form_group_title"))
+        self._form_group = group
         form = QFormLayout()
 
         self._label_input = QLineEdit()
@@ -115,9 +118,17 @@ class AddressBookView(QWidget):
         self._verify_btn = QPushButton(tr("address_book.verify_save_button"))
         self._verify_btn.clicked.connect(self._on_verify_clicked)
 
+        self._cancel_edit_btn = QPushButton(tr("address_book.cancel_edit_button"))
+        self._cancel_edit_btn.clicked.connect(self._on_cancel_edit_clicked)
+        self._cancel_edit_btn.setVisible(False)
+
+        button_row = QHBoxLayout()
+        button_row.addWidget(self._verify_btn)
+        button_row.addWidget(self._cancel_edit_btn)
+
         group_layout = QVBoxLayout()
         group_layout.addLayout(form)
-        group_layout.addWidget(self._verify_btn)
+        group_layout.addLayout(button_row)
         group.setLayout(group_layout)
         return group
 
@@ -138,6 +149,12 @@ class AddressBookView(QWidget):
         self._table = QTableWidget(0, _COLUMN_COUNT)
         self._table.setHorizontalHeaderLabels(columns)
         self._table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        # The actions column holds three buttons (Favorite/Edit/Delete) — an
+        # equal Stretch share clips them, so give it a fixed width instead.
+        self._table.horizontalHeader().setSectionResizeMode(
+            _COLUMN_COUNT - 1, QHeaderView.ResizeMode.Fixed
+        )
+        self._table.setColumnWidth(_COLUMN_COUNT - 1, 220)
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
 
         layout = QVBoxLayout()
@@ -171,9 +188,57 @@ class AddressBookView(QWidget):
 
     def _set_form_enabled(self, enabled: bool) -> None:
         self._verify_btn.setEnabled(enabled)
-        self._verify_btn.setText(
-            tr("address_book.verify_save_button") if enabled else tr("address_book.verifying_button")
+        if enabled:
+            self._verify_btn.setText(
+                tr("address_book.update_button")
+                if self._editing_address_id
+                else tr("address_book.verify_save_button")
+            )
+        else:
+            self._verify_btn.setText(tr("address_book.verifying_button"))
+
+    def _reset_form(self) -> None:
+        self._editing_address_id = None
+        self._label_input.clear()
+        self._name_input.clear()
+        self._company_input.clear()
+        self._street1_input.clear()
+        self._street2_input.clear()
+        self._city_input.clear()
+        us_index = self._country_combo.findData("US")
+        self._country_combo.setCurrentIndex(us_index if us_index >= 0 else 0)
+        self._state_input.clear()
+        self._zip_input.clear()
+        self._phone_input.clear()
+        self._email_input.clear()
+        self._favorite_checkbox.setChecked(False)
+        self._form_group.setTitle(tr("address_book.form_group_title"))
+        self._cancel_edit_btn.setVisible(False)
+        self._set_form_enabled(True)
+
+    def _on_edit_clicked(self, record) -> None:
+        self._editing_address_id = record.id
+        self._label_input.setText(record.label or "")
+        self._name_input.setText(record.name or "")
+        self._company_input.setText(record.company or "")
+        self._street1_input.setText(record.street1 or "")
+        self._street2_input.setText(record.street2 or "")
+        self._city_input.setText(record.city or "")
+        country_index = self._country_combo.findData((record.country or "US").upper())
+        self._country_combo.setCurrentIndex(country_index if country_index >= 0 else 0)
+        self._state_input.setText(record.state or "")
+        self._zip_input.setText(record.zip or "")
+        self._phone_input.setText(record.phone or "")
+        self._email_input.setText(record.email or "")
+        self._favorite_checkbox.setChecked(record.is_favorite)
+        self._form_group.setTitle(
+            tr("address_book.editing_group_title", label=record.label or record.name or record.id)
         )
+        self._cancel_edit_btn.setVisible(True)
+        self._set_form_enabled(True)
+
+    def _on_cancel_edit_clicked(self) -> None:
+        self._reset_form()
 
     def _on_verify_clicked(self) -> None:
         if not self._street1_input.text().strip() or not self._city_input.text().strip():
@@ -196,25 +261,31 @@ class AddressBookView(QWidget):
         )
         label = self._label_input.text().strip() or None
         favorite = self._favorite_checkbox.isChecked()
+        # EasyPost addresses are immutable, so "editing" one re-verifies as a
+        # brand-new Address and replaces the local row rather than patching
+        # the existing EasyPost object in place.
+        replacing_id = self._editing_address_id
 
         self._set_form_enabled(False)
         self._pending_task = run_async(lambda: verify_address(**fields), self)
         self._pending_task.succeeded.connect(
-            partial(self._on_verified, label=label, favorite=favorite)
+            partial(self._on_verified, label=label, favorite=favorite, replacing_id=replacing_id)
         )
         self._pending_task.failed.connect(
-            partial(self._on_verify_failed, label=label, favorite=favorite)
+            partial(self._on_verify_failed, label=label, favorite=favorite, replacing_id=replacing_id)
         )
 
-    def _on_verified(self, address, *, label, favorite) -> None:
-        self._set_form_enabled(True)
+    def _on_verified(self, address, *, label, favorite, replacing_id) -> None:
         save_address_locally(address, label=label, favorite=favorite, verified=True)
+        if replacing_id:
+            delete_address(replacing_id)
+        self._reset_form()
         self.refresh_table()
         QMessageBox.information(
             self, tr("address_book.verified_title"), tr("address_book.verified_body")
         )
 
-    def _on_verify_failed(self, exc: Exception, *, label, favorite) -> None:
+    def _on_verify_failed(self, exc: Exception, *, label, favorite, replacing_id) -> None:
         self._set_form_enabled(True)
         if isinstance(exc, AddressVerificationError):
             confirm_body = tr(
@@ -232,6 +303,9 @@ class AddressBookView(QWidget):
                 == QMessageBox.StandardButton.Yes
             ):
                 save_address_locally(exc.address, label=label, favorite=favorite, verified=False)
+                if replacing_id:
+                    delete_address(replacing_id)
+                self._reset_form()
                 self.refresh_table()
                 QMessageBox.information(
                     self,
@@ -240,7 +314,7 @@ class AddressBookView(QWidget):
                 )
         else:
             QMessageBox.critical(
-                self, tr("common.error"), tr("address_book.verify_error_body", error=exc)
+                self, tr("common.error"), tr("address_book.verify_error_body", error=format_api_error(exc))
             )
 
     def refresh_table(self) -> None:
@@ -274,10 +348,13 @@ class AddressBookView(QWidget):
                 else tr("address_book.favorite_button")
             )
             fav_btn.clicked.connect(partial(self._toggle_favorite, rec.id, not rec.is_favorite))
+            edit_btn = QPushButton(tr("address_book.edit_button"))
+            edit_btn.clicked.connect(partial(self._on_edit_clicked, rec))
             delete_btn = QPushButton(tr("address_book.delete_button"))
             delete_btn.clicked.connect(partial(self._delete, rec.id))
 
             actions_layout.addWidget(fav_btn)
+            actions_layout.addWidget(edit_btn)
             actions_layout.addWidget(delete_btn)
             self._table.setCellWidget(row, _COLUMN_COUNT - 1, actions)
 
@@ -295,4 +372,6 @@ class AddressBookView(QWidget):
             == QMessageBox.StandardButton.Yes
         ):
             delete_address(address_id)
+            if self._editing_address_id == address_id:
+                self._reset_form()
             self.refresh_table()

@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.insurance import insure_existing_shipment
 from app.services.shipments import (
@@ -132,7 +133,7 @@ class HistoryView(QWidget):
         self._pending_task.succeeded.connect(self._on_insured)
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("history.error_title"), tr("history.insure_failed", error=exc)
+                self, tr("history.error_title"), tr("history.insure_failed", error=format_api_error(exc))
             )
         )
 
@@ -152,7 +153,7 @@ class HistoryView(QWidget):
         self._pending_task.succeeded.connect(self._on_refund_submitted)
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("history.error_title"), tr("history.refund_failed", error=exc)
+                self, tr("history.error_title"), tr("history.refund_failed", error=format_api_error(exc))
             )
         )
 
@@ -170,7 +171,7 @@ class HistoryView(QWidget):
         self._pending_task.succeeded.connect(self._on_refund_status_checked)
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("history.error_title"), tr("history.check_status_failed", error=exc)
+                self, tr("history.error_title"), tr("history.check_status_failed", error=format_api_error(exc))
             )
         )
 

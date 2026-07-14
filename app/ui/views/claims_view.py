@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.claims import CLAIM_TYPES, file_claim, list_claims, refresh_claim_status, save_claim_locally
 from app.ui.widgets.async_worker import run_async
@@ -130,7 +131,7 @@ class ClaimsView(QWidget):
 
     def _on_failed(self, exc: Exception) -> None:
         self._submit_btn.setEnabled(True)
-        QMessageBox.critical(self, tr("common.error"), tr("claims.file_failed_body", error=exc))
+        QMessageBox.critical(self, tr("common.error"), tr("claims.file_failed_body", error=format_api_error(exc)))
 
     def refresh_table(self) -> None:
         records = list_claims()
@@ -149,6 +150,6 @@ class ClaimsView(QWidget):
         self._pending_task.succeeded.connect(lambda _status: self.refresh_table())
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("common.error"), tr("claims.refresh_failed_body", error=exc)
+                self, tr("common.error"), tr("claims.refresh_failed_body", error=format_api_error(exc))
             )
         )

@@ -23,6 +23,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.addresses import list_addresses
 from app.services.pickups import buy_pickup, cancel_pickup, create_pickup, list_pickups, save_pickup_locally
@@ -194,7 +195,7 @@ class PickupsView(QWidget):
 
     def _on_request_failed(self, exc: Exception) -> None:
         self._request_btn.setEnabled(True)
-        QMessageBox.critical(self, tr("common.error"), tr("pickups.request_failed_body", error=exc))
+        QMessageBox.critical(self, tr("common.error"), tr("pickups.request_failed_body", error=format_api_error(exc)))
 
     def _on_buy_clicked(self, rate) -> None:
         if not self._current_pickup:
@@ -213,7 +214,7 @@ class PickupsView(QWidget):
         self._pending_task.succeeded.connect(self._on_pickup_bought)
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("common.error"), tr("pickups.buy_failed_body", error=exc)
+                self, tr("common.error"), tr("pickups.buy_failed_body", error=format_api_error(exc))
             )
         )
 
@@ -254,6 +255,6 @@ class PickupsView(QWidget):
         )
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("common.error"), tr("pickups.cancel_failed_body", error=exc)
+                self, tr("common.error"), tr("pickups.cancel_failed_body", error=format_api_error(exc))
             )
         )

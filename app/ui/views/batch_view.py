@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.addresses import list_addresses
 from app.services.batches import (
@@ -192,7 +193,7 @@ class BatchView(QWidget):
             lambda exc: (
                 self._create_batch_btn.setEnabled(True),
                 QMessageBox.critical(
-                    self, tr("common.error"), tr("batch_shipments.create_failed_body", error=exc)
+                    self, tr("common.error"), tr("batch_shipments.create_failed_body", error=format_api_error(exc))
                 ),
             )
         )
@@ -212,7 +213,7 @@ class BatchView(QWidget):
         self._pending_task.succeeded.connect(self._on_status_refreshed)
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("common.error"), tr("batch_shipments.refresh_failed_body", error=exc)
+                self, tr("common.error"), tr("batch_shipments.refresh_failed_body", error=format_api_error(exc))
             )
         )
 
@@ -262,7 +263,7 @@ class BatchView(QWidget):
             lambda exc: (
                 self._buy_batch_btn.setEnabled(True),
                 QMessageBox.critical(
-                    self, tr("common.error"), tr("batch_shipments.buy_failed_body", error=exc)
+                    self, tr("common.error"), tr("batch_shipments.buy_failed_body", error=format_api_error(exc))
                 ),
             )
         )
@@ -283,6 +284,6 @@ class BatchView(QWidget):
         self._pending_task.succeeded.connect(self._on_batch_bought)
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(
-                self, tr("common.error"), tr("batch_shipments.generate_labels_failed_body", error=exc)
+                self, tr("common.error"), tr("batch_shipments.generate_labels_failed_body", error=format_api_error(exc))
             )
         )

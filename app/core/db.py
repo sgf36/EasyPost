@@ -108,6 +108,34 @@ CREATE TABLE IF NOT EXISTS hts_cache (
     indent INTEGER,
     cached_at TEXT DEFAULT (datetime('now'))
 );
+
+-- User-defined dimension/weight presets for quick reuse on Create Shipment.
+-- Purely local convenience data, not an EasyPost resource, so no mode column.
+CREATE TABLE IF NOT EXISTS saved_packages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    length REAL,
+    width REAL,
+    height REAL,
+    weight REAL NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Carrier predefined-package reference data (e.g. USPS flat rate boxes,
+-- FedEx envelopes) from EasyPost's live Carrier Metadata endpoint
+-- (app/services/packages.py). Global reference data like hts_cache — no
+-- mode column. Unlike hts_cache this is a full replace-on-refresh cache
+-- (not accumulated across searches), since each refresh fetches the
+-- complete list per carrier rather than one keyword at a time.
+CREATE TABLE IF NOT EXISTS predefined_packages_cache (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    carrier TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    dimensions TEXT,
+    max_weight REAL,
+    cached_at TEXT DEFAULT (datetime('now'))
+);
 """
 
 
