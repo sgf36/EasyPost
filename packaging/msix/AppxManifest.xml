@@ -23,6 +23,52 @@
 
   <Resources>
     <Resource Language="en-us" />
+    <Resource Language="zh-Hans" />
+    <Resource Language="hi" />
+    <Resource Language="es" />
+    <Resource Language="fr" />
+    <Resource Language="ar" />
+    <Resource Language="bn" />
+    <Resource Language="pt" />
+    <Resource Language="ru" />
+    <Resource Language="ur" />
+    <Resource Language="id" />
+    <Resource Language="de" />
+    <Resource Language="ja" />
+    <Resource Language="mr" />
+    <Resource Language="te" />
+    <Resource Language="tr" />
+    <Resource Language="ta" />
+    <Resource Language="vi" />
+    <Resource Language="ko" />
+    <Resource Language="fa" />
+    <Resource Language="ha" />
+    <Resource Language="sw" />
+    <Resource Language="it" />
+    <Resource Language="pa" />
+    <Resource Language="gu" />
+    <Resource Language="am" />
+    <Resource Language="th" />
+    <Resource Language="kn" />
+    <Resource Language="yo-Latn" />
+    <Resource Language="uz" />
+    <Resource Language="ml" />
+    <Resource Language="or" />
+    <Resource Language="uk" />
+    <Resource Language="pl" />
+    <Resource Language="ms" />
+    <Resource Language="nl" />
+    <Resource Language="ig-Latn" />
+    <Resource Language="si" />
+    <Resource Language="ne" />
+    <Resource Language="ro" />
+    <Resource Language="zu" />
+    <Resource Language="hr" />
+    <Resource Language="el" />
+    <Resource Language="hu" />
+    <Resource Language="cs" />
+    <Resource Language="he" />
+    <Resource Language="sv" />
   </Resources>
 
   <Capabilities>
