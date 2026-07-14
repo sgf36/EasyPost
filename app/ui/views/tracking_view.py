@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.errors import format_api_error
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
 from app.services.tracking import create_tracker, list_trackers, refresh_all_trackers, save_tracker_locally
@@ -112,7 +113,7 @@ class TrackingView(QWidget):
     def _on_add_failed(self, exc: Exception) -> None:
         self._add_btn.setEnabled(True)
         QMessageBox.critical(
-            self, tr("tracking.error_title"), tr("tracking.create_tracker_failed", error=exc)
+            self, tr("tracking.error_title"), tr("tracking.create_tracker_failed", error=format_api_error(exc))
         )
 
     def _refresh_all(self) -> None:
@@ -131,7 +132,7 @@ class TrackingView(QWidget):
         self._refresh_btn.setEnabled(True)
         self._refresh_btn.setText(tr("tracking.refresh_all_button"))
         QMessageBox.critical(
-            self, tr("tracking.error_title"), tr("tracking.refresh_trackers_failed", error=exc)
+            self, tr("tracking.error_title"), tr("tracking.refresh_trackers_failed", error=format_api_error(exc))
         )
 
     def refresh_table(self) -> None:

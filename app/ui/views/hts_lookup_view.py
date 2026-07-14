@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.hts_lookup import search_hts_codes
 from app.ui.widgets.async_worker import run_async
@@ -124,7 +125,7 @@ class HtsLookupView(QWidget):
     def _on_search_failed(self, exc: Exception) -> None:
         self._search_btn.setEnabled(True)
         self._search_btn.setText(tr("hts_lookup.search_button"))
-        self._status_label.setText(tr("hts_lookup.status_error", error=exc))
+        self._status_label.setText(tr("hts_lookup.status_error", error=format_api_error(exc)))
 
     def _on_copy_clicked(self, htsno: str) -> None:
         QGuiApplication.clipboard().setText(htsno)

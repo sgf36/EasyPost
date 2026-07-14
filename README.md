@@ -31,7 +31,18 @@ money asks for confirmation while in production mode.
   relabels the state/postal fields to match local convention (Province,
   County, Prefecture, Postal Code, etc.). If EasyPost can't verify an
   address, you're asked whether to save it anyway rather than being blocked.
+  Saved addresses can be edited in place — EasyPost addresses are immutable,
+  so editing re-verifies as a new address and replaces the old one locally.
 - **Create Shipment** — shop live carrier rates and buy/save/print labels.
+  International shipments prompt for full customs information (contents
+  type, itemized customs items, signer/certification) before rates can be
+  fetched, since carriers otherwise reject the label purchase outright.
+  Packages can be entered as custom dimensions, saved as a named preset for
+  reuse, or picked from each carrier's real predefined packages (USPS flat
+  rate boxes, FedEx envelopes, etc.), fetched live from EasyPost.
+- **HTS Lookup** — search the U.S. International Trade Commission's live
+  Harmonized Tariff Schedule database for customs codes, with results
+  cached locally so repeat searches work even if that API is unreachable.
 - **Tracking** — add tracking numbers, auto-refreshed every 5 minutes by
   default, or instantly via an opt-in real-time webhook push — see below.
 - **History** — browse purchased shipments, request refunds, add insurance.

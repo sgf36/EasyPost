@@ -11,28 +11,43 @@ def create_shipment(
     *,
     to_address_id: str,
     from_address_id: str,
-    length: float,
-    width: float,
-    height: float,
     weight: float,
+    length: Optional[float] = None,
+    width: Optional[float] = None,
+    height: Optional[float] = None,
+    predefined_package: Optional[str] = None,
     reference: str = "",
+    customs_info: Optional[dict] = None,
 ):
     """Create a shipment and get back live carrier rates. References existing
     verified addresses by EasyPost id rather than re-submitting full address
     fields.
+
+    Exactly one of `predefined_package` (a carrier box/envelope code, e.g.
+    "FedExPak" — see app/services/packages.py) or `length`/`width`/`height`
+    should be supplied; a predefined package already has fixed dimensions,
+    so custom ones are omitted from the parcel rather than sent alongside.
+
+    `customs_info` must be supplied for international shipments — carriers
+    reject the label purchase (a raw 400 from EasyPost) without it, and it
+    can only be attached at creation time, not added later before buying.
     """
+    parcel = {"weight": weight}
+    if predefined_package:
+        parcel["predefined_package"] = predefined_package
+    else:
+        parcel.update({"length": length, "width": width, "height": height})
+
     client = client_manager.get_client()
-    return client.shipment.create(
+    params = dict(
         to_address={"id": to_address_id},
         from_address={"id": from_address_id},
-        parcel={
-            "length": length,
-            "width": width,
-            "height": height,
-            "weight": weight,
-        },
+        parcel=parcel,
         reference=reference or None,
     )
+    if customs_info:
+        params["customs_info"] = customs_info
+    return client.shipment.create(**params)
 
 
 def buy_shipment(shipment_id: str, rate_id: str):

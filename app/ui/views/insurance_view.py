@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.insurance import create_standalone_insurance
 from app.ui.widgets.async_worker import run_async
@@ -94,5 +95,5 @@ class InsuranceView(QWidget):
     def _on_failed(self, exc: Exception) -> None:
         self._submit_btn.setEnabled(True)
         QMessageBox.critical(
-            self, tr("insurance.error_title"), tr("insurance.purchase_failed", error=exc)
+            self, tr("insurance.error_title"), tr("insurance.purchase_failed", error=format_api_error(exc))
         )
