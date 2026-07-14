@@ -5,7 +5,7 @@
 .DESCRIPTION
     Generates a throwaway self-signed certificate whose Subject matches the
     package's reserved Publisher identity, trusts it locally (Local Machine
-    Trusted People — requires an elevated/admin PowerShell session), and
+    Trusted People - requires an elevated/admin PowerShell session), and
     signs the package with SignTool.
 
     This certificate is for LOCAL TESTING ONLY. It is not needed for the
@@ -42,7 +42,7 @@ $pfxPassword = ConvertTo-SecureString -String ([System.Guid]::NewGuid().ToString
 try {
     Export-PfxCertificate -Cert $cert -FilePath $pfxPath -Password $pfxPassword | Out-Null
 
-    Write-Host "Trusting the certificate locally (requires admin — Cert:\LocalMachine\TrustedPeople)..."
+    Write-Host "Trusting the certificate locally (requires admin - Cert:\LocalMachine\TrustedPeople)..."
     Import-PfxCertificate -CertStoreLocation "Cert:\LocalMachine\TrustedPeople" -Password $pfxPassword -FilePath $pfxPath | Out-Null
 
     $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
