@@ -8,15 +8,19 @@
     Trusted People - requires an elevated/admin PowerShell session), and
     signs the package with SignTool.
 
-    Certificate creation goes through certreq.exe (built into Windows) with
-    an explicit legacy CAPI provider, rather than New-SelfSignedCertificate.
-    On some machines, New-SelfSignedCertificate's -Type Custom path crashes
-    with an AccessViolationException in its CNG-based certificate-enrollment
-    code - reproducible under both Windows PowerShell 5.1 and PowerShell 7,
-    so it's not a PowerShell-version issue. It's most likely a conflict with
-    a third-party CNG key storage provider registered on the machine (e.g.
-    Certum SimplySign). Routing through the legacy CAPI provider sidesteps
-    that code path entirely.
+    RUN THIS IN POWERSHELL 7 (pwsh), elevated.
+
+    The certificate is built entirely in managed .NET code via
+    System.Security.Cryptography.X509Certificates.CertificateRequest, NOT
+    via New-SelfSignedCertificate or certreq.exe. On some machines, both of
+    those crash with an AccessViolationException (0xC0000005) inside
+    Windows' certificate-enrollment engine (certenroll.dll) - reproducible
+    under both Windows PowerShell 5.1 and PowerShell 7, so it is not a
+    PowerShell-version issue. The likely cause is a third-party crypto
+    provider registered on the machine (e.g. Certum SimplySign) corrupting
+    that native enrollment path. CertificateRequest builds and signs the
+    certificate in-process and never touches certenroll.dll, sidestepping
+    the crash entirely.
 
     This certificate is for LOCAL TESTING ONLY. It is not needed for the
     actual Microsoft Store submission: the Store strips whatever signature
@@ -40,65 +44,69 @@ if (-not (Test-Path $MsixPath)) {
     throw "$MsixPath not found. Run packaging\build_msix.py first."
 }
 
-# Remove any stray certs left behind by earlier crashed/interrupted attempts
-# so the "pick the right cert" step below is unambiguous.
-Get-ChildItem "Cert:\CurrentUser\My" | Where-Object { $_.Subject -eq $subject } |
-    Remove-Item -Force -ErrorAction SilentlyContinue
-
-$infPath = Join-Path $env:TEMP "easypostdesktop_signing_request.inf"
-$cerPath = Join-Path $env:TEMP "easypostdesktop_signing_cert.cer"
 $pfxPath = Join-Path $env:TEMP "easypostdesktop_local_signing.pfx"
+$plainPassword = [System.Guid]::NewGuid().ToString("N")
 
-$infContent = @"
-[Version]
-Signature = "`$Windows NT`$"
+Write-Host "Creating self-signed test certificate ($subject) in managed .NET code..."
+$rsa = [System.Security.Cryptography.RSA]::Create(2048)
+try {
+    $req = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+        $subject,
+        $rsa,
+        [System.Security.Cryptography.HashAlgorithmName]::SHA256,
+        [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
 
-[NewRequest]
-Subject = "$subject"
-Exportable = TRUE
-KeyLength = 2048
-KeySpec = 2
-KeyUsage = 0x80
-MachineKeySet = FALSE
-ProviderName = "Microsoft Enhanced RSA and AES Cryptographic Provider"
-RequestType = Cert
-Silent = TRUE
-ValidityPeriod = "Years"
-ValidityPeriodUnits = 1
+    # Basic Constraints: end-entity, not a CA.
+    $req.CertificateExtensions.Add(
+        [System.Security.Cryptography.X509Certificates.X509BasicConstraintsExtension]::new($false, $false, 0, $true))
 
-[Extensions]
-2.5.29.19 = "{text}"
-2.5.29.37 = "{text}1.3.6.1.5.5.7.3.3"
-"@
-Set-Content -Path $infPath -Value $infContent -Encoding ASCII
+    # Key Usage: DigitalSignature.
+    $req.CertificateExtensions.Add(
+        [System.Security.Cryptography.X509Certificates.X509KeyUsageExtension]::new(
+            [System.Security.Cryptography.X509Certificates.X509KeyUsageFlags]::DigitalSignature, $false))
+
+    # Enhanced Key Usage: Code Signing (1.3.6.1.5.5.7.3.3).
+    $eku = [System.Security.Cryptography.OidCollection]::new()
+    [void]$eku.Add([System.Security.Cryptography.Oid]::new("1.3.6.1.5.5.7.3.3"))
+    $req.CertificateExtensions.Add(
+        [System.Security.Cryptography.X509Certificates.X509EnhancedKeyUsageExtension]::new($eku, $false))
+
+    $notBefore = [System.DateTimeOffset]::UtcNow.AddDays(-1)
+    $notAfter = [System.DateTimeOffset]::UtcNow.AddYears(1)
+    $cert = $req.CreateSelfSigned($notBefore, $notAfter)
+}
+finally {
+    $rsa.Dispose()
+}
 
 try {
-    Write-Host "Creating self-signed test certificate ($subject) via certreq..."
-    certreq -new -q $infPath $cerPath | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        throw "certreq exited with code $LASTEXITCODE"
-    }
+    # Write the PFX (cert + private key) for signtool.
+    $pfxBytes = $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $plainPassword)
+    [System.IO.File]::WriteAllBytes($pfxPath, $pfxBytes)
 
-    $cert = Get-ChildItem "Cert:\CurrentUser\My" | Where-Object { $_.Subject -eq $subject } |
-        Sort-Object NotBefore -Descending | Select-Object -First 1
-    if (-not $cert) {
-        throw "certreq did not produce a certificate matching $subject in Cert:\CurrentUser\My"
-    }
-
-    $pfxPassword = ConvertTo-SecureString -String ([System.Guid]::NewGuid().ToString("N")) -Force -AsPlainText
-    Export-PfxCertificate -Cert $cert -FilePath $pfxPath -Password $pfxPassword | Out-Null
-
+    # Trust the public cert in LocalMachine\TrustedPeople so Add-AppxPackage
+    # accepts the signature (requires admin).
     Write-Host "Trusting the certificate locally (requires admin - Cert:\LocalMachine\TrustedPeople)..."
-    Import-PfxCertificate -CertStoreLocation "Cert:\LocalMachine\TrustedPeople" -Password $pfxPassword -FilePath $pfxPath | Out-Null
+    $publicCert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
+        $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert))
+    $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("TrustedPeople", "LocalMachine")
+    $store.Open("ReadWrite")
+    try {
+        # Drop stale certs from prior attempts with the same subject.
+        foreach ($existing in @($store.Certificates)) {
+            if ($existing.Subject -eq $subject) { $store.Remove($existing) }
+        }
+        $store.Add($publicCert)
+    }
+    finally {
+        $store.Close()
+    }
 
     $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
         Sort-Object FullName -Descending | Select-Object -First 1
     if (-not $signtool) {
         throw "signtool.exe not found under C:\Program Files (x86)\Windows Kits\10\bin\*\x64. Install the Windows 10/11 SDK."
     }
-
-    $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto(
-        [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($pfxPassword))
 
     Write-Host "Signing $MsixPath..."
     # No /a: it makes signtool enumerate every registered certificate
@@ -111,11 +119,7 @@ try {
     }
 }
 finally {
-    if (Test-Path $infPath) { Remove-Item $infPath -Force }
-    if (Test-Path $cerPath) { Remove-Item $cerPath -Force }
     if (Test-Path $pfxPath) { Remove-Item $pfxPath -Force }
-    Get-ChildItem "Cert:\CurrentUser\My" | Where-Object { $_.Subject -eq $subject } |
-        Remove-Item -Force -ErrorAction SilentlyContinue
 }
 
 Write-Host ""
