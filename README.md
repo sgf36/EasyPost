@@ -127,6 +127,41 @@ Output:
 GitHub Actions builds both automatically on every push — see the **Actions**
 tab for downloadable artifacts.
 
+### Microsoft Store package (MSIX)
+
+The app is also reserved on Microsoft Partner Center as **Easy-Post
+Desktop** (Store ID `9NDSDL5LV5B5`) for eventual Microsoft Store submission.
+Build the `.msix` from an existing `dist\EasyPostDesktop\` build:
+
+```
+.venv\Scripts\python.exe packaging\build_msix.py
+```
+
+This produces `dist\EasyPostDesktop.msix`, using the identity Partner
+Center assigned (`packaging\msix\AppxManifest.xml`) and the app's existing
+icon resized to the required tile sizes — no separate maintenance needed
+when the icon changes, since assets are generated at build time.
+
+GitHub Actions builds and signs this automatically on every Windows run
+(alongside the plain `.exe`) with a throwaway self-signed certificate — see
+the next paragraph for why that's sufficient. To test-install the locally
+built package instead, from an **elevated** PowerShell window (trusting a certificate into
+the Local Machine store requires admin rights):
+
+```
+.\packaging\sign_msix_local.ps1
+Add-AppxPackage -Path dist\EasyPostDesktop.msix
+```
+
+MSIX packages must carry some signature to be structurally valid, but for
+Microsoft Store submissions specifically, Microsoft explicitly documents
+that a **self-signed** certificate is fine — the Store strips it and
+re-signs with its own certificate during publishing. That means no
+purchased code-signing certificate and no stored secrets are needed for
+this path, unlike the plain `.exe`'s SmartScreen problem below. Uninstall a
+local test install with `Get-AppxPackage SFields.Easy-PostDesktop |
+Remove-AppxPackage`.
+
 ### Windows SmartScreen warning
 
 Running a freshly-built `EasyPostDesktop.exe` on Windows will likely show a
