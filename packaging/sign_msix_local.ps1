@@ -8,6 +8,16 @@
     Trusted People - requires an elevated/admin PowerShell session), and
     signs the package with SignTool.
 
+    Certificate creation goes through certreq.exe (built into Windows) with
+    an explicit legacy CAPI provider, rather than New-SelfSignedCertificate.
+    On some machines, New-SelfSignedCertificate's -Type Custom path crashes
+    with an AccessViolationException in its CNG-based certificate-enrollment
+    code - reproducible under both Windows PowerShell 5.1 and PowerShell 7,
+    so it's not a PowerShell-version issue. It's most likely a conflict with
+    a third-party CNG key storage provider registered on the machine (e.g.
+    Certum SimplySign). Routing through the legacy CAPI provider sidesteps
+    that code path entirely.
+
     This certificate is for LOCAL TESTING ONLY. It is not needed for the
     actual Microsoft Store submission: the Store strips whatever signature
     is present and re-signs with a Microsoft certificate during publishing,
@@ -30,16 +40,52 @@ if (-not (Test-Path $MsixPath)) {
     throw "$MsixPath not found. Run packaging\build_msix.py first."
 }
 
-Write-Host "Creating self-signed test certificate ($subject)..."
-$cert = New-SelfSignedCertificate -Type Custom -KeyUsage DigitalSignature `
-    -CertStoreLocation "Cert:\CurrentUser\My" `
-    -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}") `
-    -Subject $subject -FriendlyName "EasyPostDesktop local test signing"
+# Remove any stray certs left behind by earlier crashed/interrupted attempts
+# so the "pick the right cert" step below is unambiguous.
+Get-ChildItem "Cert:\CurrentUser\My" | Where-Object { $_.Subject -eq $subject } |
+    Remove-Item -Force -ErrorAction SilentlyContinue
 
+$infPath = Join-Path $env:TEMP "easypostdesktop_signing_request.inf"
+$cerPath = Join-Path $env:TEMP "easypostdesktop_signing_cert.cer"
 $pfxPath = Join-Path $env:TEMP "easypostdesktop_local_signing.pfx"
-$pfxPassword = ConvertTo-SecureString -String ([System.Guid]::NewGuid().ToString("N")) -Force -AsPlainText
+
+$infContent = @"
+[Version]
+Signature = "`$Windows NT`$"
+
+[NewRequest]
+Subject = "$subject"
+Exportable = TRUE
+KeyLength = 2048
+KeySpec = 2
+KeyUsage = 0x80
+MachineKeySet = FALSE
+ProviderName = "Microsoft Enhanced RSA and AES Cryptographic Provider"
+RequestType = Cert
+Silent = TRUE
+ValidityPeriod = "Years"
+ValidityPeriodUnits = 1
+
+[Extensions]
+2.5.29.19 = "{text}"
+2.5.29.37 = "{text}1.3.6.1.5.5.7.3.3"
+"@
+Set-Content -Path $infPath -Value $infContent -Encoding ASCII
 
 try {
+    Write-Host "Creating self-signed test certificate ($subject) via certreq..."
+    certreq -new -q $infPath $cerPath | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "certreq exited with code $LASTEXITCODE"
+    }
+
+    $cert = Get-ChildItem "Cert:\CurrentUser\My" | Where-Object { $_.Subject -eq $subject } |
+        Sort-Object NotBefore -Descending | Select-Object -First 1
+    if (-not $cert) {
+        throw "certreq did not produce a certificate matching $subject in Cert:\CurrentUser\My"
+    }
+
+    $pfxPassword = ConvertTo-SecureString -String ([System.Guid]::NewGuid().ToString("N")) -Force -AsPlainText
     Export-PfxCertificate -Cert $cert -FilePath $pfxPath -Password $pfxPassword | Out-Null
 
     Write-Host "Trusting the certificate locally (requires admin - Cert:\LocalMachine\TrustedPeople)..."
@@ -65,8 +111,11 @@ try {
     }
 }
 finally {
+    if (Test-Path $infPath) { Remove-Item $infPath -Force }
+    if (Test-Path $cerPath) { Remove-Item $cerPath -Force }
     if (Test-Path $pfxPath) { Remove-Item $pfxPath -Force }
-    Remove-Item "Cert:\CurrentUser\My\$($cert.Thumbprint)" -Force -ErrorAction SilentlyContinue
+    Get-ChildItem "Cert:\CurrentUser\My" | Where-Object { $_.Subject -eq $subject } |
+        Remove-Item -Force -ErrorAction SilentlyContinue
 }
 
 Write-Host ""
