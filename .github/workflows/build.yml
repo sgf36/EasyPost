@@ -56,7 +56,7 @@ jobs:
             [Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
           $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
             Sort-Object FullName -Descending | Select-Object -First 1
-          & $signtool.FullName sign /fd SHA256 /a /f msix_signing.pfx /p $plainPassword dist\EasyPostDesktop.msix
+          & $signtool.FullName sign /fd SHA256 /f msix_signing.pfx /p $plainPassword dist\EasyPostDesktop.msix
           Remove-Item msix_signing.pfx
           Remove-Item "Cert:\CurrentUser\My\$($cert.Thumbprint)"
 
