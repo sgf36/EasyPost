@@ -8,6 +8,9 @@ on:
 
 jobs:
   build:
+    permissions:
+      id-token: write # required for azure/login's OIDC federated credential exchange
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -47,24 +50,35 @@ jobs:
                   lines.append(f"{digest}  {path.relative_to(dist)}")
           Path("dist/SHA256SUMS.txt").write_text("\n".join(lines) + "\n")
 
-      # No-op unless WINDOWS_CODE_SIGNING_CERT_BASE64/_PASSWORD secrets are
-      # set on the repo. Wire these up if a certificate is purchased later
-      # (see README's "Windows SmartScreen warning" section) — everything
-      # else in this workflow already works either way.
+      # Signs via Azure Artifact Signing (azure/artifact-signing-action), which
+      # replaced the older raw-PFX signtool approach. No-op until
+      # AZURE_SIGNING_READY is set to 'true' (a repo variable, not secret) —
+      # flip that on once the Artifact Signing Account's identity validation
+      # is approved and its "EasyPostDesktop" certificate profile exists (see
+      # README's "Windows SmartScreen warning" section); everything else in
+      # this workflow already works either way. AZURE_CLIENT_ID/TENANT_ID/
+      # SUBSCRIPTION_ID (repo secrets) authenticate via OIDC federated
+      # credential — no client secret is stored anywhere.
+      - name: Azure login
+        if: matrix.os == 'windows-latest' && vars.AZURE_SIGNING_READY == 'true'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Sign Windows build
-        if: matrix.os == 'windows-latest' && env.HAS_SIGNING_CERT == 'true'
-        env:
-          HAS_SIGNING_CERT: ${{ secrets.WINDOWS_CODE_SIGNING_CERT_BASE64 != '' }}
-        shell: pwsh
-        run: |
-          $bytes = [Convert]::FromBase64String("${{ secrets.WINDOWS_CODE_SIGNING_CERT_BASE64 }}")
-          [IO.File]::WriteAllBytes("cert.pfx", $bytes)
-          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
-            Sort-Object FullName -Descending | Select-Object -First 1
-          & $signtool.FullName sign /f cert.pfx /p "${{ secrets.WINDOWS_CODE_SIGNING_CERT_PASSWORD }}" `
-            /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-            dist\EasyPostDesktop\EasyPostDesktop.exe
-          Remove-Item cert.pfx
+        if: matrix.os == 'windows-latest' && vars.AZURE_SIGNING_READY == 'true'
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: https://weu.codesigning.azure.net/
+          signing-account-name: EasyPostDesktop
+          certificate-profile-name: EasyPostDesktop
+          files-folder: ${{ github.workspace }}\dist\EasyPostDesktop
+          files-folder-filter: exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
