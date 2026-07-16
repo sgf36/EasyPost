@@ -29,6 +29,17 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller packaging/build_exe.spec --noconfirm --distpath dist --workpath build
 
+      # On macOS, package the .app bundle with ditto. This preserves the
+      # executable bit, the symlinked Qt frameworks, and PyInstaller's ad-hoc
+      # code signature — all of which a plain cross-platform zip (or an
+      # artifact round-trip through Windows) destroys. arm64 macOS refuses to
+      # launch an app whose signature is invalid, so this native archive is
+      # the file to distribute to end users. macos-latest runners are Apple
+      # Silicon, so this is an arm64 build.
+      - name: Package macOS app (ditto)
+        if: matrix.os == 'macos-latest'
+        run: ditto -c -k --keepParent dist/EasyPostDesktop.app "dist/EasyPostDesktop-macOS-arm64.zip"
+
       # Packages dist/EasyPostDesktop/ (the PyInstaller output above) into
       # dist/EasyPostDesktop.msix for Microsoft Store submission via Partner
       # Center — see packaging/build_msix.py and README.
