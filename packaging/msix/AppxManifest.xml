@@ -8,7 +8,7 @@
   <Identity
     Name="SFields.Easy-PostDesktop"
     Publisher="CN=A7D4B6C0-27D4-4F66-82EB-82F5DD466788"
-    Version="1.0.0.0"
+    Version="1.0.1.0"
     ProcessorArchitecture="x64" />
 
   <Properties>
@@ -23,19 +23,63 @@
 
   <!--
     Store listing languages. Each language declared here becomes a Store
-    listing that requires its own description + screenshot in Partner Center,
-    so this is deliberately a curated set of major languages rather than all
-    50 the app localizes into. The app itself still runs in all 50 languages
-    at runtime (app/resources/locales/*.json) regardless of what is declared
-    here - this only controls what the Microsoft Store advertises.
+    listing in Partner Center. This declares all 47 of the app's 50 runtime
+    locales that the Microsoft Store supports (the Store's language list has
+    no code for Javanese, Burmese or Somali, so those 3 cannot be declared as
+    listing languages, though the app still runs in them at runtime via
+    app/resources/locales/*.json). The per-language Store listings
+    (description + screenshots) are populated in Partner Center via the
+    Import/export listings feature. Keep this set of 47 in sync with the live
+    submission's listing languages.
   -->
   <Resources>
     <Resource Language="en-us" />
+    <Resource Language="zh-Hans" />
+    <Resource Language="hi" />
     <Resource Language="es" />
     <Resource Language="fr" />
+    <Resource Language="ar" />
+    <Resource Language="bn" />
+    <Resource Language="pt" />
+    <Resource Language="ru" />
+    <Resource Language="ur" />
+    <Resource Language="id" />
     <Resource Language="de" />
-    <Resource Language="zh-Hans" />
     <Resource Language="ja" />
+    <Resource Language="mr" />
+    <Resource Language="te" />
+    <Resource Language="tr" />
+    <Resource Language="ta" />
+    <Resource Language="vi" />
+    <Resource Language="ko" />
+    <Resource Language="fa" />
+    <Resource Language="ha" />
+    <Resource Language="sw" />
+    <Resource Language="it" />
+    <Resource Language="pa" />
+    <Resource Language="gu" />
+    <Resource Language="am" />
+    <Resource Language="th" />
+    <Resource Language="kn" />
+    <Resource Language="yo-Latn" />
+    <Resource Language="uz" />
+    <Resource Language="ml" />
+    <Resource Language="or" />
+    <Resource Language="uk" />
+    <Resource Language="pl" />
+    <Resource Language="ms" />
+    <Resource Language="nl" />
+    <Resource Language="ig-Latn" />
+    <Resource Language="si" />
+    <Resource Language="ne" />
+    <Resource Language="ro" />
+    <Resource Language="zu" />
+    <Resource Language="hr" />
+    <Resource Language="el" />
+    <Resource Language="hu" />
+    <Resource Language="cs" />
+    <Resource Language="he" />
+    <Resource Language="sv" />
   </Resources>
 
   <Capabilities>

@@ -40,25 +40,15 @@ jobs:
       # valid, but the Microsoft Store re-signs with its own certificate
       # during publishing — a self-signed one is accepted for submission, so
       # this generates and discards a throwaway cert per run rather than
-      # needing a purchased cert or any stored secret. See:
+      # needing a purchased cert or any stored secret. Uses the same
+      # sign-only script (packaging/sign_msix.ps1) as local upload signing:
+      # it builds the throwaway cert in managed .NET (CertificateRequest),
+      # which avoids New-SelfSignedCertificate/certreq entirely. See:
       # https://learn.microsoft.com/windows/apps/publish/publish-your-app/msix/app-package-requirements
       - name: Sign MSIX package
         if: matrix.os == 'windows-latest'
         shell: pwsh
-        run: |
-          $cert = New-SelfSignedCertificate -Type Custom -KeyUsage DigitalSignature `
-            -CertStoreLocation "Cert:\CurrentUser\My" `
-            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}") `
-            -Subject "CN=A7D4B6C0-27D4-4F66-82EB-82F5DD466788"
-          $password = ConvertTo-SecureString -String ([System.Guid]::NewGuid().ToString("N")) -Force -AsPlainText
-          Export-PfxCertificate -Cert $cert -FilePath msix_signing.pfx -Password $password | Out-Null
-          $plainPassword = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-            [Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
-          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
-            Sort-Object FullName -Descending | Select-Object -First 1
-          & $signtool.FullName sign /fd SHA256 /f msix_signing.pfx /p $plainPassword dist\EasyPostDesktop.msix
-          Remove-Item msix_signing.pfx
-          Remove-Item "Cert:\CurrentUser\My\$($cert.Thumbprint)"
+        run: pwsh -NoProfile -File packaging\sign_msix.ps1
 
       # Unsigned builds still trigger SmartScreen/Gatekeeper warnings on first
       # run regardless of this step — only a paid code-signing certificate
