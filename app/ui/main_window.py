@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle(APP_NAME)
-        self.resize(1100, 720)
+        self._size_to_screen()
 
         self._root_stack = QStackedWidget()
         self.setCentralWidget(self._root_stack)
@@ -56,6 +56,23 @@ class MainWindow(QMainWindow):
         else:
             self._root_stack.setCurrentWidget(self._setup_wizard)
 
+    def _size_to_screen(self) -> None:
+        """Open at a comfortable size that still fits the current screen
+        (important on the cloud Mac, whose desktop may be smaller than a
+        typical Windows display), then centre the window."""
+        preferred_w, preferred_h = 1100, 720
+        screen = self.screen()
+        if screen is not None:
+            available = screen.availableGeometry()
+            width = min(preferred_w, available.width() - 80)
+            height = min(preferred_h, available.height() - 80)
+            self.resize(max(880, width), max(600, height))
+            frame = self.frameGeometry()
+            frame.moveCenter(available.center())
+            self.move(frame.topLeft())
+        else:
+            self.resize(preferred_w, preferred_h)
+
     def _build_app_shell(self) -> QWidget:
         shell = QWidget()
         outer = QVBoxLayout(shell)
@@ -70,9 +87,12 @@ class MainWindow(QMainWindow):
 
         body = QWidget()
         body_layout = QHBoxLayout(body)
+        body_layout.setContentsMargins(0, 0, 0, 0)
+        body_layout.setSpacing(0)
 
         self._nav = QListWidget()
-        self._nav.setFixedWidth(180)
+        self._nav.setObjectName("navSidebar")
+        self._nav.setFixedWidth(196)
         self._nav.addItems(
             [
                 tr("main_window.nav_dashboard"),
@@ -92,6 +112,7 @@ class MainWindow(QMainWindow):
         self._nav.currentRowChanged.connect(self._on_nav_changed)
 
         self._view_stack = QStackedWidget()
+        self._view_stack.setContentsMargins(18, 14, 18, 14)
         self._dashboard_view = DashboardView()
         self._address_book_view = AddressBookView()
         self._create_shipment_view = CreateShipmentView()
