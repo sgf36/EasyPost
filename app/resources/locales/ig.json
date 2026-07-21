@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Na-emelite…",
   "tracking.table_group_title": "Ngwongwo a na-achọpụta",
   "tracking.title": "Nchọpụta",
-  "tracking.tracking_number_placeholder": "Nọmba nchọpụta"
+  "tracking.tracking_number_placeholder": "Nọmba nchọpụta",
+  "license_gate.title": "Gbaa Easy-Post Desktop ọkụ",
+  "license_gate.subtitle": "Tinye igodo ikike ị natara site na email mgbe ị zụchara iji mepee ngwa a.",
+  "license_gate.key_label": "Igodo ikike:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Gbaa ọkụ",
+  "license_gate.buy_button": "Zụta ikike",
+  "license_gate.invalid_title": "Igodo ikike ezighi ezi",
+  "license_gate.invalid_body": "A maghị igodo ikike ahụ. Jide n'aka na ị detara igodo ahụ dum site na email ịzụ gị, ma ọ bụ kpọtụrụ ndị nkwado.",
+  "license_gate.buy_soon_title": "Ịzụ ahịa na-abịa n'oge na-adịghị anya",
+  "license_gate.buy_soon_body": "Ịzụ ahịa n'ịntanetị adịbeghị ugbu a. Biko laghachi ntakịrị oge."
 }

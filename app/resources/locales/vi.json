@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Đang làm mới…",
   "tracking.table_group_title": "Lô hàng đang theo dõi",
   "tracking.title": "Theo Dõi",
-  "tracking.tracking_number_placeholder": "Mã vận đơn"
+  "tracking.tracking_number_placeholder": "Mã vận đơn",
+  "license_gate.title": "Kích hoạt Easy-Post Desktop",
+  "license_gate.subtitle": "Nhập khóa giấy phép bạn đã nhận qua email sau khi mua để mở khóa ứng dụng.",
+  "license_gate.key_label": "Khóa giấy phép:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Kích hoạt",
+  "license_gate.buy_button": "Mua giấy phép",
+  "license_gate.invalid_title": "Khóa giấy phép không hợp lệ",
+  "license_gate.invalid_body": "Không nhận dạng được khóa giấy phép đó. Hãy đảm bảo bạn đã sao chép toàn bộ khóa từ email mua hàng, hoặc liên hệ bộ phận hỗ trợ.",
+  "license_gate.buy_soon_title": "Sắp có thể mua hàng",
+  "license_gate.buy_soon_body": "Mua hàng trực tuyến hiện chưa khả dụng. Vui lòng quay lại sau ít phút."
 }

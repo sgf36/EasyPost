@@ -378,5 +378,15 @@
   "address_book.state_label_emirate": "Emirat:",
   "address_book.state_label_default": "Delstat/Provins/Region:",
   "address_book.postal_label_zip": "Zip-kod:",
-  "address_book.postal_label_postal": "Postnummer:"
+  "address_book.postal_label_postal": "Postnummer:",
+  "license_gate.title": "Aktivera Easy-Post Desktop",
+  "license_gate.subtitle": "Ange licensnyckeln du fick via e-post efter ditt köp för att låsa upp appen.",
+  "license_gate.key_label": "Licensnyckel:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktivera",
+  "license_gate.buy_button": "Köp en licens",
+  "license_gate.invalid_title": "Ogiltig licensnyckel",
+  "license_gate.invalid_body": "Licensnyckeln kändes inte igen. Kontrollera att du kopierade hela nyckeln från ditt köpmejl, eller kontakta supporten.",
+  "license_gate.buy_soon_title": "Köp kommer snart",
+  "license_gate.buy_soon_body": "Köp online är inte tillgängligt ännu. Kom tillbaka snart."
 }

@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "ରିଫ୍ରେସ୍ ହେଉଛି…",
   "tracking.table_group_title": "ଟ୍ରାକ୍ ହେଉଥିବା ଶିପମେଣ୍ଟ",
   "tracking.title": "ଟ୍ରାକିଂ",
-  "tracking.tracking_number_placeholder": "ଟ୍ରାକିଂ ନମ୍ବର"
+  "tracking.tracking_number_placeholder": "ଟ୍ରାକିଂ ନମ୍ବର",
+  "license_gate.title": "Easy-Post Desktop ସକ୍ରିୟ କରନ୍ତୁ",
+  "license_gate.subtitle": "ଆପ୍‌ ଅନଲକ୍ କରିବା ପାଇଁ, କ୍ରୟ ପରେ ଇମେଲ୍ ମାଧ୍ୟମରେ ପାଇଥିବା ଲାଇସେନ୍ସ କି ପ୍ରବେଶ କରନ୍ତୁ।",
+  "license_gate.key_label": "ଲାଇସେନ୍ସ କି:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "ସକ୍ରିୟ କରନ୍ତୁ",
+  "license_gate.buy_button": "ଲାଇସେନ୍ସ କିଣନ୍ତୁ",
+  "license_gate.invalid_title": "ଅବୈଧ ଲାଇସେନ୍ସ କି",
+  "license_gate.invalid_body": "ସେହି ଲାଇସେନ୍ସ କି ଚିହ୍ନଟ ହେଲା ନାହିଁ। ଆପଣଙ୍କ କ୍ରୟ ଇମେଲରୁ ସମ୍ପୂର୍ଣ୍ଣ କି କପି କରିଛନ୍ତି ବୋଲି ନିଶ୍ଚିତ କରନ୍ତୁ, କିମ୍ବା ସହାୟତା ସହ ଯୋଗାଯୋଗ କରନ୍ତୁ।",
+  "license_gate.buy_soon_title": "କ୍ରୟ ଶୀଘ୍ର ଆସୁଛି",
+  "license_gate.buy_soon_body": "ଅନଲାଇନ କ୍ରୟ ବର୍ତ୍ତମାନ ଉପଲବ୍ଧ ନାହିଁ। ଦୟାକରି ଅଳ୍ପ ସମୟ ପରେ ପୁଣି ଯାଞ୍ଚ କରନ୍ତୁ।"
 }

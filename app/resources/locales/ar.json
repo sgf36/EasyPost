@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "جارٍ التحديث…",
   "tracking.table_group_title": "الشحنات المتتبعة",
   "tracking.title": "التتبع",
-  "tracking.tracking_number_placeholder": "رقم التتبع"
+  "tracking.tracking_number_placeholder": "رقم التتبع",
+  "license_gate.title": "تفعيل Easy-Post Desktop",
+  "license_gate.subtitle": "أدخل مفتاح الترخيص الذي تلقيته عبر البريد الإلكتروني بعد الشراء لفتح التطبيق.",
+  "license_gate.key_label": "مفتاح الترخيص:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "تفعيل",
+  "license_gate.buy_button": "شراء ترخيص",
+  "license_gate.invalid_title": "مفتاح ترخيص غير صالح",
+  "license_gate.invalid_body": "لم يتم التعرف على مفتاح الترخيص هذا. تأكد من نسخ المفتاح بالكامل من بريد الشراء الإلكتروني، أو تواصل مع الدعم.",
+  "license_gate.buy_soon_title": "الشراء متاح قريبًا",
+  "license_gate.buy_soon_body": "الشراء عبر الإنترنت غير متاح بعد. يُرجى المحاولة مرة أخرى قريبًا."
 }

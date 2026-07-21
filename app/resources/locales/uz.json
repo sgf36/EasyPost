@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Yangilanmoqda…",
   "tracking.table_group_title": "Kuzatilayotgan jo'natmalar",
   "tracking.title": "Kuzatuv",
-  "tracking.tracking_number_placeholder": "Kuzatuv raqami"
+  "tracking.tracking_number_placeholder": "Kuzatuv raqami",
+  "license_gate.title": "Easy-Post Desktop’ni faollashtirish",
+  "license_gate.subtitle": "Ilovani ochish uchun xariddan so‘ng elektron pochta orqali olgan litsenziya kalitini kiriting.",
+  "license_gate.key_label": "Litsenziya kaliti:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Faollashtirish",
+  "license_gate.buy_button": "Litsenziya sotib olish",
+  "license_gate.invalid_title": "Yaroqsiz litsenziya kaliti",
+  "license_gate.invalid_body": "Ushbu litsenziya kaliti tan olinmadi. Xarid haqidagi xatdan kalitni to‘liq nusxalaganingizga ishonch hosil qiling yoki qo‘llab-quvvatlash xizmatiga murojaat qiling.",
+  "license_gate.buy_soon_title": "Xaridlar tez orada",
+  "license_gate.buy_soon_body": "Onlayn xarid hozircha mavjud emas. Iltimos, birozdan so‘ng qayta tekshiring."
 }

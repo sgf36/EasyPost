@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Ana sabuntawa…",
   "tracking.table_group_title": "Kayan aikawa da ake bibiya",
   "tracking.title": "Bibiya",
-  "tracking.tracking_number_placeholder": "Lambar bibiya"
+  "tracking.tracking_number_placeholder": "Lambar bibiya",
+  "license_gate.title": "Kunna Easy-Post Desktop",
+  "license_gate.subtitle": "Shigar da maɓallin lasisi da ka karɓa ta imel bayan sayenka don buɗe manhajar.",
+  "license_gate.key_label": "Maɓallin lasisi:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Kunna",
+  "license_gate.buy_button": "Sayi lasisi",
+  "license_gate.invalid_title": "Maɓallin lasisi mara inganci",
+  "license_gate.invalid_body": "Ba a gane wannan maɓallin lasisi ba. Ka tabbata ka kwafi maɓallin gaba ɗaya daga imel ɗin sayenka, ko ka tuntuɓi tallafi.",
+  "license_gate.buy_soon_title": "Saye na zuwa nan ba da daɗewa ba",
+  "license_gate.buy_soon_body": "Saye ta yanar gizo ba ta samu ba tukuna. Da fatan za a sake dubawa nan ba da daɗewa ba."
 }

@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Yenileniyor…",
   "tracking.table_group_title": "Takip edilen gönderiler",
   "tracking.title": "Takip",
-  "tracking.tracking_number_placeholder": "Takip numarası"
+  "tracking.tracking_number_placeholder": "Takip numarası",
+  "license_gate.title": "Easy-Post Desktop'ı Etkinleştir",
+  "license_gate.subtitle": "Uygulamanın kilidini açmak için satın alma işleminizin ardından e-posta ile aldığınız lisans anahtarını girin.",
+  "license_gate.key_label": "Lisans anahtarı:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Etkinleştir",
+  "license_gate.buy_button": "Lisans satın al",
+  "license_gate.invalid_title": "Geçersiz lisans anahtarı",
+  "license_gate.invalid_body": "Bu lisans anahtarı tanınmadı. Anahtarın tamamını satın alma e-postanızdan kopyaladığınızdan emin olun veya destek ekibiyle iletişime geçin.",
+  "license_gate.buy_soon_title": "Satın alma yakında",
+  "license_gate.buy_soon_body": "Çevrimiçi satın alma henüz kullanılamıyor. Lütfen kısa süre sonra tekrar kontrol edin."
 }

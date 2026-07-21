@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 
 from app.config import APP_NAME
 from app.core.client import client_manager
+from app.core.license import is_licensed
 from app.core.settings import load_settings
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
@@ -22,6 +23,7 @@ from app.ui.views.dashboard_view import DashboardView
 from app.ui.views.history_view import HistoryView
 from app.ui.views.hts_lookup_view import HtsLookupView
 from app.ui.views.insurance_view import InsuranceView
+from app.ui.views.license_gate import LicenseGate
 from app.ui.views.pickups_view import PickupsView
 from app.ui.views.reports_view import ReportsView
 from app.ui.views.settings_view import SettingsView
@@ -42,6 +44,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self._root_stack)
         self._pending_webhook_task = None
 
+        self._license_gate = LicenseGate()
+        self._license_gate.activated.connect(self._on_license_activated)
+        self._root_stack.addWidget(self._license_gate)
+
         self._setup_wizard = SetupWizard()
         self._setup_wizard.setup_complete.connect(self._show_app_shell)
         self._root_stack.addWidget(self._setup_wizard)
@@ -50,11 +56,7 @@ class MainWindow(QMainWindow):
         self._root_stack.addWidget(self._app_shell)
 
         client_manager.reload()
-        if client_manager.credentials.active_key():
-            self._root_stack.setCurrentWidget(self._app_shell)
-            self._maybe_resume_webhook()
-        else:
-            self._root_stack.setCurrentWidget(self._setup_wizard)
+        self._route_startup()
 
     def _size_to_screen(self) -> None:
         """Open at a comfortable size that still fits the current screen
@@ -166,6 +168,19 @@ class MainWindow(QMainWindow):
             self._reports_view.refresh()
         elif index == 11:  # Settings
             self._settings_view.refresh()
+
+    def _route_startup(self) -> None:
+        """Gate order on launch: license first, then EasyPost credentials,
+        then the app shell."""
+        if not is_licensed():
+            self._root_stack.setCurrentWidget(self._license_gate)
+        elif client_manager.credentials.active_key():
+            self._show_app_shell()
+        else:
+            self._root_stack.setCurrentWidget(self._setup_wizard)
+
+    def _on_license_activated(self) -> None:
+        self._route_startup()
 
     def _show_app_shell(self) -> None:
         client_manager.reload()

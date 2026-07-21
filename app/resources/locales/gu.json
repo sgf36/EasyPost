@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "રિફ્રેશ કરી રહ્યા છીએ…",
   "tracking.table_group_title": "ટ્રેક કરેલા શિપમેન્ટ",
   "tracking.title": "ટ્રેકિંગ",
-  "tracking.tracking_number_placeholder": "ટ્રેકિંગ નંબર"
+  "tracking.tracking_number_placeholder": "ટ્રેકિંગ નંબર",
+  "license_gate.title": "Easy-Post Desktop સક્રિય કરો",
+  "license_gate.subtitle": "એપ અનલૉક કરવા માટે ખરીદી પછી ઈમેલ દ્વારા મળેલી લાઇસન્સ કી દાખલ કરો.",
+  "license_gate.key_label": "લાઇસન્સ કી:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "સક્રિય કરો",
+  "license_gate.buy_button": "લાઇસન્સ ખરીદો",
+  "license_gate.invalid_title": "અમાન્ય લાઇસન્સ કી",
+  "license_gate.invalid_body": "તે લાઇસન્સ કી ઓળખાઈ નથી. ખાતરી કરો કે તમે ખરીદી ઈમેલમાંથી આખી કી કૉપિ કરી છે, અથવા સપોર્ટનો સંપર્ક કરો.",
+  "license_gate.buy_soon_title": "ખરીદી ટૂંક સમયમાં આવી રહી છે",
+  "license_gate.buy_soon_body": "ઓનલાઇન ખરીદી હજી ઉપલબ્ધ નથી. કૃપા કરીને થોડી વારમાં ફરી તપાસો."
 }

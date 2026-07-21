@@ -5,3 +5,7 @@ build/
 dist/
 *.spec.bak
 .pytest_cache/
+
+# Never commit signing keys
+*.pem
+*PRIVATE-KEY*

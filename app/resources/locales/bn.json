@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "রিফ্রেশ করা হচ্ছে…",
   "tracking.table_group_title": "ট্র্যাক করা শিপমেন্টসমূহ",
   "tracking.title": "ট্র্যাকিং",
-  "tracking.tracking_number_placeholder": "ট্র্যাকিং নম্বর"
+  "tracking.tracking_number_placeholder": "ট্র্যাকিং নম্বর",
+  "license_gate.title": "Easy-Post Desktop সক্রিয় করুন",
+  "license_gate.subtitle": "অ্যাপটি আনলক করতে কেনার পর ইমেলে পাওয়া লাইসেন্স কী লিখুন।",
+  "license_gate.key_label": "লাইসেন্স কী:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "সক্রিয় করুন",
+  "license_gate.buy_button": "লাইসেন্স কিনুন",
+  "license_gate.invalid_title": "অবৈধ লাইসেন্স কী",
+  "license_gate.invalid_body": "সেই লাইসেন্স কীটি শনাক্ত করা যায়নি। নিশ্চিত করুন যে আপনি আপনার কেনার ইমেল থেকে সম্পূর্ণ কীটি কপি করেছেন, অথবা সহায়তার সাথে যোগাযোগ করুন।",
+  "license_gate.buy_soon_title": "কেনাকাটা শীঘ্রই আসছে",
+  "license_gate.buy_soon_body": "অনলাইন কেনাকাটা এখনও উপলব্ধ নয়। অনুগ্রহ করে কিছুক্ষণ পরে আবার দেখুন।"
 }

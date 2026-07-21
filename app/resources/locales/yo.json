@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Ń tún ṣe…",
   "tracking.table_group_title": "Àwọn ìfìránṣẹ́ tí a ń tọpinpin",
   "tracking.title": "Ìtọpinpin",
-  "tracking.tracking_number_placeholder": "Nọ́mbà ìtọpinpin"
+  "tracking.tracking_number_placeholder": "Nọ́mbà ìtọpinpin",
+  "license_gate.title": "Mú Easy-Post Desktop ṣiṣẹ́",
+  "license_gate.subtitle": "Tẹ kọ́kọ́rọ́ ìwé àṣẹ tí o gbà nípasẹ̀ ìméèlì lẹ́yìn rírà rẹ sí i láti ṣí ẹ̀rọ ohun èlò náà sílẹ̀.",
+  "license_gate.key_label": "Kọ́kọ́rọ́ ìwé àṣẹ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Mú ṣiṣẹ́",
+  "license_gate.buy_button": "Ra ìwé àṣẹ",
+  "license_gate.invalid_title": "Kọ́kọ́rọ́ ìwé àṣẹ tí kò tọ́",
+  "license_gate.invalid_body": "A kò dá kọ́kọ́rọ́ ìwé àṣẹ yẹn mọ̀. Rí i dájú pé o dà gbogbo kọ́kọ́rọ́ náà kọ láti inú ìméèlì rírà rẹ, tàbí kàn sí ẹ̀ka ìrànlọ́wọ́.",
+  "license_gate.buy_soon_title": "Rírà ń bọ̀ láìpẹ́",
+  "license_gate.buy_soon_body": "Rírà lóri ayélujára kò tíì sí lọ́wọ́lọ́wọ́. Jọ̀wọ́ padà wá yẹ̀ ẹ́ wò láìpẹ́."
 }

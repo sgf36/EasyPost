@@ -21,6 +21,8 @@ class AppSettings:
     webhook_enabled: bool = False
     webhook_id: Optional[str] = None
     webhook_port: Optional[int] = None
+    # Activated offline license key (see app/core/license.py). None until activated.
+    license_key: Optional[str] = None
 
 
 def load_settings() -> AppSettings:

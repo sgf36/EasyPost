@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Odświeżanie…",
   "tracking.table_group_title": "Śledzone przesyłki",
   "tracking.title": "Śledzenie",
-  "tracking.tracking_number_placeholder": "Numer śledzenia"
+  "tracking.tracking_number_placeholder": "Numer śledzenia",
+  "license_gate.title": "Aktywuj Easy-Post Desktop",
+  "license_gate.subtitle": "Wprowadź klucz licencyjny otrzymany e-mailem po zakupie, aby odblokować aplikację.",
+  "license_gate.key_label": "Klucz licencyjny:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktywuj",
+  "license_gate.buy_button": "Kup licencję",
+  "license_gate.invalid_title": "Nieprawidłowy klucz licencyjny",
+  "license_gate.invalid_body": "Nie rozpoznano tego klucza licencyjnego. Upewnij się, że skopiowano cały klucz z wiadomości e-mail o zakupie, lub skontaktuj się z pomocą techniczną.",
+  "license_gate.buy_soon_title": "Zakupy już wkrótce",
+  "license_gate.buy_soon_body": "Zakupy online nie są jeszcze dostępne. Prosimy wrócić wkrótce."
 }

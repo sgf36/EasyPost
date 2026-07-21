@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "در حال به‌روزرسانی…",
   "tracking.table_group_title": "مرسولات رهگیری‌شده",
   "tracking.title": "رهگیری",
-  "tracking.tracking_number_placeholder": "کد رهگیری"
+  "tracking.tracking_number_placeholder": "کد رهگیری",
+  "license_gate.title": "فعال‌سازی Easy-Post Desktop",
+  "license_gate.subtitle": "برای باز کردن قفل برنامه، کلید مجوزی را که پس از خرید از طریق ایمیل دریافت کرده‌اید وارد کنید.",
+  "license_gate.key_label": "کلید مجوز:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "فعال‌سازی",
+  "license_gate.buy_button": "خرید مجوز",
+  "license_gate.invalid_title": "کلید مجوز نامعتبر",
+  "license_gate.invalid_body": "این کلید مجوز شناسایی نشد. مطمئن شوید که کل کلید را از ایمیل خرید خود کپی کرده‌اید یا با پشتیبانی تماس بگیرید.",
+  "license_gate.buy_soon_title": "خرید به‌زودی",
+  "license_gate.buy_soon_body": "خرید آنلاین هنوز در دسترس نیست. لطفاً کمی بعد دوباره سر بزنید."
 }

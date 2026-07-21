@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "正在刷新…",
   "tracking.table_group_title": "已追踪运单",
   "tracking.title": "追踪",
-  "tracking.tracking_number_placeholder": "追踪号"
+  "tracking.tracking_number_placeholder": "追踪号",
+  "license_gate.title": "激活 Easy-Post Desktop",
+  "license_gate.subtitle": "输入您购买后通过电子邮件收到的许可证密钥以解锁应用。",
+  "license_gate.key_label": "许可证密钥：",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "激活",
+  "license_gate.buy_button": "购买许可证",
+  "license_gate.invalid_title": "许可证密钥无效",
+  "license_gate.invalid_body": "无法识别该许可证密钥。请确认您已从购买邮件中完整复制密钥，或联系支持人员。",
+  "license_gate.buy_soon_title": "购买功能即将推出",
+  "license_gate.buy_soon_body": "在线购买暂不可用，请稍后再试。"
 }

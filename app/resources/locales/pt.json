@@ -378,5 +378,15 @@
   "address_book.state_label_emirate": "Emirado:",
   "address_book.state_label_default": "Estado/Província/Região:",
   "address_book.postal_label_zip": "CEP:",
-  "address_book.postal_label_postal": "Código postal:"
+  "address_book.postal_label_postal": "Código postal:",
+  "license_gate.title": "Ativar Easy-Post Desktop",
+  "license_gate.subtitle": "Insira a chave de licença que recebeu por e-mail após a compra para desbloquear o aplicativo.",
+  "license_gate.key_label": "Chave de licença:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Ativar",
+  "license_gate.buy_button": "Comprar uma licença",
+  "license_gate.invalid_title": "Chave de licença inválida",
+  "license_gate.invalid_body": "Essa chave de licença não foi reconhecida. Confirme que copiou a chave inteira do e-mail de compra ou entre em contato com o suporte.",
+  "license_gate.buy_soon_title": "Compras em breve",
+  "license_gate.buy_soon_body": "A compra online ainda não está disponível. Tente novamente em breve."
 }

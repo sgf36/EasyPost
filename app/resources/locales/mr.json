@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "रिफ्रेश करत आहे…",
   "tracking.table_group_title": "ट्रॅक केलेल्या शिपमेंट्स",
   "tracking.title": "ट्रॅकिंग",
-  "tracking.tracking_number_placeholder": "ट्रॅकिंग नंबर"
+  "tracking.tracking_number_placeholder": "ट्रॅकिंग नंबर",
+  "license_gate.title": "Easy-Post Desktop सक्रिय करा",
+  "license_gate.subtitle": "अ‍ॅप अनलॉक करण्यासाठी खरेदीनंतर ईमेलद्वारे मिळालेली परवाना की प्रविष्ट करा.",
+  "license_gate.key_label": "परवाना की:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "सक्रिय करा",
+  "license_gate.buy_button": "परवाना खरेदी करा",
+  "license_gate.invalid_title": "अवैध परवाना की",
+  "license_gate.invalid_body": "ती परवाना की ओळखली गेली नाही. तुम्ही तुमच्या खरेदी ईमेलमधून संपूर्ण की कॉपी केल्याची खात्री करा, किंवा सपोर्टशी संपर्क साधा.",
+  "license_gate.buy_soon_title": "खरेदी लवकरच येत आहे",
+  "license_gate.buy_soon_body": "ऑनलाइन खरेदी अद्याप उपलब्ध नाही. कृपया थोड्या वेळाने पुन्हा तपासा."
 }

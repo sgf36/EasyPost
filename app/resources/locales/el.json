@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Ανανέωση…",
   "tracking.table_group_title": "Αποστολές υπό παρακολούθηση",
   "tracking.title": "Παρακολούθηση",
-  "tracking.tracking_number_placeholder": "Αριθμός παρακολούθησης"
+  "tracking.tracking_number_placeholder": "Αριθμός παρακολούθησης",
+  "license_gate.title": "Ενεργοποίηση του Easy-Post Desktop",
+  "license_gate.subtitle": "Εισαγάγετε το κλειδί άδειας που λάβατε με email μετά την αγορά σας για να ξεκλειδώσετε την εφαρμογή.",
+  "license_gate.key_label": "Κλειδί άδειας:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Ενεργοποίηση",
+  "license_gate.buy_button": "Αγορά άδειας",
+  "license_gate.invalid_title": "Μη έγκυρο κλειδί άδειας",
+  "license_gate.invalid_body": "Αυτό το κλειδί άδειας δεν αναγνωρίστηκε. Βεβαιωθείτε ότι αντιγράψατε ολόκληρο το κλειδί από το email αγοράς σας ή επικοινωνήστε με την υποστήριξη.",
+  "license_gate.buy_soon_title": "Οι αγορές έρχονται σύντομα",
+  "license_gate.buy_soon_body": "Η ηλεκτρονική αγορά δεν είναι διαθέσιμη ακόμη. Ελέγξτε ξανά σύντομα."
 }

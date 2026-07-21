@@ -378,5 +378,15 @@
   "address_book.state_label_emirate": "එමීර් රාජ්‍යය:",
   "address_book.state_label_default": "ප්‍රාන්තය/පළාත/කලාපය:",
   "address_book.postal_label_zip": "තැපැල් කේතය:",
-  "address_book.postal_label_postal": "තැපැල් කේතය:"
+  "address_book.postal_label_postal": "තැපැල් කේතය:",
+  "license_gate.title": "Easy-Post Desktop සක්‍රිය කරන්න",
+  "license_gate.subtitle": "යෙදුම අගුළු ඇරීමට ඔබේ මිලදී ගැනීමෙන් පසු විද්‍යුත් තැපෑලෙන් ලැබුණු බලපත්‍ර යතුර ඇතුළත් කරන්න.",
+  "license_gate.key_label": "බලපත්‍ර යතුර:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "සක්‍රිය කරන්න",
+  "license_gate.buy_button": "බලපත්‍රයක් මිලදී ගන්න",
+  "license_gate.invalid_title": "වලංගු නොවන බලපත්‍ර යතුර",
+  "license_gate.invalid_body": "එම බලපත්‍ර යතුර හඳුනා නොගැනිණි. ඔබේ මිලදී ගැනීමේ විද්‍යුත් තැපෑලෙන් සම්පූර්ණ යතුර පිටපත් කළ බව තහවුරු කර ගන්න, නැතහොත් සහාය අමතන්න.",
+  "license_gate.buy_soon_title": "මිලදී ගැනීම් ඉක්මනින්",
+  "license_gate.buy_soon_body": "සබැඳි මිලදී ගැනීම් තවම නොමැත. කරුණාකර මඳ වේලාවකින් නැවත පරීක්ෂා කරන්න."
 }

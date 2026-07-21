@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "रिफ्रेस गर्दै…",
   "tracking.table_group_title": "ट्र्याक गरिएका ढुवानीहरू",
   "tracking.title": "ट्र्याकिङ",
-  "tracking.tracking_number_placeholder": "ट्र्याकिङ नम्बर"
+  "tracking.tracking_number_placeholder": "ट्र्याकिङ नम्बर",
+  "license_gate.title": "Easy-Post Desktop सक्रिय गर्नुहोस्",
+  "license_gate.subtitle": "एप अनलक गर्न आफ्नो खरिदपछि इमेलमा प्राप्त गरेको इजाजतपत्र कुञ्जी प्रविष्ट गर्नुहोस्।",
+  "license_gate.key_label": "इजाजतपत्र कुञ्जी:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "सक्रिय गर्नुहोस्",
+  "license_gate.buy_button": "इजाजतपत्र किन्नुहोस्",
+  "license_gate.invalid_title": "अमान्य इजाजतपत्र कुञ्जी",
+  "license_gate.invalid_body": "त्यो इजाजतपत्र कुञ्जी पहिचान भएन। तपाईंले आफ्नो खरिद इमेलबाट पूरै कुञ्जी प्रतिलिपि गर्नुभएको छ भन्ने सुनिश्चित गर्नुहोस्, वा सहयोगलाई सम्पर्क गर्नुहोस्।",
+  "license_gate.buy_soon_title": "खरिद चाँडै आउँदैछ",
+  "license_gate.buy_soon_body": "अनलाइन खरिद अहिले उपलब्ध छैन। कृपया केही समयपछि फेरि जाँच गर्नुहोस्।"
 }

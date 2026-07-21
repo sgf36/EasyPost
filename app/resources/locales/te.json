@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "రిఫ్రెష్ చేస్తోంది…",
   "tracking.table_group_title": "ట్రాక్ చేసిన షిప్‌మెంట్‌లు",
   "tracking.title": "ట్రాకింగ్",
-  "tracking.tracking_number_placeholder": "ట్రాకింగ్ నంబర్"
+  "tracking.tracking_number_placeholder": "ట్రాకింగ్ నంబర్",
+  "license_gate.title": "Easy-Post Desktop ను యాక్టివేట్ చేయండి",
+  "license_gate.subtitle": "యాప్‌ను అన్‌లాక్ చేయడానికి కొనుగోలు తర్వాత ఇమెయిల్ ద్వారా మీకు అందిన లైసెన్స్ కీని నమోదు చేయండి.",
+  "license_gate.key_label": "లైసెన్స్ కీ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "యాక్టివేట్ చేయండి",
+  "license_gate.buy_button": "లైసెన్స్ కొనుగోలు చేయండి",
+  "license_gate.invalid_title": "చెల్లని లైసెన్స్ కీ",
+  "license_gate.invalid_body": "ఆ లైసెన్స్ కీ గుర్తించబడలేదు. మీ కొనుగోలు ఇమెయిల్ నుండి పూర్తి కీని కాపీ చేశారని నిర్ధారించుకోండి, లేదా సపోర్ట్‌ను సంప్రదించండి.",
+  "license_gate.buy_soon_title": "కొనుగోళ్లు త్వరలో రానున్నాయి",
+  "license_gate.buy_soon_body": "ఆన్‌లైన్ కొనుగోలు ప్రస్తుతం అందుబాటులో లేదు. దయచేసి కొద్దిసేపటి తర్వాత మళ్లీ తనిఖీ చేయండి."
 }

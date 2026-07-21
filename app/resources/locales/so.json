@@ -378,5 +378,15 @@
   "address_book.state_label_emirate": "Imaaraadka:",
   "address_book.state_label_default": "Gobolka/Aagga/Dhulka:",
   "address_book.postal_label_zip": "Koodhka ZIP-ka:",
-  "address_book.postal_label_postal": "Koodhka Boostada:"
+  "address_book.postal_label_postal": "Koodhka Boostada:",
+  "license_gate.title": "Fur Easy-Post Desktop",
+  "license_gate.subtitle": "Geli furaha shatiga ee aad ku heshay iimayl kadib iibsigaaga si aad u furto barnaamijka.",
+  "license_gate.key_label": "Furaha shatiga:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Fur",
+  "license_gate.buy_button": "Iibso shati",
+  "license_gate.invalid_title": "Furaha shatiga waa khalad",
+  "license_gate.invalid_body": "Furaha shatiga lama aqoonsan. Hubi inaad ka koobiday furaha oo dhan iimaylkaaga iibsiga, ama la xidhiidh taageerada.",
+  "license_gate.buy_soon_title": "Iibsashada dhawaan ayay imanaysaa",
+  "license_gate.buy_soon_body": "Iibsashada onlaynka weli lama heli karo. Fadlan mar dambe soo eeg."
 }

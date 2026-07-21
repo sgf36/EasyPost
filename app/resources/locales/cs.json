@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Obnovování…",
   "tracking.table_group_title": "Sledované zásilky",
   "tracking.title": "Sledování",
-  "tracking.tracking_number_placeholder": "Sledovací číslo"
+  "tracking.tracking_number_placeholder": "Sledovací číslo",
+  "license_gate.title": "Aktivovat Easy-Post Desktop",
+  "license_gate.subtitle": "Zadejte licenční klíč, který jste obdrželi e-mailem po nákupu, a odemkněte aplikaci.",
+  "license_gate.key_label": "Licenční klíč:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktivovat",
+  "license_gate.buy_button": "Koupit licenci",
+  "license_gate.invalid_title": "Neplatný licenční klíč",
+  "license_gate.invalid_body": "Tento licenční klíč nebyl rozpoznán. Ujistěte se, že jste zkopírovali celý klíč z e-mailu o nákupu, nebo kontaktujte podporu.",
+  "license_gate.buy_soon_title": "Nákup již brzy",
+  "license_gate.buy_soon_body": "Online nákup zatím není k dispozici. Zkuste to prosím znovu později."
 }
