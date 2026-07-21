@@ -5,8 +5,11 @@
  * webhook, mints an Ed25519-signed offline license key (the format
  * app/core/license.py verifies), and emails it to the buyer via Resend.
  *
- * Always-warm, no cold starts. All secrets come from Worker bindings; nothing
- * sensitive is in the repo.
+ * Crypto uses node:crypto (requires the `nodejs_compat` compatibility flag,
+ * set in wrangler.toml). That API is fully supported in Workers, accepts the
+ * PEM key directly, and is byte-for-byte the same code path we test locally
+ * under Node — safer than relying on WebCrypto's Ed25519 algorithm naming,
+ * which differed historically in the Workers runtime.
  *
  * Secrets (wrangler secret put ...):
  *   LICENSE_PRIVATE_KEY_PEM  Ed25519 private key, PKCS8 PEM (public half is embedded in the app)
@@ -20,56 +23,39 @@
  *   LICENSE_PRODUCT_ID       optional, default "easypost-desktop"
  */
 
-const enc = new TextEncoder();
+import { createHmac, createPrivateKey, sign as nodeSign, timingSafeEqual } from "node:crypto";
+
 const SIGNATURE_TOLERANCE_SECONDS = 300;
 
-function pemToDer(pem) {
-  const b64 = pem
-    .replace(/-----BEGIN [^-]+-----/, "")
-    .replace(/-----END [^-]+-----/, "")
-    .replace(/\s+/g, "");
-  const bin = atob(b64);
-  const der = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) der[i] = bin.charCodeAt(i);
-  return der;
+function b64url(buf) {
+  return Buffer.from(buf).toString("base64url");
 }
 
-function b64url(bytes) {
-  let bin = "";
-  for (const b of bytes) bin += String.fromCharCode(b);
-  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-function toHex(buf) {
-  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-function timingSafeEqual(a, b) {
-  if (a.length !== b.length) return false;
-  let r = 0;
-  for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return r === 0;
-}
-
-async function verifyPaddleSignature(rawBody, sigHeader, secret) {
-  const parts = Object.fromEntries(
-    sigHeader.split(";").map((kv) => kv.split("=").map((s) => s.trim()))
-  );
+/** Verify Paddle's `Paddle-Signature: ts=<unix>;h1=<hex hmac of "ts:body">`. */
+export function verifyPaddleSignature(rawBody, sigHeader, secret) {
+  let parts;
+  try {
+    parts = Object.fromEntries(
+      String(sigHeader).split(";").map((kv) => kv.split("=").map((s) => s.trim()))
+    );
+  } catch {
+    return false;
+  }
   const { ts, h1 } = parts;
   if (!ts || !h1) return false;
   if (Math.abs(Date.now() / 1000 - Number(ts)) > SIGNATURE_TOLERANCE_SECONDS) return false;
-  const key = await crypto.subtle.importKey(
-    "raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
-  );
-  const mac = await crypto.subtle.sign("HMAC", key, enc.encode(`${ts}:${rawBody}`));
-  return timingSafeEqual(toHex(mac), h1);
+  const expected = createHmac("sha256", secret).update(`${ts}:${rawBody}`).digest("hex");
+  const a = Buffer.from(expected, "utf8");
+  const b = Buffer.from(h1, "utf8");
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
-async function mintLicense(pem, product, email, order, iat) {
-  const payloadBytes = enc.encode(JSON.stringify({ v: 1, product, email, order, iat }));
-  const key = await crypto.subtle.importKey("pkcs8", pemToDer(pem), { name: "Ed25519" }, false, ["sign"]);
-  const sig = new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, key, payloadBytes));
-  return `EPD1.${b64url(payloadBytes)}.${b64url(sig)}`;
+/** Mint the offline license key the desktop app verifies. */
+export function mintLicense(pem, product, email, order, iat) {
+  const payload = Buffer.from(JSON.stringify({ v: 1, product, email, order, iat }), "utf8");
+  // Ed25519 takes a null digest algorithm.
+  const signature = nodeSign(null, payload, createPrivateKey(pem));
+  return `EPD1.${b64url(payload)}.${b64url(signature)}`;
 }
 
 async function getCustomerEmail(base, apiKey, customerId) {
@@ -113,7 +99,7 @@ export default {
 
     const raw = await request.text();
     const sig = request.headers.get("Paddle-Signature") || "";
-    if (!(await verifyPaddleSignature(raw, sig, env.PADDLE_WEBHOOK_SECRET))) {
+    if (!verifyPaddleSignature(raw, sig, env.PADDLE_WEBHOOK_SECRET)) {
       return new Response("invalid signature", { status: 401 });
     }
 
@@ -131,7 +117,7 @@ export default {
     const iat = event.occurred_at || "1970-01-01T00:00:00Z";
 
     const email = await getCustomerEmail(base, env.PADDLE_API_KEY, data.customer_id);
-    const licenseKey = await mintLicense(env.LICENSE_PRIVATE_KEY_PEM, product, email, txn, iat);
+    const licenseKey = mintLicense(env.LICENSE_PRIVATE_KEY_PEM, product, email, txn, iat);
     await sendLicenseEmail(env.RESEND_API_KEY, env.LICENSE_FROM_EMAIL, email, licenseKey);
 
     return json({ status: "license_issued", transaction: txn });

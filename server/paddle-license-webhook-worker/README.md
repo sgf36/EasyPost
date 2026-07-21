@@ -5,8 +5,12 @@ into an emailed license key. On `transaction.completed` for the license price,
 it verifies the signed webhook, mints an Ed25519-signed key (the format
 `app/core/license.py` verifies offline), and emails it via Resend.
 
-Ed25519 signing and HMAC verification use the Workers WebCrypto runtime — no
-native dependencies. Stateless; all secrets are Worker bindings.
+Ed25519 signing and HMAC verification use `node:crypto` (hence the
+`nodejs_compat` compatibility flag in `wrangler.toml`). That API is fully
+supported in Workers, takes the PEM key directly, and is the same code path we
+verify locally under Node — avoiding the Workers runtime's historical
+WebCrypto Ed25519 algorithm-naming differences. Stateless; all secrets are
+Worker bindings.
 
 > This is the recommended deployment. A container/FastAPI equivalent lives in
 > `../paddle-license-webhook/` if you ever want to self-host instead.
