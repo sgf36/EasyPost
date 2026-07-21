@@ -4,3 +4,4 @@ requests>=2.31.0
 keyring>=24.0.0
 platformdirs>=4.0.0
 cryptography>=42.0.0
+mcp>=1.28.0

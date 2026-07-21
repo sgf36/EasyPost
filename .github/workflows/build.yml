@@ -46,6 +46,14 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: touch app/resources/license_required.flag
 
+      # The MCP bridge is direct-download only. The Windows leg builds the
+      # Store MSIX from the same tree, so the flag is written after the MSIX
+      # is packaged rather than here -- see "Enable MCP for the direct-download
+      # Windows build" further down.
+      - name: Enable MCP bridge for the macOS build
+        if: matrix.os == 'macos-latest'
+        run: touch app/resources/mcp_supported.flag
+
       - name: Build with PyInstaller
         run: pyinstaller packaging/build_exe.spec --noconfirm --distpath dist --workpath build
 
@@ -71,6 +79,12 @@ jobs:
       #   APPLE_ID                      Apple ID email used for notarization
       #   APPLE_APP_PASSWORD            app-specific password for that Apple ID
       #   APPLE_TEAM_ID                 10-character Apple Developer Team ID
+      # Before notarization, not after: a bundle missing its flags must fail
+      # here rather than after half an hour in Apple's queue.
+      - name: Verify variant flags survived packaging (macOS)
+        if: matrix.os == 'macos-latest'
+        run: bash packaging/verify_variant_flags.sh dist/EasyPostDesktop.app
+
       - name: Sign, notarize & package macOS (.dmg)
         if: matrix.os == 'macos-latest' && env.HAS_MACOS_SIGNING == 'true'
         # Hard ceiling on the whole step. Run 29849490422 sat here for 1h58m:
@@ -163,9 +177,36 @@ jobs:
       # Packages dist/EasyPostDesktop/ (the PyInstaller output above) into
       # dist/EasyPostDesktop.msix for Microsoft Store submission via Partner
       # Center — see packaging/build_msix.py and README.
+      #
+      # Ordering matters: this runs while no variant flags exist, so the MSIX
+      # is packaged from a Store-shaped build (no licence gate, no MCP). The
+      # direct-download Windows build is produced afterwards, with the flags
+      # in place, overwriting dist/EasyPostDesktop/.
       - name: Build MSIX package
         if: matrix.os == 'windows-latest'
         run: python packaging\build_msix.py
+
+      # Now rebuild the same tree as the direct-download variant. The MSIX is
+      # already written, so overwriting dist/EasyPostDesktop/ is safe, and it
+      # is this second build that ships from the website.
+      - name: Enable MCP + license gate for the direct-download Windows build
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          touch app/resources/license_required.flag
+          touch app/resources/mcp_supported.flag
+
+      - name: Rebuild Windows direct-download variant
+        if: matrix.os == 'windows-latest'
+        run: pyinstaller packaging/build_exe.spec --noconfirm --distpath dist --workpath build
+
+      # A packaged build that quietly loses its variant flags would ship the
+      # paid app ungated, which is exactly what happened before the flags were
+      # added to the spec's datas. Fail the build rather than find out later.
+      - name: Verify variant flags survived packaging (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: bash packaging/verify_variant_flags.sh dist/EasyPostDesktop
 
       # MSIX/AppX packages must carry *some* signature to be structurally
       # valid, but the Microsoft Store re-signs with its own certificate
