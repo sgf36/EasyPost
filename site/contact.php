@@ -26,18 +26,18 @@
 declare(strict_types=1);
 
 /*
- * AppleApps@ is an alias on the spencer@spencerfields.com mailbox, defined in
+ * Apps@ is an alias on the spencer@spencerfields.com mailbox, defined in
  * Microsoft 365 -- which is where the domain's MX points.
  *
  * This only works because cPanel > Email Routing for spencerfields.com is set
  * to "Remote Mail Exchanger". It was previously "Local Mail Exchanger", which
  * made the web server believe it was the mail host: exim delivered on-box,
- * found no local "appleapps" mailbox, hit the domain's catch-all
+ * found no matching local mailbox, hit the domain's catch-all
  * (`*: :fail: No Such User Here`) and dropped every message -- after mail()
  * had already returned true, so the form reported success and nothing arrived.
  * If support mail ever goes quiet again, check that setting first.
  */
-const MAIL_TO            = 'AppleApps@spencerfields.com';
+const MAIL_TO            = 'Apps@spencerfields.com';
 const MAIL_FROM          = 'noreply@easy-post.spencerfields.com';
 const MIN_FILL_SECONDS   = 3;
 const MAX_FILL_AGE       = 86400;   // a stamp older than a day is stale
