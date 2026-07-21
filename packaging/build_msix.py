@@ -12,6 +12,7 @@ submission — the Store re-signs on publish.
 
 import shutil
 import subprocess
+import zipfile
 from pathlib import Path
 
 from PIL import Image
@@ -65,7 +66,15 @@ def stage_package() -> None:
     staging_dir.mkdir(parents=True)
 
     shutil.copy2(manifest_src, staging_dir / "AppxManifest.xml")
-    shutil.copytree(pyinstaller_output, staging_dir / "EasyPostDesktop")
+    # The MCP helper is direct-download only: a Store package cannot have another
+    # application launch it out of the install location. Shipping it anyway would
+    # be ~10 MB of dead weight and an invitation to wire up something that will
+    # not work, so drop it here rather than teaching the spec about variants.
+    shutil.copytree(
+        pyinstaller_output,
+        staging_dir / "EasyPostDesktop",
+        ignore=shutil.ignore_patterns("easypost-mcp", "easypost-mcp.exe"),
+    )
     generate_assets(staging_dir / "Assets")
 
 
@@ -79,7 +88,28 @@ def pack() -> None:
     )
 
 
+def verify_store_variant() -> None:
+    """The Store package must carry neither variant flag nor the MCP helper.
+
+    The mirror of packaging/verify_variant_flags.sh: that one fails the build
+    when the direct download *loses* a flag, this one fails when the Store
+    build *gains* one. A flag smuggled in here would gate a Store purchase
+    behind a second paid unlock, which breaches Microsoft's policies.
+    """
+    with zipfile.ZipFile(output_msix) as archive:
+        names = archive.namelist()
+
+    strays = [n for n in names if n.endswith(".flag") or "easypost-mcp" in n]
+    if strays:
+        raise SystemExit(
+            "MSIX contains files that belong only to the direct download:\n  "
+            + "\n  ".join(strays)
+        )
+    print("Store variant verified: no licence flag, no MCP helper.")
+
+
 if __name__ == "__main__":
     stage_package()
     pack()
+    verify_store_variant()
     print(f"Built {output_msix}")
