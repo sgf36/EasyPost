@@ -1,0 +1,6 @@
+RewriteEngine On
+# Canonical HTTPS. Both conditions must hold, so this cannot loop on Bluehost,
+# where TLS terminates at the proxy and Apache itself sees plain HTTP.
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
