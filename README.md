@@ -5,6 +5,23 @@ A cross-platform (Windows/macOS) desktop app for shipping through
 address verification, refunds, insurance, pickups, claims, and batch
 shipping — all against your own EasyPost account.
 
+Product site: **[easy-post.spencerfields.com](https://easy-post.spencerfields.com)**
+
+> **Status.** The source is complete and CI-green on Windows and macOS. The
+> two distribution channels are at different stages — see
+> [Distribution](#distribution) for exactly what is and is not ready.
+
+## Contents
+
+- [First-time setup](#first-time-setup) — running from source
+- [Features](#features)
+- [Distribution](#distribution) — the two channels and how they differ
+- [Licensing](#licensing-direct-downloads-only) — how the offline licence gate works
+- [Tracking updates](#tracking-updates-polling-vs-real-time-webhook-push)
+- [Running tests](#running-tests)
+- [Building a standalone app](#building-a-standalone-app)
+- [Repository layout](#repository-layout)
+
 ## First-time setup
 
 ```
@@ -72,6 +89,58 @@ money asks for confirmation while in production mode.
 - **Support the project** — an optional, dismissible donation banner (and a
   permanent link in Settings) points to a Stripe-hosted "pay what you want"
   page. Purely optional; nothing in the app depends on it.
+
+## Distribution
+
+The app ships through two channels, and they are deliberately **not** the
+same build.
+
+| | Microsoft Store | Direct download |
+|---|---|---|
+| Package | `.msix` | `.dmg` (macOS), `.exe` folder (Windows) |
+| Price | Set in Partner Center | $29 one-time via Paddle |
+| Licence gate | **Off** | **On** |
+| Signing | Store re-signs on publish | Apple Developer ID + notarization |
+| Status | Draft; blocked on payout profile | Blocked on notarization + Paddle approval |
+
+The licence gate is compiled in or out by the presence of
+`app/resources/license_required.flag`, which CI creates on the macOS leg
+only (see `.github/workflows/build.yml`). The Store build omits it, because
+gating a Store purchase behind a second paid unlock would breach Microsoft's
+policies — and would be a poor experience regardless. `app/config.py` reads
+the flag once at import into `LICENSE_REQUIRED`.
+
+### Why direct download exists at all
+
+Selling a $29 licence through an app store costs 15–30% in commission.
+Selling the same licence directly, with Paddle as Merchant of Record, costs
+roughly 5% + 50c and keeps Paddle responsible for VAT/GST registration and
+remittance worldwide. Apple's Guideline 3.1.1 forbids *unlocking* App Store
+app functionality with an externally-bought key, which is why the licence
+gate is scoped strictly to builds distributed outside any store.
+
+## Licensing (direct downloads only)
+
+Licence keys are **Ed25519-signed and verified entirely offline** — the app
+never phones home, and there is no activation server to go down or to leak
+customer data.
+
+```
+EPD1.<base64url(payload)>.<base64url(signature)>
+payload = {"v":1,"product":"easypost-desktop","email":…,"order":…,"iat":…}
+```
+
+- `app/core/license.py` holds the **public** key and verifies. The private
+  key never ships.
+- `tools/issue_license.py` mints keys by hand — the manual fallback, and how
+  refunds/replacements get handled.
+- `server/paddle-license-webhook-worker/` is a Cloudflare Worker that turns a
+  completed Paddle transaction into an emailed key automatically. It verifies
+  Paddle's HMAC signature, checks the price id, mints, and sends via Resend.
+  Deployed and live; see its own README for the four secrets it needs.
+
+Because `iat` is taken from the Paddle event's `occurred_at`, a webhook retry
+mints a byte-identical key rather than a second one.
 
 ## Tracking updates: polling vs. real-time webhook push
 
@@ -176,6 +245,43 @@ this path, unlike the plain `.exe`'s SmartScreen problem below. Uninstall a
 local test install with `Get-AppxPackage SFields.Easy-PostDesktop |
 Remove-AppxPackage`.
 
+### macOS signing and notarization
+
+macOS Gatekeeper refuses an unsigned or un-notarized app downloaded from the
+internet, so the direct-download `.dmg` is signed with a **Developer ID
+Application** certificate, notarized by Apple, and stapled. This runs in CI
+and is gated on `MACOS_CERTIFICATE_P12_BASE64` being present, so forks
+without the secret still build normally.
+
+Required repository secrets:
+
+| Secret | What it is |
+|---|---|
+| `MACOS_CERTIFICATE_P12_BASE64` | Developer ID cert + key, PKCS#12, base64 |
+| `MACOS_CERTIFICATE_PASSWORD` | password for that `.p12` |
+| `MACOS_SIGN_IDENTITY` | e.g. `Developer ID Application: … (TEAMID)` |
+| `APPLE_ID`, `APPLE_APP_PASSWORD`, `APPLE_TEAM_ID` | notarytool credentials |
+
+Two traps worth recording, both of which cost real time here:
+
+- **Export the `.p12` with `-legacy -macalg sha1`.** OpenSSL 3.x writes
+  PKCS#12 using AES/PBKDF2 with a SHA-256 MAC, which macOS `security import`
+  cannot read — it fails with `MAC verification failed (wrong password?)`
+  even when the password is perfectly correct.
+  ```
+  openssl pkcs12 -export -legacy -macalg sha1 \
+    -inkey key.pem -in cert.pem -out DeveloperID.p12
+  ```
+- **`ditto`, not `cp`, for the `.app` bundle.** `cp -R` breaks the symlinked
+  Qt frameworks and drops the executable bit, and arm64 macOS refuses a
+  bundle whose signature no longer matches.
+
+Notarization is submitted and waited on separately rather than with
+`submit --wait`, so the submission id is always captured even if polling
+dies. The wait is bounded (`--timeout 30m`, plus step and job timeouts). To
+query a submission afterwards without rebuilding, run the **Notarization
+status** workflow from the Actions tab with the submission id.
+
 ### Windows SmartScreen warning
 
 Running a freshly-built `EasyPostDesktop.exe` on Windows will likely show a
@@ -206,3 +312,42 @@ and `WINDOWS_CODE_SIGNING_CERT_PASSWORD` repo secrets are added.
 **If you hit the prompt:** click "More info" → "Run anyway". That's safe to
 do for a build you compiled yourself or downloaded from this repo's own
 GitHub Actions runs.
+
+## Repository layout
+
+```
+app/
+  config.py              paths, constants, LICENSE_REQUIRED flag detection
+  core/                  client, credentials, SQLite, settings, licence,
+                         label_options, webhook manager, HTTP receiver, tunnel
+  services/              one module per EasyPost resource (shipments, batches,
+                         addresses, tracking, insurance, pickups, claims,
+                         packages, hts_lookup) — thin SDK wrapper + local sync
+  ui/                    theme.py (Fusion + stylesheet), main_window.py (shell
+                         and grouped nav), views/, widgets/
+  resources/locales/     50 language catalogues; en.json is the source of truth
+packaging/               PyInstaller spec, MSIX manifest/builder, signing
+                         scripts, macOS entitlements
+server/
+  paddle-license-webhook-worker/   Cloudflare Worker: Paddle -> licence email
+  paddle-license-webhook/          container/FastAPI equivalent, if self-hosting
+site/                    easy-post.spencerfields.com — product site, policies
+                         and the PHP contact form
+tools/issue_license.py   mint a licence key by hand
+tests/                   pytest suite, no network access required
+```
+
+### Conventions worth knowing before contributing
+
+- **`en.json` is the source of truth for strings.** `tests/test_i18n.py`
+  asserts every one of the other 49 catalogues has an identical key set, so
+  adding a key means adding it everywhere. That test is the safety net for
+  machine-generated translations at this scale.
+- **No network in tests.** Every external call is mocked. A test that reaches
+  a live API will pass on your machine and fail in CI the day that service is
+  slow — which is exactly what happened once here.
+- **Services own persistence, views own presentation.** A view should not
+  build EasyPost request bodies, and a service should not import Qt.
+- **Carrier names are text, never logo artwork.** See
+  `app/ui/widgets/chips.py` for why, and what would have to change to ship
+  real logos.
