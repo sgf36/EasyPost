@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Yaroqsiz litsenziya kaliti",
   "license_gate.key_label": "Litsenziya kaliti:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Bu obuna faol emas",
   "license_gate.offline_body": "Kalitingiz haqiqiy, shuning uchun davom etishingiz mumkin. Hozircha kompyuterlar sonini tasdiqlab bo‘lmadi; avtomatik ravishda qayta urinamiz. Agar {date} gacha ham ulanib bo‘lmasa, sizdan qaytadan faollashtirish so‘raladi.",
   "license_gate.offline_title": "Faollashtirish xizmatiga ulanib bo‘lmadi",
   "license_gate.release_body": "Litsenziyangiz {seats} ta kompyuterni qamrab oladi va hammasi bandda. Shu kompyuter o‘rnini egallashi uchun bo‘shatiladigan bittasini tanlang. Bo‘shatilgan kompyuterdan keyingi ishga tushirishda qayta faollashtirish so‘raladi.",

@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Invalid license key",
   "license_gate.key_label": "License key:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "This subscription is not active",
   "license_gate.offline_body": "Your key is valid, so you can carry on. We could not confirm the computer allowance just now, and will try again automatically. If it still cannot be reached by {date}, you will be asked to activate again.",
   "license_gate.offline_title": "Could not reach the activation service",
   "license_gate.release_body": "Your licence covers {seats} computers and all of them are in use. Choose one to release so this computer can take its place. The released computer will be asked to activate again next time it starts.",

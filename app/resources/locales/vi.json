@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Khóa giấy phép không hợp lệ",
   "license_gate.key_label": "Khóa giấy phép:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Gói đăng ký này không hoạt động",
   "license_gate.offline_body": "Khóa của bạn hợp lệ nên bạn có thể tiếp tục. Hiện chưa xác nhận được số máy tính; chúng tôi sẽ tự động thử lại. Nếu đến {date} vẫn không liên hệ được, bạn sẽ được yêu cầu kích hoạt lại.",
   "license_gate.offline_title": "Không liên hệ được dịch vụ kích hoạt",
   "license_gate.release_body": "Giấy phép của bạn dùng cho {seats} máy tính và tất cả đang được sử dụng. Hãy chọn một máy để giải phóng, để máy này thế chỗ. Máy được giải phóng sẽ phải kích hoạt lại ở lần khởi động sau.",

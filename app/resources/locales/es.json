@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Clave de licencia no válida",
   "license_gate.key_label": "Clave de licencia:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Esta suscripción no está activa",
   "license_gate.offline_body": "Su clave es válida, así que puede continuar. No se ha podido confirmar el número de equipos en este momento; lo intentaremos de nuevo automáticamente. Si el {date} sigue sin poder contactarse, se le pedirá que active de nuevo.",
   "license_gate.offline_title": "No se pudo contactar con el servicio de activación",
   "license_gate.release_body": "Su licencia cubre {seats} equipos y todos están en uso. Elija uno para liberarlo y que este equipo ocupe su lugar. Al equipo liberado se le pedirá que active de nuevo la próxima vez que se inicie.",

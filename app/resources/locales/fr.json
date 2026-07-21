@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Clé de licence non valide",
   "license_gate.key_label": "Clé de licence :",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Cet abonnement n'est pas actif",
   "license_gate.offline_body": "Votre clé est valable, vous pouvez donc continuer. Le nombre d'ordinateurs n'a pas pu être confirmé pour l'instant ; nous réessaierons automatiquement. Si le service reste injoignable au {date}, il vous sera demandé de procéder à une nouvelle activation.",
   "license_gate.offline_title": "Impossible de joindre le service d'activation",
   "license_gate.release_body": "Votre licence couvre {seats} ordinateurs, tous utilisés. Choisissez-en un à libérer pour que cet ordinateur prenne sa place. Une nouvelle activation sera demandée à l'ordinateur libéré à son prochain démarrage.",

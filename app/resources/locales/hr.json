@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Nevažeći licencni ključ",
   "license_gate.key_label": "Licencni ključ:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Ova pretplata nije aktivna",
   "license_gate.offline_body": "Vaš ključ je važeći pa možete nastaviti. Broj računala trenutačno nije bilo moguće potvrditi; pokušat ćemo ponovno automatski. Ako usluga ni {date} ne bude dostupna, bit ćete zamoljeni da ponovno aktivirate.",
   "license_gate.offline_title": "Nije moguće doći do usluge aktivacije",
   "license_gate.release_body": "Vaša licenca pokriva {seats} računala i sva su u upotrebi. Odaberite jedno za oslobađanje kako bi ovo računalo zauzelo njegovo mjesto. Oslobođeno računalo bit će pri sljedećem pokretanju zamoljeno da ponovno aktivira.",

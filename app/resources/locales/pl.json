@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Nieprawidłowy klucz licencyjny",
   "license_gate.key_label": "Klucz licencyjny:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Ta subskrypcja nie jest aktywna",
   "license_gate.offline_body": "Klucz jest prawidłowy, więc można kontynuować. Nie udało się teraz potwierdzić liczby komputerów; spróbujemy ponownie automatycznie. Jeśli do {date} usługa nadal będzie niedostępna, pojawi się prośba o ponowną aktywację.",
   "license_gate.offline_title": "Nie można połączyć się z usługą aktywacji",
   "license_gate.release_body": "Licencja obejmuje {seats} komputerów i wszystkie są w użyciu. Wybierz jeden do zwolnienia, aby ten komputer zajął jego miejsce. Zwolniony komputer poprosi o ponowną aktywację przy następnym uruchomieniu.",

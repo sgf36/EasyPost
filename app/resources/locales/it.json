@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Chiave di licenza non valida",
   "license_gate.key_label": "Chiave di licenza:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Questo abbonamento non è attivo",
   "license_gate.offline_body": "La chiave è valida, quindi può proseguire. Non è stato possibile confermare ora il numero di computer; riproveremo automaticamente. Se al {date} il servizio risulterà ancora irraggiungibile, le verrà chiesto di attivare di nuovo.",
   "license_gate.offline_title": "Impossibile raggiungere il servizio di attivazione",
   "license_gate.release_body": "La licenza copre {seats} computer, tutti in uso. Ne scelga uno da rilasciare affinché questo computer ne prenda il posto. Al computer rilasciato verrà chiesto di attivare di nuovo al prossimo avvio.",

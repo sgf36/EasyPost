@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "מפתח רישיון לא תקין",
   "license_gate.key_label": "מפתח רישיון:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "מנוי זה אינו פעיל",
   "license_gate.offline_body": "המפתח שלך תקף, כך שאפשר להמשיך. לא ניתן היה לאשר כעת את מספר המחשבים; ננסה שוב באופן אוטומטי. אם עד {date} השירות עדיין לא יהיה זמין, תתבקש להפעיל מחדש.",
   "license_gate.offline_title": "לא ניתן היה להגיע לשירות ההפעלה",
   "license_gate.release_body": "הרישיון שלך מכסה {seats} מחשבים וכולם בשימוש. בחר אחד לשחרור כדי שהמחשב הזה יתפוס את מקומו. המחשב המשוחרר יתבקש להפעיל מחדש בהפעלה הבאה.",

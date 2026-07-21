@@ -144,27 +144,32 @@ gate is scoped strictly to builds distributed outside any store.
 
 ## Licensing (direct downloads only)
 
-Four tiers, all one-time purchases with no expiry. They differ only in how many
-computers one key covers.
+Four tiers. Personal is bought once and never expires; the two middle tiers
+renew annually.
 
-| Tier | Price | Computers |
-|---|---|---|
-| Personal | $29 | 3 |
-| Business | $59 | 25 |
-| Organisation | $79 | 50 |
-| Enterprise | contact | uncapped (`seats: 0`) |
+| Tier | Price | Computers | Billing |
+|---|---|---|---|
+| Personal | $29 | 3 | one-time, perpetual |
+| Business | $59 | 25 | annual subscription |
+| Organisation | $79 | 50 | annual subscription |
+| Enterprise | contact | uncapped (`seats: 0`) | as agreed |
 
 Licence keys are **Ed25519-signed and verified offline**:
 
 ```
 EPD1.<base64url(payload)>.<base64url(signature)>
-payload = {"v":2,"product":"easypost-desktop","tier":…,"seats":…,"email":…,"order":…,"iat":…}
+payload = {"v":2,"product":"easypost-desktop","tier":…,"seats":…,"plan":…,"email":…,"order":…,"iat":…}
 ```
 
 `v1` keys predate tiers, are already in customers' hands, and still verify —
 read as `personal`/3 seats. An explicit `seats` beats the tier table, so a
-bespoke allowance can be sold without shipping a new build. Both fields are
-signed, so neither can be edited.
+bespoke allowance can be sold without shipping a new build. All three fields
+are signed, so none can be edited.
+
+**There is deliberately no expiry in the key.** A key that expired would have to
+be reissued and re-pasted every year. Instead an annual key is permanent and
+names the *subscription*; the activation receipt carries the date and renews
+itself in the background. A customer pastes one key, once, ever.
 
 - `app/core/license.py` holds the **public** key and verifies. The private
   key never ships.
@@ -185,9 +190,12 @@ is about keeping that intrusion small. **The README used to claim the app never
 phones home. That is no longer true, and PRIVACY.md has been corrected** — it
 now states exactly what activation sends.
 
-- **The network is touched once.** Activation asks for an Ed25519-signed
+- **The network is touched rarely.** Activation asks for an Ed25519-signed
   *receipt* and verifies it offline on every launch afterwards. No heartbeat,
-  nothing that can fail at start-up. Receipts last 400 days.
+  nothing that can fail at start-up. A perpetual licence gets a 400-day receipt
+  and then never contacts us again in practice; an annual one gets a receipt
+  running to the end of the paid period plus 10 days, refreshed quietly 21 days
+  before it lapses so nobody offline on their renewal date is locked out.
 - **The server never learns which computer it is.** It receives
   `HMAC-SHA256(licence_key, machine_id)`. Keying by the licence means one
   computer under two licences produces two unrelated hashes, so activations

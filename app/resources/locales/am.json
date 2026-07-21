@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "ልክ ያልሆነ የፍቃድ ቁልፍ",
   "license_gate.key_label": "የፍቃድ ቁልፍ:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "ይህ ምዝገባ ንቁ አይደለም",
   "license_gate.offline_body": "ቁልፍዎ ትክክለኛ ነው፣ ስለዚህ መቀጠል ይችላሉ። አሁን የኮምፒውተሮችን ብዛት ማረጋገጥ አልተቻለም፤ በራስ-ሰር እንደገና እንሞክራለን። እስከ {date} ድረስም መድረስ ካልተቻለ፣ እንደገና እንዲያነቁ ይጠየቃሉ።",
   "license_gate.offline_title": "የማንቃት አገልግሎቱ ላይ መድረስ አልተቻለም",
   "license_gate.release_body": "ፈቃድዎ {seats} ኮምፒውተሮችን ይሸፍናል፣ ሁሉም በአገልግሎት ላይ ናቸው። ይህ ኮምፒውተር ቦታውን እንዲይዝ የሚለቀቅ አንዱን ይምረጡ። የተለቀቀው ኮምፒውተር በሚቀጥለው ጅምር እንደገና እንዲነቃ ይጠየቃል።",

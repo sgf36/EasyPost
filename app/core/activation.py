@@ -65,6 +65,12 @@ ACTIVATION_BASE_URL = "https://easypost-license-webhook.sgf36.workers.dev"
 # it is a grace period rather than a way around activation.
 GRACE_DAYS = 14
 
+# Subscription receipts expire with the billing period, so they are refreshed
+# before they lapse rather than at the moment they do. Without this head start a
+# customer who happens to be offline on their renewal date would be locked out
+# of software they are paying for.
+RENEW_WITHIN_DAYS = 21
+
 # Network calls here are the only ones a launch could ever block on, so they get
 # a hard, short ceiling. Failure is a fallback path, not an error state.
 REQUEST_TIMEOUT_SECONDS = 8
@@ -84,6 +90,14 @@ class SeatsExhausted(ActivationError):
 
 class LicenseRevoked(ActivationError):
     """The key was refunded or withdrawn."""
+
+
+class SubscriptionLapsed(ActivationError):
+    """An annual plan is no longer being paid for.
+
+    Distinct from revocation because it is recoverable by the customer without
+    talking to us, and the message should say so.
+    """
 
 
 class ActivationUnreachable(ActivationError):
@@ -303,6 +317,10 @@ def current_receipt(info: LicenseInfo) -> Optional[Receipt]:
     return None
 
 
+def _expires_within(receipt: "Receipt", days: int) -> bool:
+    return _parse_iso(receipt.expires_at) <= _now() + timedelta(days=days)
+
+
 def ensure_seat(info: LicenseInfo) -> bool:
     """Make sure this computer holds a seat, claiming one only if it has none.
 
@@ -314,9 +332,20 @@ def ensure_seat(info: LicenseInfo) -> bool:
     Never raises. A failure here means "could not confirm", and the caller
     decides — it must not be the reason an app that was working stops working.
     """
-    if current_receipt(info) is not None:
-        return True
     settings = load_settings()
+    receipt = current_receipt(info)
+
+    if receipt is not None:
+        # An annual plan's receipt expires with the billing period, so refresh it
+        # a few weeks early. Best effort by design: the current receipt is still
+        # valid, so a failure here must be invisible rather than fatal.
+        if info.is_subscription and _expires_within(receipt, RENEW_WITHIN_DAYS):
+            try:
+                activate_device(settings.license_key or "", info)
+            except ActivationError:
+                pass
+        return True
+
     try:
         activate_device(settings.license_key or "", info)
         return True
@@ -381,6 +410,10 @@ def _post(path: str, body: dict) -> dict:
         raise SeatsExhausted(
             data.get("error") or "This licence is already on all its computers.",
             data.get("devices") or [],
+        )
+    if response.status_code == 402:
+        raise SubscriptionLapsed(
+            data.get("error") or "This subscription is no longer active."
         )
     if response.status_code == 403:
         raise LicenseRevoked(data.get("error") or "This licence is no longer valid.")

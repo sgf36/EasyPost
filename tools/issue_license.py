@@ -35,6 +35,17 @@ TIERS = {
     "enterprise": 0,  # uncapped
 }
 
+# The two middle tiers renew annually. The key itself never expires — it names
+# the subscription, and the activation receipt carries the date — so a comped
+# annual key needs a subscription record on the server before it will activate
+# for more than a week. Comp a perpetual tier unless you mean otherwise.
+PLANS = {
+    "personal": "perpetual",
+    "business": "annual",
+    "organisation": "annual",
+    "enterprise": "perpetual",
+}
+
 
 def _b64url(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
@@ -49,12 +60,14 @@ def load_private_key(path: str) -> Ed25519PrivateKey:
 
 
 def mint(private_key: Ed25519PrivateKey, email: str, order: str,
-         tier: str = "personal", seats: int = None) -> str:
+         tier: str = "personal", seats: int = None, plan: str = None) -> str:
     # Both tier and seats are signed. Carrying the count explicitly means a
     # bespoke seat allowance can be sold without shipping a new build, and the
     # app never has to trust an unsigned lookup.
     if seats is None:
         seats = TIERS[tier]
+    if plan is None:
+        plan = PLANS.get(tier, "perpetual")
     payload = {
         "v": 2,
         "product": PRODUCT_ID,
@@ -62,6 +75,7 @@ def mint(private_key: Ed25519PrivateKey, email: str, order: str,
         "order": order,
         "tier": tier,
         "seats": seats,
+        "plan": plan,
         "iat": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     payload_bytes = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -79,6 +93,9 @@ def main(argv=None) -> int:
                         help="Licence tier; sets the computer allowance (default: personal).")
     parser.add_argument("--seats", type=int, default=None,
                         help="Override the tier's computer allowance. 0 means uncapped.")
+    parser.add_argument("--plan", default=None, choices=["perpetual", "annual"],
+                        help="Override the tier's billing. Use perpetual to comp an "
+                             "annual tier without creating a subscription.")
     args = parser.parse_args(argv)
 
     if not args.key:
@@ -87,7 +104,7 @@ def main(argv=None) -> int:
         parser.error("--seats cannot be negative (use 0 for uncapped)")
 
     private_key = load_private_key(args.key)
-    print(mint(private_key, args.email, args.order, args.tier, args.seats))
+    print(mint(private_key, args.email, args.order, args.tier, args.seats, args.plan))
     return 0
 
 

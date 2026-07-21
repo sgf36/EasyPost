@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "잘못된 라이선스 키",
   "license_gate.key_label": "라이선스 키:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "이 구독은 활성 상태가 아닙니다",
   "license_gate.offline_body": "키는 유효하므로 계속 사용하실 수 있습니다. 지금은 컴퓨터 수를 확인하지 못했으며 자동으로 다시 시도합니다. {date}까지도 연결되지 않으면 다시 활성화를 요청드립니다.",
   "license_gate.offline_title": "활성화 서비스에 연결할 수 없습니다",
   "license_gate.release_body": "라이선스는 컴퓨터 {seats}대까지 사용할 수 있으며 모두 사용 중입니다. 이 컴퓨터가 자리를 대신할 수 있도록 해제할 컴퓨터를 하나 선택하세요. 해제된 컴퓨터는 다음 실행 시 다시 활성화해야 합니다.",
