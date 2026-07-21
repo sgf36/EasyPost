@@ -3,7 +3,17 @@ name: Build
 on:
   push:
     branches: [main]
+    # The marketing site and prose changes cannot affect the binaries, and a
+    # macOS leg costs ~10 minutes plus a notarization wait. Skip them.
+    paths-ignore:
+      - "site/**"
+      - "**/*.md"
+      - "LICENSE"
   pull_request:
+    paths-ignore:
+      - "site/**"
+      - "**/*.md"
+      - "LICENSE"
   workflow_dispatch:
 
 jobs:
@@ -13,6 +23,9 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    # Backstop for the whole job. GitHub's default is 6 hours, which is far
+    # longer than anything here should legitimately take.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
 
@@ -60,6 +73,11 @@ jobs:
       #   APPLE_TEAM_ID                 10-character Apple Developer Team ID
       - name: Sign, notarize & package macOS (.dmg)
         if: matrix.os == 'macos-latest' && env.HAS_MACOS_SIGNING == 'true'
+        # Hard ceiling on the whole step. Run 29849490422 sat here for 1h58m:
+        # the DMG uploaded fine, then `notarytool --wait` silently retried a
+        # dead runner network until it gave up. Without this the job would
+        # have run to GitHub's 6-hour default.
+        timeout-minutes: 45
         env:
           HAS_MACOS_SIGNING: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 != '' }}
           MACOS_CERTIFICATE_P12_BASE64: ${{ secrets.MACOS_CERTIFICATE_P12_BASE64 }}
@@ -95,8 +113,48 @@ jobs:
           codesign --force --timestamp --sign "$MACOS_SIGN_IDENTITY" "$DMG"
 
           # 4) Notarize and staple.
-          xcrun notarytool submit "$DMG" \
-            --apple-id "$APPLE_ID" --password "$APPLE_APP_PASSWORD" --team-id "$APPLE_TEAM_ID" --wait
+          #
+          # Submit and wait are deliberately separate calls. `submit --wait`
+          # prints the submission id only to stdout as it goes, so when the
+          # wait died mid-poll the id was buried in a 1000-line log and the
+          # build looked like it had simply hung. Capturing the id first means
+          # it is always recorded and always queryable afterwards, whatever
+          # happens to the polling.
+          AUTH=(--apple-id "$APPLE_ID" --password "$APPLE_APP_PASSWORD" --team-id "$APPLE_TEAM_ID")
+
+          SUBMISSION_ID="$(
+            xcrun notarytool submit "$DMG" "${AUTH[@]}" --no-wait --output-format json \
+              | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])'
+          )"
+          echo "Notarization submission id: $SUBMISSION_ID"
+          {
+            echo "### macOS notarization"
+            echo "- Submission id: \`$SUBMISSION_ID\`"
+            echo "- Query later: \`Notarization status\` workflow, or"
+            echo "  \`xcrun notarytool info $SUBMISSION_ID --apple-id … --team-id …\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Bounded wait. Apple normally answers within minutes; 30m is
+          # generous without letting a stalled poll eat the whole job.
+          if ! xcrun notarytool wait "$SUBMISSION_ID" "${AUTH[@]}" --timeout 30m; then
+            echo "::error::Notarization did not reach Accepted within the timeout."
+            echo "Fetching whatever Apple has recorded for $SUBMISSION_ID:"
+            xcrun notarytool info "$SUBMISSION_ID" "${AUTH[@]}" || true
+            xcrun notarytool log "$SUBMISSION_ID" "${AUTH[@]}" || true
+            exit 1
+          fi
+
+          # A rejected submission still "completes", so check the verdict and
+          # print Apple's log, which names the exact offending binary.
+          STATUS="$(xcrun notarytool info "$SUBMISSION_ID" "${AUTH[@]}" --output-format json \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin)["status"])')"
+          echo "Notarization status: $STATUS"
+          if [ "$STATUS" != "Accepted" ]; then
+            echo "::error::Notarization returned $STATUS. Apple's log follows."
+            xcrun notarytool log "$SUBMISSION_ID" "${AUTH[@]}" || true
+            exit 1
+          fi
+
           xcrun stapler staple "$DMG"
           xcrun stapler validate "$DMG"
 

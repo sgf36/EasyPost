@@ -1,0 +1,66 @@
+# Ask Apple what happened to a notarization submission, without rebuilding.
+#
+# A submission survives the job that created it: once notarytool has uploaded
+# a DMG, Apple holds the verdict against the submission id indefinitely. When
+# a build's polling dies -- as it did in run 29849490422, where the runner lost
+# DNS mid-wait after the upload had succeeded -- the answer is still there to
+# be fetched. This workflow fetches it.
+#
+# Run it from the Actions tab: "Notarization status" -> Run workflow.
+name: Notarization status
+
+on:
+  workflow_dispatch:
+    inputs:
+      submission_id:
+        description: "notarytool submission id (UUID)"
+        required: true
+        # The DMG uploaded at 16:40 on 21 July 2026 whose verdict was never seen.
+        default: "c1dad992-1388-4d67-b290-65d6a4dabc5d"
+
+jobs:
+  status:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: Query Apple
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          SUBMISSION_ID: ${{ inputs.submission_id }}
+        run: |
+          set -uo pipefail
+          AUTH=(--apple-id "$APPLE_ID" --password "$APPLE_APP_PASSWORD" --team-id "$APPLE_TEAM_ID")
+
+          echo "== info =="
+          xcrun notarytool info "$SUBMISSION_ID" "${AUTH[@]}" | tee info.txt
+
+          echo
+          echo "== log (names the offending binary when a submission is Invalid) =="
+          # A submission that never finished processing has no log yet; that is
+          # informative in itself, so do not fail the job over it.
+          xcrun notarytool log "$SUBMISSION_ID" "${AUTH[@]}" | tee notary-log.json || \
+            echo "(no log available -- submission may still be In Progress)"
+
+          echo
+          echo "== recent submission history for this team =="
+          xcrun notarytool history "${AUTH[@]}" | head -40 || true
+
+          STATUS="$(sed -n 's/^ *status: *//p' info.txt | head -1)"
+          {
+            echo "### Notarization status"
+            echo ""
+            echo "- Submission: \`$SUBMISSION_ID\`"
+            echo "- Status: **${STATUS:-unknown}**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Apple's response
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notarization-${{ inputs.submission_id }}
+          path: |
+            info.txt
+            notary-log.json
+          if-no-files-found: warn
