@@ -88,3 +88,26 @@ switch the vars/secrets to live values and redeploy.
 - **Idempotent-ish:** the license `iat` is the event's `occurred_at`, so Paddle
   retries mint the identical key rather than a new one.
 - **Manual fallback:** `tools/issue_license.py` still issues keys by hand.
+
+
+## Live wiring (as configured 2026-07-22)
+
+Paddle product `pro_01ky2h8cfe2ven8ypchnmfbena` — "Easy-Post Desktop License":
+
+| Price id | Tier | Amount | Billing |
+|---|---|---|---|
+| `pri_01ky2hekjfm1c9nspf5pnqv0jv` | personal | $29 | one-time |
+| `pri_01ky3fxcf519vwq9vw8cwy35k9` | business | $149 | yearly |
+| `pri_01ky3fxdv0gcg0xnf04npzpb2k` | organisation | $349 | yearly |
+
+Notification destination `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` posts to
+`/paddle/webhook` for `transaction.completed`, `adjustment.created` and the
+`subscription.*` lifecycle events.
+
+**`transaction.refunded` is not a Paddle event.** Refunds arrive as
+`adjustment.created`; subscribing to the former makes the whole destination
+fail validation.
+
+The Paddle API key expires **19 July 2027**. Paddle caps key lifetime at about
+a year, so this needs rotating before then or licence emails stop being sent —
+the buyer's email address is looked up through it.

@@ -243,8 +243,12 @@ export default {
 
     // A refunded or charged-back purchase must stop working. Revoking also frees
     // the seats, so a replacement key issued later starts from a clean slate.
-    if (event.event_type === "transaction.refunded"
-        || event.event_type === "adjustment.created") {
+    //
+    // Paddle signals this with adjustment.created, NOT transaction.refunded -
+    // that event does not exist and the notification destination rejects it as
+    // an invalid subscription. The second name is kept only as a harmless guard.
+    if (event.event_type === "adjustment.created"
+        || event.event_type === "transaction.refunded") {
       const txnId = data.transaction_id || data.id || "";
       if (txnId && env.LICENSES) {
         await revokeOrder(env.LICENSES, txnId, event.event_type.split(".")[1]);
