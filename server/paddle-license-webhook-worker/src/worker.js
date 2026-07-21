@@ -69,7 +69,7 @@ async function getCustomerEmail(base, apiKey, customerId) {
 /**
  * Relay a contact-form submission from easy-post.spencerfields.com.
  *
- * The site's PHP handler does the spam filtering and then posts here rather
+ * The site PHP handler does the spam filtering and then posts here rather
  * than calling Resend itself, so the Resend key never sits on shared hosting.
  * The shared secret guarding this route is deliberately low-value: the worst
  * anyone can do with it is send Spencer email at his own address. A leaked
@@ -100,23 +100,24 @@ async function handleContact(request, env) {
   }
 
   const to = env.CONTACT_TO_EMAIL;
+  const ip = String(body.ip || "unknown").slice(0, 45);
   const text =
-    `A message was sent from the Easy-Post Desktop contact form.\n\n` +
-    `Name:  ${name}\nEmail: ${email}\nTopic: ${topic}\n` +
-    `IP:    ${String(body.ip || "unknown").slice(0, 45)}\n\n` +
-    `-----------------------------------------\n\n${message}\n`;
+    "A message was sent from the Easy-Post Desktop contact form.\n\n" +
+    "Name:  " + name + "\nEmail: " + email + "\nTopic: " + topic + "\n" +
+    "IP:    " + ip + "\n\n" +
+    "-----------------------------------------\n\n" + message + "\n";
 
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      Authorization: "Bearer " + env.RESEND_API_KEY,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: `Easy-Post Desktop <${env.LICENSE_FROM_EMAIL}>`,
+      from: "Easy-Post Desktop <" + env.LICENSE_FROM_EMAIL + ">",
       to: [to],
       reply_to: email,
-      subject: `[Easy-Post Desktop] ${topic} — ${name}`,
+      subject: "[Easy-Post Desktop] " + topic + " — " + name,
       text,
     }),
   });
