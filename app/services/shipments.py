@@ -5,6 +5,18 @@ from typing import Optional
 
 from app.core.client import client_manager
 from app.core.db import db_cursor
+from app.core.label_options import build_options
+from app.core.settings import load_settings
+
+
+def preferred_label_options() -> dict:
+    """The user's preferred label format/size, as EasyPost shipment options.
+
+    Read per call rather than cached so a change in Settings takes effect on
+    the very next shipment without an app restart.
+    """
+    settings = load_settings()
+    return build_options(settings.label_format, settings.label_size)
 
 
 def create_shipment(
@@ -44,6 +56,7 @@ def create_shipment(
         from_address={"id": from_address_id},
         parcel=parcel,
         reference=reference or None,
+        options=preferred_label_options(),
     )
     if customs_info:
         params["customs_info"] = customs_info

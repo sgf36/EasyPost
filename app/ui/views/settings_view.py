@@ -18,6 +18,12 @@ from PySide6.QtWidgets import (
 
 from app.config import DONATION_URL
 from app.core.credential_store import load_credentials, save_credentials
+from app.core.label_options import (
+    LABEL_FORMATS,
+    default_size_for,
+    normalise,
+    sizes_for_format,
+)
 from app.core.settings import load_settings, save_settings
 from app.core.webhook_manager import (
     STATE_ERROR,
@@ -61,12 +67,86 @@ class SettingsView(QWidget):
         layout.addWidget(title)
         layout.addLayout(form)
         layout.addLayout(button_row)
+        layout.addWidget(self._build_label_group())
         layout.addWidget(self._build_language_group())
         layout.addWidget(self._build_webhook_group())
         layout.addWidget(self._build_support_group())
         layout.addStretch(1)
 
         self.refresh()
+
+    def _build_label_group(self) -> QGroupBox:
+        """Printed-label format and size.
+
+        A preference rather than a per-shipment choice because it's dictated
+        by the printer and label stock on the desk, which doesn't change from
+        parcel to parcel. It applies to single and batch shipments alike, and
+        only takes effect on shipments created after it's changed — EasyPost
+        fixes label_size at shipment-creation time.
+        """
+        group = QGroupBox(tr("settings.label_group_title"))
+        settings = load_settings()
+        current_format, current_size = normalise(settings.label_format, settings.label_size)
+
+        self._label_format_combo = QComboBox()
+        for code in LABEL_FORMATS:
+            self._label_format_combo.addItem(
+                tr("settings.label_format_option", format=code, size=default_size_for(code)), code
+            )
+        self._label_format_combo.setCurrentIndex(self._label_format_combo.findData(current_format))
+
+        self._label_size_combo = QComboBox()
+        self._populate_label_sizes(current_format, current_size)
+
+        self._label_format_combo.currentIndexChanged.connect(self._on_label_format_changed)
+        self._label_size_combo.currentIndexChanged.connect(self._on_label_choice_saved)
+
+        form = QFormLayout()
+        form.addRow(tr("settings.label_format_label"), self._label_format_combo)
+        form.addRow(tr("settings.label_size_label"), self._label_size_combo)
+
+        caveats = QLabel(
+            tr("settings.label_caveat_ups")
+            + "\n"
+            + tr("settings.label_caveat_dhl")
+            + "\n"
+            + tr("settings.label_caveat_zpl_only")
+        )
+        caveats.setWordWrap(True)
+
+        note = QLabel(tr("settings.label_applies_note"))
+        note.setWordWrap(True)
+
+        layout = QVBoxLayout()
+        layout.addLayout(form)
+        layout.addWidget(note)
+        layout.addWidget(caveats)
+        group.setLayout(layout)
+        return group
+
+    def _populate_label_sizes(self, label_format: str, preferred: str) -> None:
+        combo = self._label_size_combo
+        combo.blockSignals(True)
+        combo.clear()
+        for size in sizes_for_format(label_format):
+            combo.addItem(size, size)
+        index = combo.findData(preferred)
+        combo.setCurrentIndex(index if index >= 0 else 0)
+        combo.blockSignals(False)
+
+    def _on_label_format_changed(self, _index: int) -> None:
+        label_format = self._label_format_combo.currentData()
+        # Re-offer only the sizes that make sense for the new format, keeping
+        # the current size if it survives the switch.
+        self._populate_label_sizes(label_format, self._label_size_combo.currentData())
+        self._on_label_choice_saved()
+
+    def _on_label_choice_saved(self, _index: int = 0) -> None:
+        settings = load_settings()
+        settings.label_format, settings.label_size = normalise(
+            self._label_format_combo.currentData(), self._label_size_combo.currentData()
+        )
+        save_settings(settings)
 
     def _build_language_group(self) -> QGroupBox:
         group = QGroupBox(tr("settings.language_group_title"))
