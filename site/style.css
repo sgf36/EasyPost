@@ -106,6 +106,59 @@ section + section { border-top: 1px solid var(--rule); }
 .grid h3 { margin-top: 0; }
 .grid p { color: var(--body); margin-bottom: 0; }
 
+/* ---- section lede (full-width sections that still need a readable
+   opening line, so it is capped even though its section is not) ---- */
+.section-lede { max-width: var(--measure); font-size: 1.05rem; margin-bottom: 2.2em; }
+
+/* ---- support: form beside the contact details ---- */
+.support-grid {
+  display: grid; gap: 2.5rem;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: start;
+}
+@media (max-width: 47rem) { .support-grid { grid-template-columns: 1fr; } }
+
+.field { margin-bottom: 1.1rem; }
+.field label { display: block; font-size: .88rem; font-weight: 600; color: var(--ink); margin-bottom: .35em; }
+.field input, .field textarea, .field select {
+  width: 100%; font: inherit; font-size: .95rem; color: var(--body);
+  background: var(--white); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 10px 12px;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(31, 92, 84, .12);
+}
+.field textarea { min-height: 9rem; resize: vertical; }
+
+/* Honeypot. Positioned off-canvas rather than display:none, which some bots
+   check for; kept out of the tab order and hidden from assistive tech. */
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.form-note { font-size: .82rem; color: var(--muted); margin-top: .9em; }
+
+.contact-card {
+  background: var(--cream); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 1.5rem 1.6rem;
+}
+.contact-card h3 { margin-top: 0; font-size: 1.15rem; }
+.contact-card details { margin-top: 1em; }
+.contact-card summary {
+  cursor: pointer; color: var(--green); font-weight: 600; font-size: .92rem;
+}
+.contact-card dl { margin: 1em 0 0; }
+.contact-card dt {
+  font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); margin-top: .9em;
+}
+.contact-card dd { margin: .2em 0 0; color: var(--ink); }
+
+.form-status {
+  border-radius: 4px; padding: 12px 14px; margin-bottom: 1.5rem; font-size: .92rem;
+  border: 1px solid var(--rule); background: var(--cream);
+}
+.form-status.ok { border-color: #b7d8c8; background: #eef7f2; color: #17443e; }
+.form-status.bad { border-color: #e4c3c3; background: #fbeeee; color: #8d2b2b; }
+
 /* ---- price card ---- */
 .price-card {
   background: var(--cream); border: 1px solid var(--rule); border-radius: 6px;
