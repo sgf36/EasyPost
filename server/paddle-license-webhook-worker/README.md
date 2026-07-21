@@ -108,6 +108,19 @@ Notification destination `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` posts to
 `adjustment.created`; subscribing to the former makes the whole destination
 fail validation.
 
-The Paddle API key expires **19 July 2027**. Paddle caps key lifetime at about
-a year, so this needs rotating before then or licence emails stop being sent —
-the buyer's email address is looked up through it.
+The Paddle API key (`Licence webhook (Worker, read-only)`) is scoped to
+**`customer.read` + `transaction.read` only** — the sole runtime call is
+`GET /customers/{id}` to find the buyer's email. It cannot create or change
+anything, so a leak of the Worker's secrets cannot be used to alter prices,
+issue refunds or touch the catalogue.
+
+It expires **18 July 2027**. Paddle caps key lifetime at roughly a year (a
+2036 expiry was rejected outright), so this needs rotating before then or
+licence emails stop being sent.
+
+The products and prices above were created with a temporary broad key, which
+was revoked immediately afterwards.
+
+**The permission checkboxes in Paddle's key dialog only respond to real mouse
+clicks** — setting them programmatically appears to succeed and silently does
+not register, producing a "Select at least one" error on save.
