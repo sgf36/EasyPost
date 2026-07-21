@@ -14,7 +14,7 @@ database_id = "2deb96f3-3585-4c03-a147-11547e5f76c1"
 [vars]
 # Which tier each Paddle price buys. A price that is not listed mints nothing,
 # so a new product cannot hand out licences before its tier has been decided.
-PRICE_TIERS = '{"pri_01ky2hekjfm1c9nspf5pnqv0jv":"personal"}'
+PRICE_TIERS = '{"pri_01ky2hekjfm1c9nspf5pnqv0jv":"personal","pri_01ky3fxcf519vwq9vw8cwy35k9":"business","pri_01ky3fxdv0gcg0xnf04npzpb2k":"organisation"}'
 # Legacy single-price setting, read as the entry tier when PRICE_TIERS omits it.
 PADDLE_PRICE_ID = "pri_01ky2hekjfm1c9nspf5pnqv0jv"
 LICENSE_FROM_EMAIL = "licenses@easy-post.spencerfields.com"
