@@ -39,6 +39,13 @@ declare(strict_types=1);
  */
 const MAIL_TO            = 'Apps@spencerfields.com';
 const MAIL_FROM          = 'noreply@easy-post.spencerfields.com';
+
+// Cloudflare Worker relay (preferred delivery path -- see the send section).
+const WORKER_CONTACT_URL = 'https://easypost-license-webhook.sgf36.workers.dev/contact';
+// Kept above the document root so it is never web-servable, even if PHP
+// execution is ever misconfigured.
+const WORKER_SECRET_FILE = '/home2/spencgh6/.epd-contact-secret';
+
 const MIN_FILL_SECONDS   = 3;
 const MAX_FILL_AGE       = 86400;   // a stamp older than a day is stale
 const MAX_LINKS          = 3;
@@ -228,7 +235,73 @@ $headers = implode("\r\n", [
     'X-Mailer: easy-post.spencerfields.com',
 ]);
 
-$sent = @mail(MAIL_TO, $subject, $body, $headers, '-f' . MAIL_FROM);
+/*
+ * Delivery: Cloudflare Worker -> Resend first, PHP mail() as the fallback.
+ *
+ * mail() works, but Bluehost's shared outbound relays are poorly regarded by
+ * Exchange Online: even with SPF, DKIM and DMARC all passing, Microsoft still
+ * scored the message SCL:5 and filed it in Junk. That is reputation, not
+ * authentication, so no DNS record fixes it -- it needs a sender with its own
+ * standing, which is what Resend provides.
+ *
+ * The Resend key deliberately does not live on this shared host. The Worker
+ * holds it; this side only knows a shared secret whose worst-case misuse is
+ * sending Spencer mail at his own address.
+ *
+ * If the Worker is unreachable, misconfigured, or Resend rejects the send, we
+ * fall back to mail(). A message landing in Junk is a far better failure than
+ * a message silently lost.
+ */
+function relay_via_worker(array $payload, ?string &$error): bool
+{
+    $secretFile = WORKER_SECRET_FILE;
+    if (!is_readable($secretFile)) {
+        $error = 'shared secret file missing';
+        return false;
+    }
+    $secret = trim((string) file_get_contents($secretFile));
+    if ($secret === '') {
+        $error = 'shared secret empty';
+        return false;
+    }
+
+    $ch = curl_init(WORKER_CONTACT_URL);
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'X-EPD-Contact-Secret: ' . $secret,
+        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 12,
+        CURLOPT_CONNECTTIMEOUT => 6,
+    ]);
+    $response = curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr = curl_error($ch);
+    curl_close($ch);
+
+    if ($status === 200) {
+        return true;
+    }
+    $error = $curlErr !== '' ? $curlErr : "worker HTTP {$status}: " . substr((string) $response, 0, 200);
+    return false;
+}
+
+$relayError = null;
+$sent = relay_via_worker([
+    'name' => $name,
+    'email' => $email,
+    'topic' => $topic,
+    'message' => $message,
+    'ip' => $ip,
+], $relayError);
+
+if (!$sent) {
+    error_log('[easy-post contact] Worker relay failed, falling back to mail(): ' . $relayError);
+    $sent = @mail(MAIL_TO, $subject, $body, $headers, '-f' . MAIL_FROM);
+}
 
 if (!$sent) {
     render(

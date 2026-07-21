@@ -7,9 +7,11 @@ compatibility_flags = ["nodejs_compat"]
 # Non-secret configuration. Set the real values here before deploying.
 [vars]
 PADDLE_PRICE_ID = "pri_01ky2hekjfm1c9nspf5pnqv0jv"
-LICENSE_FROM_EMAIL = "licenses@yourdomain.com"
+LICENSE_FROM_EMAIL = "licenses@easy-post.spencerfields.com"
+CONTACT_TO_EMAIL = "Apps@spencerfields.com"
 # PADDLE_API_BASE = "https://api.paddle.com"      # sandbox: https://sandbox-api.paddle.com
 # LICENSE_PRODUCT_ID = "easypost-desktop"
 
 # Secrets are NOT stored here — set them with `wrangler secret put`:
-#   LICENSE_PRIVATE_KEY_PEM  PADDLE_WEBHOOK_SECRET  PADDLE_API_KEY  RESEND_API_KEY
+#   LICENSE_PRIVATE_KEY_PEM  PADDLE_WEBHOOK_SECRET  PADDLE_API_KEY
+#   RESEND_API_KEY  CONTACT_SHARED_SECRET

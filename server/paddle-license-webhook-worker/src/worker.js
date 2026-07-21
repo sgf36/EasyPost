@@ -66,6 +66,69 @@ async function getCustomerEmail(base, apiKey, customerId) {
   return (await r.json()).data.email;
 }
 
+/**
+ * Relay a contact-form submission from easy-post.spencerfields.com.
+ *
+ * The site's PHP handler does the spam filtering and then posts here rather
+ * than calling Resend itself, so the Resend key never sits on shared hosting.
+ * The shared secret guarding this route is deliberately low-value: the worst
+ * anyone can do with it is send Spencer email at his own address. A leaked
+ * Resend key, by contrast, would let them send mail *as* the domain.
+ */
+async function handleContact(request, env) {
+  const supplied = request.headers.get("X-EPD-Contact-Secret") || "";
+  const expected = env.CONTACT_SHARED_SECRET || "";
+  const a = Buffer.from(supplied, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  if (!expected || a.length !== b.length || !timingSafeEqual(a, b)) {
+    return new Response("forbidden", { status: 403 });
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "bad json" }, 400);
+  }
+
+  const name = String(body.name || "").slice(0, 100).replace(/[\r\n]/g, " ").trim();
+  const email = String(body.email || "").slice(0, 150).replace(/[\r\n]/g, " ").trim();
+  const topic = String(body.topic || "Something else").slice(0, 60).replace(/[\r\n]/g, " ").trim();
+  const message = String(body.message || "").slice(0, 4000);
+  if (!name || !email || message.length < 10) {
+    return json({ error: "missing fields" }, 400);
+  }
+
+  const to = env.CONTACT_TO_EMAIL;
+  const text =
+    `A message was sent from the Easy-Post Desktop contact form.\n\n` +
+    `Name:  ${name}\nEmail: ${email}\nTopic: ${topic}\n` +
+    `IP:    ${String(body.ip || "unknown").slice(0, 45)}\n\n` +
+    `-----------------------------------------\n\n${message}\n`;
+
+  const r = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: `Easy-Post Desktop <${env.LICENSE_FROM_EMAIL}>`,
+      to: [to],
+      reply_to: email,
+      subject: `[Easy-Post Desktop] ${topic} — ${name}`,
+      text,
+    }),
+  });
+
+  if (!r.ok) {
+    // Surface the reason so the PHP side can log it and fall back to mail().
+    const detail = await r.text().catch(() => "");
+    return json({ error: "resend", status: r.status, detail: detail.slice(0, 300) }, 502);
+  }
+  return json({ status: "sent" });
+}
+
 async function sendLicenseEmail(apiKey, from, to, licenseKey) {
   const text =
     "Thank you for buying Easy-Post Desktop.\n\n" +
@@ -93,6 +156,9 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/health") return json({ ok: true });
+    if (request.method === "POST" && url.pathname === "/contact") {
+      return handleContact(request, env);
+    }
     if (request.method !== "POST" || url.pathname !== "/paddle/webhook") {
       return new Response("Not found", { status: 404 });
     }
