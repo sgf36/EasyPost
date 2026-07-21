@@ -3,16 +3,28 @@
 Users paste the license key they were emailed after purchasing (via Paddle);
 it is verified offline against the embedded public key. A "Buy a license"
 button opens the Paddle checkout for users who don't have a key yet.
+
+Since tiers cap how many computers a key covers, a valid key is no longer the
+whole story: this screen also claims one of the licence's seats. Two rules
+shape how that failure is handled. If the licence is full the user is shown
+which computers are using it and can release one, because the alternative is
+telling a paying customer "no" with no way forward. If our own server cannot
+be reached the app lets them in on a time-limited grace — an outage of ours
+must never look like a licensing problem of theirs.
 """
 
 import webbrowser
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
     QFrame,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QListWidget,
+    QListWidgetItem,
     QMessageBox,
     QPushButton,
     QSizePolicy,
@@ -21,7 +33,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.core.license import PADDLE_CHECKOUT_URL, activate
+from app.core import activation
+from app.core.license import PADDLE_CHECKOUT_URL, activate, deactivate, verify_license
 from app.i18n import is_rtl, tr
 
 _CARD_MAX_WIDTH = 460
@@ -131,11 +144,100 @@ class LicenseGate(QWidget):
 
     def _on_activate(self) -> None:
         key = self._key_input.text().strip()
-        if activate(key) is not None:
-            self.activated.emit()
-        else:
+        info = activate(key)
+        if info is None:
             QMessageBox.warning(
                 self,
                 tr("license_gate.invalid_title"),
                 tr("license_gate.invalid_body"),
             )
+            return
+        if self._claim_seat(key, info):
+            self.activated.emit()
+
+    def _claim_seat(self, key: str, info, allow_release: bool = True) -> bool:
+        """Take one of the licence's seats. False means do not let them in."""
+        try:
+            activation.activate_device(key, info)
+            return True
+
+        except activation.SeatsExhausted as exc:
+            if allow_release and self._offer_release(key, info, exc.devices):
+                return self._claim_seat(key, info, allow_release=False)
+            return False
+
+        except activation.LicenseRevoked as exc:
+            # Refunded or withdrawn. Drop the key rather than leaving it sitting
+            # in settings to fail again at the next launch.
+            deactivate()
+            QMessageBox.warning(self, tr("license_gate.revoked_title"), str(exc))
+            return False
+
+        except activation.ActivationUnreachable:
+            until = activation.start_grace()
+            QMessageBox.information(
+                self,
+                tr("license_gate.offline_title"),
+                tr("license_gate.offline_body", date=until.strftime("%d %B %Y")),
+            )
+            return True
+
+        except activation.ActivationError as exc:
+            QMessageBox.warning(self, tr("license_gate.activation_failed_title"), str(exc))
+            return False
+
+    def _offer_release(self, key: str, info, devices: list[dict]) -> bool:
+        """Show the computers using this licence and free one. True if freed."""
+        dialog = _ReleaseDialog(info, devices, self)
+        if dialog.exec() != QDialog.DialogCode.Accepted or not dialog.selected:
+            return False
+        try:
+            activation.release_device(key, info, dialog.selected)
+            return True
+        except activation.ActivationError as exc:
+            QMessageBox.warning(self, tr("license_gate.release_failed_title"), str(exc))
+            return False
+
+
+class _ReleaseDialog(QDialog):
+    """Pick a computer to release so this one can take its seat.
+
+    The list is labelled with names the user chose, not device hashes, because
+    "release one of these" is only a real choice if they can tell them apart.
+    """
+
+    def __init__(self, info, devices: list[dict], parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.selected = ""
+        self.setWindowTitle(tr("license_gate.release_title"))
+
+        layout = QVBoxLayout(self)
+        heading = QLabel(tr("license_gate.release_body", seats=info.seats))
+        heading.setWordWrap(True)
+        layout.addWidget(heading)
+
+        self._list = QListWidget()
+        for device in devices:
+            label = device.get("label") or tr("license_gate.unnamed_device")
+            first_seen = (device.get("first_seen") or "")[:10]
+            item = QListWidgetItem(f"{label}   —   {first_seen}")
+            item.setData(Qt.ItemDataRole.UserRole, device.get("device", ""))
+            self._list.addItem(item)
+        layout.addWidget(self._list)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
+        buttons.button(QDialogButtonBox.StandardButton.Ok).setText(
+            tr("license_gate.release_confirm")
+        )
+        buttons.accepted.connect(self._accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def _accept(self) -> None:
+        item = self._list.currentItem()
+        if item is None:
+            return  # nothing chosen: keep the dialog open rather than silently doing nothing
+        self.selected = item.data(Qt.ItemDataRole.UserRole)
+        self.accept()

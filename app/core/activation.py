@@ -303,6 +303,30 @@ def current_receipt(info: LicenseInfo) -> Optional[Receipt]:
     return None
 
 
+def ensure_seat(info: LicenseInfo) -> bool:
+    """Make sure this computer holds a seat, claiming one only if it has none.
+
+    The upgrade path: someone who bought before tiers existed has a valid key
+    and no receipt, and should not be sent back to the activation screen. It is
+    also the only place the app reaches the network without being asked, which
+    is why it returns early the moment a valid receipt is present.
+
+    Never raises. A failure here means "could not confirm", and the caller
+    decides — it must not be the reason an app that was working stops working.
+    """
+    if current_receipt(info) is not None:
+        return True
+    settings = load_settings()
+    try:
+        activate_device(settings.license_key or "", info)
+        return True
+    except ActivationUnreachable:
+        start_grace()
+        return True
+    except ActivationError:
+        return False
+
+
 def start_grace() -> datetime:
     """Let the app run while our server is unreachable, and record until when."""
     until = _now() + timedelta(days=GRACE_DAYS)

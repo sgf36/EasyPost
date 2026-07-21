@@ -13,7 +13,8 @@ from PySide6.QtWidgets import (
 
 from app.config import APP_NAME, LICENSE_REQUIRED
 from app.core.client import client_manager
-from app.core.license import is_licensed
+from app.core.activation import ensure_seat
+from app.core.license import load_active_license
 from app.core.settings import load_settings
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
@@ -217,12 +218,24 @@ class MainWindow(QMainWindow):
     def _route_startup(self) -> None:
         """Gate order on launch: license first, then EasyPost credentials,
         then the app shell."""
-        if LICENSE_REQUIRED and not is_licensed():
+        if LICENSE_REQUIRED and not self._license_ok():
             self._root_stack.setCurrentWidget(self._license_gate)
         elif client_manager.credentials.active_key():
             self._show_app_shell()
         else:
             self._root_stack.setCurrentWidget(self._setup_wizard)
+
+    def _license_ok(self) -> bool:
+        """A valid key, and a seat on this computer to go with it.
+
+        Someone who bought before tiers existed has the first and not the
+        second, so ensure_seat claims one rather than sending them back to the
+        activation screen. It is a no-op once a receipt is stored.
+        """
+        info = load_active_license()
+        if info is None:
+            return False
+        return ensure_seat(info)
 
     def _on_license_activated(self) -> None:
         self._route_startup()
