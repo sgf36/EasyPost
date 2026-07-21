@@ -1,8 +1,10 @@
 """Application shell: first-run gate, nav sidebar, mode banner, view stack."""
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QListWidget,
+    QListWidgetItem,
     QMainWindow,
     QStackedWidget,
     QVBoxLayout,
@@ -92,27 +94,6 @@ class MainWindow(QMainWindow):
         body_layout.setContentsMargins(0, 0, 0, 0)
         body_layout.setSpacing(0)
 
-        self._nav = QListWidget()
-        self._nav.setObjectName("navSidebar")
-        self._nav.setFixedWidth(196)
-        self._nav.addItems(
-            [
-                tr("main_window.nav_dashboard"),
-                tr("main_window.nav_address_book"),
-                tr("main_window.nav_create_shipment"),
-                tr("main_window.nav_tracking"),
-                tr("main_window.nav_history"),
-                tr("main_window.nav_insurance"),
-                tr("main_window.nav_pickups"),
-                tr("main_window.nav_claims"),
-                tr("main_window.nav_batch_shipments"),
-                tr("main_window.nav_reports"),
-                tr("main_window.nav_hts_lookup"),
-                tr("main_window.nav_settings"),
-            ]
-        )
-        self._nav.currentRowChanged.connect(self._on_nav_changed)
-
         self._view_stack = QStackedWidget()
         self._view_stack.setContentsMargins(18, 14, 18, 14)
         self._dashboard_view = DashboardView()
@@ -127,47 +108,104 @@ class MainWindow(QMainWindow):
         self._reports_view = ReportsView()
         self._hts_lookup_view = HtsLookupView()
         self._settings_view = SettingsView()
-        self._view_stack.addWidget(self._dashboard_view)
-        self._view_stack.addWidget(self._address_book_view)
-        self._view_stack.addWidget(self._create_shipment_view)
-        self._view_stack.addWidget(self._tracking_view)
-        self._view_stack.addWidget(self._history_view)
-        self._view_stack.addWidget(self._insurance_view)
-        self._view_stack.addWidget(self._pickups_view)
-        self._view_stack.addWidget(self._claims_view)
-        self._view_stack.addWidget(self._batch_view)
-        self._view_stack.addWidget(self._reports_view)
-        self._view_stack.addWidget(self._hts_lookup_view)
-        self._view_stack.addWidget(self._settings_view)
+
+        self._nav = QListWidget()
+        self._nav.setObjectName("navSidebar")
+        self._nav.setFixedWidth(196)
+        self._nav_actions: dict[int, object] = {}
+        self._build_nav()
+        self._nav.currentRowChanged.connect(self._on_nav_changed)
 
         body_layout.addWidget(self._nav)
         body_layout.addWidget(self._view_stack, stretch=1)
         outer.addWidget(body, stretch=1)
 
-        self._nav.setCurrentRow(0)
+        self._select_first_nav_entry()
         return shell
 
-    def _on_nav_changed(self, index: int) -> None:
-        self._view_stack.setCurrentIndex(index)
-        if index == 1:  # Address Book
-            self._address_book_view.refresh_table()
-        elif index == 2:  # Create Shipment
-            self._create_shipment_view.refresh_address_choices()
-        elif index == 3:  # Tracking
-            self._tracking_view.refresh_table()
-        elif index == 4:  # History
-            self._history_view.refresh_table()
-        elif index == 6:  # Pickups
+    def _nav_sections(self):
+        """Sidebar grouped by what the user is trying to do, so the everyday
+        shipping flow isn't given the same visual weight as Claims or HTS
+        Lookup. Each entry is (label key, view, refresh-on-show callable)."""
+
+        def pickups_refresh() -> None:
             self._pickups_view.refresh_choices()
             self._pickups_view.refresh_scheduled()
-        elif index == 7:  # Claims
-            self._claims_view.refresh_table()
-        elif index == 8:  # Batch Shipments
-            self._batch_view.refresh_address_choices()
-        elif index == 9:  # Reports
-            self._reports_view.refresh()
-        elif index == 11:  # Settings
-            self._settings_view.refresh()
+
+        return [
+            (
+                "main_window.nav_section_shipping",
+                [
+                    ("main_window.nav_dashboard", self._dashboard_view, None),
+                    (
+                        "main_window.nav_create_shipment",
+                        self._create_shipment_view,
+                        self._create_shipment_view.refresh_address_choices,
+                    ),
+                    (
+                        "main_window.nav_batch_shipments",
+                        self._batch_view,
+                        self._batch_view.refresh_address_choices,
+                    ),
+                    (
+                        "main_window.nav_address_book",
+                        self._address_book_view,
+                        self._address_book_view.refresh_table,
+                    ),
+                ],
+            ),
+            (
+                "main_window.nav_section_manage",
+                [
+                    ("main_window.nav_tracking", self._tracking_view, self._tracking_view.refresh_table),
+                    ("main_window.nav_history", self._history_view, self._history_view.refresh_table),
+                    ("main_window.nav_insurance", self._insurance_view, None),
+                    ("main_window.nav_claims", self._claims_view, self._claims_view.refresh_table),
+                    ("main_window.nav_pickups", self._pickups_view, pickups_refresh),
+                ],
+            ),
+            (
+                "main_window.nav_section_tools",
+                [
+                    ("main_window.nav_reports", self._reports_view, self._reports_view.refresh),
+                    ("main_window.nav_hts_lookup", self._hts_lookup_view, None),
+                    ("main_window.nav_settings", self._settings_view, self._settings_view.refresh),
+                ],
+            ),
+        ]
+
+    def _build_nav(self) -> None:
+        for header_key, entries in self._nav_sections():
+            header = QListWidgetItem(tr(header_key))
+            # NoItemFlags makes the header unselectable, so it reads as a
+            # caption and arrow-key navigation skips straight over it.
+            header.setFlags(Qt.ItemFlag.NoItemFlags)
+            header.setData(Qt.ItemDataRole.UserRole, None)
+            self._nav.addItem(header)
+            for label_key, view, on_show in entries:
+                stack_index = self._view_stack.addWidget(view)
+                item = QListWidgetItem(tr(label_key))
+                item.setData(Qt.ItemDataRole.UserRole, stack_index)
+                self._nav.addItem(item)
+                self._nav_actions[stack_index] = on_show
+
+    def _select_first_nav_entry(self) -> None:
+        for row in range(self._nav.count()):
+            if self._nav.item(row).data(Qt.ItemDataRole.UserRole) is not None:
+                self._nav.setCurrentRow(row)
+                return
+
+    def _on_nav_changed(self, row: int) -> None:
+        item = self._nav.item(row)
+        if item is None:
+            return
+        stack_index = item.data(Qt.ItemDataRole.UserRole)
+        if stack_index is None:  # a section header
+            return
+        self._view_stack.setCurrentIndex(stack_index)
+        on_show = self._nav_actions.get(stack_index)
+        if on_show is not None:
+            on_show()
 
     def _route_startup(self) -> None:
         """Gate order on launch: license first, then EasyPost credentials,

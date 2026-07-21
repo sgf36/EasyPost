@@ -50,6 +50,41 @@ def create_shipment(
     return client.shipment.create(**params)
 
 
+def create_rate_quote(
+    *,
+    from_postal_code: str,
+    to_postal_code: str,
+    from_country: str = "US",
+    to_country: str = "US",
+    weight: float,
+    length: Optional[float] = None,
+    width: Optional[float] = None,
+    height: Optional[float] = None,
+    predefined_package: Optional[str] = None,
+):
+    """Price-check a route from postal codes alone, without an address book
+    entry at either end.
+
+    Carriers can rate on postal code + country, which is enough to answer
+    "roughly what will this cost?" before anyone has typed a full address.
+    The resulting shipment is **quote-only**: a label cannot be bought from
+    it, because carriers require a complete, verified recipient address to
+    generate one. Callers must keep the Buy action disabled for these.
+    """
+    parcel = {"weight": weight}
+    if predefined_package:
+        parcel["predefined_package"] = predefined_package
+    else:
+        parcel.update({"length": length, "width": width, "height": height})
+
+    client = client_manager.get_client()
+    return client.shipment.create(
+        to_address={"zip": to_postal_code, "country": to_country},
+        from_address={"zip": from_postal_code, "country": from_country},
+        parcel=parcel,
+    )
+
+
 def buy_shipment(shipment_id: str, rate_id: str):
     client = client_manager.get_client()
     return client.shipment.buy(shipment_id, rate={"id": rate_id})

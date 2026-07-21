@@ -116,6 +116,16 @@ QListWidget#navSidebar::item:selected {{
     color: {ACCENT};
     font-weight: 600;
 }}
+/* Section captions. They carry Qt::NoItemFlags, so they match :disabled and
+   can never be selected or hovered — they only group the entries below. */
+QListWidget#navSidebar::item:disabled {{
+    color: {TEXT_MUTED};
+    background: transparent;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 14px 12px 4px 12px;
+    margin: 0;
+}}
 
 /* ---- headings (QLabel rich text uses <h2>) ---- */
 QLabel {{

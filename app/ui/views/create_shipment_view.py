@@ -5,6 +5,7 @@ from functools import partial
 
 import requests
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -19,6 +20,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMessageBox,
     QPushButton,
+    QRadioButton,
     QScrollArea,
     QSpinBox,
     QTableWidget,
@@ -37,12 +39,70 @@ from app.services.packages import (
     list_saved_packages,
     save_package,
 )
-from app.services.shipments import buy_shipment, create_shipment, save_shipment_locally
+from app.services.shipments import (
+    buy_shipment,
+    create_rate_quote,
+    create_shipment,
+    save_shipment_locally,
+)
+from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
+from app.ui.widgets.chips import badge, carrier_chip
 from app.ui.widgets.purchase_confirm import confirm_if_production
 
-_RATE_COLUMN_COUNT = 6
+# Carrier & service | Rate | Delivery | Buy. Carrier and service share one
+# cell (chip plus name) rather than taking a column each — the same amount of
+# information in less width, which keeps the table readable now that it sits
+# beside the label preview.
+_RATE_COLUMN_COUNT = 4
 _CUSTOMS_ITEM_COLUMN_COUNT = 7
+
+# Label previews are rendered from the image EasyPost returns. PDFs can't be
+# painted by Qt without a PDF engine, so those fall back to the open/save
+# buttons alone.
+_PREVIEWABLE_SUFFIXES = (".png", ".jpg", ".jpeg", ".gif", ".bmp")
+
+
+def _rate_sort_key(rate) -> float:
+    """Cheapest first. EasyPost returns rates in no meaningful order and hands
+    back `rate` as a string, so anything unparseable sorts to the bottom
+    rather than crashing the whole table."""
+    try:
+        return float(getattr(rate, "rate", None))
+    except (TypeError, ValueError):
+        return float("inf")
+
+
+def _delivery_days(rate) -> int | None:
+    days = getattr(rate, "delivery_days", None)
+    try:
+        return int(days)
+    except (TypeError, ValueError):
+        return None
+
+
+def _fastest_rate_id(rates) -> str | None:
+    """Id of the quickest rate, or None when no carrier quoted an estimate
+    (common for international and for some regional carriers)."""
+    timed = [r for r in rates if _delivery_days(r) is not None]
+    if not timed:
+        return None
+    return min(timed, key=_delivery_days).id
+
+
+def _format_price(rate) -> str:
+    amount = getattr(rate, "rate", "") or ""
+    currency = getattr(rate, "currency", "") or ""
+    return f"{amount} {currency}".strip()
+
+
+def _format_delivery(rate) -> str:
+    """Just the number — the column is already headed "Est. days", so this
+    sidesteps plural rules ("1 days") in every one of the 50 locales."""
+    days = _delivery_days(rate)
+    if days is None:
+        return tr("create_shipment.delivery_unknown")
+    return str(days)
 
 
 class CreateShipmentView(QWidget):
@@ -50,18 +110,28 @@ class CreateShipmentView(QWidget):
         super().__init__(parent)
         self._pending_task = None
         self._pending_packages_task = None
+        self._pending_preview_task = None
         self._current_shipment = None
         self._address_by_id = {}
         self._saved_packages = []
         self._predefined_packages = []
+        # True when the current rates came from a postal-code-only quote, in
+        # which case no rate on screen can actually be bought.
+        self._quote_only = False
 
         content = QWidget()
         content_layout = QVBoxLayout(content)
         content_layout.addWidget(QLabel(f"<h2>{tr('create_shipment.title')}</h2>"))
         content_layout.addWidget(self._build_form_group())
         content_layout.addWidget(self._build_customs_group())
-        content_layout.addWidget(self._build_rates_group())
-        content_layout.addWidget(self._build_result_group())
+
+        # Rates sit beside the purchased label rather than above it, so the
+        # label you just bought is visible without leaving the page — and the
+        # other quotes stay on screen next to it.
+        results_row = QHBoxLayout()
+        results_row.addWidget(self._build_rates_group(), stretch=3)
+        results_row.addWidget(self._build_result_group(), stretch=2)
+        content_layout.addLayout(results_row)
         content_layout.addStretch(1)
 
         # The Rates table auto-sizes to show every service option in full
@@ -91,12 +161,18 @@ class CreateShipmentView(QWidget):
         refresh_btn = QPushButton(tr("create_shipment.reload_button"))
         refresh_btn.clicked.connect(self.refresh_address_choices)
 
-        addr_row = QHBoxLayout()
+        self._full_address_widget = QWidget()
+        addr_row = QHBoxLayout(self._full_address_widget)
+        addr_row.setContentsMargins(0, 0, 0, 0)
         addr_row.addWidget(QLabel(tr("create_shipment.from_label")))
         addr_row.addWidget(self._from_combo, stretch=1)
         addr_row.addWidget(QLabel(tr("create_shipment.to_label")))
         addr_row.addWidget(self._to_combo, stretch=1)
         addr_row.addWidget(refresh_btn)
+
+        mode_row = self._build_address_mode_row()
+        self._zip_widget = self._build_zip_row()
+        self._zip_widget.setVisible(False)
 
         self._length_input = self._spin(1, 1000, 6)
         self._width_input = self._spin(1, 1000, 6)
@@ -127,10 +203,13 @@ class CreateShipmentView(QWidget):
         dims_row.addWidget(QLabel(tr("create_shipment.weight_label")))
         dims_row.addWidget(self._weight_input)
 
-        form.addRow(addr_row)
+        form.addRow(mode_row)
+        form.addRow(self._full_address_widget)
+        form.addRow(self._zip_widget)
         form.addRow(tr("create_shipment.package_label"), package_row)
         form.addRow(dims_row)
-        form.addRow(tr("create_shipment.reference_field"), self._reference_input)
+        self._reference_row_label = QLabel(tr("create_shipment.reference_field"))
+        form.addRow(self._reference_row_label, self._reference_input)
 
         self._get_rates_btn = QPushButton(tr("create_shipment.get_rates_button"))
         self._get_rates_btn.clicked.connect(self._on_get_rates_clicked)
@@ -140,6 +219,63 @@ class CreateShipmentView(QWidget):
         group_layout.addWidget(self._get_rates_btn)
         group.setLayout(group_layout)
         return group
+
+    def _build_address_mode_row(self) -> QHBoxLayout:
+        """Full addresses (can buy a label) vs postal codes only (price check).
+
+        A quick "what would this cost?" doesn't need a saved, verified address
+        at either end, which is otherwise a lot of typing before you see a
+        single number.
+        """
+        self._mode_full_radio = QRadioButton(tr("create_shipment.address_mode_full"))
+        self._mode_zip_radio = QRadioButton(tr("create_shipment.address_mode_zip"))
+        self._mode_full_radio.setChecked(True)
+        self._mode_full_radio.toggled.connect(self._on_address_mode_changed)
+
+        row = QHBoxLayout()
+        row.addWidget(self._mode_full_radio)
+        row.addWidget(self._mode_zip_radio)
+        row.addStretch(1)
+        return row
+
+    def _build_zip_row(self) -> QWidget:
+        self._from_zip_input = QLineEdit()
+        self._from_zip_input.setPlaceholderText(tr("create_shipment.zip_placeholder"))
+        self._to_zip_input = QLineEdit()
+        self._to_zip_input.setPlaceholderText(tr("create_shipment.zip_placeholder"))
+        self._from_country_combo = self._country_combo()
+        self._to_country_combo = self._country_combo()
+
+        widget = QWidget()
+        row = QHBoxLayout(widget)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.addWidget(QLabel(tr("create_shipment.from_label")))
+        row.addWidget(self._from_zip_input, stretch=1)
+        row.addWidget(self._from_country_combo)
+        row.addWidget(QLabel(tr("create_shipment.to_label")))
+        row.addWidget(self._to_zip_input, stretch=1)
+        row.addWidget(self._to_country_combo)
+        return widget
+
+    @staticmethod
+    def _country_combo() -> QComboBox:
+        combo = QComboBox()
+        for code, name in COUNTRIES:
+            combo.addItem(f"{code} — {name}", code)
+        index = combo.findData("US")
+        if index >= 0:
+            combo.setCurrentIndex(index)
+        return combo
+
+    def _on_address_mode_changed(self) -> None:
+        full = self._mode_full_radio.isChecked()
+        self._full_address_widget.setVisible(full)
+        self._zip_widget.setVisible(not full)
+        # A reference and a customs declaration only mean something on a real
+        # shipment; neither applies to a throwaway price check.
+        self._reference_input.setVisible(full)
+        self._reference_row_label.setVisible(full)
+        self._update_customs_visibility()
 
     @staticmethod
     def _spin(minimum: float, maximum: float, default: float) -> QDoubleSpinBox:
@@ -417,7 +553,10 @@ class CreateShipmentView(QWidget):
         return from_rec.country.upper() != to_rec.country.upper()
 
     def _update_customs_visibility(self) -> None:
-        self._customs_group.setVisible(self._is_international())
+        # Postal-code quotes never carry a customs declaration — nothing can
+        # be bought from them, so there is nothing to declare.
+        zip_mode = getattr(self, "_mode_zip_radio", None) is not None and self._mode_zip_radio.isChecked()
+        self._customs_group.setVisible(not zip_mode and self._is_international())
         self._resync_customs_item_origins()
 
     def _resync_customs_item_origins(self) -> None:
@@ -499,37 +638,99 @@ class CreateShipmentView(QWidget):
     def _build_rates_group(self) -> QGroupBox:
         group = QGroupBox(tr("create_shipment.rates_group"))
         rate_columns = [
-            tr("create_shipment.col_carrier"),
-            tr("create_shipment.col_service"),
+            tr("create_shipment.col_carrier_service"),
             tr("create_shipment.col_rate"),
-            tr("create_shipment.col_currency"),
             tr("create_shipment.col_est_days"),
             "",
         ]
         self._rates_table = QTableWidget(0, _RATE_COLUMN_COUNT)
         self._rates_table.setHorizontalHeaderLabels(rate_columns)
-        self._rates_table.horizontalHeader().setSectionResizeMode(
-            QHeaderView.ResizeMode.Stretch
-        )
+        header = self._rates_table.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        # Column 0 holds a cell widget, and ResizeToContents measures the
+        # delegate rather than the widget — it would truncate longer service
+        # names. Width is set from the widgets themselves once rows are built.
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
         self._rates_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self._rates_table.verticalHeader().setVisible(False)
         # Sized to fit every row (see _resize_rates_table_to_content) instead
         # of scrolling internally — the outer QScrollArea handles overflow.
         self._rates_table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self._quote_only_note = QLabel(tr("create_shipment.zip_mode_note"))
+        self._quote_only_note.setWordWrap(True)
+        self._quote_only_note.setStyleSheet(f"color: {TEXT_MUTED};")
+        self._quote_only_note.setVisible(False)
+
         layout = QVBoxLayout()
         layout.addWidget(self._rates_table)
+        layout.addWidget(self._quote_only_note)
         group.setLayout(layout)
         return group
 
+    def _build_rate_identity_cell(self, rate, *, cheapest: bool, fastest: bool) -> QWidget:
+        """One cell holding the carrier chip, the service name, and any
+        cheapest/fastest marker — the column that used to be three."""
+        cell = QWidget()
+        row = QHBoxLayout(cell)
+        row.setContentsMargins(6, 4, 6, 4)
+        row.setSpacing(8)
+        row.addWidget(carrier_chip(getattr(rate, "carrier", "")))
+        row.addWidget(QLabel(getattr(rate, "service", "") or "—"))
+        if cheapest:
+            row.addWidget(badge(tr("create_shipment.badge_cheapest")))
+        if fastest:
+            row.addWidget(badge(tr("create_shipment.badge_fastest"), tone="muted"))
+        row.addStretch(1)
+        return cell
+
     def _resize_rates_table_to_content(self) -> None:
+        """Size rows, the identity column, and the table itself around the
+        cell *widgets*.
+
+        Qt's resizeRowsToContents/ResizeToContents measure the item delegate,
+        which knows nothing about a cell widget — left to itself the table
+        clips the carrier chip vertically and truncates longer service names
+        horizontally.
+        """
         table = self._rates_table
         table.resizeRowsToContents()
+
+        identity_width = 0
         total_height = table.horizontalHeader().height() + 2 * table.frameWidth()
         for row in range(table.rowCount()):
+            widget_height = 0
+            for col in range(table.columnCount()):
+                widget = table.cellWidget(row, col)
+                if widget is None:
+                    continue
+                hint = widget.sizeHint()
+                widget_height = max(widget_height, hint.height())
+                if col == 0:
+                    identity_width = max(identity_width, hint.width())
+            # +6 so the Buy button isn't flush against the row borders.
+            if widget_height + 6 > table.rowHeight(row):
+                table.setRowHeight(row, widget_height + 6)
             total_height += table.rowHeight(row)
-        table.setFixedHeight(total_height)
+
+        if identity_width:
+            table.setColumnWidth(0, identity_width + 12)
+        table.setFixedHeight(total_height + 2)
 
     def _build_result_group(self) -> QGroupBox:
         group = QGroupBox(tr("create_shipment.result_group"))
+
+        # The label itself, drawn in-app. Previously this group only offered
+        # "open in browser" / "save as PDF", so you never actually saw what
+        # you had just paid for without leaving the app.
+        self._label_preview = QLabel(tr("create_shipment.preview_placeholder"))
+        self._label_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._label_preview.setWordWrap(True)
+        self._label_preview.setMinimumHeight(260)
+        self._label_preview.setStyleSheet(
+            f"color: {TEXT_MUTED}; border: 1px dashed #d9dee5; border-radius: 8px; padding: 8px;"
+        )
+
         self._result_label = QLabel(tr("create_shipment.no_label_yet"))
         self._result_label.setWordWrap(True)
 
@@ -547,10 +748,41 @@ class CreateShipmentView(QWidget):
         button_row.addStretch(1)
 
         layout = QVBoxLayout()
+        layout.addWidget(self._label_preview, stretch=1)
         layout.addWidget(self._result_label)
         layout.addLayout(button_row)
         group.setLayout(layout)
         return group
+
+    def _load_label_preview(self, url: str) -> None:
+        """Fetch and draw the purchased label. Qt has no PDF engine, so a PDF
+        label falls back to the open/save buttons with a note."""
+        if not url.lower().split("?")[0].endswith(_PREVIEWABLE_SUFFIXES):
+            self._label_preview.setText(tr("create_shipment.preview_unavailable"))
+            return
+
+        self._label_preview.setText(tr("create_shipment.preview_loading"))
+        self._pending_preview_task = run_async(
+            lambda: requests.get(url, timeout=30).content, self
+        )
+        self._pending_preview_task.succeeded.connect(self._on_preview_loaded)
+        self._pending_preview_task.failed.connect(
+            lambda _exc: self._label_preview.setText(tr("create_shipment.preview_failed"))
+        )
+
+    def _on_preview_loaded(self, data: bytes) -> None:
+        pixmap = QPixmap()
+        if not pixmap.loadFromData(data):
+            self._label_preview.setText(tr("create_shipment.preview_failed"))
+            return
+        self._label_preview.setPixmap(
+            pixmap.scaled(
+                self._label_preview.width() - 16,
+                self._label_preview.height() - 16,
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation,
+            )
+        )
 
     def refresh_address_choices(self) -> None:
         self._from_combo.clear()
@@ -564,6 +796,10 @@ class CreateShipmentView(QWidget):
         self._update_customs_visibility()
 
     def _on_get_rates_clicked(self) -> None:
+        if self._mode_zip_radio.isChecked():
+            self._request_zip_quote()
+            return
+
         from_id = self._from_combo.currentData()
         to_id = self._to_combo.currentData()
         if not from_id or not to_id:
@@ -630,7 +866,42 @@ class CreateShipmentView(QWidget):
             params["length"] = self._length_input.value()
             params["width"] = self._width_input.value()
             params["height"] = self._height_input.value()
+        self._quote_only = False
         self._pending_task = run_async(lambda: create_shipment(**params), self)
+        self._pending_task.succeeded.connect(self._on_rates_received)
+        self._pending_task.failed.connect(self._on_rates_failed)
+
+    def _request_zip_quote(self) -> None:
+        from_zip = self._from_zip_input.text().strip()
+        to_zip = self._to_zip_input.text().strip()
+        if not from_zip or not to_zip:
+            QMessageBox.warning(
+                self,
+                tr("create_shipment.missing_zip_title"),
+                tr("create_shipment.missing_zip_body"),
+            )
+            return
+
+        self._get_rates_btn.setEnabled(False)
+        self._get_rates_btn.setText(tr("create_shipment.fetching_rates_button"))
+
+        params = dict(
+            from_postal_code=from_zip,
+            to_postal_code=to_zip,
+            from_country=self._from_country_combo.currentData(),
+            to_country=self._to_country_combo.currentData(),
+            weight=self._weight_input.value(),
+        )
+        package_data = self._package_combo.currentData()
+        if isinstance(package_data, tuple) and package_data[0] == "predefined":
+            params["predefined_package"] = package_data[1].name
+        else:
+            params["length"] = self._length_input.value()
+            params["width"] = self._width_input.value()
+            params["height"] = self._height_input.value()
+
+        self._quote_only = True
+        self._pending_task = run_async(lambda: create_rate_quote(**params), self)
         self._pending_task.succeeded.connect(self._on_rates_received)
         self._pending_task.failed.connect(self._on_rates_failed)
 
@@ -639,21 +910,34 @@ class CreateShipmentView(QWidget):
         self._get_rates_btn.setText(tr("create_shipment.get_rates_button"))
         self._current_shipment = shipment
 
-        rates = getattr(shipment, "rates", None) or []
+        rates = sorted(getattr(shipment, "rates", None) or [], key=_rate_sort_key)
+        cheapest_id = rates[0].id if rates else None
+        fastest_id = _fastest_rate_id(rates)
+
+        self._quote_only_note.setVisible(self._quote_only)
         self._rates_table.setRowCount(len(rates))
         for row, rate in enumerate(rates):
-            values = [
-                getattr(rate, "carrier", ""),
-                getattr(rate, "service", ""),
-                getattr(rate, "rate", ""),
-                getattr(rate, "currency", ""),
-                str(getattr(rate, "delivery_days", "") or ""),
-            ]
-            for col, value in enumerate(values):
-                self._rates_table.setItem(row, col, QTableWidgetItem(value))
+            self._rates_table.setCellWidget(
+                row,
+                0,
+                self._build_rate_identity_cell(
+                    rate,
+                    cheapest=rate.id == cheapest_id,
+                    fastest=rate.id == fastest_id,
+                ),
+            )
+            self._rates_table.setItem(row, 1, QTableWidgetItem(_format_price(rate)))
+            self._rates_table.setItem(row, 2, QTableWidgetItem(_format_delivery(rate)))
 
             buy_btn = QPushButton(tr("create_shipment.buy_button"))
-            buy_btn.clicked.connect(partial(self._on_buy_clicked, rate))
+            if self._quote_only:
+                # A postal-code quote has no deliverable address, so EasyPost
+                # would reject the purchase. Disable rather than hide, so the
+                # reason is discoverable instead of the button just vanishing.
+                buy_btn.setEnabled(False)
+                buy_btn.setToolTip(tr("create_shipment.buy_needs_full_address"))
+            else:
+                buy_btn.clicked.connect(partial(self._on_buy_clicked, rate))
             self._rates_table.setCellWidget(row, _RATE_COLUMN_COUNT - 1, buy_btn)
 
         self._resize_rates_table_to_content()
@@ -712,8 +996,10 @@ class CreateShipmentView(QWidget):
             self._open_label_btn.setEnabled(True)
             self._save_label_btn.setEnabled(True)
             self._pending_label_url = label_url
+            self._load_label_preview(label_url)
         else:
             self._result_label.setText(tr("create_shipment.purchased_no_label"))
+            self._label_preview.setText(tr("create_shipment.preview_placeholder"))
 
         QMessageBox.information(
             self, tr("create_shipment.purchased_title"), tr("create_shipment.purchased_body")
