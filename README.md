@@ -103,7 +103,7 @@ same build.
 | | Microsoft Store | Direct download |
 |---|---|---|
 | Package | `.msix` | `.dmg` (macOS), `.exe` folder (Windows) |
-| Price | Set in Partner Center | $29 one-time via Paddle |
+| Price | Set in Partner Center | $29 one-time, or $59/$79 a year via Paddle |
 | Licence gate | **Off** | **On** |
 | MCP / AI agents | **Off** | **On** |
 | Signing | Store re-signs on publish | Apple Developer ID + notarization |
@@ -135,7 +135,7 @@ conditionally and the verifier is the backstop.
 
 ### Why direct download exists at all
 
-Selling a $29 licence through an app store costs 15–30% in commission.
+Selling a licence through an app store costs 15–30% in commission.
 Selling the same licence directly, with Paddle as Merchant of Record, costs
 roughly 5% + 50c and keeps Paddle responsible for VAT/GST registration and
 remittance worldwide. Apple's Guideline 3.1.1 forbids *unlocking* App Store
