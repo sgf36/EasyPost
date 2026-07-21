@@ -49,9 +49,14 @@ def test_successful_search_parses_and_caches(monkeypatch):
     # Blank htsno (a category header row) is preserved, not dropped.
     assert results[1].htsno == ""
 
-    # Second search for the same keyword should now find it in the cache too.
-    cached = search_hts_codes("copper-unique-test-1")
+    # The rows were cached: a later search that cannot reach the live API falls
+    # back to them. Searched by a term present in the cached description, since
+    # the cache matches on htsno/description rather than the original keyword.
+    # (Mocked deliberately — a unit test must never depend on the live USITC API.)
+    with patch("app.services.hts_lookup.requests.get", side_effect=ConnectionError("offline")):
+        cached = search_hts_codes("Refined copper")
     assert any(r.htsno == "7403.11.00.00" for r in cached)
+    assert all(r.from_cache for r in cached)
 
 
 def test_empty_keyword_returns_empty_without_network_call():
