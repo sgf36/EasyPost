@@ -34,12 +34,19 @@ money asks for confirmation while in production mode.
   Saved addresses can be edited in place — EasyPost addresses are immutable,
   so editing re-verifies as a new address and replaces the old one locally.
 - **Create Shipment** — shop live carrier rates and buy/save/print labels.
+  Rates are sorted cheapest-first and tagged "Cheapest"/"Fastest", each row
+  carrying a colour-coded carrier chip, and the purchased label is rendered
+  in-app beside the rate list rather than only opening in a browser.
   International shipments prompt for full customs information (contents
   type, itemized customs items, signer/certification) before rates can be
   fetched, since carriers otherwise reject the label purchase outright.
   Packages can be entered as custom dimensions, saved as a named preset for
   reuse, or picked from each carrier's real predefined packages (USPS flat
   rate boxes, FedEx envelopes, etc.), fetched live from EasyPost.
+- **Quick price check** — rate a route from two postal codes alone, before
+  any address has been saved. Quotes are deliberately not purchasable:
+  carriers need a complete recipient address to issue a label, so the Buy
+  button stays disabled until you switch back to full addresses.
 - **HTS Lookup** — search the U.S. International Trade Commission's live
   Harmonized Tariff Schedule database for customs codes, with results
   cached locally so repeat searches work even if that API is unreachable.
