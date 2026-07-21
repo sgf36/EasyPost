@@ -1,0 +1,145 @@
+/* Easy-Post Desktop — easy-post.spencerfields.com
+   Type and colour taken from spencerfields.com so the product site reads as
+   part of the same estate: Cormorant Garamond headings, Inter body,
+   #1F5C54 green, #191A1C ink on a warm off-white. */
+
+:root {
+  --ink: #191a1c;
+  --body: #404040;
+  --muted: #6b6b6b;
+  --green: #1f5c54;
+  --green-dark: #17443e;
+  --cream: #f7f4ed;
+  --rule: #e2ded4;
+  --white: #ffffff;
+  --measure: 44rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--white);
+  color: var(--body);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Mulish, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+h1, h2, h3 {
+  font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.15;
+  margin: 0 0 .5em;
+}
+
+h1 { font-size: clamp(2.6rem, 6vw, 4.4rem); letter-spacing: -.01em; }
+h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); margin-top: 2.2em; }
+h3 { font-size: 1.3rem; margin-top: 2em; }
+
+p, ul, ol { margin: 0 0 1.1em; }
+ul, ol { padding-left: 1.25em; }
+li { margin-bottom: .4em; }
+
+a { color: var(--green); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: var(--green-dark); }
+
+strong { color: var(--ink); }
+
+.eyebrow {
+  font-size: .78rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 600;
+  margin-bottom: 1.1em;
+}
+
+.wrap { max-width: 72rem; margin: 0 auto; padding: 0 clamp(1.25rem, 5vw, 3rem); }
+.prose { max-width: var(--measure); }
+
+/* ---- header / nav ---- */
+.site-head { border-bottom: 1px solid var(--rule); background: var(--white); }
+.site-head .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.5rem; flex-wrap: wrap; padding-top: 1.1rem; padding-bottom: 1.1rem;
+}
+.brand {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.45rem; font-weight: 600; color: var(--ink); text-decoration: none;
+}
+.site-nav { display: flex; gap: 1.4rem; flex-wrap: wrap; }
+.site-nav a {
+  font-size: .92rem; color: var(--body); text-decoration: none;
+}
+.site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--green); }
+
+/* ---- hero ---- */
+.hero { background: var(--cream); border-bottom: 1px solid var(--rule); }
+.hero .wrap { padding-top: clamp(3.5rem, 9vw, 6.5rem); padding-bottom: clamp(3.5rem, 9vw, 6.5rem); }
+.hero .lede {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.6vw, 1.85rem);
+  line-height: 1.4; color: var(--ink); max-width: 40rem; margin-bottom: 1.8em;
+}
+
+/* ---- buttons ---- */
+.btn {
+  display: inline-block; background: var(--green); color: var(--white);
+  padding: 15px 26px; border-radius: 4px; text-decoration: none;
+  font-weight: 600; font-size: .95rem; border: 1px solid var(--green);
+}
+.btn:hover { background: var(--green-dark); border-color: var(--green-dark); color: var(--white); }
+.btn-secondary { background: transparent; color: var(--green); }
+.btn-secondary:hover { background: var(--cream); color: var(--green-dark); }
+.btn-row { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
+
+/* ---- sections ---- */
+section { padding: clamp(3rem, 7vw, 5rem) 0; }
+section + section { border-top: 1px solid var(--rule); }
+
+.grid { display: grid; gap: 2rem 2.5rem; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); }
+.grid h3 { margin-top: 0; }
+.grid p { color: var(--body); margin-bottom: 0; }
+
+/* ---- price card ---- */
+.price-card {
+  background: var(--cream); border: 1px solid var(--rule); border-radius: 6px;
+  padding: clamp(1.75rem, 4vw, 2.75rem); max-width: 30rem;
+}
+.price {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 3.6rem; font-weight: 600; color: var(--ink); line-height: 1;
+}
+.price span { font-size: 1rem; font-family: Inter, sans-serif; color: var(--muted); font-weight: 400; }
+.price-card ul { list-style: none; padding: 0; margin: 1.5em 0; }
+.price-card li { padding-left: 1.5em; position: relative; }
+.price-card li::before {
+  content: "—"; position: absolute; left: 0; color: var(--green);
+}
+
+/* ---- legal pages ---- */
+.legal { padding-top: clamp(2.5rem, 6vw, 4rem); }
+.legal .updated { color: var(--muted); font-size: .9rem; margin-bottom: 2.5em; }
+.legal h2 { font-size: 1.5rem; margin-top: 2em; }
+.legal h2:first-of-type { margin-top: 1em; }
+
+/* ---- footer ---- */
+.site-foot {
+  border-top: 1px solid var(--rule); background: var(--cream);
+  padding: 3rem 0; font-size: .92rem; color: var(--muted);
+}
+.site-foot .cols { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+.site-foot h4 {
+  font-size: .78rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink); margin: 0 0 .9em; font-weight: 600;
+}
+.site-foot ul { list-style: none; padding: 0; margin: 0; }
+.site-foot li { margin-bottom: .45em; }
+.site-foot a { color: var(--body); text-decoration: none; }
+.site-foot a:hover { color: var(--green); text-decoration: underline; }
+.site-foot .legal-line { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
