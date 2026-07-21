@@ -30,8 +30,8 @@ FORMAT_TAG = "EPD1"
 # private key to hand, not a checkout of the app.
 TIERS = {
     "personal": 3,
-    "business": 25,
-    "organisation": 50,
+    "business": 10,
+    "organisation": 30,
     "enterprise": 0,  # uncapped
 }
 

@@ -211,7 +211,7 @@ def test_proof_is_not_the_licence_key():
 # --- tiers -----------------------------------------------------------------
 
 @pytest.mark.parametrize("tier,seats", [
-    ("personal", 3), ("business", 25), ("organisation", 50), ("enterprise", 0),
+    ("personal", 3), ("business", 10), ("organisation", 30), ("enterprise", 0),
 ])
 def test_tier_table_matches_what_is_sold(tier, seats):
     assert license_mod.TIERS[tier] == seats
