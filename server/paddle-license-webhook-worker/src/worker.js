@@ -25,7 +25,38 @@
 
 import { createHmac, createPrivateKey, sign as nodeSign, timingSafeEqual } from "node:crypto";
 
+import {
+  handleActivate,
+  handleDeactivate,
+  handleDevices,
+  revokeOrder,
+  TIER_SEATS,
+} from "./activation.js";
+
 const SIGNATURE_TOLERANCE_SECONDS = 300;
+
+/**
+ * Which tier a Paddle price buys. Set PRICE_TIERS in wrangler.toml as JSON:
+ *   { "pri_abc": "personal", "pri_def": "business", "pri_ghi": "organisation" }
+ * An unrecognised price mints nothing, so a new product cannot accidentally
+ * hand out licences before its tier has been decided.
+ */
+function tierForPrice(env, priceIds) {
+  let table = {};
+  try {
+    table = JSON.parse(env.PRICE_TIERS || "{}");
+  } catch {
+    table = {};
+  }
+  // Legacy single-price config predates tiers and means the entry tier.
+  if (env.PADDLE_PRICE_ID && !table[env.PADDLE_PRICE_ID]) {
+    table[env.PADDLE_PRICE_ID] = "personal";
+  }
+  for (const id of priceIds) {
+    if (id && table[id]) return table[id];
+  }
+  return null;
+}
 
 function b64url(buf) {
   return Buffer.from(buf).toString("base64url");
@@ -51,8 +82,14 @@ export function verifyPaddleSignature(rawBody, sigHeader, secret) {
 }
 
 /** Mint the offline license key the desktop app verifies. */
-export function mintLicense(pem, product, email, order, iat) {
-  const payload = Buffer.from(JSON.stringify({ v: 1, product, email, order, iat }), "utf8");
+export function mintLicense(pem, product, email, order, iat, tier = "personal", seats = null) {
+  // Both tier and seats are signed: the app reads the count from the key rather
+  // than from a table it would have to keep in step with ours.
+  const allowance = seats === null ? (TIER_SEATS[tier] ?? TIER_SEATS.personal) : seats;
+  const payload = Buffer.from(
+    JSON.stringify({ v: 2, product, email, order, tier, seats: allowance, iat }),
+    "utf8"
+  );
   // Ed25519 takes a null digest algorithm.
   const signature = nodeSign(null, payload, createPrivateKey(pem));
   return `EPD1.${b64url(payload)}.${b64url(signature)}`;
@@ -130,14 +167,21 @@ async function handleContact(request, env) {
   return json({ status: "sent" });
 }
 
-async function sendLicenseEmail(apiKey, from, to, licenseKey) {
+async function sendLicenseEmail(apiKey, from, to, licenseKey, tier = "personal") {
+  const seats = TIER_SEATS[tier] ?? TIER_SEATS.personal;
+  const allowance = seats === 0
+    ? "This key has no computer limit."
+    : `This key covers up to ${seats} computer${seats === 1 ? "" : "s"}.`;
   const text =
     "Thank you for buying Easy-Post Desktop.\n\n" +
     "Your license key:\n\n" +
     `${licenseKey}\n\n` +
+    `${allowance}\n\n` +
     "To activate: open Easy-Post Desktop, paste this key on the activation " +
     "screen, and click Activate. Keep this email for your records.\n\n" +
-    "Questions? https://github.com/sgf36/EasyPost/issues\n";
+    "Changing computers? Open Settings and release the old one first, or " +
+    "release it from the new computer when prompted.\n\n" +
+    "Questions? Apps@spencerfields.com\n";
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -160,6 +204,17 @@ export default {
     if (request.method === "POST" && url.pathname === "/contact") {
       return handleContact(request, env);
     }
+    // Seat activation. Each verifies the licence signature and a proof of key
+    // possession itself, so none of them needs a shared secret with the app.
+    if (request.method === "POST" && url.pathname === "/activate") {
+      return handleActivate(request, env, json);
+    }
+    if (request.method === "POST" && url.pathname === "/devices") {
+      return handleDevices(request, env, json);
+    }
+    if (request.method === "POST" && url.pathname === "/deactivate") {
+      return handleDeactivate(request, env, json);
+    }
     if (request.method !== "POST" || url.pathname !== "/paddle/webhook") {
       return new Response("Not found", { status: 404 });
     }
@@ -171,11 +226,25 @@ export default {
     }
 
     const event = JSON.parse(raw);
+    const data = event.data || {};
+
+    // A refunded or charged-back purchase must stop working. Revoking also frees
+    // the seats, so a replacement key issued later starts from a clean slate.
+    if (event.event_type === "transaction.refunded"
+        || event.event_type === "adjustment.created") {
+      const txnId = data.transaction_id || data.id || "";
+      if (txnId && env.LICENSES) {
+        await revokeOrder(env.LICENSES, txnId, event.event_type.split(".")[1]);
+        return json({ status: "revoked", transaction: txnId });
+      }
+      return json({ ignored: "no-transaction-id" });
+    }
+
     if (event.event_type !== "transaction.completed") return json({ ignored: event.event_type });
 
-    const data = event.data || {};
     const priceIds = (data.items || []).map((i) => i.price && i.price.id);
-    if (!priceIds.includes(env.PADDLE_PRICE_ID)) return json({ ignored: "other-price" });
+    const tier = tierForPrice(env, priceIds);
+    if (!tier) return json({ ignored: "other-price" });
 
     const base = env.PADDLE_API_BASE || "https://api.paddle.com";
     const product = env.LICENSE_PRODUCT_ID || "easypost-desktop";
@@ -184,9 +253,9 @@ export default {
     const iat = event.occurred_at || "1970-01-01T00:00:00Z";
 
     const email = await getCustomerEmail(base, env.PADDLE_API_KEY, data.customer_id);
-    const licenseKey = mintLicense(env.LICENSE_PRIVATE_KEY_PEM, product, email, txn, iat);
-    await sendLicenseEmail(env.RESEND_API_KEY, env.LICENSE_FROM_EMAIL, email, licenseKey);
+    const licenseKey = mintLicense(env.LICENSE_PRIVATE_KEY_PEM, product, email, txn, iat, tier);
+    await sendLicenseEmail(env.RESEND_API_KEY, env.LICENSE_FROM_EMAIL, email, licenseKey, tier);
 
-    return json({ status: "license_issued", transaction: txn });
+    return json({ status: "license_issued", transaction: txn, tier });
   },
 };

@@ -34,6 +34,15 @@ LICENSE_FORMAT_TAG = "EPD1"
 # Where customers buy a license (Paddle checkout — set once the product exists).
 PADDLE_CHECKOUT_URL = ""
 
+# Tiers differ only in how many computers one key may activate.
+TIERS = {
+    "personal": 3,
+    "business": 25,
+    "organisation": 50,
+    "enterprise": 0,  # 0 means uncapped; negotiated individually
+}
+DEFAULT_TIER = "personal"
+
 
 @dataclass
 class LicenseInfo:
@@ -43,6 +52,17 @@ class LicenseInfo:
     order: str
     product: str
     issued_at: str
+    tier: str = DEFAULT_TIER
+    seats: int = TIERS[DEFAULT_TIER]
+
+    @property
+    def is_uncapped(self) -> bool:
+        return self.seats <= 0
+
+    def seat_summary(self) -> str:
+        if self.is_uncapped:
+            return "unlimited computers"
+        return f"up to {self.seats} computer{'' if self.seats == 1 else 's'}"
 
 
 def _b64url_decode(data: str) -> bytes:
@@ -78,13 +98,28 @@ def verify_license(key: str) -> Optional[LicenseInfo]:
         payload = json.loads(payload_bytes.decode("utf-8"))
     except (ValueError, UnicodeDecodeError):
         return None
-    if payload.get("v") != 1 or payload.get("product") != LICENSE_PRODUCT_ID:
+    # v1 predates tiers. Those keys are already in customers' hands, so they
+    # stay valid and are read as the entry tier rather than being rejected.
+    if payload.get("v") not in (1, 2) or payload.get("product") != LICENSE_PRODUCT_ID:
         return None
+
+    tier = str(payload.get("tier") or DEFAULT_TIER)
+    # `seats` is signed alongside the tier, so an explicit count is trustworthy
+    # and lets a bespoke seat count be sold without shipping a new build. The
+    # tier table is only the fallback for keys that carry a tier and nothing else.
+    raw_seats = payload.get("seats")
+    if isinstance(raw_seats, int) and raw_seats >= 0:
+        seats = raw_seats
+    else:
+        seats = TIERS.get(tier, TIERS[DEFAULT_TIER])
+
     return LicenseInfo(
         email=str(payload.get("email", "")),
         order=str(payload.get("order", "")),
         product=str(payload.get("product", "")),
         issued_at=str(payload.get("iat", "")),
+        tier=tier,
+        seats=seats,
     )
 
 

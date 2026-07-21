@@ -25,6 +25,16 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 PRODUCT_ID = "easypost-desktop"
 FORMAT_TAG = "EPD1"
 
+# Kept in step with app/core/license.py's TIERS. Duplicated rather than imported
+# because this script is meant to run from a support machine with only the
+# private key to hand, not a checkout of the app.
+TIERS = {
+    "personal": 3,
+    "business": 25,
+    "organisation": 50,
+    "enterprise": 0,  # uncapped
+}
+
 
 def _b64url(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
@@ -38,12 +48,20 @@ def load_private_key(path: str) -> Ed25519PrivateKey:
     return key
 
 
-def mint(private_key: Ed25519PrivateKey, email: str, order: str) -> str:
+def mint(private_key: Ed25519PrivateKey, email: str, order: str,
+         tier: str = "personal", seats: int = None) -> str:
+    # Both tier and seats are signed. Carrying the count explicitly means a
+    # bespoke seat allowance can be sold without shipping a new build, and the
+    # app never has to trust an unsigned lookup.
+    if seats is None:
+        seats = TIERS[tier]
     payload = {
-        "v": 1,
+        "v": 2,
         "product": PRODUCT_ID,
         "email": email,
         "order": order,
+        "tier": tier,
+        "seats": seats,
         "iat": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
     payload_bytes = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -57,13 +75,19 @@ def main(argv=None) -> int:
                         help="Path to the Ed25519 private key PEM (or set EASYPOST_LICENSE_KEY_PATH).")
     parser.add_argument("--email", required=True, help="Buyer email (recorded in the license).")
     parser.add_argument("--order", default="", help="Paddle order/transaction id (optional but recommended).")
+    parser.add_argument("--tier", default="personal", choices=sorted(TIERS),
+                        help="Licence tier; sets the computer allowance (default: personal).")
+    parser.add_argument("--seats", type=int, default=None,
+                        help="Override the tier's computer allowance. 0 means uncapped.")
     args = parser.parse_args(argv)
 
     if not args.key:
         parser.error("no private key: pass --key or set EASYPOST_LICENSE_KEY_PATH")
+    if args.seats is not None and args.seats < 0:
+        parser.error("--seats cannot be negative (use 0 for uncapped)")
 
     private_key = load_private_key(args.key)
-    print(mint(private_key, args.email, args.order))
+    print(mint(private_key, args.email, args.order, args.tier, args.seats))
     return 0
 
 
