@@ -1,7 +1,8 @@
 name = "easypost-license-webhook"
 main = "src/worker.js"
-# Recent date so WebCrypto Ed25519 is available in the Workers runtime.
 compatibility_date = "2025-06-01"
+# node:crypto (Ed25519 signing + HMAC) requires nodejs_compat.
+compatibility_flags = ["nodejs_compat"]
 
 # Non-secret configuration. Set the real values here before deploying.
 [vars]
