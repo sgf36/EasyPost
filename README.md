@@ -144,14 +144,27 @@ gate is scoped strictly to builds distributed outside any store.
 
 ## Licensing (direct downloads only)
 
-Licence keys are **Ed25519-signed and verified entirely offline** — the app
-never phones home, and there is no activation server to go down or to leak
-customer data.
+Four tiers, all one-time purchases with no expiry. They differ only in how many
+computers one key covers.
+
+| Tier | Price | Computers |
+|---|---|---|
+| Personal | $29 | 3 |
+| Business | $59 | 25 |
+| Organisation | $79 | 50 |
+| Enterprise | contact | uncapped (`seats: 0`) |
+
+Licence keys are **Ed25519-signed and verified offline**:
 
 ```
 EPD1.<base64url(payload)>.<base64url(signature)>
-payload = {"v":1,"product":"easypost-desktop","email":…,"order":…,"iat":…}
+payload = {"v":2,"product":"easypost-desktop","tier":…,"seats":…,"email":…,"order":…,"iat":…}
 ```
+
+`v1` keys predate tiers, are already in customers' hands, and still verify —
+read as `personal`/3 seats. An explicit `seats` beats the tier table, so a
+bespoke allowance can be sold without shipping a new build. Both fields are
+signed, so neither can be edited.
 
 - `app/core/license.py` holds the **public** key and verifies. The private
   key never ships.
@@ -164,6 +177,45 @@ payload = {"v":1,"product":"easypost-desktop","email":…,"order":…,"iat":…}
 
 Because `iat` is taken from the Paddle event's `occurred_at`, a webhook retry
 mints a byte-identical key rather than a second one.
+
+### Seat activation
+
+Counting computers needs a server the app previously did without, so the design
+is about keeping that intrusion small. **The README used to claim the app never
+phones home. That is no longer true, and PRIVACY.md has been corrected** — it
+now states exactly what activation sends.
+
+- **The network is touched once.** Activation asks for an Ed25519-signed
+  *receipt* and verifies it offline on every launch afterwards. No heartbeat,
+  nothing that can fail at start-up. Receipts last 400 days.
+- **The server never learns which computer it is.** It receives
+  `HMAC-SHA256(licence_key, machine_id)`. Keying by the licence means one
+  computer under two licences produces two unrelated hashes, so activations
+  cannot be correlated across customers.
+- **Possession is proved, not asserted.** Every request carries an HMAC over its
+  own fields. Knowing an order id is not enough to burn a stranger's seats.
+- **Our outage is not their problem.** Unreachable, or any 5xx, grants a 14-day
+  grace and retries in the background rather than refusing to start.
+- **Moving computers is expected.** A full licence returns its device list so
+  the user can release one; a computer silent for 180 days is reclaimed.
+
+The Worker verifies the licence *signature* rather than consulting a list of
+known orders, which is what makes complimentary keys work: one minted by hand
+with `tools/issue_license.py --tier business` activates exactly like a purchased
+one, with nothing to register first.
+
+```
+tools/issue_license.py --email x@y.com --order COMP-001 --tier organisation
+tools/issue_license.py --email x@y.com --order COMP-002 --seats 10   # bespoke
+```
+
+Discount and 100%-off coupon codes are Paddle Discounts — a fully discounted
+purchase still fires `transaction.completed`, so the normal flow mints and
+emails the key with a record against it. Refunds and adjustments revoke the
+order and free its seats.
+
+State lives in a Cloudflare D1 database (`easypost-licenses`): `devices`,
+`revocations`, `activation_log`. `packaging/`-side code never touches it.
 
 ## Connecting AI agents (MCP, direct downloads only)
 

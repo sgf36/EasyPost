@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy policy — Easy-Post Desktop</title>
-<meta name="description" content="What Easy-Post Desktop stores, what it sends and to whom. Shipping data stays on your own machine; the Supplier operates no analytics and no tracking.">
+<meta name="description" content="What Easy-Post Desktop stores, what it sends and to whom. Shipping data stays on your own machine; the Supplier operates no analytics and no tracking, and licence activation sends only a one-way fingerprint.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
     <p>This policy explains what Easy-Post Desktop stores, what it transmits and to whom. The data controller is <strong>Spencer Fields</strong>, a sole trader established in London, United Kingdom, contactable at <a href="mailto:Apps@spencerfields.com">Apps@spencerfields.com</a>.</p>
 
     <h2>The short version</h2>
-    <p>Shipping data stays on your own computer. The application contains no analytics, no telemetry, no advertising identifiers and no crash reporting. Nothing is transmitted to the Supplier by the application at any time — not on launch, not on purchase of a label, not ever.</p>
+    <p>Shipping data stays on your own computer. The application contains no analytics, no telemetry, no advertising identifiers and no crash reporting. The Supplier receives exactly one thing from the application, once: a record that a given computer is using one of the places your licence covers, described in full below. Nothing about what you ship, or how you use the application, is ever transmitted.</p>
 
     <h2>What the application stores on your computer</h2>
     <ul>
@@ -50,7 +50,15 @@
       <li><strong>The U.S. International Trade Commission.</strong> When the tariff-code lookup is used, the search term alone is sent to the Commission's public database. No shipment or personal data accompanies it.</li>
       <li><strong>Carrier label images.</strong> Purchased label files are fetched from the address EasyPost provides so they can be displayed and saved.</li>
       <li><strong>Cloudflare, only if you enable real-time tracking.</strong> The optional webhook feature is off by default. Turning it on starts a local receiver and a Cloudflare tunnel so that EasyPost can deliver tracking events to your machine. It can be turned off again at any time in Settings.</li>
+      <li><strong>The licence activation service.</strong> Direct-download builds only, and only when activating or releasing a computer. What is sent is set out in the next section. The Microsoft Store build never contacts it.</li>
     </ul>
+
+    <h2>Licence activation</h2>
+    <p>Each licence covers a set number of computers, so something has to count them. Activation records that this computer is using one of those places. It happens <strong>once</strong>: the service returns a signed confirmation which is stored on your machine and checked from then on without any network connection. There is no periodic check-in, no heartbeat and no usage reporting.</p>
+    <p><strong>What is sent.</strong> A one-way fingerprint of the computer, produced by combining a machine identifier with your licence key; the identifier itself never leaves your computer and the fingerprint cannot be reversed to recover it. Because your licence key forms part of that calculation, the same computer under a different licence produces an unrelated value, so activations cannot be linked between customers. Alongside it: a name for the computer taken from its hostname, so you can tell your own machines apart when releasing one; the order reference contained in your licence key; and the date.</p>
+    <p><strong>What is never sent.</strong> Your EasyPost API keys, your addresses, your shipments, your tracking or customs data, any file you open, or anything at all about how you use the application.</p>
+    <p><strong>How long it is kept.</strong> For as long as the licence is in use. Releasing a computer deletes its record straight away. A computer that has not activated for six months is deleted automatically. Refunding a purchase deletes every record for it.</p>
+    <p><strong>If the service is unavailable.</strong> The application carries on working. It allows itself a limited grace period and tries again later. An outage on our side must never stop software you have paid for from running.</p>
 
     <h2>Buying a licence</h2>
     <p>Purchases are handled by <strong>Paddle.com Market Ltd</strong>, our authorised reseller and Merchant of Record. Payment details are collected and processed entirely by Paddle. The Supplier never sees, receives or stores card numbers or bank details.</p>

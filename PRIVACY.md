@@ -52,12 +52,54 @@ perform the actions you request:
   payment is handled entirely by Stripe under
   [Stripe's privacy policy](https://stripe.com/privacy); the developer receives
   no card or contact details.
+- **Licence activation** (`easypost-license-webhook.sgf36.workers.dev`) — used
+  by the direct-download build only, and only to record that this computer is
+  using one of the places your licence covers. See below for exactly what is
+  sent. The Microsoft Store build does not contact it at all.
+
+## Licence activation
+
+Licences cover a set number of computers, so activation records which computers
+are using one. This is the only developer-operated service the application
+contacts, and it is contacted **once** — when you activate, and again only if
+you release a computer or activation is repeated. It returns a signed
+confirmation that is stored on your computer and checked without the network
+from then on. There is no periodic check-in and no usage reporting.
+
+**What is sent:**
+
+- A **one-way fingerprint** of the computer: a HMAC-SHA256 of a machine
+  identifier, keyed by your licence key. The machine identifier itself never
+  leaves your computer, and the value cannot be reversed to recover it. Because
+  your licence key is the HMAC key, the same computer under a different licence
+  produces an unrelated value, so activations cannot be linked across customers.
+- A **name for the computer**, taken from its hostname, so that you can tell
+  your own machines apart when releasing one. You can see this in the
+  application before it is sent.
+- The **order reference** contained in your licence key, and the **date**.
+
+**What is never sent:** your EasyPost API keys, addresses, shipments, tracking
+data, customs information, any file you open, your IP address as a stored
+record, or anything about how you use the application.
+
+**How long it is kept:** for as long as the licence is in use. Releasing a
+computer deletes its row immediately. A computer that has not activated for six
+months is deleted automatically. Refunding a purchase deletes all of its rows.
+
+**If the service is unavailable:** the application continues to work. It grants
+itself a limited grace period and retries later. An outage on the developer's
+side is not permitted to stop software you have paid for from running.
 
 ## What the developer collects
 
-Nothing. The application contains no analytics, no telemetry and no
-developer-operated servers. The developer cannot see your API keys, your
-shipping data or your usage of the application.
+No analytics and no telemetry. The developer cannot see your API keys, your
+shipping data, or how you use the application.
+
+The single exception is the licence activation record described above: for the
+direct-download build, the developer holds a fingerprint that cannot be
+reversed, a computer name you can see beforehand, an order reference and a
+date. That exists solely to count computers against the licence you bought.
+Nothing else about your use of the application is recorded anywhere.
 
 ## Children
 
