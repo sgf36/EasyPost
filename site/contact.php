@@ -25,7 +25,24 @@
 
 declare(strict_types=1);
 
-const MAIL_TO            = 'AppleApps@spencerfields.com';
+/*
+ * STOPGAP RECIPIENT -- see the note below before changing.
+ *
+ * The intended address is AppleApps@spencerfields.com, but mail() cannot
+ * reach it today. spencerfields.com has its MX on Microsoft 365, yet cPanel
+ * still lists the domain as a *local* mail domain, so exim delivers on-box
+ * instead of relaying to Outlook. There is no local "appleapps" mailbox, and
+ * /etc/valiases/spencerfields.com ends in `*: :fail: No Such User Here`, so
+ * every message was being rejected after mail() had already returned true --
+ * the form said "thank you" and the message went nowhere.
+ *
+ * spencer@spencerfields.com is a real local mailbox (verified: a test message
+ * landed in its maildir), so messages are captured rather than lost until the
+ * routing is fixed. Once cPanel > Email Routing for spencerfields.com is set
+ * to "Remote Mail Exchanger", change this back to AppleApps@spencerfields.com
+ * and re-test.
+ */
+const MAIL_TO            = 'spencer@spencerfields.com';
 const MAIL_FROM          = 'noreply@easy-post.spencerfields.com';
 const MIN_FILL_SECONDS   = 3;
 const MAX_FILL_AGE       = 86400;   // a stamp older than a day is stale
