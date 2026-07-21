@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Kunci lisensi ora sah",
   "license_gate.key_label": "Kunci lisensi:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Langganan iki ora aktif",
   "license_gate.offline_body": "Kunci sampeyan sah, dadi bisa nerusake. Cacahe komputer durung bisa dipesthekake saiki; kita bakal nyoba maneh kanthi otomatis. Yen nganti {date} isih ora bisa digayuh, sampeyan bakal dijaluk ngaktifake maneh.",
   "license_gate.offline_title": "Ora bisa nggayuh layanan aktivasi",
   "license_gate.release_body": "Lisensi sampeyan nyakup {seats} komputer lan kabeh lagi dienggo. Pilih siji sing arep diuculake supaya komputer iki bisa ngganteni. Komputer sing diuculake bakal dijaluk ngaktifake maneh nalika diuripake sabanjure.",

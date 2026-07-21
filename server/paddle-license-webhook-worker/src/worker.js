@@ -29,7 +29,9 @@ import {
   handleActivate,
   handleDeactivate,
   handleDevices,
+  recordSubscription,
   revokeOrder,
+  TIER_PLANS,
   TIER_SEATS,
 } from "./activation.js";
 
@@ -83,11 +85,17 @@ export function verifyPaddleSignature(rawBody, sigHeader, secret) {
 
 /** Mint the offline license key the desktop app verifies. */
 export function mintLicense(pem, product, email, order, iat, tier = "personal", seats = null) {
-  // Both tier and seats are signed: the app reads the count from the key rather
+  // Tier, seats and plan are all signed: the app reads them from the key rather
   // than from a table it would have to keep in step with ours.
+  //
+  // Note what is NOT in here: an expiry. Annual plans expire, but baking that
+  // into the key would mean reissuing and re-pasting one every year. The key is
+  // permanent and names the subscription; the activation receipt carries the
+  // date and renews itself quietly.
   const allowance = seats === null ? (TIER_SEATS[tier] ?? TIER_SEATS.personal) : seats;
+  const plan = TIER_PLANS[tier] || "perpetual";
   const payload = Buffer.from(
-    JSON.stringify({ v: 2, product, email, order, tier, seats: allowance, iat }),
+    JSON.stringify({ v: 2, product, email, order, tier, seats: allowance, plan, iat }),
     "utf8"
   );
   // Ed25519 takes a null digest algorithm.
@@ -169,14 +177,19 @@ async function handleContact(request, env) {
 
 async function sendLicenseEmail(apiKey, from, to, licenseKey, tier = "personal") {
   const seats = TIER_SEATS[tier] ?? TIER_SEATS.personal;
+  const annual = TIER_PLANS[tier] === "annual";
   const allowance = seats === 0
     ? "This key has no computer limit."
     : `This key covers up to ${seats} computer${seats === 1 ? "" : "s"}.`;
+  const billing = annual
+    ? "This is an annual subscription. Keep this key — it stays the same every "
+      + "year, and renewals are applied automatically. You will not be sent a new one."
+    : "This is a one-time purchase. The key does not expire.";
   const text =
     "Thank you for buying Easy-Post Desktop.\n\n" +
     "Your license key:\n\n" +
     `${licenseKey}\n\n` +
-    `${allowance}\n\n` +
+    `${allowance}\n${billing}\n\n` +
     "To activate: open Easy-Post Desktop, paste this key on the activation " +
     "screen, and click Activate. Keep this email for your records.\n\n" +
     "Changing computers? Open Settings and release the old one first, or " +
@@ -240,6 +253,28 @@ export default {
       return json({ ignored: "no-transaction-id" });
     }
 
+    // Subscription lifecycle. The licence key never changes; what changes is how
+    // long an activation receipt is worth, so all these do is keep the record of
+    // what has been paid for up to date.
+    if (event.event_type.startsWith("subscription.")) {
+      const subId = data.id || "";
+      if (!subId || !env.LICENSES) return json({ ignored: "no-subscription-id" });
+
+      const priceIds = (data.items || []).map((i) => i.price && i.price.id);
+      const subTier = tierForPrice(env, priceIds) || "";
+      const status = event.event_type === "subscription.canceled"
+        ? "canceled"
+        : (data.status || "active");
+      // next_billed_at is what has actually been paid up to; current_billing_period
+      // is the fallback when a subscription is cancelled and simply runs out.
+      const periodEnd = data.next_billed_at
+        || (data.current_billing_period && data.current_billing_period.ends_at)
+        || "";
+
+      await recordSubscription(env.LICENSES, subId, status, periodEnd, subTier);
+      return json({ status: "subscription_recorded", subscription: subId, state: status });
+    }
+
     if (event.event_type !== "transaction.completed") return json({ ignored: event.event_type });
 
     const priceIds = (data.items || []).map((i) => i.price && i.price.id);
@@ -249,13 +284,36 @@ export default {
     const base = env.PADDLE_API_BASE || "https://api.paddle.com";
     const product = env.LICENSE_PRODUCT_ID || "easypost-desktop";
     const txn = data.id || "";
-    // Deterministic iat from the event, so Paddle retries mint the identical key.
-    const iat = event.occurred_at || "1970-01-01T00:00:00Z";
+    const subId = data.subscription_id || "";
+    const annual = TIER_PLANS[tier] === "annual";
+
+    // An annual key names the subscription, not the transaction, so it stays
+    // valid across every renewal and activation can look up what is paid for.
+    const orderRef = annual && subId ? subId : txn;
+
+    // A renewal is a fresh transaction against a key the customer already has.
+    // Minting is harmless (it is deterministic), but emailing again would be
+    // noise, so only the first transaction sends anything.
+    const isRenewal = data.origin === "subscription_recurring";
+
+    // Deterministic iat, so Paddle retries mint the identical key. For a
+    // subscription that means every renewal reproduces the original key rather
+    // than a new one the customer would have to paste.
+    const iat = annual && subId
+      ? (data.billed_at || event.occurred_at || "1970-01-01T00:00:00Z")
+      : (event.occurred_at || "1970-01-01T00:00:00Z");
+    const stableIat = annual && subId ? "subscription" : iat;
 
     const email = await getCustomerEmail(base, env.PADDLE_API_KEY, data.customer_id);
-    const licenseKey = mintLicense(env.LICENSE_PRIVATE_KEY_PEM, product, email, txn, iat, tier);
+    const licenseKey = mintLicense(
+      env.LICENSE_PRIVATE_KEY_PEM, product, email, orderRef, stableIat, tier
+    );
+
+    if (isRenewal) {
+      return json({ status: "renewal_noted", subscription: subId, tier });
+    }
     await sendLicenseEmail(env.RESEND_API_KEY, env.LICENSE_FROM_EMAIL, email, licenseKey, tier);
 
-    return json({ status: "license_issued", transaction: txn, tier });
+    return json({ status: "license_issued", transaction: txn, order: orderRef, tier });
   },
 };

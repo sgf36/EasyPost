@@ -54,6 +54,23 @@ const TIER_SEATS = {
   enterprise: 0, // uncapped
 };
 
+const TIER_PLANS = {
+  personal: "perpetual",
+  business: "annual",
+  organisation: "annual",
+  enterprise: "perpetual",
+};
+
+// Days past the billing period end that a subscription receipt stays valid.
+// Covers a failed card and the retries that follow it: a payment hiccup should
+// not stop someone working while it is being sorted out.
+const SUBSCRIPTION_GRACE_DAYS = 10;
+
+// Used when a subscription's webhook has not arrived yet — a real race on a
+// brand-new purchase. Short, so it self-heals once the webhook lands, and long
+// enough that the buyer is never turned away at the moment they pay.
+const UNKNOWN_SUBSCRIPTION_DAYS = 7;
+
 function b64url(buf) {
   return Buffer.from(buf).toString("base64url");
 }
@@ -116,8 +133,15 @@ export function verifyLicense(privatePem, key) {
   const seats = Number.isInteger(payload.seats) && payload.seats >= 0
     ? payload.seats
     : (TIER_SEATS[tier] ?? TIER_SEATS.personal);
+  const plan = payload.plan || TIER_PLANS[tier] || "perpetual";
 
-  return { order: String(payload.order || ""), email: String(payload.email || ""), tier, seats };
+  return {
+    order: String(payload.order || ""),
+    email: String(payload.email || ""),
+    tier,
+    seats,
+    plan,
+  };
 }
 
 /** Constant-time compare of the caller's HMAC proof. */
@@ -137,7 +161,7 @@ function freshEnough(ts) {
 }
 
 /** The signed statement the app stores and re-checks offline on every launch. */
-export function signReceipt(privatePem, { order, device, tier, seats }) {
+export function signReceipt(privatePem, { order, device, tier, seats, expiresAt }) {
   const payload = Buffer.from(JSON.stringify({
     v: 1,
     order,
@@ -145,10 +169,67 @@ export function signReceipt(privatePem, { order, device, tier, seats }) {
     tier,
     seats,
     iat: nowIso(),
-    exp: isoPlusDays(RECEIPT_DAYS),
+    exp: expiresAt || isoPlusDays(RECEIPT_DAYS),
   }), "utf8");
   const signature = nodeSign(null, payload, createPrivateKey(privatePem));
   return `${RECEIPT_TAG}.${b64url(payload)}.${b64url(signature)}`;
+}
+
+/**
+ * How long a receipt should last, and whether one is owed at all.
+ *
+ * A perpetual licence gets the long default. An annual one gets a receipt that
+ * runs to the end of what has been paid for, plus a grace window, so the app
+ * checks back roughly once a year rather than continuously.
+ *
+ * Returns { expiresAt } or { error, status }.
+ */
+async function receiptWindow(db, license) {
+  if (license.plan !== "annual") {
+    return { expiresAt: isoPlusDays(RECEIPT_DAYS) };
+  }
+
+  const row = await db.prepare(
+    "SELECT status, period_end FROM subscriptions WHERE sub_id = ?"
+  ).bind(license.order).first();
+
+  if (!row) {
+    // Webhook has not landed yet. Let them in on a short receipt rather than
+    // refusing a customer who has just paid.
+    return { expiresAt: isoPlusDays(UNKNOWN_SUBSCRIPTION_DAYS) };
+  }
+
+  const dead = ["canceled", "cancelled", "expired"];
+  if (dead.includes(String(row.status).toLowerCase())) {
+    return {
+      error: "This subscription has ended. Renew it to keep using Easy-Post Desktop.",
+      status: 402,
+    };
+  }
+
+  const periodEnd = Date.parse(row.period_end);
+  if (Number.isNaN(periodEnd)) {
+    return { expiresAt: isoPlusDays(UNKNOWN_SUBSCRIPTION_DAYS) };
+  }
+
+  const until = new Date(periodEnd + SUBSCRIPTION_GRACE_DAYS * 86400000);
+  if (until.getTime() <= Date.now()) {
+    return {
+      error: "This subscription is past due. Update payment to keep using Easy-Post Desktop.",
+      status: 402,
+    };
+  }
+  return { expiresAt: until.toISOString().replace(/\.\d{3}Z$/, "Z") };
+}
+
+/** Record what Paddle says about a subscription. */
+export async function recordSubscription(db, subId, status, periodEnd, tier) {
+  await db.prepare(
+    "INSERT INTO subscriptions (sub_id, status, period_end, tier, updated_at) "
+    + "VALUES (?, ?, ?, ?, ?) ON CONFLICT(sub_id) DO UPDATE SET "
+    + "status = excluded.status, period_end = excluded.period_end, "
+    + "tier = excluded.tier, updated_at = excluded.updated_at"
+  ).bind(subId, status || "active", periodEnd || "", tier || "", nowIso()).run();
 }
 
 async function logAttempt(db, order, device, action, outcome) {
@@ -237,6 +318,15 @@ export async function handleActivate(request, env, json) {
 
   const { license, device } = auth;
   const db = env.LICENSES;
+
+  // Settle how long a receipt may last before taking a seat, so a lapsed
+  // subscription is refused without first consuming an allowance.
+  const window = await receiptWindow(db, license);
+  if (window.error) {
+    await logAttempt(db, license.order, device, "activate", "subscription_inactive");
+    return json({ error: window.error }, window.status);
+  }
+
   await reclaimStale(db, license.order);
 
   const existing = await db.prepare(
@@ -275,9 +365,12 @@ export async function handleActivate(request, env, json) {
   return json({
     receipt: signReceipt(env.LICENSE_PRIVATE_KEY_PEM, {
       order: license.order, device, tier: license.tier, seats: license.seats,
+      expiresAt: window.expiresAt,
     }),
     tier: license.tier,
     seats: license.seats,
+    plan: license.plan,
+    expires: window.expiresAt,
     used: (await deviceList(db, license.order)).length,
   });
 }
@@ -320,4 +413,4 @@ export async function revokeOrder(db, order, reason) {
   await db.prepare("DELETE FROM devices WHERE order_id = ?").bind(order).run();
 }
 
-export { TIER_SEATS, RECEIPT_DAYS, RECLAIM_DAYS };
+export { TIER_SEATS, TIER_PLANS, RECEIPT_DAYS, RECLAIM_DAYS, SUBSCRIPTION_GRACE_DAYS };

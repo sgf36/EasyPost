@@ -34,7 +34,7 @@ LICENSE_FORMAT_TAG = "EPD1"
 # Where customers buy a license (Paddle checkout — set once the product exists).
 PADDLE_CHECKOUT_URL = ""
 
-# Tiers differ only in how many computers one key may activate.
+# How many computers one key may activate.
 TIERS = {
     "personal": 3,
     "business": 25,
@@ -42,6 +42,22 @@ TIERS = {
     "enterprise": 0,  # 0 means uncapped; negotiated individually
 }
 DEFAULT_TIER = "personal"
+
+# How each tier is billed. Personal is bought once and never expires; the two
+# middle tiers renew annually.
+#
+# The expiry deliberately does NOT live in the licence key. A key that expired
+# would have to be reissued and re-pasted every year, which is a miserable thing
+# to ask of a customer and a support burden for us. Instead the key is permanent
+# and identifies the subscription; the *activation receipt* carries the expiry
+# and is renewed quietly in the background while the subscription is paid up.
+PLANS = {
+    "personal": "perpetual",
+    "business": "annual",
+    "organisation": "annual",
+    "enterprise": "perpetual",  # negotiated; the signed value wins either way
+}
+DEFAULT_PLAN = "perpetual"
 
 
 @dataclass
@@ -54,10 +70,15 @@ class LicenseInfo:
     issued_at: str
     tier: str = DEFAULT_TIER
     seats: int = TIERS[DEFAULT_TIER]
+    plan: str = DEFAULT_PLAN
 
     @property
     def is_uncapped(self) -> bool:
         return self.seats <= 0
+
+    @property
+    def is_subscription(self) -> bool:
+        return self.plan == "annual"
 
     def seat_summary(self) -> str:
         if self.is_uncapped:
@@ -113,6 +134,8 @@ def verify_license(key: str) -> Optional[LicenseInfo]:
     else:
         seats = TIERS.get(tier, TIERS[DEFAULT_TIER])
 
+    plan = str(payload.get("plan") or PLANS.get(tier, DEFAULT_PLAN))
+
     return LicenseInfo(
         email=str(payload.get("email", "")),
         order=str(payload.get("order", "")),
@@ -120,6 +143,7 @@ def verify_license(key: str) -> Optional[LicenseInfo]:
         issued_at=str(payload.get("iat", "")),
         tier=tier,
         seats=seats,
+        plan=plan,
     )
 
 

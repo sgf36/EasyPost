@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Igodo ikike ezighi ezi",
   "license_gate.key_label": "Igodo ikike:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Ndenye aha a anaghị arụ ọrụ",
   "license_gate.offline_body": "Igodo gị dị irè, yabụ ị nwere ike ịga n'ihu. Enweghị ike ikwenye ọnụọgụ kọmputa ugbu a; anyị ga-anwale ọzọ na-akpaghị aka. Ọ bụrụ na ruo {date} a ka enweghị ike iru ya, a ga-arịọ gị ka ị malitegharịa.",
   "license_gate.offline_title": "Enweghị ike iru ọrụ mmalite",
   "license_gate.release_body": "Ikike gị na-ekpuchi kọmputa {seats} ma a na-eji ha niile. Họrọ otu ka a hapụ ya ka kọmputa a wee were ọnọdụ ya. A ga-arịọ kọmputa ahọpụtara ka ọ malitegharịa n'oge ọzọ ọ ga-amalite.",

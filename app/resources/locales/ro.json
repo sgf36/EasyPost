@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Cheie de licență nevalidă",
   "license_gate.key_label": "Cheie de licență:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Acest abonament nu este activ",
   "license_gate.offline_body": "Cheia este valabilă, deci puteți continua. Numărul de calculatoare nu a putut fi confirmat acum; vom încerca din nou automat. Dacă nici la {date} serviciul nu este disponibil, vi se va cere să activați din nou.",
   "license_gate.offline_title": "Serviciul de activare nu a putut fi contactat",
   "license_gate.release_body": "Licența acoperă {seats} calculatoare, toate fiind utilizate. Alegeți unul de eliberat, pentru ca acest calculator să îi ia locul. Calculatorului eliberat i se va cere o nouă activare la următoarea pornire.",

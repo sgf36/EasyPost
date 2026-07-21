@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Ungültiger Lizenzschlüssel",
   "license_gate.key_label": "Lizenzschlüssel:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Dieses Abonnement ist nicht aktiv",
   "license_gate.offline_body": "Ihr Schlüssel ist gültig, Sie können also fortfahren. Die Anzahl der Computer konnte gerade nicht bestätigt werden; wir versuchen es automatisch erneut. Ist der Dienst bis zum {date} weiterhin nicht erreichbar, werden Sie erneut zur Aktivierung aufgefordert.",
   "license_gate.offline_title": "Aktivierungsdienst nicht erreichbar",
   "license_gate.release_body": "Ihre Lizenz umfasst {seats} Computer, die alle belegt sind. Wählen Sie einen aus, der freigegeben werden soll, damit dieser Computer dessen Platz einnehmen kann. Der freigegebene Computer wird beim nächsten Start erneut zur Aktivierung aufgefordert.",

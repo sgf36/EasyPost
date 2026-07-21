@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Ukhiye welayisensi ongavumelekile",
   "license_gate.key_label": "Ukhiye welayisensi:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Lokhu kubhalisa akusebenzi",
   "license_gate.offline_body": "Ukhiye wakho uvumelekile, ngakho ungaqhubeka. Inani lamakhompyutha alikwazanga ukuqinisekiswa okwamanje; sizozama futhi ngokuzenzakalelayo. Uma kufika {date} kungakafinyeleleki, uzocelwa ukuthi uvule kabusha.",
   "license_gate.offline_title": "Ayikwazanga ukufinyelela insizakalo yokuvula",
   "license_gate.release_body": "Ilayisense yakho ihlanganisa amakhompyutha angu-{seats} futhi wonke asetshenziswa. Khetha elilodwa ukuze likhululwe, lelicomputer lithathe indawo yalo. Ikhompyutha ekhululiwe izocelwa ukuthi ivule kabusha uma iqala okulandelayo.",

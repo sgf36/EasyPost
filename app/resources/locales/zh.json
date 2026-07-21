@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "许可证密钥无效",
   "license_gate.key_label": "许可证密钥：",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "此订阅未生效",
   "license_gate.offline_body": "您的密钥有效，可以继续使用。此刻未能确认电脑数量，我们会自动重试。若到 {date} 仍无法连接，将请您重新激活。",
   "license_gate.offline_title": "无法连接激活服务",
   "license_gate.release_body": "您的授权涵盖 {seats} 台电脑，且全部在用。请选择一台释放，好让这台电脑接替它。被释放的电脑下次启动时需要重新激活。",

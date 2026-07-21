@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Kọ́kọ́rọ́ ìwé àṣẹ tí kò tọ́",
   "license_gate.key_label": "Kọ́kọ́rọ́ ìwé àṣẹ:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Ìforúkọsílẹ̀ yìí kò ń ṣiṣẹ́",
   "license_gate.offline_body": "Kọ́kọ́rọ́ rẹ wúlò, nítorí náà o lè tẹ̀síwájú. A kò lè fìdí iye kọ̀ǹpútà múlẹ̀ ní àkókò yìí; a ó tún gbìyànjú fúnra rẹ̀. Bí ó bá ṣì jẹ́ pé a kò lè dé ọ̀dọ̀ rẹ̀ nígbà tí ó bá di {date}, a ó bi ọ́ pé kí o tún mú un ṣiṣẹ́.",
   "license_gate.offline_title": "A kò lè dé ọ̀dọ̀ iṣẹ́ ìmúṣiṣẹ́",
   "license_gate.release_body": "Iwe-àṣẹ rẹ bo kọ̀ǹpútà {seats}, gbogbo wọn sì ń ṣiṣẹ́. Yan ọ̀kan láti tú sílẹ̀ kí kọ̀ǹpútà yìí lè gba ààyè rẹ̀. A ó bi kọ̀ǹpútà tí a tú sílẹ̀ pé kí ó tún mú ara rẹ̀ ṣiṣẹ́ nígbà tí ó bá tún bẹ̀rẹ̀.",

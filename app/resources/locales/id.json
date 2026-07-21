@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Kunci lisensi tidak valid",
   "license_gate.key_label": "Kunci lisensi:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Langganan ini tidak aktif",
   "license_gate.offline_body": "Kunci Anda sah, jadi Anda bisa melanjutkan. Jumlah komputer belum dapat dipastikan saat ini; kami akan mencoba lagi secara otomatis. Jika sampai {date} masih tidak dapat dihubungi, Anda akan diminta mengaktifkan ulang.",
   "license_gate.offline_title": "Tidak dapat menghubungi layanan aktivasi",
   "license_gate.release_body": "Lisensi Anda mencakup {seats} komputer dan semuanya sedang dipakai. Pilih satu untuk dilepaskan agar komputer ini menggantikannya. Komputer yang dilepaskan akan diminta mengaktifkan ulang saat berikutnya dinyalakan.",

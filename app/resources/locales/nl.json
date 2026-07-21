@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Ongeldige licentiesleutel",
   "license_gate.key_label": "Licentiesleutel:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Dit abonnement is niet actief",
   "license_gate.offline_body": "Uw sleutel is geldig, u kunt dus doorgaan. Het aantal computers kon zojuist niet worden bevestigd; we proberen het automatisch opnieuw. Is de dienst op {date} nog steeds onbereikbaar, dan wordt u gevraagd opnieuw te activeren.",
   "license_gate.offline_title": "Activeringsdienst niet bereikbaar",
   "license_gate.release_body": "Uw licentie dekt {seats} computers en die zijn allemaal in gebruik. Kies er een om vrij te geven zodat deze computer de plaats kan innemen. De vrijgegeven computer wordt bij de volgende start gevraagd opnieuw te activeren.",

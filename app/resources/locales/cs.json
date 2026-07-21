@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Neplatný licenční klíč",
   "license_gate.key_label": "Licenční klíč:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Toto předplatné není aktivní",
   "license_gate.offline_body": "Váš klíč je platný, můžete tedy pokračovat. Počet počítačů se nyní nepodařilo ověřit; zkusíme to znovu automaticky. Pokud služba nebude dostupná ani {date}, budete požádáni o novou aktivaci.",
   "license_gate.offline_title": "Aktivační službu se nepodařilo kontaktovat",
   "license_gate.release_body": "Vaše licence pokrývá {seats} počítačů a všechny jsou používány. Vyberte jeden k uvolnění, aby jeho místo mohl zaujmout tento počítač. Uvolněný počítač bude při příštím spuštění požádán o novou aktivaci.",

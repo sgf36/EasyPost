@@ -166,6 +166,13 @@ class LicenseGate(QWidget):
                 return self._claim_seat(key, info, allow_release=False)
             return False
 
+        except activation.SubscriptionLapsed as exc:
+            # Deliberately keeps the key. An annual plan that lapsed starts
+            # working again the moment it is renewed, with the same key, so
+            # throwing it away would only create a support request.
+            QMessageBox.warning(self, tr("license_gate.lapsed_title"), str(exc))
+            return False
+
         except activation.LicenseRevoked as exc:
             # Refunded or withdrawn. Drop the key rather than leaving it sitting
             # in settings to fail again at the next launch.

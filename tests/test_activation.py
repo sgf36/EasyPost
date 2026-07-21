@@ -232,3 +232,119 @@ def test_seat_summary_is_not_pluralised_wrongly():
         issued_at="", tier="custom", seats=1,
     )
     assert info.seat_summary() == "up to 1 computer"
+
+
+# --- annual plans ----------------------------------------------------------
+
+def test_perpetual_tiers_are_not_subscriptions():
+    for tier in ("personal", "enterprise"):
+        info = license_mod.LicenseInfo(
+            email="a@b.com", order="O", product="easypost-desktop",
+            issued_at="", tier=tier, seats=3, plan=license_mod.PLANS[tier],
+        )
+        assert not info.is_subscription
+
+
+def test_middle_tiers_are_annual():
+    for tier in ("business", "organisation"):
+        assert license_mod.PLANS[tier] == "annual"
+
+
+def test_lapsed_subscription_is_its_own_error(monkeypatch):
+    """402 must not be read as revocation: the key still works once renewed."""
+    import requests
+
+    class Response:
+        status_code = 402
+        ok = False
+
+        def json(self):
+            return {"error": "This subscription has ended."}
+
+    monkeypatch.setattr(requests, "post", lambda *a, **k: Response())
+    with pytest.raises(activation.SubscriptionLapsed):
+        activation._post("/activate", {})
+
+
+def test_lapsed_is_not_caught_as_revoked(monkeypatch):
+    import requests
+
+    class Response:
+        status_code = 402
+        ok = False
+
+        def json(self):
+            return {}
+
+    monkeypatch.setattr(requests, "post", lambda *a, **k: Response())
+    try:
+        activation._post("/activate", {})
+    except activation.LicenseRevoked:
+        pytest.fail("a lapsed subscription must not be reported as a revoked licence")
+    except activation.SubscriptionLapsed:
+        pass
+
+
+def test_subscription_receipt_is_refreshed_before_it_expires(monkeypatch, signing_key):
+    """A customer offline on their renewal date must not be locked out."""
+    calls = []
+
+    near = (activation._now() + timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    receipt = activation.Receipt(
+        order="ORD-1", device="a" * 32, tier="business", seats=25,
+        issued_at="2026-01-01T00:00:00Z", expires_at=near,
+    )
+    monkeypatch.setattr(activation, "current_receipt", lambda info: receipt)
+    monkeypatch.setattr(activation, "activate_device",
+                        lambda key, info, label="": calls.append("renewed"))
+    monkeypatch.setattr(activation, "load_settings",
+                        lambda: type("S", (), {"license_key": "EPD1.a.b"})())
+
+    info = license_mod.LicenseInfo(
+        email="a@b.com", order="ORD-1", product="easypost-desktop",
+        issued_at="", tier="business", seats=25, plan="annual",
+    )
+    assert activation.ensure_seat(info) is True
+    assert calls == ["renewed"]
+
+
+def test_perpetual_receipt_is_not_refreshed_early(monkeypatch, signing_key):
+    calls = []
+    near = (activation._now() + timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    receipt = activation.Receipt(
+        order="ORD-1", device="a" * 32, tier="personal", seats=3,
+        issued_at="2026-01-01T00:00:00Z", expires_at=near,
+    )
+    monkeypatch.setattr(activation, "current_receipt", lambda info: receipt)
+    monkeypatch.setattr(activation, "activate_device",
+                        lambda key, info, label="": calls.append("renewed"))
+
+    info = license_mod.LicenseInfo(
+        email="a@b.com", order="ORD-1", product="easypost-desktop",
+        issued_at="", tier="personal", seats=3, plan="perpetual",
+    )
+    assert activation.ensure_seat(info) is True
+    assert calls == [], "a perpetual licence must never re-contact the server"
+
+
+def test_failed_renewal_does_not_lock_out_a_valid_receipt(monkeypatch, signing_key):
+    """The current receipt is still good, so a refresh failure must be silent."""
+    near = (activation._now() + timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    receipt = activation.Receipt(
+        order="ORD-1", device="a" * 32, tier="business", seats=25,
+        issued_at="2026-01-01T00:00:00Z", expires_at=near,
+    )
+
+    def explode(*args, **kwargs):
+        raise activation.ActivationUnreachable("offline")
+
+    monkeypatch.setattr(activation, "current_receipt", lambda info: receipt)
+    monkeypatch.setattr(activation, "activate_device", explode)
+    monkeypatch.setattr(activation, "load_settings",
+                        lambda: type("S", (), {"license_key": "EPD1.a.b"})())
+
+    info = license_mod.LicenseInfo(
+        email="a@b.com", order="ORD-1", product="easypost-desktop",
+        issued_at="", tier="business", seats=25, plan="annual",
+    )
+    assert activation.ensure_seat(info) is True

@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Chave de licença inválida",
   "license_gate.key_label": "Chave de licença:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Esta subscrição não está ativa",
   "license_gate.offline_body": "A sua chave é válida, pelo que pode continuar. Não foi possível confirmar agora o número de computadores; tentaremos novamente de forma automática. Se a {date} continuar inacessível, ser-lhe-á pedido que ative de novo.",
   "license_gate.offline_title": "Não foi possível contactar o serviço de ativação",
   "license_gate.release_body": "A sua licença abrange {seats} computadores e todos estão em uso. Escolha um para libertar, de modo que este computador ocupe o seu lugar. Será pedido ao computador libertado que ative de novo no próximo arranque.",

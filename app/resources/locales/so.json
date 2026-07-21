@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Furaha shatiga waa khalad",
   "license_gate.key_label": "Furaha shatiga:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Rukunkan ma firfircoona",
   "license_gate.offline_body": "Furahaagu waa sax, sidaas darteed waad sii wadi kartaa. Hadda lama xaqiijin karin tirada kombayutarada; si toos ah ayaan mar kale isku dayi doonnaa. Haddii ilaa {date} weli la gaari waayo, waxaa lagu weydiisan doonaa inaad mar kale firfircooniso.",
   "license_gate.offline_title": "Lama gaari karin adeegga firfircoonaanta",
   "license_gate.release_body": "Shatigaagu wuxuu daboolayaa {seats} kombayutar oo dhammaantood la isticmaalayo. Dooro mid aad sii deyso si kombayutarkan uu meeshiisa u qaato. Kombayutarka la sii daayay waxaa laga codsan doonaa inuu mar kale firfircoonaado marka xiga ee la shido.",

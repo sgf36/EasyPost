@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Ogiltig licensnyckel",
   "license_gate.key_label": "Licensnyckel:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Denna prenumeration är inte aktiv",
   "license_gate.offline_body": "Nyckeln är giltig, så du kan fortsätta. Antalet datorer kunde inte bekräftas just nu; vi försöker igen automatiskt. Om tjänsten fortfarande inte kan nås den {date} kommer du att ombes aktivera på nytt.",
   "license_gate.offline_title": "Aktiveringstjänsten kunde inte nås",
   "license_gate.release_body": "Din licens omfattar {seats} datorer och alla används. Välj en att frigöra så att den här datorn kan ta dess plats. Den frigjorda datorn ombeds aktivera på nytt vid nästa start.",

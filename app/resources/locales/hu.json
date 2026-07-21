@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Érvénytelen licenckulcs",
   "license_gate.key_label": "Licenckulcs:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Ez az előfizetés nem aktív",
   "license_gate.offline_body": "A kulcs érvényes, így folytathatja. A számítógépek számát most nem sikerült megerősíteni; automatikusan újra próbálkozunk. Ha {date} napjáig sem lesz elérhető, ismételt aktiválást fogunk kérni.",
   "license_gate.offline_title": "Az aktiválási szolgáltatás nem érhető el",
   "license_gate.release_body": "A licenc {seats} számítógépre szól, és mind használatban van. Válasszon egyet felszabadításra, hogy ez a gép átvehesse a helyét. A felszabadított gép a következő indításkor újbóli aktiválást fog kérni.",

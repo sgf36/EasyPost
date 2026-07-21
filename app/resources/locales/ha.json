@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Maɓallin lasisi mara inganci",
   "license_gate.key_label": "Maɓallin lasisi:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Wannan biyan kuɗi ba ya aiki",
   "license_gate.offline_body": "Maɓallinka yana aiki, don haka za ka iya ci gaba. Ba a iya tabbatar da adadin kwamfutoci a yanzu ba; za mu sake gwadawa ta atomatik. Idan har zuwa {date} har yanzu ba a iya isa ba, za a nemi ka sake kunnawa.",
   "license_gate.offline_title": "An kasa isa ga sabis na kunnawa",
   "license_gate.release_body": "Lasisinka ya ƙunshi kwamfutoci {seats} kuma duk suna amfani. Zaɓi ɗaya don sakinta domin wannan kwamfutar ta maye gurbinta. Za a nemi kwamfutar da aka saki ta sake kunnawa a lokacin da za a kunna ta na gaba.",

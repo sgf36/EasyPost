@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Ufunguo wa leseni si sahihi",
   "license_gate.key_label": "Ufunguo wa leseni:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Usajili huu haujaamilishwa",
   "license_gate.offline_body": "Ufunguo wako ni halali, hivyo unaweza kuendelea. Idadi ya kompyuta haikuweza kuthibitishwa sasa hivi; tutajaribu tena kiotomatiki. Ikiwa hadi {date} bado haiwezi kufikiwa, utaombwa kuwasha upya.",
   "license_gate.offline_title": "Haikuweza kufikia huduma ya kuwasha",
   "license_gate.release_body": "Leseni yako inashughulikia kompyuta {seats} na zote zinatumika. Chagua moja ya kuachiwa ili kompyuta hii ichukue nafasi yake. Kompyuta iliyoachiwa itaombwa kuwasha upya itakapoanzishwa tena.",

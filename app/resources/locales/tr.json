@@ -333,6 +333,7 @@
   "license_gate.invalid_title": "Geçersiz lisans anahtarı",
   "license_gate.key_label": "Lisans anahtarı:",
   "license_gate.key_placeholder": "EPD1...",
+  "license_gate.lapsed_title": "Bu abonelik etkin değil",
   "license_gate.offline_body": "Anahtarınız geçerli, bu nedenle devam edebilirsiniz. Bilgisayar sayısı şu anda doğrulanamadı; otomatik olarak yeniden deneyeceğiz. {date} tarihine kadar hizmete hâlâ ulaşılamazsa yeniden etkinleştirmeniz istenecektir.",
   "license_gate.offline_title": "Etkinleştirme hizmetine ulaşılamadı",
   "license_gate.release_body": "Lisansınız {seats} bilgisayarı kapsıyor ve hepsi kullanımda. Bu bilgisayarın yerini alabilmesi için serbest bırakılacak birini seçin. Serbest bırakılan bilgisayardan bir sonraki açılışında yeniden etkinleştirme istenecektir.",
