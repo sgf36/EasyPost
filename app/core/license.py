@@ -37,8 +37,8 @@ PADDLE_CHECKOUT_URL = ""
 # How many computers one key may activate.
 TIERS = {
     "personal": 3,
-    "business": 25,
-    "organisation": 50,
+    "business": 10,
+    "organisation": 30,
     "enterprise": 0,  # 0 means uncapped; negotiated individually
 }
 DEFAULT_TIER = "personal"

@@ -103,7 +103,7 @@ same build.
 | | Microsoft Store | Direct download |
 |---|---|---|
 | Package | `.msix` | `.dmg` (macOS), `.exe` folder (Windows) |
-| Price | Set in Partner Center | $29 one-time, or $59/$79 a year via Paddle |
+| Price | Set in Partner Center | $29 one-time, or $149/$349 a year via Paddle |
 | Licence gate | **Off** | **On** |
 | MCP / AI agents | **Off** | **On** |
 | Signing | Store re-signs on publish | Apple Developer ID + notarization |
@@ -150,8 +150,8 @@ renew annually.
 | Tier | Price | Computers | Billing |
 |---|---|---|---|
 | Personal | $29 | 3 | one-time, perpetual |
-| Business | $59 | 25 | annual subscription |
-| Organisation | $79 | 50 | annual subscription |
+| Business | $149/yr | 10 | annual subscription |
+| Organisation | $349/yr | 30 | annual subscription |
 | Enterprise | contact | uncapped (`seats: 0`) | as agreed |
 
 Licence keys are **Ed25519-signed and verified offline**:

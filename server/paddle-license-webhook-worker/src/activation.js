@@ -49,8 +49,8 @@ const MAX_FAILURES_PER_HOUR = 20;
 
 const TIER_SEATS = {
   personal: 3,
-  business: 25,
-  organisation: 50,
+  business: 10,
+  organisation: 30,
   enterprise: 0, // uncapped
 };
 
