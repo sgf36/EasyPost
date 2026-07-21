@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Actualizando…",
   "tracking.table_group_title": "Envíos seguidos",
   "tracking.title": "Seguimiento",
-  "tracking.tracking_number_placeholder": "Número de seguimiento"
+  "tracking.tracking_number_placeholder": "Número de seguimiento",
+  "license_gate.title": "Activar Easy-Post Desktop",
+  "license_gate.subtitle": "Introduzca la clave de licencia que recibió por correo electrónico tras la compra para desbloquear la aplicación.",
+  "license_gate.key_label": "Clave de licencia:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Activar",
+  "license_gate.buy_button": "Comprar una licencia",
+  "license_gate.invalid_title": "Clave de licencia no válida",
+  "license_gate.invalid_body": "No se reconoció esa clave de licencia. Asegúrese de haber copiado la clave completa del correo de compra o póngase en contacto con soporte.",
+  "license_gate.buy_soon_title": "Compras próximamente",
+  "license_gate.buy_soon_body": "La compra en línea aún no está disponible. Vuelva a intentarlo en breve."
 }

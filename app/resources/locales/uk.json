@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Оновлення…",
   "tracking.table_group_title": "Відстежувані відправлення",
   "tracking.title": "Відстеження",
-  "tracking.tracking_number_placeholder": "Номер відстеження"
+  "tracking.tracking_number_placeholder": "Номер відстеження",
+  "license_gate.title": "Активувати Easy-Post Desktop",
+  "license_gate.subtitle": "Введіть ліцензійний ключ, який ви отримали електронною поштою після покупки, щоб розблокувати застосунок.",
+  "license_gate.key_label": "Ліцензійний ключ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Активувати",
+  "license_gate.buy_button": "Придбати ліцензію",
+  "license_gate.invalid_title": "Недійсний ліцензійний ключ",
+  "license_gate.invalid_body": "Цей ліцензійний ключ не розпізнано. Переконайтеся, що ви скопіювали ключ повністю з листа про покупку, або зверніться до служби підтримки.",
+  "license_gate.buy_soon_title": "Покупки скоро з’являться",
+  "license_gate.buy_soon_body": "Онлайн-покупка поки що недоступна. Будь ласка, завітайте трохи згодом."
 }

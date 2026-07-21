@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Osvježavanje…",
   "tracking.table_group_title": "Praćene pošiljke",
   "tracking.title": "Praćenje",
-  "tracking.tracking_number_placeholder": "Broj za praćenje"
+  "tracking.tracking_number_placeholder": "Broj za praćenje",
+  "license_gate.title": "Aktivirajte Easy-Post Desktop",
+  "license_gate.subtitle": "Unesite licencni ključ koji ste primili e-poštom nakon kupnje kako biste otključali aplikaciju.",
+  "license_gate.key_label": "Licencni ključ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktiviraj",
+  "license_gate.buy_button": "Kupi licencu",
+  "license_gate.invalid_title": "Nevažeći licencni ključ",
+  "license_gate.invalid_body": "Taj licencni ključ nije prepoznat. Provjerite jeste li kopirali cijeli ključ iz e-pošte o kupnji ili se obratite podršci.",
+  "license_gate.buy_soon_title": "Kupnja uskoro dostupna",
+  "license_gate.buy_soon_body": "Internetska kupnja još nije dostupna. Pokušajte ponovno uskoro."
 }

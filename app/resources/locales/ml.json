@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "പുതുക്കുന്നു…",
   "tracking.table_group_title": "ട്രാക്ക് ചെയ്യുന്ന ഷിപ്മെന്റുകൾ",
   "tracking.title": "ട്രാക്കിംഗ്",
-  "tracking.tracking_number_placeholder": "ട്രാക്കിംഗ് നമ്പർ"
+  "tracking.tracking_number_placeholder": "ട്രാക്കിംഗ് നമ്പർ",
+  "license_gate.title": "Easy-Post Desktop സജീവമാക്കുക",
+  "license_gate.subtitle": "ആപ്പ് അൺലോക്ക് ചെയ്യാൻ, വാങ്ങിയതിന് ശേഷം ഇമെയിലിലൂടെ ലഭിച്ച ലൈസൻസ് കീ നൽകുക.",
+  "license_gate.key_label": "ലൈസൻസ് കീ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "സജീവമാക്കുക",
+  "license_gate.buy_button": "ലൈസൻസ് വാങ്ങുക",
+  "license_gate.invalid_title": "അസാധുവായ ലൈസൻസ് കീ",
+  "license_gate.invalid_body": "ആ ലൈസൻസ് കീ തിരിച്ചറിഞ്ഞില്ല. നിങ്ങളുടെ വാങ്ങൽ ഇമെയിലിൽ നിന്ന് കീ പൂർണ്ണമായി പകർത്തിയെന്ന് ഉറപ്പാക്കുക, അല്ലെങ്കിൽ പിന്തുണയുമായി ബന്ധപ്പെടുക.",
+  "license_gate.buy_soon_title": "വാങ്ങൽ ഉടൻ വരുന്നു",
+  "license_gate.buy_soon_body": "ഓൺലൈൻ വാങ്ങൽ ഇപ്പോൾ ലഭ്യമല്ല. ദയവായി ഉടൻ വീണ്ടും പരിശോധിക്കുക."
 }

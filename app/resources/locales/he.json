@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "מרענן…",
   "tracking.table_group_title": "משלוחים במעקב",
   "tracking.title": "מעקב",
-  "tracking.tracking_number_placeholder": "מספר מעקב"
+  "tracking.tracking_number_placeholder": "מספר מעקב",
+  "license_gate.title": "הפעלת Easy-Post Desktop",
+  "license_gate.subtitle": "הזינו את מפתח הרישיון שקיבלתם בדוא\"ל לאחר הרכישה כדי לפתוח את היישום.",
+  "license_gate.key_label": "מפתח רישיון:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "הפעלה",
+  "license_gate.buy_button": "רכישת רישיון",
+  "license_gate.invalid_title": "מפתח רישיון לא תקין",
+  "license_gate.invalid_body": "מפתח הרישיון הזה לא זוהה. ודאו שהעתקתם את המפתח כולו מדוא\"ל הרכישה, או פנו לתמיכה.",
+  "license_gate.buy_soon_title": "רכישות בקרוב",
+  "license_gate.buy_soon_body": "רכישה מקוונת אינה זמינה עדיין. אנא בדקו שוב בקרוב."
 }

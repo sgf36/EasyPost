@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Wird aktualisiert…",
   "tracking.table_group_title": "Verfolgte Sendungen",
   "tracking.title": "Sendungsverfolgung",
-  "tracking.tracking_number_placeholder": "Sendungsnummer"
+  "tracking.tracking_number_placeholder": "Sendungsnummer",
+  "license_gate.title": "Easy-Post Desktop aktivieren",
+  "license_gate.subtitle": "Geben Sie den Lizenzschlüssel ein, den Sie nach dem Kauf per E-Mail erhalten haben, um die App freizuschalten.",
+  "license_gate.key_label": "Lizenzschlüssel:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktivieren",
+  "license_gate.buy_button": "Lizenz kaufen",
+  "license_gate.invalid_title": "Ungültiger Lizenzschlüssel",
+  "license_gate.invalid_body": "Dieser Lizenzschlüssel wurde nicht erkannt. Stellen Sie sicher, dass Sie den vollständigen Schlüssel aus Ihrer Kauf-E-Mail kopiert haben, oder wenden Sie sich an den Support.",
+  "license_gate.buy_soon_title": "Käufe bald verfügbar",
+  "license_gate.buy_soon_body": "Der Online-Kauf ist derzeit noch nicht verfügbar. Bitte schauen Sie in Kürze wieder vorbei."
 }

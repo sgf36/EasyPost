@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Inasasisha…",
   "tracking.table_group_title": "Vifurushi vinavyofuatiliwa",
   "tracking.title": "Ufuatiliaji",
-  "tracking.tracking_number_placeholder": "Namba ya ufuatiliaji"
+  "tracking.tracking_number_placeholder": "Namba ya ufuatiliaji",
+  "license_gate.title": "Amilisha Easy-Post Desktop",
+  "license_gate.subtitle": "Weka ufunguo wa leseni uliopokea kwa barua pepe baada ya ununuzi ili kufungua programu.",
+  "license_gate.key_label": "Ufunguo wa leseni:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Amilisha",
+  "license_gate.buy_button": "Nunua leseni",
+  "license_gate.invalid_title": "Ufunguo wa leseni si sahihi",
+  "license_gate.invalid_body": "Ufunguo huo wa leseni haukutambuliwa. Hakikisha umenakili ufunguo mzima kutoka kwa barua pepe ya ununuzi wako, au wasiliana na usaidizi.",
+  "license_gate.buy_soon_title": "Ununuzi unakuja hivi karibuni",
+  "license_gate.buy_soon_body": "Ununuzi mtandaoni bado haupatikani. Tafadhali angalia tena baada ya muda mfupi."
 }

@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "تازہ کیا جا رہا ہے…",
   "tracking.table_group_title": "ٹریک شدہ شپمنٹس",
   "tracking.title": "ٹریکنگ",
-  "tracking.tracking_number_placeholder": "ٹریکنگ نمبر"
+  "tracking.tracking_number_placeholder": "ٹریکنگ نمبر",
+  "license_gate.title": "Easy-Post Desktop کو فعال کریں",
+  "license_gate.subtitle": "ایپ کو کھولنے کے لیے وہ لائسنس کلید درج کریں جو آپ کو خریداری کے بعد ای میل کے ذریعے موصول ہوئی۔",
+  "license_gate.key_label": "لائسنس کلید:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "فعال کریں",
+  "license_gate.buy_button": "لائسنس خریدیں",
+  "license_gate.invalid_title": "غلط لائسنس کلید",
+  "license_gate.invalid_body": "اس لائسنس کلید کو پہچانا نہیں گیا۔ یقینی بنائیں کہ آپ نے اپنی خریداری کی ای میل سے پوری کلید کاپی کی ہے، یا سپورٹ سے رابطہ کریں۔",
+  "license_gate.buy_soon_title": "خریداری جلد آ رہی ہے",
+  "license_gate.buy_soon_body": "آن لائن خریداری ابھی دستیاب نہیں ہے۔ براہ کرم تھوڑی دیر بعد دوبارہ دیکھیں۔"
 }

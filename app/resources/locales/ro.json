@@ -378,5 +378,15 @@
   "address_book.state_label_emirate": "Emirat:",
   "address_book.state_label_default": "Stat/Provincie/Regiune:",
   "address_book.postal_label_zip": "Cod ZIP:",
-  "address_book.postal_label_postal": "Cod poștal:"
+  "address_book.postal_label_postal": "Cod poștal:",
+  "license_gate.title": "Activați Easy-Post Desktop",
+  "license_gate.subtitle": "Introduceți cheia de licență primită prin e-mail după achiziție pentru a debloca aplicația.",
+  "license_gate.key_label": "Cheie de licență:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Activați",
+  "license_gate.buy_button": "Cumpărați o licență",
+  "license_gate.invalid_title": "Cheie de licență nevalidă",
+  "license_gate.invalid_body": "Cheia de licență nu a fost recunoscută. Asigurați-vă că ați copiat cheia integrală din e-mailul de achiziție sau contactați asistența.",
+  "license_gate.buy_soon_title": "Achizițiile vor fi disponibile în curând",
+  "license_gate.buy_soon_body": "Achizițiile online nu sunt încă disponibile. Reveniți în scurt timp."
 }

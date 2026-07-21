@@ -378,5 +378,15 @@
   "address_book.state_label_emirate": "Эмират:",
   "address_book.state_label_default": "Штат/Провинция/Область:",
   "address_book.postal_label_zip": "Индекс:",
-  "address_book.postal_label_postal": "Почтовый индекс:"
+  "address_book.postal_label_postal": "Почтовый индекс:",
+  "license_gate.title": "Активация Easy-Post Desktop",
+  "license_gate.subtitle": "Введите лицензионный ключ, полученный по электронной почте после покупки, чтобы разблокировать приложение.",
+  "license_gate.key_label": "Лицензионный ключ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Активировать",
+  "license_gate.buy_button": "Купить лицензию",
+  "license_gate.invalid_title": "Недействительный лицензионный ключ",
+  "license_gate.invalid_body": "Этот лицензионный ключ не распознан. Убедитесь, что вы скопировали ключ целиком из письма о покупке, или обратитесь в службу поддержки.",
+  "license_gate.buy_soon_title": "Покупки скоро появятся",
+  "license_gate.buy_soon_body": "Онлайн-покупки пока недоступны. Пожалуйста, зайдите позже."
 }

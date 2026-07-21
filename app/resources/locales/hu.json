@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Frissítés…",
   "tracking.table_group_title": "Nyomon követett szállítmányok",
   "tracking.title": "Nyomkövetés",
-  "tracking.tracking_number_placeholder": "Nyomkövetési szám"
+  "tracking.tracking_number_placeholder": "Nyomkövetési szám",
+  "license_gate.title": "Az Easy-Post Desktop aktiválása",
+  "license_gate.subtitle": "Adja meg a vásárlás után e-mailben kapott licenckulcsot az alkalmazás feloldásához.",
+  "license_gate.key_label": "Licenckulcs:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktiválás",
+  "license_gate.buy_button": "Licenc vásárlása",
+  "license_gate.invalid_title": "Érvénytelen licenckulcs",
+  "license_gate.invalid_body": "A rendszer nem ismerte fel ezt a licenckulcsot. Győződjön meg róla, hogy a teljes kulcsot másolta ki a vásárlási e-mailből, vagy forduljon az ügyfélszolgálathoz.",
+  "license_gate.buy_soon_title": "A vásárlás hamarosan elérhető",
+  "license_gate.buy_soon_body": "Az online vásárlás még nem érhető el. Kérjük, nézzen vissza hamarosan."
 }

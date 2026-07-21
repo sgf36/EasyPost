@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Menyegarkan…",
   "tracking.table_group_title": "Pengiriman yang dilacak",
   "tracking.title": "Pelacakan",
-  "tracking.tracking_number_placeholder": "Nomor resi"
+  "tracking.tracking_number_placeholder": "Nomor resi",
+  "license_gate.title": "Aktifkan Easy-Post Desktop",
+  "license_gate.subtitle": "Masukkan kunci lisensi yang Anda terima melalui email setelah pembelian untuk membuka aplikasi.",
+  "license_gate.key_label": "Kunci lisensi:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktifkan",
+  "license_gate.buy_button": "Beli lisensi",
+  "license_gate.invalid_title": "Kunci lisensi tidak valid",
+  "license_gate.invalid_body": "Kunci lisensi tersebut tidak dikenali. Pastikan Anda menyalin seluruh kunci dari email pembelian Anda, atau hubungi dukungan.",
+  "license_gate.buy_soon_title": "Pembelian segera hadir",
+  "license_gate.buy_soon_body": "Pembelian online belum tersedia saat ini. Silakan periksa kembali nanti."
 }

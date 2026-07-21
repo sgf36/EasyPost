@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "ರಿಫ್ರೆಶ್ ಮಾಡಲಾಗುತ್ತಿದೆ…",
   "tracking.table_group_title": "ಟ್ರ್ಯಾಕ್ ಮಾಡಿದ ಶಿಪ್‌ಮೆಂಟ್‌ಗಳು",
   "tracking.title": "ಟ್ರ್ಯಾಕಿಂಗ್",
-  "tracking.tracking_number_placeholder": "ಟ್ರ್ಯಾಕಿಂಗ್ ಸಂಖ್ಯೆ"
+  "tracking.tracking_number_placeholder": "ಟ್ರ್ಯಾಕಿಂಗ್ ಸಂಖ್ಯೆ",
+  "license_gate.title": "Easy-Post Desktop ಸಕ್ರಿಯಗೊಳಿಸಿ",
+  "license_gate.subtitle": "ಅಪ್ಲಿಕೇಶನ್ ಅನ್‌ಲಾಕ್ ಮಾಡಲು ಖರೀದಿಯ ನಂತರ ಇಮೇಲ್ ಮೂಲಕ ಪಡೆದ ಪರವಾನಗಿ ಕೀಲಿಯನ್ನು ನಮೂದಿಸಿ.",
+  "license_gate.key_label": "ಪರವಾನಗಿ ಕೀಲಿ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "ಸಕ್ರಿಯಗೊಳಿಸಿ",
+  "license_gate.buy_button": "ಪರವಾನಗಿ ಖರೀದಿಸಿ",
+  "license_gate.invalid_title": "ಅಮಾನ್ಯ ಪರವಾನಗಿ ಕೀಲಿ",
+  "license_gate.invalid_body": "ಆ ಪರವಾನಗಿ ಕೀಲಿ ಗುರುತಿಸಲಾಗಿಲ್ಲ. ನೀವು ಖರೀದಿ ಇಮೇಲ್‌ನಿಂದ ಸಂಪೂರ್ಣ ಕೀಲಿಯನ್ನು ನಕಲಿಸಿರುವಿರಿ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ, ಅಥವಾ ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+  "license_gate.buy_soon_title": "ಖರೀದಿ ಶೀಘ್ರದಲ್ಲೇ ಬರಲಿದೆ",
+  "license_gate.buy_soon_body": "ಆನ್‌ಲೈನ್ ಖರೀದಿ ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ."
 }

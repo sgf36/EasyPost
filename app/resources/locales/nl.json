@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Vernieuwen…",
   "tracking.table_group_title": "Gevolgde zendingen",
   "tracking.title": "Tracking",
-  "tracking.tracking_number_placeholder": "Trackingnummer"
+  "tracking.tracking_number_placeholder": "Trackingnummer",
+  "license_gate.title": "Easy-Post Desktop activeren",
+  "license_gate.subtitle": "Voer de licentiesleutel in die u na uw aankoop per e-mail hebt ontvangen om de app te ontgrendelen.",
+  "license_gate.key_label": "Licentiesleutel:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Activeren",
+  "license_gate.buy_button": "Licentie kopen",
+  "license_gate.invalid_title": "Ongeldige licentiesleutel",
+  "license_gate.invalid_body": "Die licentiesleutel is niet herkend. Controleer of u de volledige sleutel uit uw aankoop-e-mail hebt gekopieerd, of neem contact op met de ondersteuning.",
+  "license_gate.buy_soon_title": "Aankopen binnenkort beschikbaar",
+  "license_gate.buy_soon_body": "Online aankopen zijn nog niet beschikbaar. Kom binnenkort terug."
 }

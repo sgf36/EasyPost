@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "กำลังรีเฟรช…",
   "tracking.table_group_title": "พัสดุที่กำลังติดตาม",
   "tracking.title": "ติดตามพัสดุ",
-  "tracking.tracking_number_placeholder": "เลขพัสดุ"
+  "tracking.tracking_number_placeholder": "เลขพัสดุ",
+  "license_gate.title": "เปิดใช้งาน Easy-Post Desktop",
+  "license_gate.subtitle": "ป้อนคีย์ลิขสิทธิ์ที่คุณได้รับทางอีเมลหลังการซื้อเพื่อปลดล็อกแอป",
+  "license_gate.key_label": "คีย์ลิขสิทธิ์:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "เปิดใช้งาน",
+  "license_gate.buy_button": "ซื้อลิขสิทธิ์",
+  "license_gate.invalid_title": "คีย์ลิขสิทธิ์ไม่ถูกต้อง",
+  "license_gate.invalid_body": "ไม่รู้จักคีย์ลิขสิทธิ์นี้ โปรดตรวจสอบว่าคุณคัดลอกคีย์ทั้งหมดจากอีเมลการซื้อ หรือติดต่อฝ่ายสนับสนุน",
+  "license_gate.buy_soon_title": "การซื้อจะเปิดให้บริการเร็ว ๆ นี้",
+  "license_gate.buy_soon_body": "ยังไม่สามารถซื้อออนไลน์ได้ในขณะนี้ โปรดกลับมาตรวจสอบอีกครั้งในไม่ช้า"
 }

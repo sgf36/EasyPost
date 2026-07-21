@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "更新中…",
   "tracking.table_group_title": "追跡中の配送",
   "tracking.title": "追跡",
-  "tracking.tracking_number_placeholder": "追跡番号"
+  "tracking.tracking_number_placeholder": "追跡番号",
+  "license_gate.title": "Easy-Post Desktop を有効化",
+  "license_gate.subtitle": "アプリのロックを解除するには、購入後にメールで受け取ったライセンスキーを入力してください。",
+  "license_gate.key_label": "ライセンスキー:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "有効化",
+  "license_gate.buy_button": "ライセンスを購入",
+  "license_gate.invalid_title": "無効なライセンスキー",
+  "license_gate.invalid_body": "そのライセンスキーは認識されませんでした。購入確認メールからキー全体をコピーしたことを確認するか、サポートにお問い合わせください。",
+  "license_gate.buy_soon_title": "購入機能は近日公開",
+  "license_gate.buy_soon_body": "オンライン購入はまだご利用いただけません。しばらくしてから再度ご確認ください。"
 }

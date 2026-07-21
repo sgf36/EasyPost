@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "ਰਿਫ੍ਰੈਸ਼ ਹੋ ਰਿਹਾ ਹੈ…",
   "tracking.table_group_title": "ਟਰੈਕ ਕੀਤੀਆਂ ਸ਼ਿਪਮੈਂਟਾਂ",
   "tracking.title": "ਟਰੈਕਿੰਗ",
-  "tracking.tracking_number_placeholder": "ਟਰੈਕਿੰਗ ਨੰਬਰ"
+  "tracking.tracking_number_placeholder": "ਟਰੈਕਿੰਗ ਨੰਬਰ",
+  "license_gate.title": "Easy-Post Desktop ਸਰਗਰਮ ਕਰੋ",
+  "license_gate.subtitle": "ਐਪ ਅਨਲਾਕ ਕਰਨ ਲਈ ਖਰੀਦ ਤੋਂ ਬਾਅਦ ਈਮੇਲ ਰਾਹੀਂ ਮਿਲੀ ਲਾਇਸੈਂਸ ਕੁੰਜੀ ਦਾਖਲ ਕਰੋ।",
+  "license_gate.key_label": "ਲਾਇਸੈਂਸ ਕੁੰਜੀ:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "ਸਰਗਰਮ ਕਰੋ",
+  "license_gate.buy_button": "ਲਾਇਸੈਂਸ ਖਰੀਦੋ",
+  "license_gate.invalid_title": "ਗਲਤ ਲਾਇਸੈਂਸ ਕੁੰਜੀ",
+  "license_gate.invalid_body": "ਇਹ ਲਾਇਸੈਂਸ ਕੁੰਜੀ ਪਛਾਣੀ ਨਹੀਂ ਗਈ। ਯਕੀਨੀ ਬਣਾਓ ਕਿ ਤੁਸੀਂ ਖਰੀਦ ਈਮੇਲ ਤੋਂ ਪੂਰੀ ਕੁੰਜੀ ਕਾਪੀ ਕੀਤੀ ਹੈ, ਜਾਂ ਸਹਾਇਤਾ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।",
+  "license_gate.buy_soon_title": "ਖਰੀਦਦਾਰੀ ਜਲਦੀ ਆ ਰਹੀ ਹੈ",
+  "license_gate.buy_soon_body": "ਆਨਲਾਈਨ ਖਰੀਦਦਾਰੀ ਹਾਲੇ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਥੋੜ੍ਹੀ ਦੇਰ ਬਾਅਦ ਦੁਬਾਰਾ ਦੇਖੋ।"
 }

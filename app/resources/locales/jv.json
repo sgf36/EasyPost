@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "Nyegerake…",
   "tracking.table_group_title": "Kiriman sing dilacak",
   "tracking.title": "Lacak",
-  "tracking.tracking_number_placeholder": "Nomer lacak"
+  "tracking.tracking_number_placeholder": "Nomer lacak",
+  "license_gate.title": "Aktifake Easy-Post Desktop",
+  "license_gate.subtitle": "Ketikake kunci lisensi sing ditampa liwat email sawise tuku kanggo mbukak aplikasi.",
+  "license_gate.key_label": "Kunci lisensi:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "Aktifake",
+  "license_gate.buy_button": "Tuku lisensi",
+  "license_gate.invalid_title": "Kunci lisensi ora sah",
+  "license_gate.invalid_body": "Kunci lisensi kasebut ora dikenali. Pesthekake sampeyan nyalin kabeh kunci saka email tuku, utawa hubungi dhukungan.",
+  "license_gate.buy_soon_title": "Tuku bakal ana sedhela maneh",
+  "license_gate.buy_soon_body": "Tuku online durung kasedhiya saiki. Mangga mriksa maneh sedhela maneh."
 }

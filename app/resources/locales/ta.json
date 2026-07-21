@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "புதுப்பிக்கிறது…",
   "tracking.table_group_title": "கண்காணிக்கப்பட்ட அனுப்புகைகள்",
   "tracking.title": "டிராக்கிங்",
-  "tracking.tracking_number_placeholder": "டிராக்கிங் எண்"
+  "tracking.tracking_number_placeholder": "டிராக்கிங் எண்",
+  "license_gate.title": "Easy-Post Desktop ஐ செயல்படுத்துக",
+  "license_gate.subtitle": "செயலியைத் திறக்க, உங்கள் கொள்முதலுக்குப் பிறகு மின்னஞ்சலில் பெற்ற உரிம விசையை உள்ளிடவும்.",
+  "license_gate.key_label": "உரிம விசை:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "செயல்படுத்து",
+  "license_gate.buy_button": "உரிமம் வாங்கு",
+  "license_gate.invalid_title": "தவறான உரிம விசை",
+  "license_gate.invalid_body": "அந்த உரிம விசை அங்கீகரிக்கப்படவில்லை. உங்கள் கொள்முதல் மின்னஞ்சலிலிருந்து முழு விசையையும் நகலெடுத்தீர்கள் என்பதை உறுதிசெய்யவும், அல்லது ஆதரவைத் தொடர்பு கொள்ளவும்.",
+  "license_gate.buy_soon_title": "கொள்முதல் விரைவில்",
+  "license_gate.buy_soon_body": "ஆன்லைன் கொள்முதல் இன்னும் கிடைக்கவில்லை. சிறிது நேரத்தில் மீண்டும் பார்க்கவும்."
 }

@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "새로고침 중…",
   "tracking.table_group_title": "추적 중인 배송 건",
   "tracking.title": "추적",
-  "tracking.tracking_number_placeholder": "운송장 번호"
+  "tracking.tracking_number_placeholder": "운송장 번호",
+  "license_gate.title": "Easy-Post Desktop 활성화",
+  "license_gate.subtitle": "앱의 잠금을 해제하려면 구매 후 이메일로 받은 라이선스 키를 입력하세요.",
+  "license_gate.key_label": "라이선스 키:",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "활성화",
+  "license_gate.buy_button": "라이선스 구매",
+  "license_gate.invalid_title": "잘못된 라이선스 키",
+  "license_gate.invalid_body": "해당 라이선스 키를 인식할 수 없습니다. 구매 이메일에서 키 전체를 복사했는지 확인하거나 고객 지원에 문의하세요.",
+  "license_gate.buy_soon_title": "구매 기능 준비 중",
+  "license_gate.buy_soon_body": "온라인 구매는 아직 이용할 수 없습니다. 잠시 후 다시 확인해 주세요."
 }

@@ -378,5 +378,15 @@
   "tracking.refreshing_button": "ပြန်လည်စစ်ဆေးနေသည်…",
   "tracking.table_group_title": "ခြေရာခံနေသော ပို့ဆောင်မှုများ",
   "tracking.title": "ခြေရာခံခြင်း",
-  "tracking.tracking_number_placeholder": "ခြေရာခံနံပါတ်"
+  "tracking.tracking_number_placeholder": "ခြေရာခံနံပါတ်",
+  "license_gate.title": "Easy-Post Desktop ကို အသက်သွင်းပါ",
+  "license_gate.subtitle": "အက်ပ်ကို ဖွင့်ရန် ဝယ်ယူပြီးနောက် အီးမေးလ်ဖြင့် လက်ခံရရှိသော လိုင်စင်ကီးကို ထည့်သွင်းပါ။",
+  "license_gate.key_label": "လိုင်စင်ကီး-",
+  "license_gate.key_placeholder": "EPD1...",
+  "license_gate.activate_button": "အသက်သွင်းပါ",
+  "license_gate.buy_button": "လိုင်စင်ဝယ်ယူပါ",
+  "license_gate.invalid_title": "မမှန်ကန်သော လိုင်စင်ကီး",
+  "license_gate.invalid_body": "ထိုလိုင်စင်ကီးကို မမှတ်မိပါ။ သင့်ဝယ်ယူမှုအီးမေးလ်မှ ကီးအပြည့်အစုံကို ကူးယူထားကြောင်း သေချာစေပါ၊ သို့မဟုတ် အကူအညီဌာနကို ဆက်သွယ်ပါ။",
+  "license_gate.buy_soon_title": "ဝယ်ယူမှု မကြာမီ လာမည်",
+  "license_gate.buy_soon_body": "အွန်လိုင်းဝယ်ယူမှုကို ယခုအချိန်တွင် မရရှိသေးပါ။ ကျေးဇူးပြု၍ မကြာမီ ပြန်စစ်ဆေးပါ။"
 }
