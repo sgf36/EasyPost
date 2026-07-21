@@ -175,6 +175,34 @@ section + section { border-top: 1px solid var(--rule); }
   content: "—"; position: absolute; left: 0; color: var(--green);
 }
 
+/* ---- tiers ---- */
+/* auto-fit rather than a fixed column count, so four cards reflow to two rows
+   on a tablet and one column on a phone without a media query per breakpoint. */
+.tiers {
+  display: grid; gap: 1.25rem; margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+.tier {
+  background: var(--cream); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 1.75rem 1.5rem; display: flex; flex-direction: column;
+}
+.tier.featured { border-color: var(--green); border-width: 2px; }
+.tier .tag {
+  font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--green); font-weight: 600; margin-bottom: .5em; min-height: 1.2em;
+}
+.tier h3 { font-size: 1.35rem; margin: 0 0 .1em; }
+.tier .seats { color: var(--muted); font-size: .92rem; margin: 0 0 1em; }
+.tier .amount {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2.6rem; font-weight: 600; line-height: 1; color: var(--ink);
+}
+.tier .amount span {
+  font-size: .85rem; font-family: Inter, sans-serif; color: var(--muted); font-weight: 400;
+}
+.tier .btn { margin-top: auto; text-align: center; }
+.tier .per-seat { color: var(--muted); font-size: .82rem; margin: .6em 0 1.4em; }
+
 /* ---- legal pages ---- */
 .legal { padding-top: clamp(2.5rem, 6vw, 4rem); }
 .legal .updated { color: var(--muted); font-size: .9rem; margin-bottom: 2.5em; }
