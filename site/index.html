@@ -80,27 +80,111 @@
 </section>
 
 <section>
-  <div class="wrap prose">
+  <div class="wrap">
     <p class="eyebrow">Before you buy</p>
     <h2>You will need your own EasyPost account.</h2>
-    <p>Easy-Post Desktop is an independent desktop client for <a href="https://www.easypost.com">EasyPost</a>. It is not affiliated with, endorsed by, or a reseller of EasyPost or of any carrier. You supply your own EasyPost API key, and postage is purchased through your EasyPost account at your own rates.</p>
-    <p>Carrier names are used only to identify the services being quoted. All carrier names and marks are the property of their respective owners.</p>
-    <p><strong>System requirements.</strong> Windows 10 version 1809 or later (64-bit), or macOS 12 Monterey or later on Apple Silicon or Intel. An internet connection is required to reach EasyPost.</p>
+    <div class="grid">
+      <div>
+        <h3>An independent client</h3>
+        <p>Easy-Post Desktop is an independent desktop client for <a href="https://www.easypost.com">EasyPost</a>. It is not affiliated with, endorsed by, or a reseller of EasyPost or of any carrier.</p>
+      </div>
+      <div>
+        <h3>Your account, your rates</h3>
+        <p>You supply your own EasyPost API key, and postage is purchased through your EasyPost account at your own rates. Carrier names are used only to identify the services being quoted, and all carrier marks remain the property of their owners.</p>
+      </div>
+      <div>
+        <h3>System requirements</h3>
+        <p>Windows 10 version 1809 or later (64-bit), or macOS 12 Monterey or later on Apple Silicon or Intel. An internet connection is required to reach EasyPost.</p>
+      </div>
+    </div>
   </div>
 </section>
 
 <section id="support">
-  <div class="wrap prose">
+  <div class="wrap">
     <p class="eyebrow">Support</p>
     <h2>Talk to a person.</h2>
-    <p>Questions before buying, trouble activating a licence, or a refund request — reach out directly and you will hear back from Spencer Fields, not a queue.</p>
-    <ul>
-      <li><strong>Email:</strong> <a href="mailto:AppleApps@spencerfields.com">AppleApps@spencerfields.com</a></li>
-      <li><strong>Telephone:</strong> <a href="tel:+442081325790">+44 20 8132 5790</a></li>
-    </ul>
-    <p>Bug reports and feature requests are also welcome on the <a href="https://github.com/sgf36/EasyPost/issues">public issue tracker</a>.</p>
+    <p class="section-lede">Reach out directly for questions before buying, trouble activating a licence or a refund request.</p>
+
+    <div class="support-grid">
+      <form method="post" action="contact.php" id="contact-form" novalidate>
+        <div class="field">
+          <label for="cf-name">Your name</label>
+          <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name">
+        </div>
+        <div class="field">
+          <label for="cf-email">Your email</label>
+          <input type="email" id="cf-email" name="email" maxlength="150" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="cf-topic">What is this about?</label>
+          <select id="cf-topic" name="topic">
+            <option>Question before buying</option>
+            <option>Licence activation</option>
+            <option>Refund request</option>
+            <option>Bug report</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="cf-message">Message</label>
+          <textarea id="cf-message" name="message" maxlength="4000" required></textarea>
+        </div>
+
+        <!-- Honeypot: invisible to people, irresistible to bots. Any value
+             submitted here means the sender is automated. -->
+        <div class="hp" aria-hidden="true">
+          <label for="cf-website">Leave this field empty</label>
+          <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <!-- Filled in by script on load. A form posted with no timestamp, or
+             submitted implausibly fast, did not come from a person. -->
+        <input type="hidden" name="ts" id="cf-ts" value="">
+
+        <button class="btn" type="submit">Send message</button>
+        <p class="form-note">Replies come from Spencer Fields, usually within one business day. Your address is used only to answer you.</p>
+        <noscript>
+          <p class="form-note">This form needs JavaScript. Without it, write to <strong>AppleApps [at] spencerfields [dot] com</strong>.</p>
+        </noscript>
+      </form>
+
+      <aside class="contact-card">
+        <h3>Prefer not to use a form?</h3>
+        <p>The form reaches the same inbox and is the quickest route. Direct details are here if you need them.</p>
+        <details>
+          <summary>Show email and telephone</summary>
+          <dl>
+            <dt>Email</dt>
+            <dd data-contact="email">&nbsp;</dd>
+            <dt>Telephone</dt>
+            <dd data-contact="phone">&nbsp;</dd>
+          </dl>
+        </details>
+        <p class="form-note">Bug reports are also welcome on the <a href="https://github.com/sgf36/EasyPost/issues">public issue tracker</a>.</p>
+      </aside>
+    </div>
   </div>
 </section>
+
+<script>
+  // Timestamp the form so the server can reject submissions filled in faster
+  // than a person could type, and those posted without ever loading the page.
+  document.getElementById('cf-ts').value = Date.now();
+
+  // Contact details are assembled here rather than written into the HTML, so
+  // they are not sitting in the page source for address harvesters. Anyone
+  // reading the page sees them normally.
+  (function () {
+    var user = 'AppleApps', host = 'spencerfields.com';
+    var dial = ['+44', '20', '8132', '5790'];
+    var email = user + '@' + host;
+    var phone = dial.join(' ');
+    var e = document.querySelector('[data-contact="email"]');
+    var p = document.querySelector('[data-contact="phone"]');
+    if (e) { e.innerHTML = '<a href="mai' + 'lto:' + email + '">' + email + '</a>'; }
+    if (p) { p.innerHTML = '<a href="te' + 'l:' + dial.join('') + '">' + phone + '</a>'; }
+  })();
+</script>
 
 <footer class="site-foot">
   <div class="wrap">
@@ -124,8 +208,8 @@
       <div>
         <h4>Contact</h4>
         <ul>
-          <li><a href="mailto:AppleApps@spencerfields.com">AppleApps@spencerfields.com</a></li>
-          <li><a href="tel:+442081325790">+44 20 8132 5790</a></li>
+          <li><a href="index.html#support">Contact form</a></li>
+          <li><a href="index.html#support">Email and telephone</a></li>
         </ul>
       </div>
     </div>
