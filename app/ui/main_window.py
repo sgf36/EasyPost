@@ -20,6 +20,7 @@ from app.i18n import tr
 from app.ui.views.address_book_view import AddressBookView
 from app.ui.views.batch_view import BatchView
 from app.ui.views.claims_view import ClaimsView
+from app.ui.views.connect_agents_view import ConnectAgentsView
 from app.ui.views.create_shipment_view import CreateShipmentView
 from app.ui.views.dashboard_view import DashboardView
 from app.ui.views.history_view import HistoryView
@@ -107,6 +108,7 @@ class MainWindow(QMainWindow):
         self._batch_view = BatchView()
         self._reports_view = ReportsView()
         self._hts_lookup_view = HtsLookupView()
+        self._connect_agents_view = ConnectAgentsView()
         self._settings_view = SettingsView()
 
         self._nav = QListWidget()
@@ -169,6 +171,11 @@ class MainWindow(QMainWindow):
                 [
                     ("main_window.nav_reports", self._reports_view, self._reports_view.refresh),
                     ("main_window.nav_hts_lookup", self._hts_lookup_view, None),
+                    (
+                        "main_window.nav_connect_agents",
+                        self._connect_agents_view,
+                        self._connect_agents_view.refresh,
+                    ),
                     ("main_window.nav_settings", self._settings_view, self._settings_view.refresh),
                 ],
             ),

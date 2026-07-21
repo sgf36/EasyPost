@@ -17,6 +17,7 @@ Product site: **[easy-post.spencerfields.com](https://easy-post.spencerfields.co
 - [Features](#features)
 - [Distribution](#distribution) — the two channels and how they differ
 - [Licensing](#licensing-direct-downloads-only) — how the offline licence gate works
+- [AI agents](#connecting-ai-agents-mcp-direct-downloads-only) — the MCP server and its safety model
 - [Tracking updates](#tracking-updates-polling-vs-real-time-webhook-push)
 - [Running tests](#running-tests)
 - [Building a standalone app](#building-a-standalone-app)
@@ -83,6 +84,10 @@ money asks for confirmation while in production mode.
 - **Batch Shipments** — import a CSV of recipients, validate, bulk rate + buy,
   generate combined labels.
 - **Reports** — local spend-by-carrier chart, label counts, refund breakdown.
+- **Connect AI agents** — expose the app to Claude, Cursor, VS Code and other
+  MCP clients. Reading and rate-shopping run freely; anything that spends
+  money becomes a request a person approves in the app. Direct download only;
+  see [MCP-SETUP.md](MCP-SETUP.md).
 - **50 languages** — pick one in Settings; restart to apply. Translations are
   AI-generated (not professionally reviewed) — open an issue if something
   reads wrong.
@@ -100,15 +105,33 @@ same build.
 | Package | `.msix` | `.dmg` (macOS), `.exe` folder (Windows) |
 | Price | Set in Partner Center | $29 one-time via Paddle |
 | Licence gate | **Off** | **On** |
+| MCP / AI agents | **Off** | **On** |
 | Signing | Store re-signs on publish | Apple Developer ID + notarization |
 | Status | Draft; blocked on payout profile | Blocked on notarization + Paddle approval |
 
-The licence gate is compiled in or out by the presence of
-`app/resources/license_required.flag`, which CI creates on the macOS leg
-only (see `.github/workflows/build.yml`). The Store build omits it, because
-gating a Store purchase behind a second paid unlock would breach Microsoft's
-policies — and would be a poor experience regardless. `app/config.py` reads
-the flag once at import into `LICENSE_REQUIRED`.
+Both differences are compiled in or out by **variant flag files** under
+`app/resources/`, created at package time by CI and never committed:
+
+| Flag file | Sets | Present in |
+|---|---|---|
+| `license_required.flag` | `config.LICENSE_REQUIRED` | Direct download |
+| `mcp_supported.flag` | `config.MCP_SUPPORTED` | Direct download |
+
+`app/config.py` reads both once at import. The Store build omits the licence
+flag because gating a Store purchase behind a second paid unlock would breach
+Microsoft's policies — and would be a poor experience regardless. It omits the
+MCP flag because a Store package cannot reliably have another application
+launch a helper process out of its install location, nor write into other
+programs' configuration files; the app says so on the Connect AI agents page
+rather than offering a button that would not work.
+
+Because a missing flag silently *disables* a paid feature rather than
+breaking the build, `packaging/verify_variant_flags.sh` runs in CI after each
+packaging step and fails the job if the expected flags are not inside the
+bundle. This is not theoretical: the flags were absent from PyInstaller's
+`datas` for several releases, so `LICENSE_REQUIRED` was `False` in every
+shipped build and the paid app went out ungated. The spec now adds them
+conditionally and the verifier is the backstop.
 
 ### Why direct download exists at all
 
@@ -141,6 +164,47 @@ payload = {"v":1,"product":"easypost-desktop","email":…,"order":…,"iat":…}
 
 Because `iat` is taken from the Paddle event's `occurred_at`, a webhook retry
 mints a byte-identical key rather than a second one.
+
+## Connecting AI agents (MCP, direct downloads only)
+
+The direct-download build ships a second executable, `easypost-mcp`, beside
+the main app: an MCP (Model Context Protocol) server that lets Claude Desktop,
+Claude Code, Cursor, VS Code, Windsurf or any other MCP client work with your
+shipping data. **Connect AI agents** in the sidebar detects installed clients
+and — after asking — writes the server into their configuration.
+
+Full instructions, including manual setup, are in **[MCP-SETUP.md](MCP-SETUP.md)**.
+
+### The safety model
+
+The threat model is prompt injection, not a malicious user: an agent that has
+read a poisoned tracking note or web page and is now acting on instructions
+that are not the user's. Fourteen tools are exposed. Ten read or quote and run
+immediately, because none of them spends money. Four touch money —
+`request_label_purchase`, `request_pickup_purchase`, `request_refund`, and
+`check_approval` — and none of them completes on its own.
+
+- **Approval is out of band.** A spending tool files a request and returns an
+  ID. The confirmation is a dialog inside the app. No tool approves anything,
+  so an agent cannot approve its own request.
+- **The summary is re-fetched, never repeated.** `app/services/mcp_verify.py`
+  builds the approval card from EasyPost using only the identifiers the agent
+  supplied. Nothing the agent *asserted* is displayed, and a rate ID that is
+  not attached to the named shipment raises rather than rendering.
+- **Ceilings refuse, they do not prompt.** `check_ceilings()` raises before a
+  request is ever created. A prompt shown often enough eventually gets
+  approved by reflex; a limit that refuses cannot be worn down.
+- **Text is neutered.** Control characters are stripped from every string that
+  reaches the card, so a value cannot forge lines or an "approved" label.
+- **Every check runs twice.** `app/services/mcp_runner.py` re-evaluates
+  enabled state, mode, spending permission and ceilings at execution time, so
+  disabling access or lowering a limit invalidates a request already waiting.
+  Requests expire after an hour.
+
+Access is off by default, spending is a second opt-in on top of that, and both
+ceilings default to conservative values. Every filed request, approval,
+rejection and refusal lands in a local `mcp_audit` table.
+`tests/test_mcp_safety.py` pins each of the properties above.
 
 ## Tracking updates: polling vs. real-time webhook push
 
@@ -207,8 +271,24 @@ Output:
 - macOS: `dist/EasyPostDesktop.app` — a proper app bundle with the icon set,
   ready to drag into `/Applications`.
 
-GitHub Actions builds both automatically on every push — see the **Actions**
-tab for downloadable artifacts.
+The spec declares two `Analysis`/`EXE` pairs merged by one `COLLECT`, so the
+MCP server ships as a second console executable (`easypost-mcp`) beside the
+GUI, sharing its bundled dependencies. Building from source produces both
+regardless of variant; it is the flag files (above) that decide whether the
+running app offers the feature.
+
+To reproduce a *shipped* build locally, create the flags before packaging:
+
+```
+type nul > app\resources\license_required.flag
+type nul > app\resources\mcp_supported.flag
+```
+
+(`touch` on macOS/Linux.) They are gitignored, so a plain source build has
+both features off — matching the Store variant, not the paid one.
+
+GitHub Actions builds both platforms automatically on every push — see the
+**Actions** tab for downloadable artifacts.
 
 ### Microsoft Store package (MSIX)
 
@@ -317,17 +397,26 @@ GitHub Actions runs.
 
 ```
 app/
-  config.py              paths, constants, LICENSE_REQUIRED flag detection
+  config.py              paths, constants, variant-flag detection
+                         (LICENSE_REQUIRED, MCP_SUPPORTED)
+  mcp_server.py          the MCP server — packaged as its own `easypost-mcp`
+                         executable; read tools run, spending tools file
+                         requests
   core/                  client, credentials, SQLite, settings, licence,
-                         label_options, webhook manager, HTTP receiver, tunnel
+                         label_options, webhook manager, HTTP receiver, tunnel,
+                         mcp_approvals (the gate), mcp_clients (detect/write
+                         other apps' MCP configs)
   services/              one module per EasyPost resource (shipments, batches,
                          addresses, tracking, insurance, pickups, claims,
-                         packages, hts_lookup) — thin SDK wrapper + local sync
+                         packages, hts_lookup) — thin SDK wrapper + local sync;
+                         plus mcp_verify (re-fetches approval summaries) and
+                         mcp_runner (re-checks everything at execution time)
   ui/                    theme.py (Fusion + stylesheet), main_window.py (shell
                          and grouped nav), views/, widgets/
   resources/locales/     50 language catalogues; en.json is the source of truth
 packaging/               PyInstaller spec, MSIX manifest/builder, signing
-                         scripts, macOS entitlements
+                         scripts, macOS entitlements,
+                         verify_variant_flags.sh (CI backstop)
 server/
   paddle-license-webhook-worker/   Cloudflare Worker: Paddle -> licence email
   paddle-license-webhook/          container/FastAPI equivalent, if self-hosting
