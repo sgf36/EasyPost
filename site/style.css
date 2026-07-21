@@ -142,4 +142,5 @@ section + section { border-top: 1px solid var(--rule); }
 .site-foot li { margin-bottom: .45em; }
 .site-foot a { color: var(--body); text-decoration: none; }
 .site-foot a:hover { color: var(--green); text-decoration: underline; }
-.site-foot .legal-line { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); }
+.site-foot .legal-line { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); margin-bottom: 1.1em; }
+.site-foot .copyright { margin: 0; }
