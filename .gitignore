@@ -9,3 +9,6 @@ dist/
 # Never commit signing keys
 *.pem
 *PRIVATE-KEY*
+
+# Direct-download build flag (created at package time, never committed)
+app/resources/license_required.flag

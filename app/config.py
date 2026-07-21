@@ -10,6 +10,13 @@ KEYRING_SERVICE_NAME = "EasyPostDesktop"
 
 ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
 
+# The Paddle license gate is enforced ONLY in direct-download builds, which
+# bundle this flag file. Store builds (e.g. the Microsoft Store MSIX) omit it,
+# so those users are never asked for a license key on top of their store
+# purchase. Create app/resources/license_required.flag before packaging a
+# direct-download build (CI does this on the macOS leg).
+LICENSE_REQUIRED = (Path(__file__).parent / "resources" / "license_required.flag").exists()
+
 APP_DATA_DIR = Path(platformdirs.user_data_dir(APP_DIR_NAME, appauthor=False))
 DATABASE_PATH = APP_DATA_DIR / "easypost_desktop.sqlite3"
 SETTINGS_PATH = APP_DATA_DIR / "settings.json"

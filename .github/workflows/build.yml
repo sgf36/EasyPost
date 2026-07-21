@@ -26,6 +26,13 @@ jobs:
       - name: Run tests
         run: python -m pytest tests/ -v
 
+      # Direct-download builds (macOS .dmg) enforce the Paddle license gate by
+      # bundling this flag file; the Windows leg omits it so the Microsoft Store
+      # MSIX is not double-gated. See app/config.py:LICENSE_REQUIRED.
+      - name: Enable license gate for direct-download build
+        if: matrix.os == 'macos-latest'
+        run: touch app/resources/license_required.flag
+
       - name: Build with PyInstaller
         run: pyinstaller packaging/build_exe.spec --noconfirm --distpath dist --workpath build
 

@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import APP_NAME
+from app.config import APP_NAME, LICENSE_REQUIRED
 from app.core.client import client_manager
 from app.core.license import is_licensed
 from app.core.settings import load_settings
@@ -172,7 +172,7 @@ class MainWindow(QMainWindow):
     def _route_startup(self) -> None:
         """Gate order on launch: license first, then EasyPost credentials,
         then the app shell."""
-        if not is_licensed():
+        if LICENSE_REQUIRED and not is_licensed():
             self._root_stack.setCurrentWidget(self._license_gate)
         elif client_manager.credentials.active_key():
             self._show_app_shell()
