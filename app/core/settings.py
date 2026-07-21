@@ -29,6 +29,15 @@ class AppSettings:
     # label_size at shipment-creation time.
     label_format: str = DEFAULT_LABEL_FORMAT
     label_size: str = DEFAULT_LABEL_SIZE
+    # AI-agent (MCP) bridge — off until explicitly enabled. The ceilings are
+    # deliberately conservative defaults: an agent that has been prompt-injected
+    # should hit a wall long before it can do real damage, and raising them is
+    # a decision the user makes knowingly. 0 means "no limit", which is why
+    # neither defaults to 0.
+    mcp_enabled: bool = False
+    mcp_allow_spending: bool = False
+    mcp_max_purchase: float = 50.0
+    mcp_daily_limit: float = 200.0
 
 
 def load_settings() -> AppSettings:
