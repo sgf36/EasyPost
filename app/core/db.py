@@ -136,6 +136,37 @@ CREATE TABLE IF NOT EXISTS predefined_packages_cache (
     max_weight REAL,
     cached_at TEXT DEFAULT (datetime('now'))
 );
+
+-- Spend requests raised by an AI agent over MCP, awaiting human approval in
+-- the desktop app. Nothing here is trusted: `summary_json` is re-fetched from
+-- EasyPost at approval time rather than taken from whatever the agent said,
+-- so an agent cannot misrepresent what it is asking to buy.
+CREATE TABLE IF NOT EXISTS mcp_approvals (
+    id TEXT PRIMARY KEY,
+    mode TEXT NOT NULL,
+    action TEXT NOT NULL,          -- buy_shipment | buy_pickup | refund | ...
+    args_json TEXT NOT NULL,       -- exactly what the agent asked for
+    summary_json TEXT,             -- independently verified detail, for display
+    amount REAL,                   -- verified cost, for the spend ceiling
+    currency TEXT,
+    status TEXT NOT NULL DEFAULT 'pending',   -- pending|approved|rejected|expired|done
+    result_json TEXT,
+    error TEXT,
+    requested_at TEXT DEFAULT (datetime('now')),
+    decided_at TEXT
+);
+
+-- Append-only record of every MCP tool invocation. Deliberately separate from
+-- approvals: read-only calls never create an approval, but still need to be
+-- auditable after the fact.
+CREATE TABLE IF NOT EXISTS mcp_audit (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mode TEXT,
+    tool TEXT NOT NULL,
+    args_json TEXT,
+    outcome TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
 """
 
 
