@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass
 from typing import Optional
 
 from app.config import SETTINGS_PATH, ensure_app_data_dir
+from app.core.label_options import DEFAULT_LABEL_FORMAT, DEFAULT_LABEL_SIZE
 
 DEFAULT_LOCALE = "en"
 
@@ -23,6 +24,11 @@ class AppSettings:
     webhook_port: Optional[int] = None
     # Activated offline license key (see app/core/license.py). None until activated.
     license_key: Optional[str] = None
+    # Preferred printed-label format/size (see app/core/label_options.py).
+    # Applies to every shipment created, since EasyPost only honours
+    # label_size at shipment-creation time.
+    label_format: str = DEFAULT_LABEL_FORMAT
+    label_size: str = DEFAULT_LABEL_SIZE
 
 
 def load_settings() -> AppSettings:

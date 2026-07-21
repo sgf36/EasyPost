@@ -6,6 +6,7 @@ from typing import Optional
 
 from app.core.client import client_manager
 from app.core.db import db_cursor
+from app.services.shipments import preferred_label_options
 
 CSV_COLUMNS = [
     "to_name",
@@ -96,6 +97,9 @@ def _row_to_shipment_params(row: BatchRow, from_address_id: str) -> dict:
             "weight": float(f["weight"]),
         },
         "reference": f.get("reference") or None,
+        # Same printed-label format/size as a single shipment — label_size is
+        # only honoured at creation time, so a batch has to carry it too.
+        "options": preferred_label_options(),
     }
 
 

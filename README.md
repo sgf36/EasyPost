@@ -47,6 +47,13 @@ money asks for confirmation while in production mode.
   any address has been saved. Quotes are deliberately not purchasable:
   carriers need a complete recipient address to issue a label, so the Buy
   button stays disabled until you switch back to full addresses.
+- **Label format and size** — choose PNG, PDF, ZPL or EPL and the printed
+  size (4x6, 4x7, 4x8, 4x5, 8.5x11) in Settings, per
+  [EasyPost's supported sizes](https://support.easypost.com/hc/en-us/articles/360044915671-Shipping-Label-Sizes).
+  Only sizes that make sense for the chosen format are offered, and the
+  carrier caveats (UPS defaults to 4x7; LaserShip/OnTrac are ZPL-only) are
+  shown alongside. Applies to single and batch shipments; carriers fix the
+  size at shipment creation, so it never alters labels already bought.
 - **HTS Lookup** — search the U.S. International Trade Commission's live
   Harmonized Tariff Schedule database for customs codes, with results
   cached locally so repeat searches work even if that API is unreachable.
