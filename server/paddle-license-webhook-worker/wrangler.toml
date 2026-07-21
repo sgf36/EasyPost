@@ -4,8 +4,18 @@ compatibility_date = "2025-06-01"
 # node:crypto (Ed25519 signing + HMAC) requires nodejs_compat.
 compatibility_flags = ["nodejs_compat"]
 
+# The seat ledger: which computers each licence is on, plus revocations.
+[[d1_databases]]
+binding = "LICENSES"
+database_name = "easypost-licenses"
+database_id = "2deb96f3-3585-4c03-a147-11547e5f76c1"
+
 # Non-secret configuration. Set the real values here before deploying.
 [vars]
+# Which tier each Paddle price buys. A price that is not listed mints nothing,
+# so a new product cannot hand out licences before its tier has been decided.
+PRICE_TIERS = '{"pri_01ky2hekjfm1c9nspf5pnqv0jv":"personal"}'
+# Legacy single-price setting, read as the entry tier when PRICE_TIERS omits it.
 PADDLE_PRICE_ID = "pri_01ky2hekjfm1c9nspf5pnqv0jv"
 LICENSE_FROM_EMAIL = "licenses@easy-post.spencerfields.com"
 CONTACT_TO_EMAIL = "Apps@spencerfields.com"

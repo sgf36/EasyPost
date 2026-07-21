@@ -63,8 +63,42 @@ def test_wrong_product_rejected(signer):
     assert lic.verify_license(_mint(signer, _payload(product="something-else"))) is None
 
 
-def test_wrong_version_rejected(signer):
-    assert lic.verify_license(_mint(signer, _payload(v=2))) is None
+def test_unknown_version_rejected(signer):
+    assert lic.verify_license(_mint(signer, _payload(v=3))) is None
+
+
+def test_v1_keys_still_verify_as_the_entry_tier(signer):
+    """v1 predates tiers and is already in customers' hands."""
+    info = lic.verify_license(_mint(signer, _payload(v=1)))
+    assert info is not None
+    assert info.tier == "personal"
+    assert info.seats == 3
+
+
+def test_v2_carries_its_tier_and_seat_count(signer):
+    info = lic.verify_license(
+        _mint(signer, _payload(v=2, tier="organisation", seats=50))
+    )
+    assert info is not None
+    assert info.tier == "organisation"
+    assert info.seats == 50
+
+
+def test_seat_count_cannot_be_raised_without_the_signing_key(signer):
+    """The seat allowance is signed, so editing it invalidates the key."""
+    token = _mint(signer, _payload(v=2, tier="personal", seats=3))
+    tag, payload_b64, sig = token.split(".")
+    forged = base64.urlsafe_b64encode(
+        json.dumps(_payload(v=2, tier="enterprise", seats=0),
+                   sort_keys=True, separators=(",", ":")).encode()
+    ).rstrip(b"=").decode()
+    assert lic.verify_license(f"{tag}.{forged}.{sig}") is None
+
+
+def test_explicit_seats_beat_the_tier_table(signer):
+    """Lets a bespoke allowance be sold without shipping a new build."""
+    info = lic.verify_license(_mint(signer, _payload(v=2, tier="business", seats=10)))
+    assert info is not None and info.seats == 10
 
 
 @pytest.mark.parametrize("junk", ["", "not-a-key", "EPD1.only-two", "WRONG.aa.bb", "EPD1..", "....."])

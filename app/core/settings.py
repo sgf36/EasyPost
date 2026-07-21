@@ -24,6 +24,13 @@ class AppSettings:
     webhook_port: Optional[int] = None
     # Activated offline license key (see app/core/license.py). None until activated.
     license_key: Optional[str] = None
+    # Signed proof that this computer holds one of the licence's seats. Verified
+    # offline on every launch, so activation touches the network exactly once.
+    activation_receipt: Optional[str] = None
+    # Set only when activation could not reach the server; a time-limited grace
+    # so an outage of ours never locks a paying customer out of their own app.
+    activation_grace_until: Optional[str] = None
+    device_label: Optional[str] = None
     # Preferred printed-label format/size (see app/core/label_options.py).
     # Applies to every shipment created, since EasyPost only honours
     # label_size at shipment-creation time.
