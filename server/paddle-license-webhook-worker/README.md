@@ -31,12 +31,40 @@ npx wrangler secret put LICENSE_PRIVATE_KEY_PEM    # the Ed25519 private key PEM
 npx wrangler secret put PADDLE_WEBHOOK_SECRET       # from the Paddle notification destination
 npx wrangler secret put PADDLE_API_KEY              # Paddle API key
 npx wrangler secret put RESEND_API_KEY              # Resend API key
+npx wrangler secret put CONTACT_SHARED_SECRET       # shared with the site's contact.php
 
 npx wrangler deploy
 ```
 
 Deploy prints your URL, e.g. `https://easypost-license-webhook.<you>.workers.dev`.
 Health check: `GET /health`. Webhook endpoint: `POST /paddle/webhook`.
+
+## Contact-form relay: `POST /contact`
+
+The product site's contact form posts here rather than calling Resend itself,
+so the Resend API key never sits on shared hosting. `site/contact.php` does
+the spam filtering, then relays the cleaned fields with an
+`X-EPD-Contact-Secret` header; this Worker checks that secret (timing-safe)
+and sends via Resend to `CONTACT_TO_EMAIL`.
+
+The shared secret is deliberately low-value by design: the worst anyone can
+do with it is send Spencer an email at his own address. A leaked Resend key,
+by contrast, would let them send mail *as* the domain — which is exactly why
+it lives here and not on the web host. Rotating the shared secret is two
+commands: write a new value to `~/.epd-contact-secret` on the host, and
+`wrangler secret put CONTACT_SHARED_SECRET`.
+
+`contact.php` falls back to PHP `mail()` if this route is unreachable or
+Resend rejects the send. A message landing in Junk is a much better failure
+than a message silently lost.
+
+### Why Resend at all, for a form that already worked
+
+`mail()` delivered fine, but Bluehost's shared outbound relays carry poor
+reputation with Exchange Online: with SPF, DKIM **and** DMARC all passing,
+Microsoft still scored the message `SCL:5` / `CAT:SPM` and filed it under
+Junk. That is a reputation judgement, not an authentication failure, so no
+DNS record fixes it. A sender with its own standing does.
 
 ## Wire up Paddle & Resend
 
