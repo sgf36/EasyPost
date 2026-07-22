@@ -154,86 +154,156 @@ def asset_file(locale: str, slot: int, slug: str) -> str:
     return f"{locale}_{slot}_{slug}.png"
 
 
-def asset_path(locale: str, slot: int, slug: str) -> str:
-    """The value Partner Center expects in a screenshot cell: the root folder
-    name, then the file. A bare filename does not resolve."""
-    return f"{PACKAGE}/{asset_file(locale, slot, slug)}"
-
-
-def main() -> None:
-    export = Path(sys.argv[1])
-    rows = list(csv.reader(export.read_bytes().decode("utf-8-sig").splitlines(True)))
-    header = rows[0]
+def read_export(path: Path):
+    rows = list(csv.reader(Path(path).read_bytes().decode("utf-8-sig").splitlines(True)))
     # Column 3 is "default", the catch-all Partner Center applies to languages
     # with no value of their own. The export leaves it empty and every listing
     # language is populated explicitly, so it stays empty here too.
-    langs = header[4:]
+    return rows, rows[0], rows[0][4:], {r[0]: r for r in rows[1:]}
 
-    if OUT_DIR.exists():
-        shutil.rmtree(OUT_DIR)
-    OUT_DIR.mkdir(parents=True)
 
-    # Copy each captured image once, under the flat name the CSV will cite.
+def write_csv(rows, target: Path) -> None:
+    with target.open("w", encoding="utf-8-sig", newline="") as fh:
+        csv.writer(fh).writerows(rows)
+
+
+def clear_unused_slots(by_field, width: int) -> None:
+    """Slots past the ninth held nothing in the export and must stay that way,
+    otherwise a stale tenth image could survive the import."""
+    for slot in range(len(ORDER) + 1, 31):
+        for row in (by_field[f"DesktopScreenshot{slot}"],
+                    by_field[f"DesktopScreenshotCaption{slot}"]):
+            for col in range(4, width):
+                row[col] = ""
+
+
+def build_folder(export: Path, package: str, only_localised: bool, dest: Path | None):
+    """A folder package: CSV plus the images it cites, paths prefixed with the
+    folder name."""
+    rows, header, langs, by_field = read_export(export)
+    out_dir = ROOT / "store_assets" / package
+
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    out_dir.mkdir(parents=True)
+
     for locale in LOCALISED.values():
         for slot, (source, slug) in enumerate(ORDER, start=1):
             src = SHOTS / locale / f"{source}.png"
             if not src.exists():
                 raise SystemExit(f"missing screenshot: {src}")
-            shutil.copy2(src, OUT_DIR / asset_file(locale, slot, slug))
+            shutil.copy2(src, out_dir / asset_file(locale, slot, slug))
 
-    by_field = {row[0]: row for row in rows[1:]}
     touched = 0
-
     for slot, (_, slug) in enumerate(ORDER, start=1):
         shot_row = by_field[f"DesktopScreenshot{slot}"]
         caption_row = by_field[f"DesktopScreenshotCaption{slot}"]
         for col, lang in enumerate(langs, start=4):
+            if only_localised and lang not in LOCALISED:
+                # Blanking an image field is a documented no-op: the language
+                # keeps whatever it already has. That is what makes staging
+                # safe — the 40 fallback listings are simply not touched, and
+                # no asset URL has to sit beside a folder path in one file.
+                shot_row[col] = ""
+                caption_row[col] = ""
+                continue
             locale = LOCALISED.get(lang, FALLBACK)
-            shot_row[col] = asset_path(locale, slot, slug)
+            shot_row[col] = f"{package}/{asset_file(locale, slot, slug)}"
             caption_row[col] = CAPTIONS[locale][slot - 1]
             touched += 2
 
-    # Slots past the ninth held nothing in the export and must stay that way,
-    # otherwise a stale tenth image could survive the import.
-    for slot in range(len(ORDER) + 1, 31):
-        for row in (by_field[f"DesktopScreenshot{slot}"],
-                    by_field[f"DesktopScreenshotCaption{slot}"]):
-            for col in range(4, len(header)):
-                row[col] = ""
-
-    target = OUT_DIR / CSV_NAME
-    with target.open("w", encoding="utf-8-sig", newline="") as fh:
-        csv.writer(fh).writerows(rows)
+    clear_unused_slots(by_field, len(header))
+    target = out_dir / f"{package}.csv"
+    write_csv(rows, target)
 
     # Everything the importer will silently reject, checked here instead —
     # its error page names no field, no language and no reason.
-    text = target.read_text(encoding="utf-8-sig")
-    if "developer.microsoft.com" in text:
+    if "developer.microsoft.com" in target.read_text(encoding="utf-8-sig"):
         raise SystemExit("asset URL survived into the CSV; it will not resolve")
-    if len(list(OUT_DIR.glob("*.csv"))) != 1:
+    if len(list(out_dir.glob("*.csv"))) != 1:
         raise SystemExit("the folder must hold exactly one .csv")
 
-    images = sorted(p.name for p in OUT_DIR.glob("*.png"))
+    images = sorted(p.name for p in out_dir.glob("*.png"))
     cited = {v for row in rows[1:] if row[0].startswith("DesktopScreenshot")
              and "Caption" not in row[0] for v in row[4:] if v.strip()}
     for ref in sorted(cited):
         root, _, name = ref.partition("/")
-        if root != PACKAGE or name not in images:
+        if root != package or name not in images:
             raise SystemExit(f"unresolvable screenshot reference: {ref}")
 
-    print(f"languages      : {len(langs)}")
-    print(f"screenshots    : {len(ORDER)} per language")
+    print(f"mode           : {'stage 1 (localised only)' if only_localised else 'full'}")
+    print(f"listings written: {len(LOCALISED) if only_localised else len(langs)}")
     print(f"images copied  : {len(images)}")
     print(f"cells rewritten: {touched}")
-    print(f"asset URLs left: 0")
-    print(f"folder         : {OUT_DIR}")
+    print(f"folder         : {out_dir}")
+    deliver(out_dir, dest, package)
 
-    if len(sys.argv) > 2:
-        dest = Path(sys.argv[2]) / PACKAGE
-        if dest.exists():
-            shutil.rmtree(dest)
-        shutil.copytree(OUT_DIR, dest)
-        print(f"copied to      : {dest}")
+
+def build_fanout(export: Path, dest: Path | None):
+    """Stage 2: no upload at all. Copy the English asset URLs that stage 1
+    created into the 40 languages that reuse them, and ship a bare CSV.
+
+    This is the pattern that already populated those listings once, and it is
+    the cheap half — Partner Center resolves a URL it minted itself instead of
+    ingesting 3.8 MB of images across 400-odd asset records."""
+    rows, header, langs, by_field = read_export(export)
+    en = header.index("en-us")
+
+    missing = [s for s in range(1, len(ORDER) + 1)
+               if "developer.microsoft.com" not in by_field[f"DesktopScreenshot{s}"][en]]
+    if missing:
+        raise SystemExit(
+            f"en-us slots {missing} hold no Partner Center URL. Run stage 1 first, "
+            "then export again and re-run this."
+        )
+
+    touched = 0
+    for slot in range(1, len(ORDER) + 1):
+        shot_row = by_field[f"DesktopScreenshot{slot}"]
+        caption_row = by_field[f"DesktopScreenshotCaption{slot}"]
+        url = shot_row[en]
+        for col, lang in enumerate(langs, start=4):
+            if lang in LOCALISED:
+                continue  # keeps its own imagery, passed through untouched
+            shot_row[col] = url
+            caption_row[col] = CAPTIONS[FALLBACK][slot - 1]
+            touched += 2
+
+    clear_unused_slots(by_field, len(header))
+    target = ROOT / "store_assets" / "EasyPost-Store-Listings-IMPORT-v2-stage2.csv"
+    write_csv(rows, target)
+
+    print("mode           : stage 2 (URL fan-out, nothing uploaded)")
+    print(f"listings written: {len(langs) - len(LOCALISED)}")
+    print(f"cells rewritten: {touched}")
+    print(f"csv            : {target}")
+    if dest:
+        shutil.copy2(target, dest / target.name)
+        print(f"copied to      : {dest / target.name}")
+
+
+def deliver(out_dir: Path, dest: Path | None, package: str) -> None:
+    if not dest:
+        return
+    target = dest / package
+    if target.exists():
+        shutil.rmtree(target)
+    shutil.copytree(out_dir, target)
+    print(f"copied to      : {target}")
+
+
+def main() -> None:
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    flags = {a for a in sys.argv[1:] if a.startswith("--")}
+    export = Path(args[0])
+    dest = Path(args[1]) if len(args) > 1 else None
+
+    if "--stage2" in flags:
+        build_fanout(export, dest)
+    elif "--stage1" in flags:
+        build_folder(export, PACKAGE + "-stage1", True, dest)
+    else:
+        build_folder(export, PACKAGE, False, dest)
 
 
 if __name__ == "__main__":

@@ -67,6 +67,38 @@ Two consequences worth knowing:
 - **The `default` column is left empty**, matching the export. Every listing
   language is populated explicitly, so the catch-all is never consulted.
 
+## Splitting it, if the single import stalls
+
+One import doing all 47 languages uploads 3.8 MB across 423 screenshot cells,
+and Partner Center appears to mint a separate asset per language rather than
+per file — so it can be doing 400-odd ingests, not 63. If that sits on
+"Importing" for hours, the same result is reachable in two cheaper passes.
+
+**Stage 1** — the seven localised languages only, images and all:
+
+```bash
+python store_assets/build_listing_import.py <export.csv> ~/Downloads --stage1
+```
+
+63 images, 126 cells. The other 40 languages get **blank** screenshot cells,
+which is a documented no-op for image fields: they keep exactly what they have
+today. That is what makes staging safe, and it avoids putting an asset URL
+beside a folder path in the same file.
+
+**Stage 2** — re-export, then fan the English URLs stage 1 minted across the
+remaining 40:
+
+```bash
+python store_assets/build_listing_import.py <fresh-export.csv> ~/Downloads --stage2
+```
+
+Uploads nothing — Partner Center resolves URLs it minted itself. Output is a
+bare `.csv`, so use **Import .csv**, not Import folder. The script refuses to
+run if the English slots do not yet hold Partner Center URLs, which is the
+signal that stage 1 has not landed.
+
+This is the shape that populated those 40 listings the first time round.
+
 ## Screenshots
 
 Nine per language, in this order, rate shopping first because it is the one
