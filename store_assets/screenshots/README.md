@@ -68,6 +68,6 @@ merely hidden for these captures.
 
 ## Reproducing
 
-`scratchpad/shoot.py <locale>` drives the real window through Qt — sets the
+`store_assets/shoot_screenshots.py <locale>` drives the real window through Qt — sets the
 locale, builds `MainWindow`, walks the sidebar, and grabs each page. Scripted
 rather than mouse-driven so the five sets are identical but for language.
