@@ -9,19 +9,34 @@ listing changes go through export → edit → import.
 ## Rebuilding the package
 
 1. In Partner Center, open the submission and choose **Export listings**.
-2. Run the builder against whatever file that produced:
+2. Run the builder against whatever file that produced, with an optional second
+   argument to drop a copy somewhere convenient:
 
 ```bash
-python store_assets/build_listing_import.py ~/Downloads/listingData-9NDSDL5LV5B5-*.csv
+python store_assets/build_listing_import.py ~/Downloads/listingData-9NDSDL5LV5B5-*.csv ~/Downloads
 ```
 
-It writes `store_assets/listing_import/` (CSV plus every referenced image,
-flat) and `store_assets/listing_import.zip`. Both are gitignored — the inputs
-are committed, the output is disposable.
+It writes `EasyPost-Store-Listings-IMPORT-v2/` — the CSV plus every referenced
+image, flat, beside it. Gitignored: the inputs are committed, the output is
+disposable.
 
-3. In Partner Center, choose **Import listings** and upload the **zip**.
+3. In Partner Center, choose **Import listings** and select **the folder**.
 4. Re-export afterwards and confirm the screenshot rows now carry Partner
    Center asset URLs rather than the filenames sent up.
+
+## Two rules the importer enforces silently
+
+Both were learned by failing an import, and both are now asserted by the
+builder rather than left to memory.
+
+**It takes a folder, not a zip.** The dialog wants the directory holding the
+CSV and its images.
+
+**Every screenshot cell must name a bundled file.** Partner Center asset URLs
+carried over from an export do not resolve on a folder import. The only symptom
+is *"We couldn't import listings for the following languages"* — with the list
+of languages rendered blank, which makes it look like a portal fault rather
+than a file problem. The builder aborts if a single URL survives into the CSV.
 
 ## Why it starts from a fresh export
 

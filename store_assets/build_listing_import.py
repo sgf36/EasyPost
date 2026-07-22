@@ -10,12 +10,17 @@ This script does exactly that for the screenshot block: it rewrites
 DesktopScreenshot1-9 and their captions for all 47 listing languages and
 leaves every other row byte-identical to the export.
 
-Images are referenced by bare filename and shipped alongside the CSV in the
-same zip, which is the form Partner Center accepts and the form the previous
-import used successfully.
+Two rules learned the hard way from the previous import, both enforced below:
+
+1. Partner Center wants a **folder**, not a zip. Its import dialog asks for a
+   directory containing the CSV and the images beside it.
+2. Every screenshot cell must name a **bundled file**. Partner Center asset
+   URLs from a previous export do not resolve on a folder import, and the only
+   symptom is "we couldn't import listings for the following languages" with
+   the language list left blank.
 
 Usage:
-    python store_assets/build_listing_import.py <exported-listingData.csv>
+    python store_assets/build_listing_import.py <exported-listingData.csv> [dest]
 """
 
 import csv
@@ -25,8 +30,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SHOTS = ROOT / "store_assets" / "screenshots"
-OUT_DIR = ROOT / "store_assets" / "listing_import"
-CSV_NAME = "EasyPost-Store-Listings-IMPORT-v2.csv"
+# Folder name matches the CSV inside it, the shape the successful import used.
+PACKAGE = "EasyPost-Store-Listings-IMPORT-v2"
+OUT_DIR = ROOT / "store_assets" / PACKAGE
+CSV_NAME = PACKAGE + ".csv"
 
 # Screenshot order as it will appear on the Store page. Rate shopping leads:
 # it is the one image that shows what the product actually does. Settings
@@ -187,17 +194,26 @@ def main() -> None:
     with target.open("w", encoding="utf-8-sig", newline="") as fh:
         csv.writer(fh).writerows(rows)
 
-    images = sorted(p.name for p in OUT_DIR.glob("*.png"))
-    archive = shutil.make_archive(
-        str(ROOT / "store_assets" / OUT_DIR.name), "zip", root_dir=OUT_DIR
-    )
+    # A leftover asset URL is the one failure mode that produces an unreadable
+    # error page, so refuse to ship a package that still contains one.
+    if "developer.microsoft.com" in target.read_text(encoding="utf-8-sig"):
+        raise SystemExit("asset URL survived into the CSV; folder import would fail")
 
-    print(f"languages     : {len(langs)}")
-    print(f"screenshots   : {len(ORDER)} per language")
-    print(f"images copied : {len(images)}")
+    images = sorted(p.name for p in OUT_DIR.glob("*.png"))
+
+    print(f"languages      : {len(langs)}")
+    print(f"screenshots    : {len(ORDER)} per language")
+    print(f"images copied  : {len(images)}")
     print(f"cells rewritten: {touched}")
-    print(f"csv           : {target}")
-    print(f"zip           : {archive} ({Path(archive).stat().st_size / 1_048_576:.1f} MB)")
+    print(f"asset URLs left: 0")
+    print(f"folder         : {OUT_DIR}")
+
+    if len(sys.argv) > 2:
+        dest = Path(sys.argv[2]) / PACKAGE
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(OUT_DIR, dest)
+        print(f"copied to      : {dest}")
 
 
 if __name__ == "__main__":
