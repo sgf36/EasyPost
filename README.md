@@ -91,9 +91,6 @@ money asks for confirmation while in production mode.
 - **50 languages** — pick one in Settings; restart to apply. Translations are
   AI-generated (not professionally reviewed) — open an issue if something
   reads wrong.
-- **Support the project** — an optional, dismissible donation banner (and a
-  permanent link in Settings) points to a Stripe-hosted "pay what you want"
-  page. Purely optional; nothing in the app depends on it.
 
 ## Distribution
 

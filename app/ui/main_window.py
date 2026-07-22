@@ -34,7 +34,6 @@ from app.ui.views.settings_view import SettingsView
 from app.ui.views.setup_wizard import SetupWizard
 from app.ui.views.tracking_view import TrackingView
 from app.ui.widgets.async_worker import run_async
-from app.ui.widgets.donation_banner import DonationBanner
 from app.ui.widgets.mode_banner import ModeBanner
 
 
@@ -87,9 +86,6 @@ class MainWindow(QMainWindow):
 
         self._mode_banner = ModeBanner()
         outer.addWidget(self._mode_banner)
-
-        self._donation_banner = DonationBanner()
-        outer.addWidget(self._donation_banner)
 
         body = QWidget()
         body_layout = QHBoxLayout(body)

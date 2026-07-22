@@ -124,3 +124,24 @@ was revoked immediately afterwards.
 **The permission checkboxes in Paddle's key dialog only respond to real mouse
 clicks** — setting them programmatically appears to succeed and silently does
 not register, producing a "Select at least one" error on save.
+
+
+## DNS: the trap that cost hours
+
+The Resend DKIM key contains `+` characters. **Every cPanel CLI path decodes
+`+` as a space** (form-urlencoding), silently corrupting the key:
+
+    should be : ...YLncfWSvo+u+Z/fEEii...
+    landed as : ...YLncfWSvo u Z/fEEii...
+
+`cpapi2 ZoneEdit`, `uapi DNS mass_edit_zone`, `%2B` and `%252B` pre-encoding
+all produced spaces. Only the **Zone Editor web form** (or a manual paste) gets
+the value through intact. Always diff the published record byte-for-byte
+against the source afterwards — a two-character corruption in 218 is invisible
+by eye.
+
+Second trap: **lowering a TTL does not shorten a copy already in a resolver's
+cache.** The broken record was published with TTL 14400, so AWS SES (which
+Resend runs on) held the corrupt value for four hours. Dropping the TTL to 400
+and re-adding the domain in Resend changed nothing — the cache had to expire on
+its own. Set a short TTL *before* publishing a record you may need to correct.
