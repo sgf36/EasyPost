@@ -13,3 +13,6 @@ dist/
 # Direct-download build flag (created at package time, never committed)
 app/resources/license_required.flag
 app/resources/mcp_supported.flag
+
+# Locally downloaded build artifacts — never committed
+dist-download/

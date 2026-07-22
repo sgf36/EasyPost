@@ -36,9 +36,6 @@ SETTINGS_PATH = APP_DATA_DIR / "settings.json"
 MODE_TEST = "test"
 MODE_PRODUCTION = "production"
 
-# Stripe Payment Link for optional donations (public URL, not a secret).
-DONATION_URL = "https://donate.stripe.com/aFabJ38bEaOq1wMgHl0gw01"
-
 
 def ensure_app_data_dir() -> Path:
     APP_DATA_DIR.mkdir(parents=True, exist_ok=True)

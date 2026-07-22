@@ -1,4 +1,4 @@
-"""Local non-secret app preferences (language, donation banner dismissal).
+"""Local non-secret app preferences (language, label defaults, licence).
 
 Kept separate from credential_store.py since these values aren't sensitive
 and don't need OS keyring protection — a plain JSON file is simpler.
@@ -17,7 +17,6 @@ DEFAULT_LOCALE = "en"
 @dataclass
 class AppSettings:
     locale: str = DEFAULT_LOCALE
-    donation_banner_dismissed: bool = False
     # Webhook push-update feature (off by default — see app/core/webhook_manager.py).
     webhook_enabled: bool = False
     webhook_id: Optional[str] = None

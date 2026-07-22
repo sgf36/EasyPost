@@ -1,6 +1,5 @@
-"""Settings: update stored API keys, view active mode, language, donations."""
+"""Settings: update stored API keys, view active mode, language, labels."""
 
-import webbrowser
 
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -16,7 +15,6 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import DONATION_URL
 from app.core.credential_store import load_credentials, save_credentials
 from app.core.label_options import (
     LABEL_FORMATS,
@@ -70,7 +68,6 @@ class SettingsView(QWidget):
         layout.addWidget(self._build_label_group())
         layout.addWidget(self._build_language_group())
         layout.addWidget(self._build_webhook_group())
-        layout.addWidget(self._build_support_group())
         layout.addStretch(1)
 
         self.refresh()
@@ -215,15 +212,6 @@ class SettingsView(QWidget):
         else:
             text = tr("settings.webhook_status_stopped")
         self._webhook_status_label.setText(text)
-
-    def _build_support_group(self) -> QGroupBox:
-        group = QGroupBox(tr("settings.support_group_title"))
-        support_btn = QPushButton(tr("settings.support_button"))
-        support_btn.clicked.connect(lambda: webbrowser.open(DONATION_URL))
-        layout = QVBoxLayout()
-        layout.addWidget(support_btn)
-        group.setLayout(layout)
-        return group
 
     def refresh(self) -> None:
         creds = load_credentials()
