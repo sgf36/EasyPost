@@ -8,7 +8,7 @@
   <Identity
     Name="SFields.Easy-PostDesktop"
     Publisher="CN=A7D4B6C0-27D4-4F66-82EB-82F5DD466788"
-    Version="1.0.2.0"
+    Version="1.0.3.0"
     ProcessorArchitecture="x64" />
 
   <Properties>
