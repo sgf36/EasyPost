@@ -18,7 +18,8 @@ app/resources/mcp_supported.flag
 dist-download/
 
 # Generated listing-import package (rebuild with build_listing_import.py)
-store_assets/EasyPost-Store-Listings-IMPORT-v2/
+store_assets/EasyPost-Store-Listings-IMPORT-v2*/
+store_assets/EasyPost-Store-Listings-IMPORT-v2-stage2.csv
 
 # Staged Store package (71MB, rebuilt by packaging/build_msix.py)
 store_assets/submission/
