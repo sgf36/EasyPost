@@ -10,14 +10,19 @@ This script does exactly that for the screenshot block: it rewrites
 DesktopScreenshot1-9 and their captions for all 47 listing languages and
 leaves every other row byte-identical to the export.
 
-Two rules learned the hard way from the previous import, both enforced below:
+Three rules the importer enforces without saying so:
 
-1. Partner Center wants a **folder**, not a zip. Its import dialog asks for a
-   directory containing the CSV and the images beside it.
-2. Every screenshot cell must name a **bundled file**. Partner Center asset
-   URLs from a previous export do not resolve on a folder import, and the only
-   symptom is "we couldn't import listings for the following languages" with
-   the language list left blank.
+1. It wants a **folder**, not a zip. The dialog asks for a directory holding
+   the CSV and its images.
+2. Image paths must be **prefixed with the root folder name** — Microsoft's
+   own example is `my_folder/screenshot1.png`, not `screenshot1.png`. This is
+   the one that bit us: a bare filename is silently unresolvable.
+3. Exactly **one .csv** may sit in the folder.
+
+Breaking any of them produces the same useless error: "we couldn't import
+listings for the following languages", with the language list rendered blank
+and the backing API returning `validations: []`. Nothing is saved — the import
+is all-or-nothing — so a failure leaves the listing untouched.
 
 Usage:
     python store_assets/build_listing_import.py <exported-listingData.csv> [dest]
@@ -145,8 +150,14 @@ CAPTIONS = {
 }
 
 
-def asset_name(locale: str, slot: int, slug: str) -> str:
+def asset_file(locale: str, slot: int, slug: str) -> str:
     return f"{locale}_{slot}_{slug}.png"
+
+
+def asset_path(locale: str, slot: int, slug: str) -> str:
+    """The value Partner Center expects in a screenshot cell: the root folder
+    name, then the file. A bare filename does not resolve."""
+    return f"{PACKAGE}/{asset_file(locale, slot, slug)}"
 
 
 def main() -> None:
@@ -168,7 +179,7 @@ def main() -> None:
             src = SHOTS / locale / f"{source}.png"
             if not src.exists():
                 raise SystemExit(f"missing screenshot: {src}")
-            shutil.copy2(src, OUT_DIR / asset_name(locale, slot, slug))
+            shutil.copy2(src, OUT_DIR / asset_file(locale, slot, slug))
 
     by_field = {row[0]: row for row in rows[1:]}
     touched = 0
@@ -178,7 +189,7 @@ def main() -> None:
         caption_row = by_field[f"DesktopScreenshotCaption{slot}"]
         for col, lang in enumerate(langs, start=4):
             locale = LOCALISED.get(lang, FALLBACK)
-            shot_row[col] = asset_name(locale, slot, slug)
+            shot_row[col] = asset_path(locale, slot, slug)
             caption_row[col] = CAPTIONS[locale][slot - 1]
             touched += 2
 
@@ -194,12 +205,21 @@ def main() -> None:
     with target.open("w", encoding="utf-8-sig", newline="") as fh:
         csv.writer(fh).writerows(rows)
 
-    # A leftover asset URL is the one failure mode that produces an unreadable
-    # error page, so refuse to ship a package that still contains one.
-    if "developer.microsoft.com" in target.read_text(encoding="utf-8-sig"):
-        raise SystemExit("asset URL survived into the CSV; folder import would fail")
+    # Everything the importer will silently reject, checked here instead —
+    # its error page names no field, no language and no reason.
+    text = target.read_text(encoding="utf-8-sig")
+    if "developer.microsoft.com" in text:
+        raise SystemExit("asset URL survived into the CSV; it will not resolve")
+    if len(list(OUT_DIR.glob("*.csv"))) != 1:
+        raise SystemExit("the folder must hold exactly one .csv")
 
     images = sorted(p.name for p in OUT_DIR.glob("*.png"))
+    cited = {v for row in rows[1:] if row[0].startswith("DesktopScreenshot")
+             and "Caption" not in row[0] for v in row[4:] if v.strip()}
+    for ref in sorted(cited):
+        root, _, name = ref.partition("/")
+        if root != PACKAGE or name not in images:
+            raise SystemExit(f"unresolvable screenshot reference: {ref}")
 
     print(f"languages      : {len(langs)}")
     print(f"screenshots    : {len(ORDER)} per language")

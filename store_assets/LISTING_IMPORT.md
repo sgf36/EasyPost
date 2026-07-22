@@ -24,19 +24,33 @@ disposable.
 4. Re-export afterwards and confirm the screenshot rows now carry Partner
    Center asset URLs rather than the filenames sent up.
 
-## Two rules the importer enforces silently
+## Three rules the importer enforces silently
 
-Both were learned by failing an import, and both are now asserted by the
-builder rather than left to memory.
+All three produce the identical, useless error: *"We couldn't import listings
+for the following languages"* with the language list rendered **blank**, and
+`listings/importvalidations` returning `validations: []`. It reads like a
+portal fault. It is not. The builder now asserts all three.
 
-**It takes a folder, not a zip.** The dialog wants the directory holding the
-CSV and its images.
+**It takes a folder, not a zip.** The dialog wants the directory itself.
 
-**Every screenshot cell must name a bundled file.** Partner Center asset URLs
-carried over from an export do not resolve on a folder import. The only symptom
-is *"We couldn't import listings for the following languages"* — with the list
-of languages rendered blank, which makes it look like a portal fault rather
-than a file problem. The builder aborts if a single URL survives into the CSV.
+**Image paths must include the root folder name.** Microsoft's own example is
+`my_folder/screenshot1.png` — a bare `screenshot1.png` does not resolve. This
+is the one that cost two failed imports.
+
+**Exactly one .csv in the folder**, alongside the assets.
+
+Worth knowing: the import is all-or-nothing. Nothing is saved until the file
+is completely clean, so a failure leaves the listing exactly as it was.
+
+## A note on the previous import
+
+The 46 non-English languages carry screenshot asset URLs that all share a
+single asset ID, while the six originally-localised languages each have their
+own. That is the signature of a **URL-reuse** import, not a folder import —
+the images were uploaded through the portal for six languages, then an export
+supplied the URLs that a second CSV fanned out across the rest. So the earlier
+folder attempt almost certainly failed for this same path-prefix reason and
+was worked around rather than fixed.
 
 ## Why it starts from a fresh export
 
