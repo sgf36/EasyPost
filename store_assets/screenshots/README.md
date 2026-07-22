@@ -1,7 +1,8 @@
 # Microsoft Store screenshots
 
-45 PNGs, 1924 × 1175 — inside the Store's 1366 × 768 to 3840 × 2160 range, and
-9 per language against a limit of 10.
+63 PNGs, 1924 × 1175 — inside the Store's 1366 × 768 to 3840 × 2160 range, and
+9 per language against a limit of 10. German is 2075 × 1175: its labels are
+longer, so the window grows to fit, and the result is still well inside range.
 
 Captured from the real application against **live EasyPost test-mode data**, not
 mockups: the 18 carrier rates on `02_create_shipment` are genuine USPS, FedEx
@@ -11,24 +12,28 @@ incurred.
 
 ## Localised sets
 
-Five languages, chosen as the most spoken worldwide by total speakers, with
-English included as required.
+Seven languages. Five are the most spoken worldwide by total speakers, with
+English included as required; German and Japanese are here because the listing
+already carried localised imagery for them and falling back to English would
+have been a regression.
 
 | Folder | Partner Center language | |
 |---|---|---|
 | `en/` | English (United States) | `en-us` |
 | `zh/` | Chinese (Simplified) | `zh-hans` |
-| `hi/` | Hindi | `hi-in` |
-| `es/` | Spanish | `es-es` |
-| `fr/` | French | `fr-fr` |
+| `hi/` | Hindi | `hi` |
+| `es/` | Spanish | `es` |
+| `fr/` | French | `fr` |
+| `de/` | German | `de` |
+| `ja/` | Japanese | `ja` |
 
 ## Every other language uses the English set
 
-Upload `en/` unchanged for the remaining 45 listing languages:
+The remaining 40 listing languages reference `en/` unchanged:
 
 ```
-am ar bn cs de el fa gu ha he hr hu id ig it ja jv kn ko ml mr ms my ne nl
-or pa pl pt ro ru si so sv sw ta te th tr uk ur uz vi yo zu
+am ar bn cs el fa gu ha he hr hu id ig-latn it kn ko ml mr ms ne nl or pa
+pl pt ro ru si sv sw ta te th tr uk ur uz vi yo-latn zu
 ```
 
 The application is still fully translated into all 50 — only the *listing

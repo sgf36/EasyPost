@@ -16,3 +16,10 @@ app/resources/mcp_supported.flag
 
 # Locally downloaded build artifacts — never committed
 dist-download/
+
+# Generated listing-import package (rebuild with build_listing_import.py)
+store_assets/listing_import/
+store_assets/listing_import.zip
+
+# Staged Store package (71MB, rebuilt by packaging/build_msix.py)
+store_assets/submission/
