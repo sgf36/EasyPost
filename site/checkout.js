@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  var CLIENT_TOKEN = "PLACEHOLDER";
+  var CLIENT_TOKEN = "live_105e36879a0794ff55edb619561";
 
   // Paddle rejects an unrecognised token at Initialize() and the overlay never
   // opens, so refuse to touch the buttons unless a real one is present.
