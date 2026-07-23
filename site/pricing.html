@@ -36,9 +36,11 @@
 
 <section>
   <div class="wrap">
-    <!-- Replace each href with its Paddle hosted-checkout URL once the account
-         is approved and the three prices exist. Until then these route buyers
-         to a person rather than a dead button. -->
+    <!-- The Buy buttons are progressive enhancement: the href stays a mailto,
+         and checkout.js upgrades it to a Paddle overlay once Paddle.js has
+         loaded and a client token is configured. If either is missing the
+         click falls through to the mailto, so a buyer always reaches a person
+         rather than a dead button. -->
     <div class="tiers">
 
       <div class="tier">
@@ -47,7 +49,7 @@
         <p class="seats">Up to 3 computers</p>
         <p class="amount">$29 <span>once</span></p>
         <p class="per-seat">Yours permanently &middot; about $9.70 per computer</p>
-        <a class="btn" href="mailto:Apps@spencerfields.com?subject=Easy-Post%20Desktop%20—%20Personal%20licence">Buy — $29</a>
+        <a class="btn" data-paddle-price="pri_01ky2hekjfm1c9nspf5pnqv0jv" href="mailto:Apps@spencerfields.com?subject=Easy-Post%20Desktop%20—%20Personal%20licence">Buy — $29</a>
       </div>
 
       <div class="tier featured">
@@ -56,7 +58,7 @@
         <p class="seats">Up to 10 computers</p>
         <p class="amount">$149 <span>per year</span></p>
         <p class="per-seat">Renews annually &middot; about $14.90 per computer per year</p>
-        <a class="btn" href="mailto:Apps@spencerfields.com?subject=Easy-Post%20Desktop%20—%20Business%20licence">Buy — $149</a>
+        <a class="btn" data-paddle-price="pri_01ky3fxcf519vwq9vw8cwy35k9" href="mailto:Apps@spencerfields.com?subject=Easy-Post%20Desktop%20—%20Business%20licence">Buy — $149</a>
       </div>
 
       <div class="tier">
@@ -65,7 +67,7 @@
         <p class="seats">Up to 30 computers</p>
         <p class="amount">$349 <span>per year</span></p>
         <p class="per-seat">Renews annually &middot; about $11.60 per computer per year</p>
-        <a class="btn" href="mailto:Apps@spencerfields.com?subject=Easy-Post%20Desktop%20—%20Organisation%20licence">Buy — $349</a>
+        <a class="btn" data-paddle-price="pri_01ky3fxdv0gcg0xnf04npzpb2k" href="mailto:Apps@spencerfields.com?subject=Easy-Post%20Desktop%20—%20Organisation%20licence">Buy — $349</a>
       </div>
 
       <div class="tier">
@@ -158,5 +160,6 @@
   </div>
 </footer>
 
+<script src="checkout.js" defer></script>
 </body>
 </html>
