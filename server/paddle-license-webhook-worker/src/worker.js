@@ -185,13 +185,29 @@ async function sendLicenseEmail(apiKey, from, to, licenseKey, tier = "personal")
     ? "This is an annual subscription. Keep this key — it stays the same every "
       + "year, and renewals are applied automatically. You will not be sent a new one."
     : "This is a one-time purchase. The key does not expire.";
+  // The download link points at a page on the product site rather than at
+  // release assets directly, so the builds can be re-cut without redeploying
+  // this Worker — and so a customer who keeps the email still finds a current
+  // download a year from now.
   const text =
     "Thank you for buying Easy-Post Desktop.\n\n" +
     "Your license key:\n\n" +
     `${licenseKey}\n\n` +
     `${allowance}\n${billing}\n\n` +
-    "To activate: open Easy-Post Desktop, paste this key on the activation " +
-    "screen, and click Activate. Keep this email for your records.\n\n" +
+    "STEP 1 — Download the application\n\n" +
+    "  https://easy-post.spencerfields.com/download.html\n\n" +
+    "  Windows and macOS builds are both there. Windows shows a blue " +
+    "\"Windows protected your PC\" screen the first time, because the download " +
+    "is not yet code-signed — click \"More info\", then \"Run anyway\". The " +
+    "download page explains this and lists the checksums if you would like to " +
+    "verify the file first.\n\n" +
+    "STEP 2 — Activate\n\n" +
+    "  Open Easy-Post Desktop, paste the key above on the activation screen, " +
+    "and click Activate. Keep this email for your records.\n\n" +
+    "STEP 3 — Connect your EasyPost account\n\n" +
+    "  The application ships no postage of its own: it drives your own " +
+    "EasyPost account. Paste your EasyPost API key when asked. A test-mode key " +
+    "lets you explore everything without buying real labels.\n\n" +
     "Changing computers? Open Settings and release the old one first, or " +
     "release it from the new computer when prompted.\n\n" +
     "Questions? Apps@spencerfields.com\n";

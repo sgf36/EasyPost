@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download — Easy-Post Desktop</title>
+<meta name="description" content="Download Easy-Post Desktop for Windows or macOS. Notarized macOS build, checksums for both, and how to get past the Windows SmartScreen warning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html">Easy-Post Desktop</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="download.html" aria-current="page">Download</a>
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="index.html#support">Support</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Download</p>
+    <h1>Version 1.0.4</h1>
+    <p class="lede">Windows and macOS. A licence key is required for these downloads &mdash; the Microsoft Store version does not need one.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="tiers">
+
+      <div class="tier featured">
+        <p class="tag">Windows</p>
+        <h3>Windows 10 &amp; 11</h3>
+        <p class="seats">64-bit &middot; 76 MB</p>
+        <p class="per-seat">Unzip anywhere, then run EasyPostDesktop.exe</p>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.0.4/EasyPostDesktop-Windows-x64.zip">Download for Windows</a>
+      </div>
+
+      <div class="tier">
+        <p class="tag">macOS</p>
+        <h3>macOS on Apple silicon</h3>
+        <p class="seats">Apple silicon &middot; 71 MB</p>
+        <p class="per-seat">Notarized by Apple &middot; opens without warnings</p>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.0.4/EasyPostDesktop-macOS-arm64.dmg">Download for macOS</a>
+      </div>
+
+      <div class="tier">
+        <p class="tag">Microsoft Store</p>
+        <h3>Windows, from the Store</h3>
+        <p class="seats">No licence key needed</p>
+        <p class="per-seat">Signed by Microsoft &middot; updates automatically</p>
+        <a class="btn" href="https://www.microsoft.com/store/apps/9NDSDL5LV5B5">View in the Store</a>
+      </div>
+
+    </div>
+
+    <div class="prose" style="margin-top:2.5rem;">
+      <h2>Windows shows a blue warning. That is expected.</h2>
+      <p><strong>&ldquo;Windows protected your PC&rdquo;</strong> appears the first time you run the download, because this build is not yet code-signed. Click <strong>More info</strong>, then <strong>Run anyway</strong>.</p>
+      <p>This is not a sign that anything is wrong &mdash; SmartScreen shows it for any application whose publisher it does not yet recognise, and a certificate is being arranged. If you would rather verify the file yourself before running it, compare its checksum against the list below:</p>
+      <pre><code>powershell -Command "Get-FileHash .\EasyPostDesktop-Windows-x64.zip -Algorithm SHA256"</code></pre>
+      <p>The Microsoft Store build is signed by Microsoft and shows no such warning, so it is the smoother route on Windows once you have a Store licence.</p>
+
+      <h2>Getting started</h2>
+      <ol>
+        <li><strong>Install and open</strong> the application.</li>
+        <li><strong>Paste your licence key</strong> on the activation screen. It arrived by email when you bought &mdash; search for &ldquo;Easy-Post Desktop licence key&rdquo;. Store installs skip this step.</li>
+        <li><strong>Paste your EasyPost API key.</strong> Easy-Post Desktop sells no postage of its own; it drives your own EasyPost account. Sign up free at <a href="https://www.easypost.com">easypost.com</a>. A test-mode key lets you try everything without buying real labels.</li>
+      </ol>
+      <p>Changing computers later is expected and costs you nothing permanently &mdash; release the old machine from within the application, under Settings.</p>
+
+      <h2>Checksums</h2>
+      <p>SHA-256, for anyone who would like to verify a download before running it:</p>
+      <pre><code>800a789ef500fa8bc0a909cdb00c64f3502eff37e6cf82753ef5164377e9e177  EasyPostDesktop-Windows-x64.zip
+69edfdf21ac9c2668ed10c60dc2f9b1d5905f202cc6527cf9adfc05fbd0c0423  EasyPostDesktop-macOS-arm64.dmg</code></pre>
+
+      <h2>Requirements</h2>
+      <ul>
+        <li>Windows 10 version 1809 or later, 64-bit &mdash; or macOS on Apple silicon</li>
+        <li>An EasyPost account and API key</li>
+        <li>An internet connection to buy labels and to activate once</li>
+      </ul>
+
+      <h2>Older versions and source</h2>
+      <p>Every release, with its notes and checksums, is listed on <a href="https://github.com/sgf36/EasyPost/releases">GitHub</a>. The application is open source under the MIT licence; the source is at <a href="https://github.com/sgf36/EasyPost">github.com/sgf36/EasyPost</a>.</p>
+
+      <h2>Trouble downloading or activating?</h2>
+      <p>Write to <a href="mailto:Apps@spencerfields.com">Apps@spencerfields.com</a> or telephone <a href="tel:+442081325790">+44 20 8132 5790</a>. If a licence key has not arrived, check the spam folder first, then get in touch from the address used to buy &mdash; the order can be found from the email address alone.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <p>
+      Orders are processed by our authorised reseller and Merchant of Record, Paddle.com Market Ltd, who handle
+      billing, invoicing and the collection and remittance of any applicable tax.
+    </p>
+    <p class="copyright">&copy; 2026 Spencer Fields.</p>
+  </div>
+</footer>
+
+</body>
+</html>
