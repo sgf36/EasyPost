@@ -23,3 +23,7 @@ store_assets/EasyPost-Store-Listings-IMPORT-v2-stage2.csv
 
 # Staged Store package (71MB, rebuilt by packaging/build_msix.py)
 store_assets/submission/
+
+# esbuild output produced when deploying the Worker by hand
+server/paddle-license-webhook-worker/build-bundle*.js
+server/paddle-license-webhook-worker/bundle*.b64
