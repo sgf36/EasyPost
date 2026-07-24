@@ -487,14 +487,39 @@ blue "Windows protected your PC" SmartScreen prompt. This is expected for
 **any** new, low-download-volume executable from an unrecognized publisher —
 it isn't specific to this app, and it isn't a sign the build is unsafe.
 
-**What actually fixes it:** a paid code-signing certificate (from a CA like
-DigiCert/SSL.com, or Microsoft's cheaper Trusted Signing service) applied to
-every release. Signing an executable is what lets Windows attribute it to a
-real, verified publisher and build reputation over time. This repo's build
-doesn't do that yet since it requires purchasing a certificate under a real
-identity — `.github/workflows/build.yml` already has a signing step wired
-up and ready to go (currently a no-op) for whenever `WINDOWS_CODE_SIGNING_CERT_BASE64`
-and `WINDOWS_CODE_SIGNING_CERT_PASSWORD` repo secrets are added.
+**What actually fixes it:** a code-signing certificate applied to every
+release, which lets Windows attribute the build to a verified publisher and
+accrue reputation over time. This project uses a **Certum Open Source Code
+Signing** certificate.
+
+Signing happens **locally, not in CI**, and this is not a shortcut — it is
+forced by how modern certificates work. Since June 2023 the CA/Browser Forum
+baseline requires standard/OV code-signing private keys to live on
+FIPS-certified hardware: Certum's SimplySign cloud HSM, or a physical
+cryptographic card. The key cannot be exported to a `.pfx`, and a
+GitHub-hosted runner cannot reach it. So the old plan of a `.pfx` in a repo
+secret is a dead end; `packaging\sign_windows_local.ps1` signs the build on
+the machine where the key lives:
+
+```
+# SimplySign: open SimplySign Desktop and log in first (approve on your phone).
+# Card: insert it and start proCertum CardManager.
+.\packaging\sign_windows_local.ps1
+```
+
+It signs every `.exe` in the build with an RFC3161 timestamp, verifies the
+result, repackages the `.zip`, and prints the new SHA-256 — which then has to
+be updated on the GitHub release asset and in `site\download.html`, since
+signing changes the archive. The stale `WINDOWS_CODE_SIGNING_CERT_*` step in
+`.github/workflows/build.yml` is left inert (gated off) because it cannot work
+with a hardware key; it is not the signing path.
+
+**A caveat worth setting expectations on:** a standard (OV) certificate does
+not clear SmartScreen instantly. Reputation accrues with download volume, so
+the "unrecognized publisher" warning can persist for weeks on a brand-new
+certificate before Microsoft's reputation service trusts it. EV certificates
+historically earned instant reputation, at roughly 2–3× the cost. The
+Microsoft Store build, which Microsoft signs itself, never shows the warning.
 
 **What this repo does to reduce false positives in the meantime:**
 - The build uses PyInstaller's `--onedir` mode rather than `--onefile`.
