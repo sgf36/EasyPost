@@ -104,7 +104,7 @@ same build.
 | Licence gate | **Off** | **On** |
 | MCP / AI agents | **Off** | **On** |
 | Signing | Store re-signs on publish | Apple Developer ID + notarization |
-| Status | Draft; blocked on payout profile | Blocked on notarization + Paddle approval |
+| Status | `1.0.4.0` submitted for certification | Checkout live; licence email unproven |
 
 Both differences are compiled in or out by **variant flag files** under
 `app/resources/`, created at package time by CI and never committed:
@@ -138,6 +138,45 @@ roughly 5% + 50c and keeps Paddle responsible for VAT/GST registration and
 remittance worldwide. Apple's Guideline 3.1.1 forbids *unlocking* App Store
 app functionality with an externally-bought key, which is why the licence
 gate is scoped strictly to builds distributed outside any store.
+
+## Publishing the product site
+
+`site/` is served from shared cPanel hosting at
+`/home2/spencgh6/easy-post.spencerfields.com`. There is no deploy script and no
+stored host credential, so publishing is a manual step taken from an
+authenticated browser session.
+
+The cPanel **upload widget 404s** on this Bluehost build, so files go through
+cPanel's UAPI instead:
+
+```
+POST /cpsess<token>/execute/Fileman/save_file_content
+     dir=/home2/spencgh6/easy-post.spencerfields.com
+     file=<name>  content=<utf-8>  from_charset=UTF-8  to_charset=UTF-8
+```
+
+**Verify by fetching each file over HTTPS afterwards** and comparing byte
+counts against the repository. The File Manager listing shows what is on disk,
+not what the web server actually serves — those can differ, and only the second
+one matters.
+
+The pricing page's Buy buttons are **progressive enhancement**: each is an
+`<a>` whose `href` is a mailto, and `site/checkout.js` upgrades the click to a
+Paddle overlay only once Paddle.js has loaded and a client token is present. No
+JavaScript, a blocked script, an unreachable CDN or a missing token all fall
+through to the mailto. There is deliberately no state in which a buyer clicks
+Buy and nothing happens.
+
+`checkout.js` carries Paddle's **client-side token**, which is public and meant
+to be embedded. The API key must never appear there.
+
+Two Paddle account settings gate checkout, and neither is visible from the
+code: the **checkout domain must be approved**, and a **default payment link**
+must be set. Without the latter, `Paddle.Checkout.open` and API transaction
+creation both fail while the catalogue, webhook, domain approval and
+`PricePreview` all keep working — the browser only ever says "Something went
+wrong". Creating a transaction through the Paddle API returns the real error in
+one call; start there.
 
 ## Licensing (direct downloads only)
 
@@ -362,6 +401,28 @@ Center assigned (`packaging\msix\AppxManifest.xml`) and the app's existing
 icon resized to the required tile sizes — no separate maintenance needed
 when the icon changes, since assets are generated at build time.
 
+**Two rules the packaging enforces, both learned from a failed certification.**
+Submission `1.0.3.0` was rejected under **10.3.4 — "the product failed to
+install through the Store"**, because the manifest declared 47
+`<Resource Language>` entries while the package shipped no `resources.pri` at
+all. `Add-AppxPackage` tolerates that, which is exactly why local sideload
+testing passed and the defect survived all the way to certification; Store
+deployment is stricter and refuses it.
+
+- `build_msix.py` runs **`makepri`** to write a real `resources.pri` into the
+  package, and `verify_store_variant()` fails the build if it is ever missing
+  again.
+- The manifest declares **one language, `en-US`** — what the package actually
+  provides. The app localises at runtime from its own bundled JSON, so it has
+  no MRT language resources to back further declarations. Verified rather than
+  assumed: `makepri` run against the 47-language manifest produced an index
+  containing zero languages, because there were no language-qualified resources
+  to bind them to.
+
+The 47 localised **Store listings** live in Partner Center and are entirely
+independent of this element — reducing the package to `en-US` does not remove
+them.
+
 GitHub Actions builds and signs this automatically on every Windows run
 (alongside the plain `.exe`) with a throwaway self-signed certificate — see
 the next paragraph for why that's sufficient. To test-install the locally
@@ -477,8 +538,8 @@ packaging/               PyInstaller spec, MSIX manifest/builder, signing
 server/
   paddle-license-webhook-worker/   Cloudflare Worker: Paddle -> licence email
   paddle-license-webhook/          container/FastAPI equivalent, if self-hosting
-site/                    easy-post.spencerfields.com — product site, policies
-                         and the PHP contact form
+site/                    easy-post.spencerfields.com — product site, policies,
+                         Paddle checkout and the PHP contact form
 tools/issue_license.py   mint a licence key by hand
 tests/                   pytest suite, no network access required
 ```
