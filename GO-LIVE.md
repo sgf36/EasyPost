@@ -13,37 +13,50 @@ button only the account owner should press.
 | Paddle catalogue | Product `pro_01ky2h8cfe2ven8ypchnmfbena`; Personal $29 one-time, Business $149/yr, Organisation $349/yr — matches the Worker's `PRICE_TIERS` exactly |
 | Webhook destination | `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh`, active, subscribed to the eight events the Worker handles |
 | Licence Worker | Deployed at `easypost-license-webhook.sgf36.workers.dev`; `/health` returns 200, `/paddle/webhook` rejects a bad signature with 401 |
-| Site checkout | `pricing.html` + `checkout.js` + `thank-you.html`, live client token set |
+| Site checkout | Published live; Paddle overlay confirmed rendering $29 Personal |
+| Checkout domain | `easy-post.spencerfields.com` approved, Apple Pay verified |
+| Default payment link | Set — this was the last blocker |
 
-## Remaining — three actions
+## Site — published and verified
 
-### 1. Publish the site
+`pricing.html`, `checkout.js` and `thank-you.html` are live on
+`easy-post.spencerfields.com`, byte-for-byte identical to the repository.
 
-`site/` is committed but not deployed. Upload to the host serving
-`easy-post.spencerfields.com`:
+The cPanel upload widget 404s on this Bluehost build, so publishing goes
+through cPanel's UAPI from an authenticated browser session:
 
 ```
-site/pricing.html      (Buy buttons now carry data-paddle-price)
-site/checkout.js       (new)
-site/thank-you.html    (new)
+POST /cpsess<token>/execute/Fileman/save_file_content
+     dir=/home2/spencgh6/easy-post.spencerfields.com
+     file=<name>  content=<utf-8>  from_charset=UTF-8  to_charset=UTF-8
 ```
 
-Nothing else in `site/` changed. There is no deploy script and no stored
-credential for the host, which is why this is manual.
+Verify afterwards by fetching each file over HTTPS and comparing byte counts —
+the File Manager listing alone does not prove what the web server serves.
 
-### 2. Resubmit to the Microsoft Store
+## Checkout — working end to end
 
-`store_assets/submission/EasyPostDesktop_1.0.4.0.msix` → Partner Center →
-Packages → remove 1.0.3.0, upload 1.0.4.0, wait for "Validated" → Submit.
+Verified live: clicking Buy opens a real Paddle overlay showing
+"Easy-Post Desktop License — Personal, US$29.00 now", with the discount field
+and payment step present.
 
-The previous rejection was certification **10.3.4**, "the product failed to
-install through the Store". Cause: the manifest declared 47 resource languages
-while the package shipped no `resources.pri` at all. `Add-AppxPackage`
-tolerates that, which is why sideload testing passed and the defect reached
-certification; Store deployment does not. Fixed by generating a real resource
-index and declaring the one language the package actually provides.
+Two account-level settings had to be right, and only one was obvious:
 
-### 3. Prove the payment path before announcing
+- **Checkout domain approved.** `easy-post.spencerfields.com`,
+  `chedom_01ky33xg2xzcaehr4ja6rshm9b`, status `approved`, Apple Pay verified.
+- **Default payment link set.** This one is easy to miss: without it, both
+  `Paddle.Checkout.open` and API transaction creation fail, and the only
+  symptom in the browser is a bare "Something went wrong" overlay. The
+  catalogue, webhook, domain approval and `Paddle.PricePreview` all work
+  perfectly without it, so nothing else points at the gap. The API is what
+  named it — the browser never will.
+
+Diagnosing this cost two wrong hypotheses. When checkout misbehaves, create a
+transaction through the API first: it returns the real error in one call.
+
+## Remaining — one action
+
+### Prove the payment path before announcing
 
 **This is the one thing not to assume.** Every component has been verified in
 isolation, but no purchase has ever run end to end. The failure mode is silent
