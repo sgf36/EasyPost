@@ -27,3 +27,6 @@ store_assets/submission/
 # esbuild output produced when deploying the Worker by hand
 server/paddle-license-webhook-worker/build-bundle*.js
 server/paddle-license-webhook-worker/bundle*.b64
+
+# wrangler local state
+server/paddle-license-webhook-worker/.wrangler/
