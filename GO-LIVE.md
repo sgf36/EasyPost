@@ -54,30 +54,54 @@ Two account-level settings had to be right, and only one was obvious:
 Diagnosing this cost two wrong hypotheses. When checkout misbehaves, create a
 transaction through the API first: it returns the real error in one call.
 
-## Remaining — one action
+## Remaining — one action, and it is yours to take
 
-### Prove the payment path before announcing
+### Prove the licence email actually sends
 
-**This is the one thing not to assume.** Every component has been verified in
-isolation, but no purchase has ever run end to end. The failure mode is silent
-and expensive: a customer pays, no licence arrives, and the first you hear of
-it is a complaint.
+**This is the one thing not to assume.** Every component is verified in
+isolation and checkout is verified live, but no purchase has completed the
+chain. The failure mode is silent and expensive: a customer pays, no licence
+arrives, and the first you hear of it is a complaint.
 
-Two secrets could not be checked, because Cloudflare does not expose secret
-values through its API:
+Two Worker secrets cannot be read back — Cloudflare does not expose secret
+values through its API, by design:
 
 - `RESEND_API_KEY` — wrong and the licence is minted but never emailed
 - `LICENSE_PRIVATE_KEY_PEM` — wrong and the minted key fails to verify in the app
 
-Run one free purchase:
+A discount code is already created and waiting:
 
-1. Paddle → Discounts → 100% off, code `EPDPIPELINETEST`, **usage limit 1**,
-   **restricted to** `pri_01ky2hekjfm1c9nspf5pnqv0jv`, **expiring** in days.
-   The limit, restriction and expiry are not optional hygiene — an unbounded
-   100% code on a live store is a standing liability.
-2. Buy Personal on the published pricing page with that code, total $0.
-3. Confirm a licence email arrives and the key activates the app.
-4. Delete or let the code expire.
+| | |
+|---|---|
+| Code | `EPDPIPELINETEST` |
+| Discount | 100% |
+| Usage limit | **1** |
+| Restricted to | `pri_01ky2hekjfm1c9nspf5pnqv0jv` (Personal only) |
+| Expires | 2026-07-26 |
+| Paddle ID | `dsc_01ky9be49hjb3yhd0cwm720nrh` |
+
+The limit, restriction and expiry are not optional hygiene — an unbounded 100%
+code on a live store is a standing liability.
+
+To run it:
+
+1. Open <https://easy-post.spencerfields.com/pricing.html> and click
+   **Buy — $29**.
+2. Enter your email, then **Add discount** → `EPDPIPELINETEST`. Total becomes
+   $0.00.
+3. Complete the checkout. Nothing is charged.
+4. Confirm the licence email arrives and the key activates the application.
+5. The code is single-use, so it burns itself out. Nothing to clean up.
+
+Why you and not the tooling: completing a checkout means entering personal
+details and pressing the final confirm on a live payment page. That is the
+account owner's action, even at zero cost.
+
+**If the email does not arrive**, the licence was almost certainly minted and
+the failure is delivery. Check the Worker's logs and `RESEND_API_KEY` first.
+**If the email arrives but the key will not activate**, suspect
+`LICENSE_PRIVATE_KEY_PEM` — the app verifies against the public half, so a
+mismatched pair produces a well-formed key that fails verification.
 
 ## Worth knowing
 
@@ -88,9 +112,9 @@ you: regenerate the destination's signing secret in Paddle, then
 `npx wrangler secret put PADDLE_WEBHOOK_SECRET`. Do it *after* the test above
 passes, so a failure is never ambiguous between two causes.
 
-**The API key still lacks `discount.write`**, which is why the test code above
-is created by hand rather than by tooling. Leave it that way unless there is a
-reason to widen a live key.
+**The live API key now holds `discount.write`.** It was widened to create the
+test code. Consider narrowing it again once the pipeline is proven — a live key
+that can mint 100% discounts is worth more to an attacker than one that cannot.
 
 **Enterprise stays a mailto** on the pricing page. It is an enquiry, not a
 purchase, and should not open a checkout.

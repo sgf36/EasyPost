@@ -90,6 +90,25 @@ switch the vars/secrets to live values and redeploy.
 - **Manual fallback:** `tools/issue_license.py` still issues keys by hand.
 
 
+## Verified live (2026-07-23)
+
+Confirmed against the live account and the deployed Worker:
+
+- `GET /health` returns `200 {"ok":true}`.
+- `POST /paddle/webhook` with a deliberately bad `Paddle-Signature` returns
+  **401 `invalid signature`** — so `PADDLE_WEBHOOK_SECRET` is set and enforced,
+  not quietly absent.
+- Destination `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` is `active` and subscribed to
+  all eight events this Worker handles.
+- Catalogue matches `PRICE_TIERS` exactly: $29 one-time, $149/yr, $349/yr.
+
+**Not yet proven:** no purchase has completed the chain, so the mint-and-email
+path has never actually run. `RESEND_API_KEY` and `LICENSE_PRIVATE_KEY_PEM`
+cannot be read back out of Cloudflare — secrets are write-only by design — and
+both fail silently. A wrong Resend key mints a licence that is never delivered;
+a wrong private key delivers one that will not verify in the app. See
+`GO-LIVE.md` for the zero-cost test that closes this gap.
+
 ## Live wiring (as configured 2026-07-22)
 
 Paddle product `pro_01ky2h8cfe2ven8ypchnmfbena` — "Easy-Post Desktop License":
