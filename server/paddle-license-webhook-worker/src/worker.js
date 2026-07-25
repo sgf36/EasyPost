@@ -163,6 +163,104 @@ async function getCustomerEmail(base, apiKey, customerId) {
   return (await r.json()).data.email;
 }
 
+// --- Contact-form AI triage -------------------------------------------------
+// The cheapest Anthropic model drafts a first reply to general enquiries. It is
+// grounded in the facts below and nothing else, gated behind a confidence flag,
+// and never lets an outage or a bad answer swallow a message: the owner is
+// always forwarded the original regardless of what the AI does.
+const AI_MODEL = "claude-haiku-4-5-20251001";
+const AI_TRIAGE_DAILY_CAP = 50;
+// Only these topics are auto-answered. Activation, refunds and bug reports need
+// account-specific action or judgement, so they are acknowledged and routed to
+// a human rather than adjudicated by a model.
+const AI_AUTO_TOPICS = new Set(["Question before buying", "Something else"]);
+
+const TRIAGE_FACTS = `- Easy-Post Desktop is an independent, open-source desktop app for Windows and macOS that drives the customer's OWN EasyPost account. It does not sell postage; labels are bought through the customer's EasyPost account and EasyPost bills them directly.
+- An EasyPost account (free at easypost.com) and API key are required. A test-mode key lets them try everything with no real charges.
+- Pricing: Personal is $29 one-time for up to 3 computers and never expires. Business is $149/year for up to 10 computers. Organisation is $349/year for up to 30. Both annual tiers are subscriptions, cancellable at any time. Enterprise (more than 30 computers) is by enquiry.
+- Summer 2026 offer: 26% off Personal for the first 26 customers with code SUMMER26 at checkout, bringing it to $21.46.
+- Every purchase has a 30-day money-back guarantee, no reason required. Refunds are handled by Paddle (the Merchant of Record) back to the original payment method, usually within 3 to 5 business days.
+- The licence key is emailed immediately after purchase to the address used at checkout; if it is missing, check the spam folder. The Microsoft Store version needs no licence key.
+- Each licence covers a set number of computers; the first run on a machine claims a place. A machine can be released from Settings, or from a new machine; a computer not seen for six months releases its place automatically.
+- The Windows direct download shows a SmartScreen "Windows protected your PC" warning because it is not yet code-signed: click More info, then Run anyway. The Microsoft Store build is signed by Microsoft and shows no warning. The macOS build is signed and notarized by Apple.
+- Supported systems: Windows 10 version 1809 or later (64-bit), or macOS 12 or later (Apple Silicon or Intel). The interface is available in fifty languages.
+- Downloads and checksums: https://easy-post.spencerfields.com/download.html . Full FAQ: https://easy-post.spencerfields.com/faq.html . Source code: https://github.com/sgf36/EasyPost .
+- The application stores data locally and has no analytics or telemetry; activation sends only a one-way fingerprint. Details: https://easy-post.spencerfields.com/privacy.html .
+- Contact: Apps@spencerfields.com or +44 20 8132 5790.`;
+
+async function resendSend(env, { from, to, replyTo, subject, text }) {
+  return fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + env.RESEND_API_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ from, to: [to], reply_to: replyTo, subject, text }),
+  });
+}
+
+async function underAiCap(db) {
+  if (!db) return false;
+  try {
+    await db.prepare("CREATE TABLE IF NOT EXISTS ai_triage_log (at TEXT)").run();
+    const since = new Date(Date.now() - 864e5).toISOString();
+    const row = await db
+      .prepare("SELECT COUNT(*) AS n FROM ai_triage_log WHERE at > ?")
+      .bind(since)
+      .first();
+    return (row?.n ?? 0) < AI_TRIAGE_DAILY_CAP;
+  } catch {
+    return false;
+  }
+}
+
+async function logAiUse(db) {
+  try {
+    await db.prepare("INSERT INTO ai_triage_log (at) VALUES (?)").bind(new Date().toISOString()).run();
+  } catch {}
+}
+
+// Returns { confident: boolean, reply: string } or null if the call or parse
+// fails. The model is told to answer only from TRIAGE_FACTS and to set
+// confident=false whenever it cannot, which is the gate that keeps a guessed
+// answer from ever reaching a customer.
+async function aiAnswer(env, { topic, message }) {
+  const system =
+    "You are the automated first-response assistant for Easy-Post Desktop customer support. " +
+    "Answer the customer's question using ONLY the facts below. Write in British English, warm and concise " +
+    "(a short paragraph or two). Do not add a greeting with the customer's name, a signature, or any note that " +
+    "the reply is automated — those are added around your text. If the question cannot be fully and confidently " +
+    "answered from these facts, or needs account-specific action (looking up an order, issuing a refund, debugging " +
+    "a crash), set confident to false and leave reply empty. Never invent prices, policies or dates. Never promise " +
+    "a refund or make commitments on the business's behalf.\n\nFACTS:\n" +
+    TRIAGE_FACTS +
+    '\n\nRespond with STRICT JSON only — no prose, no code fences: {"confident": true|false, "reply": "..."}';
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: AI_MODEL,
+      max_tokens: 700,
+      system,
+      messages: [{ role: "user", content: `Topic: ${topic}\n\n${message}` }],
+    }),
+  });
+  if (!r.ok) throw new Error("anthropic " + r.status);
+  const data = await r.json();
+  const raw = (data.content && data.content[0] && data.content[0].text) || "";
+  let parsed;
+  try {
+    parsed = JSON.parse(raw.trim().replace(/^```json\s*/i, "").replace(/```$/, "").trim());
+  } catch {
+    return null;
+  }
+  return typeof parsed.confident === "boolean" ? parsed : null;
+}
+
 /**
  * Relay a contact-form submission from easy-post.spencerfields.com.
  *
@@ -198,33 +296,72 @@ async function handleContact(request, env) {
 
   const to = env.CONTACT_TO_EMAIL;
   const ip = String(body.ip || "unknown").slice(0, 45);
-  const text =
+
+  // 1) Triage. Try an AI first-reply for general enquiries only, with a key
+  //    present and under the daily cap. Anything unexpected here degrades to
+  //    "no auto-reply" — it never blocks the forward to the owner below.
+  let aiReply = null;
+  let triageNote = "Not eligible for auto-reply; routed to you.";
+  const eligible = AI_AUTO_TOPICS.has(topic) && env.ANTHROPIC_API_KEY;
+  if (eligible && (await underAiCap(env.LICENSES))) {
+    try {
+      const res = await aiAnswer(env, { topic, message });
+      await logAiUse(env.LICENSES);
+      if (res && res.confident && res.reply && res.reply.trim().length > 20) {
+        aiReply = res.reply.trim();
+        triageNote = "AUTO-REPLIED to the customer:\n\n" + aiReply;
+      } else {
+        triageNote = "AI declined (low confidence); acknowledged and routed to you.";
+      }
+    } catch (e) {
+      triageNote = "AI call failed (" + String(e).slice(0, 80) + "); acknowledged and routed to you.";
+    }
+  } else if (eligible) {
+    triageNote = "AI daily cap reached; acknowledged and routed to you.";
+  }
+
+  // 2) Reply to the customer — the AI answer if we have one, otherwise a plain
+  //    acknowledgement. Best-effort: a failure here must not lose the message.
+  const customerText = aiReply
+    ? aiReply +
+      "\n\n— Easy-Post Desktop support\n\n" +
+      "This is an automated first reply. If it does not fully answer your question, just reply to this " +
+      "email and a member of the team will pick it up personally."
+    : "Hello " + name + ",\n\n" +
+      "Thank you for contacting Easy-Post Desktop support. We have received your message" +
+      (topic ? ' about "' + topic + '"' : "") +
+      " and a member of the team will reply personally, usually within one business day.\n\n" +
+      "— Easy-Post Desktop support";
+  try {
+    await resendSend(env, {
+      from: "Easy-Post Desktop Support <" + env.LICENSE_FROM_EMAIL + ">",
+      to: email,
+      replyTo: to,
+      subject: "Re: " + topic + " — Easy-Post Desktop",
+      text: customerText,
+    });
+  } catch {}
+
+  // 3) Forward the original to the owner. This is the safety net, so its success
+  //    is what the endpoint reports — the customer reply above is a bonus.
+  const ownerText =
     "A message was sent from the Easy-Post Desktop contact form.\n\n" +
-    "Name:  " + name + "\nEmail: " + email + "\nTopic: " + topic + "\n" +
-    "IP:    " + ip + "\n\n" +
+    "Name:  " + name + "\nEmail: " + email + "\nTopic: " + topic + "\nIP:    " + ip + "\n\n" +
+    "Triage: " + triageNote + "\n\n" +
     "-----------------------------------------\n\n" + message + "\n";
-
-  const r = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + env.RESEND_API_KEY,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "Easy-Post Desktop <" + env.LICENSE_FROM_EMAIL + ">",
-      to: [to],
-      reply_to: email,
-      subject: "[Easy-Post Desktop] " + topic + " — " + name,
-      text,
-    }),
+  const r = await resendSend(env, {
+    from: "Easy-Post Desktop <" + env.LICENSE_FROM_EMAIL + ">",
+    to,
+    replyTo: email,
+    subject: (aiReply ? "[auto-replied] " : "[needs reply] ") + topic + " — " + name,
+    text: ownerText,
   });
-
   if (!r.ok) {
     // Surface the reason so the PHP side can log it and fall back to mail().
     const detail = await r.text().catch(() => "");
     return json({ error: "resend", status: r.status, detail: detail.slice(0, 300) }, 502);
   }
-  return json({ status: "sent" });
+  return json({ status: "sent", auto_replied: Boolean(aiReply) });
 }
 
 async function sendLicenseEmail(apiKey, from, to, licenseKey, tier = "personal") {
