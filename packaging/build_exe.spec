@@ -17,6 +17,13 @@ block_cipher = None
 project_root = Path(SPECPATH).parent
 icons_dir = project_root / "packaging" / "icons"
 
+# Application manifest embedded into the GUI exe. It declares the process
+# Per-Monitor v2 DPI-aware at the manifest level so Windows applies awareness
+# at process creation — this is what clears the WACK DPIAwarenessValidation
+# warning and keeps the UI crisp on high-DPI / scaled displays. PyInstaller
+# preserves the custom windowsSettings block (see the manifest's own comment).
+gui_manifest = str(project_root / "packaging" / "EasyPostDesktop.exe.manifest")
+
 # Build-variant flags. app/config.py looks for these next to the other
 # resources at runtime, using the same Path(__file__).parent pattern that
 # app/i18n.py uses for locales — so they only take effect if they are actually
@@ -104,6 +111,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon=str(icons_dir / "app_icon.ico"),
+    manifest=gui_manifest,
 )
 
 coll = COLLECT(
