@@ -28,7 +28,7 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $PSScriptRoot
 if (-not $MsixPath) {
-    $MsixPath = Join-Path $repo "store_assets\submission\EasyPostDesktop_1.0.4.0.msix"
+    $MsixPath = Join-Path $repo "store_assets\submission\EasyPostDesktop_1.0.5.0.msix"
 }
 if (-not (Test-Path $MsixPath)) { throw "MSIX not found: $MsixPath" }
 

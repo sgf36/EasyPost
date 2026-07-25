@@ -104,7 +104,7 @@ same build.
 | Licence gate | **Off** | **On** |
 | MCP / AI agents | **Off** | **On** |
 | Signing | Store re-signs on publish | Apple Developer ID + notarization |
-| Status | `1.0.4.0` submitted for certification | Checkout live; licence email unproven |
+| Status | `1.0.4.0` in certification; `1.0.5.0` (DPI-aware) prepared to supersede | Checkout live; licence email unproven |
 
 Both differences are compiled in or out by **variant flag files** under
 `app/resources/`, created at package time by CI and never committed:

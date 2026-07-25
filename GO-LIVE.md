@@ -8,7 +8,8 @@ button only the account owner should press.
 
 | Piece | State |
 |---|---|
-| Store package `1.0.4.0` | Built by CI, downloaded and verified — `resources.pri` present, single `en-US` resource language, signed, no variant flags, no MCP helper, no donation strings |
+| Store package `1.0.4.0` | Uploaded to Partner Center and in certification. Verified — `resources.pri` present, single `en-US` resource language, signed, no variant flags, no MCP helper, no donation strings. WACK run locally: overall WARNING (a pass), the one FAIL an optional Blocked-executables false-positive, the one WARNING DPIAwarenessValidation |
+| Store package `1.0.5.0` | Prepared: embeds a Per-Monitor v2 DPI-aware manifest in the exe to clear the WACK DPI warning. Will be built by CI on push; supersedes 1.0.4.0 at the next submission |
 | Store listings | 47 languages, 9 screenshots and 9 captions each, imported and verified |
 | Paddle catalogue | Product `pro_01ky2h8cfe2ven8ypchnmfbena`; Personal $29 one-time, Business $149/yr, Organisation $349/yr — matches the Worker's `PRICE_TIERS` exactly |
 | Webhook destination | `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh`, active, subscribed to the eight events the Worker handles |
