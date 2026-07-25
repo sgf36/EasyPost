@@ -37,6 +37,58 @@ import {
 
 const SIGNATURE_TOLERANCE_SECONDS = 300;
 
+// The advertised launch offer. The website shows how many of the 26 remain and
+// hides its banner once they are gone, by reading GET /promo below. The count
+// is kept in D1 (promo_redemptions), incremented as discounted purchases
+// complete, rather than queried from Paddle on every page load — so a busy
+// pricing page costs nothing at Paddle and the Worker's API key stays scoped to
+// the minimum. Paddle remains the real gate: it enforces usage_limit at
+// checkout regardless of what this count says.
+const PROMO = {
+  id: "dsc_01kyb9g2cvkr6bsck13gngk3xf",
+  code: "SUMMER26",
+  limit: 26,
+  expiresAt: "2026-09-30T23:59:59Z",
+};
+
+// Same allow-list origin for the browser-facing GET endpoints.
+const SITE_ORIGIN = "https://easy-post.spencerfields.com";
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": SITE_ORIGIN,
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Max-Age": "86400",
+};
+
+// A discounted purchase, recorded once per transaction. INSERT OR IGNORE keeps
+// a Paddle webhook retry from double-counting, since the transaction id is the
+// primary key.
+async function recordPromoRedemption(db, discountId, txnId) {
+  if (!discountId || !txnId) return;
+  try {
+    await db.prepare(
+      "INSERT OR IGNORE INTO promo_redemptions (transaction_id, discount_id, at) VALUES (?, ?, ?)"
+    ).bind(txnId, discountId, new Date().toISOString().replace(/\.\d{3}Z$/, "Z")).run();
+  } catch {
+    // A missing table or a write hiccup must never fail the licence webhook —
+    // the banner is cosmetic, the licence is not.
+  }
+}
+
+async function promoStatus(db) {
+  let used = 0;
+  try {
+    const row = await db.prepare(
+      "SELECT COUNT(*) AS n FROM promo_redemptions WHERE discount_id = ?"
+    ).bind(PROMO.id).first();
+    used = row?.n ?? 0;
+  } catch {
+    used = 0;
+  }
+  const remaining = Math.max(0, PROMO.limit - used);
+  const live = remaining > 0 && Date.now() < Date.parse(PROMO.expiresAt);
+  return { code: PROMO.code, limit: PROMO.limit, used, remaining, active: live };
+}
+
 /**
  * Which tier a Paddle price buys. Set PRICE_TIERS in wrangler.toml as JSON:
  *   { "pri_abc": "personal", "pri_def": "business", "pri_ghi": "organisation" }
@@ -230,6 +282,24 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/health") return json({ ok: true });
+
+    // Public, read-only: how many of the launch discount remain. Cached briefly
+    // at the edge so a burst of pricing-page views collapses to one D1 read.
+    if (url.pathname === "/promo") {
+      if (request.method === "OPTIONS") {
+        return new Response(null, { status: 204, headers: CORS_HEADERS });
+      }
+      if (request.method === "GET") {
+        const status = await promoStatus(env.LICENSES);
+        return new Response(JSON.stringify(status), {
+          headers: {
+            "content-type": "application/json",
+            "cache-control": "public, max-age=60",
+            ...CORS_HEADERS,
+          },
+        });
+      }
+    }
     if (request.method === "POST" && url.pathname === "/contact") {
       return handleContact(request, env);
     }
@@ -300,6 +370,12 @@ export default {
     const priceIds = (data.items || []).map((i) => i.price && i.price.id);
     const tier = tierForPrice(env, priceIds);
     if (!tier) return json({ ignored: "other-price" });
+
+    // Count the launch discount against its 26, so the website can show how many
+    // are left. Only real first purchases carry it; a renewal never does.
+    if (env.LICENSES && data.discount_id === PROMO.id && data.origin !== "subscription_recurring") {
+      await recordPromoRedemption(env.LICENSES, data.discount_id, data.id || "");
+    }
 
     const base = env.PADDLE_API_BASE || "https://api.paddle.com";
     const product = env.LICENSE_PRODUCT_ID || "easypost-desktop";
