@@ -25,3 +25,6 @@ CONTACT_TO_EMAIL = "Apps@spencerfields.com"
 # Secrets are NOT stored here — set them with `wrangler secret put`:
 #   LICENSE_PRIVATE_KEY_PEM  PADDLE_WEBHOOK_SECRET  PADDLE_API_KEY
 #   RESEND_API_KEY  CONTACT_SHARED_SECRET
+#   ANTHROPIC_API_KEY   ← contact-form AI triage. If unset, the form still
+#                         works: it just acknowledges and routes to a human
+#                         instead of drafting an auto-reply.
