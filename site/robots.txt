@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# thank-you.html is intentionally not disallowed here: it carries its own
+# <meta name="robots" content="noindex">, and a crawler must be allowed to
+# fetch the page to see that tag. Disallowing it would leave it as a URL-only
+# entry Google could still list.
+
+Sitemap: https://easy-post.spencerfields.com/sitemap.xml
