@@ -225,3 +225,29 @@ section + section { border-top: 1px solid var(--rule); }
 .site-foot a:hover { color: var(--green); text-decoration: underline; }
 .site-foot .legal-line { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--rule); margin-bottom: 1.1em; }
 .site-foot .copyright { margin: 0; }
+
+/* ---- promo banner (Summer 2026 launch offer) ---- */
+.promo {
+  background: var(--cream);
+  border: 1px solid var(--green);
+  border-radius: 10px;
+  padding: 1.1rem 1.4rem;
+  margin: 0 0 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem 1rem;
+  line-height: 1.5;
+}
+.promo .promo-tag {
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+  font-weight: 600; color: var(--green); white-space: nowrap;
+}
+.promo strong { color: var(--ink); }
+.promo code {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  background: var(--white); border: 1px dashed var(--green);
+  color: var(--green-dark); padding: .12em .5em; border-radius: 5px;
+  font-weight: 600; letter-spacing: .05em; white-space: nowrap;
+}
+.hero .promo { margin-top: 1.8rem; margin-bottom: 0; }
