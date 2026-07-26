@@ -35,6 +35,13 @@ import {
   TIER_SEATS,
 } from "./activation.js";
 
+import {
+  contactCustomerEmail,
+  contactOwnerEmail,
+  licenseEmail,
+  newCaseId,
+} from "./emails.js";
+
 const SIGNATURE_TOLERANCE_SECONDS = 300;
 
 // The advertised launch offer. The website shows how many of the 26 remain and
@@ -188,15 +195,37 @@ const TRIAGE_FACTS = `- Easy-Post Desktop is an independent, open-source desktop
 - The application stores data locally and has no analytics or telemetry; activation sends only a one-way fingerprint. Details: https://easy-post.spencerfields.com/privacy.html .
 - Contact: Apps@spencerfields.com or +44 20 8132 5790.`;
 
-async function resendSend(env, { from, to, replyTo, subject, text }) {
+async function resendSend(env, { from, to, replyTo, subject, text, html }) {
+  const payload = { from, to: [to], reply_to: replyTo, subject, text };
+  if (html) payload.html = html;
   return fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: "Bearer " + env.RESEND_API_KEY,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from, to: [to], reply_to: replyTo, subject, text }),
+    body: JSON.stringify(payload),
   });
+}
+
+// Best-effort record of a contact case so a support reference (EPD-YYMMDD-XXXX)
+// can be traced back to the original enquiry later. Never blocks a reply: the
+// table is created on demand and any failure is swallowed.
+async function logContactCase(db, { caseId, name, email, topic, autoReplied }) {
+  if (!db) return;
+  try {
+    await db
+      .prepare(
+        "CREATE TABLE IF NOT EXISTS contact_cases (case_id TEXT PRIMARY KEY, at TEXT, name TEXT, email TEXT, topic TEXT, auto_replied INTEGER)"
+      )
+      .run();
+    await db
+      .prepare(
+        "INSERT OR IGNORE INTO contact_cases (case_id, at, name, email, topic, auto_replied) VALUES (?,?,?,?,?,?)"
+      )
+      .bind(caseId, new Date().toISOString(), name, email, topic, autoReplied ? 1 : 0)
+      .run();
+  } catch {}
 }
 
 async function underAiCap(db) {
@@ -320,90 +349,56 @@ async function handleContact(request, env) {
     triageNote = "AI daily cap reached; acknowledged and routed to you.";
   }
 
+  // Assign a support reference and record it (best-effort). Generated before
+  // sending so the same number appears in the customer reply, the owner forward,
+  // and both subject lines.
+  const caseId = newCaseId();
+  const autoReplied = Boolean(aiReply);
+  await logContactCase(env.LICENSES, { caseId, name, email, topic, autoReplied });
+
   // 2) Reply to the customer — the AI answer if we have one, otherwise a plain
   //    acknowledgement. Best-effort: a failure here must not lose the message.
-  const customerText = aiReply
-    ? aiReply +
-      "\n\n— Easy-Post Desktop support\n\n" +
-      "This is an automated first reply. If it does not fully answer your question, just reply to this " +
-      "email and a member of the team will pick it up personally."
-    : "Hello " + name + ",\n\n" +
-      "Thank you for contacting Easy-Post Desktop support. We have received your message" +
-      (topic ? ' about "' + topic + '"' : "") +
-      " and a member of the team will reply personally, usually within one business day.\n\n" +
-      "— Easy-Post Desktop support";
+  const customer = contactCustomerEmail({ name, topic, caseId, aiReply });
   try {
     await resendSend(env, {
       from: "Easy-Post Desktop Support <" + env.LICENSE_FROM_EMAIL + ">",
       to: email,
       replyTo: to,
-      subject: "Re: " + topic + " — Easy-Post Desktop",
-      text: customerText,
+      subject: customer.subject,
+      text: customer.text,
+      html: customer.html,
     });
   } catch {}
 
   // 3) Forward the original to the owner. This is the safety net, so its success
   //    is what the endpoint reports — the customer reply above is a bonus.
-  const ownerText =
-    "A message was sent from the Easy-Post Desktop contact form.\n\n" +
-    "Name:  " + name + "\nEmail: " + email + "\nTopic: " + topic + "\nIP:    " + ip + "\n\n" +
-    "Triage: " + triageNote + "\n\n" +
-    "-----------------------------------------\n\n" + message + "\n";
+  const owner = contactOwnerEmail({
+    name, email, topic, ip, caseId, triageNote, message, autoReplied,
+  });
   const r = await resendSend(env, {
     from: "Easy-Post Desktop <" + env.LICENSE_FROM_EMAIL + ">",
     to,
     replyTo: email,
-    subject: (aiReply ? "[auto-replied] " : "[needs reply] ") + topic + " — " + name,
-    text: ownerText,
+    subject: owner.subject,
+    text: owner.text,
+    html: owner.html,
   });
   if (!r.ok) {
     // Surface the reason so the PHP side can log it and fall back to mail().
     const detail = await r.text().catch(() => "");
     return json({ error: "resend", status: r.status, detail: detail.slice(0, 300) }, 502);
   }
-  return json({ status: "sent", auto_replied: Boolean(aiReply) });
+  return json({ status: "sent", auto_replied: autoReplied, case_id: caseId });
 }
 
 async function sendLicenseEmail(apiKey, from, to, licenseKey, tier = "personal") {
   const seats = TIER_SEATS[tier] ?? TIER_SEATS.personal;
   const annual = TIER_PLANS[tier] === "annual";
-  const allowance = seats === 0
-    ? "This key has no computer limit."
-    : `This key covers up to ${seats} computer${seats === 1 ? "" : "s"}.`;
-  const billing = annual
-    ? "This is an annual subscription. Keep this key — it stays the same every "
-      + "year, and renewals are applied automatically. You will not be sent a new one."
-    : "This is a one-time purchase. The key does not expire.";
-  // The download link points at a page on the product site rather than at
-  // release assets directly, so the builds can be re-cut without redeploying
-  // this Worker — and so a customer who keeps the email still finds a current
-  // download a year from now.
-  const text =
-    "Thank you for buying Easy-Post Desktop.\n\n" +
-    "Your license key:\n\n" +
-    `${licenseKey}\n\n` +
-    `${allowance}\n${billing}\n\n` +
-    "STEP 1 — Download the application\n\n" +
-    "  https://easy-post.spencerfields.com/download.html\n\n" +
-    "  Windows and macOS builds are both there. Windows shows a blue " +
-    "\"Windows protected your PC\" screen the first time, because the download " +
-    "is not yet code-signed — click \"More info\", then \"Run anyway\". The " +
-    "download page explains this and lists the checksums if you would like to " +
-    "verify the file first.\n\n" +
-    "STEP 2 — Activate\n\n" +
-    "  Open Easy-Post Desktop, paste the key above on the activation screen, " +
-    "and click Activate. Keep this email for your records.\n\n" +
-    "STEP 3 — Connect your EasyPost account\n\n" +
-    "  The application ships no postage of its own: it drives your own " +
-    "EasyPost account. Paste your EasyPost API key when asked. A test-mode key " +
-    "lets you explore everything without buying real labels.\n\n" +
-    "Changing computers? Open Settings and release the old one first, or " +
-    "release it from the new computer when prompted.\n\n" +
-    "Questions? Apps@spencerfields.com\n";
+  const { subject, text, html } = licenseEmail({ licenseKey, seats, annual });
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from, to: [to], subject: "Your Easy-Post Desktop license key", text }),
+    body: JSON.stringify({ from, to: [to], subject, text, html }),
   });
   if (!r.ok) throw new Error(`resend ${r.status}`);
 }
