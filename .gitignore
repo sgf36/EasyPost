@@ -30,3 +30,6 @@ server/paddle-license-webhook-worker/bundle*.b64
 
 # wrangler local state
 server/paddle-license-webhook-worker/.wrangler/
+
+# Internal marketing drafts — not for the public repo
+marketing/
