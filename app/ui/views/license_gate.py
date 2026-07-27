@@ -60,6 +60,7 @@ QPushButton#activateButton:hover { background-color: #2c5282; }
 
 class LicenseGate(QWidget):
     activated = Signal()
+    use_test_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -96,6 +97,13 @@ class LicenseGate(QWidget):
         self._activate_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._activate_btn.clicked.connect(self._on_activate)
 
+        # Escape hatch: this screen appears only when the user reaches for
+        # production, so there is always a free way back to test mode.
+        self._use_test_btn = QPushButton()
+        self._use_test_btn.setFlat(True)
+        self._use_test_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._use_test_btn.clicked.connect(self.use_test_requested.emit)
+
         button_row = QHBoxLayout()
         button_row.addWidget(self._buy_btn)
         button_row.addStretch(1)
@@ -108,6 +116,7 @@ class LicenseGate(QWidget):
         card_layout.addWidget(self._key_input)
         card_layout.addSpacing(4)
         card_layout.addLayout(button_row)
+        card_layout.addWidget(self._use_test_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(24, 24, 24, 24)
@@ -128,6 +137,7 @@ class LicenseGate(QWidget):
         self._key_input.setPlaceholderText(tr("license_gate.key_placeholder"))
         self._buy_btn.setText(tr("license_gate.buy_button"))
         self._activate_btn.setText(tr("license_gate.activate_button"))
+        self._use_test_btn.setText(tr("license_gate.use_test_button"))
         self.setLayoutDirection(
             Qt.LayoutDirection.RightToLeft if is_rtl() else Qt.LayoutDirection.LeftToRight
         )

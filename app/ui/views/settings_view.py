@@ -31,6 +31,7 @@ from app.core.webhook_manager import (
 )
 from app.i18n import SUPPORTED_LOCALES, tr
 from app.ui.widgets.async_worker import run_async
+from app.ui.widgets.key_verification import verify_key_slots
 
 
 class SettingsView(QWidget):
@@ -53,13 +54,13 @@ class SettingsView(QWidget):
         form.addRow(tr("settings.test_key_label"), self._test_key_input)
         form.addRow(tr("settings.prod_key_label"), self._prod_key_input)
 
-        save_btn = QPushButton(tr("settings.save_button"))
-        save_btn.clicked.connect(self._on_save)
+        self._save_btn = QPushButton(tr("settings.save_button"))
+        self._save_btn.clicked.connect(self._on_save)
 
         button_row = QHBoxLayout()
         button_row.addWidget(show_keys_btn)
         button_row.addStretch(1)
-        button_row.addWidget(save_btn)
+        button_row.addWidget(self._save_btn)
 
         layout = QVBoxLayout(self)
         layout.addWidget(title)
@@ -224,15 +225,31 @@ class SettingsView(QWidget):
         self._prod_key_input.setEchoMode(mode)
 
     def _on_save(self) -> None:
-        creds = load_credentials()
-        creds.test_key = self._test_key_input.text().strip() or None
-        creds.production_key = self._prod_key_input.text().strip() or None
-        if not creds.has_mode(creds.active_mode):
-            # Active mode's key was just cleared; fall back to whichever
-            # mode still has a key, if any.
-            for fallback in ("test", "production"):
-                if creds.has_mode(fallback):
-                    creds.active_mode = fallback
-                    break
-        save_credentials(creds)
-        QMessageBox.information(self, tr("settings.saved_title"), tr("settings.saved_body"))
+        test_key = self._test_key_input.text().strip()
+        prod_key = self._prod_key_input.text().strip()
+
+        # Verify each key's true mode with EasyPost before saving, so a
+        # production key cannot be stored in the free test field.
+        def save() -> None:
+            creds = load_credentials()
+            creds.test_key = test_key or None
+            creds.production_key = prod_key or None
+            if not creds.has_mode(creds.active_mode):
+                # Active mode's key was just cleared; fall back to whichever
+                # mode still has a key, if any.
+                for fallback in ("test", "production"):
+                    if creds.has_mode(fallback):
+                        creds.active_mode = fallback
+                        break
+            save_credentials(creds)
+            QMessageBox.information(
+                self, tr("settings.saved_title"), tr("settings.saved_body")
+            )
+
+        verify_key_slots(self, test_key, prod_key, on_ok=save, on_busy=self._set_keys_busy)
+
+    def _set_keys_busy(self, busy: bool) -> None:
+        self._save_btn.setEnabled(not busy)
+        self._save_btn.setText(
+            tr("key_check.verifying") if busy else tr("settings.save_button")
+        )

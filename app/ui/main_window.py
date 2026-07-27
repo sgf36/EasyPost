@@ -11,9 +11,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import APP_NAME, LICENSE_REQUIRED
+from app.config import APP_NAME, LICENSE_REQUIRED, MODE_PRODUCTION, MODE_TEST
 from app.core.client import client_manager
 from app.core.activation import ensure_seat
+from app.core.credential_store import load_credentials, save_credentials
 from app.core.license import load_active_license
 from app.core.settings import load_settings
 from app.core.webhook_manager import webhook_manager
@@ -46,9 +47,13 @@ class MainWindow(QMainWindow):
         self._root_stack = QStackedWidget()
         self.setCentralWidget(self._root_stack)
         self._pending_webhook_task = None
+        # True while the licence gate is being shown to unlock production
+        # (rather than as a first-run wall). Governs where activation returns to.
+        self._pending_production = False
 
         self._license_gate = LicenseGate()
         self._license_gate.activated.connect(self._on_license_activated)
+        self._license_gate.use_test_requested.connect(self._on_use_test_mode)
         self._root_stack.addWidget(self._license_gate)
 
         self._setup_wizard = SetupWizard()
@@ -85,6 +90,7 @@ class MainWindow(QMainWindow):
         outer.setSpacing(0)
 
         self._mode_banner = ModeBanner()
+        self._mode_banner.production_locked.connect(self._on_production_locked)
         outer.addWidget(self._mode_banner)
 
         body = QWidget()
@@ -212,14 +218,33 @@ class MainWindow(QMainWindow):
             on_show()
 
     def _route_startup(self) -> None:
-        """Gate order on launch: license first, then EasyPost credentials,
-        then the app shell."""
-        if LICENSE_REQUIRED and not self._license_ok():
-            self._root_stack.setCurrentWidget(self._license_gate)
-        elif client_manager.credentials.active_key():
+        """The app opens free in test mode. Production — real labels, real
+        money — needs a licence in direct-download builds: if production is the
+        active mode but not unlocked, fall back to free test mode so the app
+        still opens, and only show the licence gate when there is no test key to
+        fall back to. Then: EasyPost credentials, then the app shell."""
+        client_manager.reload()
+        creds = client_manager.credentials
+        if creds.active_mode == MODE_PRODUCTION and not self._production_ok():
+            if creds.has_mode(MODE_TEST):
+                creds.active_mode = MODE_TEST
+                save_credentials(creds)
+                client_manager.reload()
+            else:
+                self._pending_production = True
+                self._root_stack.setCurrentWidget(self._license_gate)
+                return
+        if client_manager.credentials.active_key():
             self._show_app_shell()
         else:
             self._root_stack.setCurrentWidget(self._setup_wizard)
+
+    def _production_ok(self) -> bool:
+        """Entitled to production right now: either a build with no licence gate,
+        or a valid licence with a seat on this computer."""
+        if not LICENSE_REQUIRED:
+            return True
+        return self._license_ok()
 
     def _license_ok(self) -> bool:
         """A valid key, and a seat on this computer to go with it.
@@ -234,7 +259,35 @@ class MainWindow(QMainWindow):
         return ensure_seat(info)
 
     def _on_license_activated(self) -> None:
+        """Activation succeeded in the gate. If the gate was shown to unlock
+        production (not as a first-run wall), switch into production now."""
+        if self._pending_production:
+            self._pending_production = False
+            creds = load_credentials()
+            if creds.has_mode(MODE_PRODUCTION):
+                creds.active_mode = MODE_PRODUCTION
+                save_credentials(creds)
+                client_manager.reload()
         self._route_startup()
+
+    def _on_production_locked(self) -> None:
+        """The user reached for production without a licence: offer the gate."""
+        self._pending_production = True
+        self._root_stack.setCurrentWidget(self._license_gate)
+
+    def _on_use_test_mode(self) -> None:
+        """"Continue in test mode" from the gate: stay free."""
+        self._pending_production = False
+        creds = load_credentials()
+        if creds.has_mode(MODE_TEST):
+            if creds.active_mode != MODE_TEST:
+                creds.active_mode = MODE_TEST
+                save_credentials(creds)
+            client_manager.reload()
+            self._show_app_shell()
+        else:
+            # No test key yet — let them add one.
+            self._root_stack.setCurrentWidget(self._setup_wizard)
 
     def _show_app_shell(self) -> None:
         client_manager.reload()

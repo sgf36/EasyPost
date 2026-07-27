@@ -26,6 +26,7 @@ from app.config import MODE_PRODUCTION, MODE_TEST
 from app.core.credential_store import Credentials, save_credentials
 from app.core.settings import load_settings, save_settings
 from app.i18n import SUPPORTED_LOCALES, is_rtl, tr
+from app.ui.widgets.key_verification import verify_key_slots
 
 _CARD_MAX_WIDTH = 460
 
@@ -187,12 +188,23 @@ class SetupWizard(QWidget):
             )
             return
 
-        active_mode = MODE_TEST if test_key else MODE_PRODUCTION
-        save_credentials(
-            Credentials(
-                test_key=test_key or None,
-                production_key=prod_key or None,
-                active_mode=active_mode,
+        # Verify each key's true mode with EasyPost before saving, so a
+        # production key cannot be entered in the free test field.
+        def save() -> None:
+            active_mode = MODE_TEST if test_key else MODE_PRODUCTION
+            save_credentials(
+                Credentials(
+                    test_key=test_key or None,
+                    production_key=prod_key or None,
+                    active_mode=active_mode,
+                )
             )
+            self.setup_complete.emit()
+
+        verify_key_slots(self, test_key, prod_key, on_ok=save, on_busy=self._set_busy)
+
+    def _set_busy(self, busy: bool) -> None:
+        self._continue_btn.setEnabled(not busy)
+        self._continue_btn.setText(
+            tr("key_check.verifying") if busy else tr("setup_wizard.continue_button")
         )
-        self.setup_complete.emit()
