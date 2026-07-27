@@ -22,6 +22,7 @@ from typing import Optional
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
+from app.config import LICENSE_REQUIRED
 from app.core.settings import load_settings, save_settings
 
 # Public half of the license signing key. The private half is NOT in the repo.
@@ -154,6 +155,23 @@ def load_active_license() -> Optional[LicenseInfo]:
 
 def is_licensed() -> bool:
     return load_active_license() is not None
+
+
+def production_allowed() -> bool:
+    """Whether this build may operate in EasyPost production mode.
+
+    Test mode is always free. Production — real labels, real money — requires a
+    licence in direct-download builds (LICENSE_REQUIRED). Store builds carry no
+    such flag and are unrestricted.
+
+    The gate keys off a licence being present, never off which UI field a key
+    sits in: a production key is classified as production wherever it is entered
+    (see app/core/easypost_keys.py), so it cannot be run for free by pasting it
+    into the test field.
+    """
+    if not LICENSE_REQUIRED:
+        return True
+    return is_licensed()
 
 
 def activate(key: str) -> Optional[LicenseInfo]:
