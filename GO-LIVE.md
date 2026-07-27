@@ -4,6 +4,32 @@ State as of 2026-07-23. Everything in the repository is finished, committed and
 pushed. What remains needs either a credential this project does not hold or a
 button only the account owner should press.
 
+## Production-mode licence model — deploy WITH the next signed release
+
+The app now opens free in EasyPost **test** mode; a licence is required only for
+**production** (real labels). Code is done, tested and on `main`. The public
+copy below describes behaviour that only exists in a build containing this code,
+so it must be deployed **at the moment the new direct-download build is released**
+(itself gated on the Certum code-signing) — not before, or it would misdescribe
+the currently downloadable v1.0.4.
+
+To deploy at release (all drafted, none live yet):
+
+- **site/pricing.html** — reframe the direct-download line to "free to try in
+  test mode; a licence unlocks production (real labels)". Keep the tiers.
+- **site/faq.html** — add: "Do I have to pay to try it? No — it is free in
+  EasyPost test mode; a licence is only needed to ship in production."
+- **site/download.html** — one line: free in test mode, licence for production.
+- **Microsoft Store listing** — a sentence to the same effect (Store build is
+  unaffected functionally: it has no licence gate).
+- **Worker `TRIAGE_FACTS`** (server/paddle-license-webhook-worker/src/worker.js)
+  — update the pricing/trial fact so the AI support answers reflect the model;
+  then `wrangler deploy`.
+- **Direct-download version bump** for the release, and update download links +
+  checksums once the signed binaries exist.
+
+Deploy path for the site is the usual cPanel UAPI (see "Site" section below).
+
 ## Done
 
 | Piece | State |
