@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QComboBox, QHBoxLayout, QLabel, QWidget
 from app.config import MODE_PRODUCTION, MODE_TEST
 from app.core.client import client_manager
 from app.core.credential_store import Credentials, save_credentials
+from app.core.license import production_allowed
 from app.i18n import tr
 
 _TEST_STYLE = (
@@ -24,6 +25,9 @@ class ModeBanner(QWidget):
     """
 
     mode_changed = Signal(str)
+    # Emitted when the user reaches for production but the build isn't licensed.
+    # The main window shows the licence gate in response.
+    production_locked = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -62,6 +66,12 @@ class ModeBanner(QWidget):
     def _on_selection_changed(self, _index: int) -> None:
         new_mode = self._selector.currentData()
         creds: Credentials = client_manager.credentials
+        if new_mode == MODE_PRODUCTION and not production_allowed():
+            # Production needs a licence in this build. Revert to the current
+            # mode and let the window offer activation.
+            self.refresh()
+            self.production_locked.emit()
+            return
         if not creds.has_mode(new_mode):
             # No key stored for that mode yet; revert selection.
             self.refresh()
