@@ -101,7 +101,7 @@ same build.
 |---|---|---|
 | Package | `.msix` | `.dmg` (macOS), `.exe` folder (Windows) |
 | Price | Set in Partner Center | $29 one-time, or $149/$349 a year via Paddle |
-| Licence gate | **Off** | **On** |
+| Licence gate | **Off** | **Production mode only** — test mode is free |
 | MCP / AI agents | **Off** | **On** |
 | Signing | Store re-signs on publish | Apple Developer ID + notarization |
 | Status | `1.0.4.0` in certification; `1.0.5.0` (DPI-aware) prepared to supersede | Checkout live; licence email unproven |
@@ -179,6 +179,17 @@ wrong". Creating a transaction through the Paddle API returns the real error in
 one call; start there.
 
 ## Licensing (direct downloads only)
+
+**Free in test mode; a licence unlocks production.** The app runs with no
+licence in EasyPost *test* mode (no real carrier charges), so it can be tried in
+full for free with a test API key. Switching to *production* — real labels, real
+money — requires an activated licence. The gate keys off a key's **true mode**,
+not the field it was typed into: keys are verified against EasyPost when entered
+(`app/core/easypost_keys.py`) so a production key cannot be run for free by
+pasting it into the test field, and `client.get_client()` refuses a production
+client without a licence as a backstop (`app/core/client.py`). Being open source,
+this is honest-by-default rather than hardened DRM — the official builds enforce
+it and the casual "wrong field" bypass is closed.
 
 Four tiers. Personal is bought once and never expires; the two middle tiers
 renew annually.
