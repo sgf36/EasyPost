@@ -30,12 +30,24 @@ To deploy at release (all drafted, none live yet):
 
 Deploy path for the site is the usual cPanel UAPI (see "Site" section below).
 
+## Windows code signing — switched to Standard Code Signing (2026-07-27)
+
+Certum **rejected the Open Source Code Signing** application (order
+ZoZE/001522/US/24/07/2026): their reviewer judged the website presents a
+**company/commercial product**, and Open Source Code Signing is for individuals
+only. They instructed: cancel it, contact `reklamacje@certum.pl`, and switch to
+**Standard Code Signing**. That is the correct product for commercial software
+(the app is sold, even though the source is open), delivers the same SmartScreen
+benefit, and works with the same local `sign_windows_local.ps1` flow once issued.
+A switch email is drafted in Outlook. Until the Standard cert issues, the Windows
+**direct-download** build stays unsigned (SmartScreen warning). The **Microsoft
+Store** build is unaffected — Microsoft signs it on publish.
+
 ## Done
 
 | Piece | State |
 |---|---|
-| Store package `1.0.4.0` | Uploaded to Partner Center and in certification. Verified — `resources.pri` present, single `en-US` resource language, signed, no variant flags, no MCP helper, no donation strings. WACK run locally: overall WARNING (a pass), the one FAIL an optional Blocked-executables false-positive, the one WARNING DPIAwarenessValidation |
-| Store package `1.0.5.0` | Prepared: embeds a Per-Monitor v2 DPI-aware manifest in the exe to clear the WACK DPI warning. Will be built by CI on push; supersedes 1.0.4.0 at the next submission |
+| Store package `1.0.5.0` | **Uploaded to Partner Center and IN CERTIFICATION** (resubmitted 2026-07-29). Verified in the submission: single package, `v1.0.5.0` X64, `resources.pri` present, single `en-US` resource language. WACK = **PASS**. This fixes the prior cert failure (10.3.4 "App Is Testable": the old `1.0.3.0` declared invalid resource language `ha` with no `resources.pri`, so Windows could not register it — `0x80070057`). The failed submission had still been carrying `1.0.3.0`; `1.0.4.0` then `1.0.5.0` were the fixes, and `1.0.5.0` (which also clears the DPI warning) is what is now certifying. Old `1.0.4.0` removed on save as superseded |
 | Store listings | 47 languages, 9 screenshots and 9 captions each, imported and verified |
 | Paddle catalogue | Product `pro_01ky2h8cfe2ven8ypchnmfbena`; Personal $29 one-time, Business $149/yr, Organisation $349/yr — matches the Worker's `PRICE_TIERS` exactly |
 | Webhook destination | `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh`, active, subscribed to the eight events the Worker handles |
