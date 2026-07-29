@@ -104,7 +104,7 @@ same build.
 | Licence gate | **Off** | **Production mode only** — test mode is free |
 | MCP / AI agents | **Off** | **On** |
 | Signing | Store re-signs on publish | Apple Developer ID + notarization |
-| Status | `1.0.4.0` in certification; `1.0.5.0` (DPI-aware) prepared to supersede | Checkout live; licence email unproven |
+| Status | `1.0.5.0` **in certification** (resubmitted after fixing the 1.0.3.0 install failure) | Windows signing switched to Certum Standard Code Signing (pending) |
 
 Both differences are compiled in or out by **variant flag files** under
 `app/resources/`, created at package time by CI and never committed:
