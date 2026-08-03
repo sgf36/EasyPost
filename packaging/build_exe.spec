@@ -113,6 +113,12 @@ mcp_exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    # Same Per-Monitor v2 DPI manifest as the GUI exe. This helper is headless
+    # (console, no window) so DPI awareness is functionally moot, but WACK's
+    # DPIAwarenessValidation flags any exe in the package that lacks it — now
+    # that the Store build ships this helper, manifest it too to keep the
+    # certification report clean (a WARNING there does not block submission).
+    manifest=gui_manifest,
 )
 
 exe = EXE(
