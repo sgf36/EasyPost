@@ -31,17 +31,20 @@ STORE_BUILD = (Path(__file__).parent / "resources" / "store_build.flag").exists(
 # and team licences live on the website, so the Store unlock screen links here.
 MULTI_SEAT_URL = "https://easy-post.spencerfields.com/pricing.html"
 
-# The AI-agent (MCP) bridge is likewise direct-download only for now, and
-# gated on its own flag rather than reusing LICENSE_REQUIRED — they answer
-# different questions and will not always move together.
+# The AI-agent (MCP) bridge. Direct-download builds gate it on their own flag
+# (created at package time); the Store build supports it too — hence the
+# `or STORE_BUILD`.
 #
-# Connecting an agent means an external application launches a helper process
-# from inside this install and writes to config files belonging to other apps.
-# Under MSIX both of those run into packaging constraints: the install path is
-# virtualised, and writes outside the package are redirected. Rather than
-# discover that during Store certification, the Store build ships without the
-# feature and says so plainly in the UI.
-MCP_SUPPORTED = (Path(__file__).parent / "resources" / "mcp_supported.flag").exists()
+# The Store build reaches parity through two MSIX mechanisms that sidestep the
+# original packaging worries. The helper process is not launched from the
+# ACL-locked, version-stamped install path: it is exposed as an App Execution
+# Alias (`easypost-mcp.exe` on PATH — see packaging/msix/AppxManifest.xml and
+# app/core/mcp_clients.server_command), launched with the package's own
+# identity so its keyring and app data line up with the GUI. And connecting a
+# client never depends on a redirected cross-package write: the copy-paste
+# snippet in Tools > Connect AI agents always works, with the auto-write kept
+# as a convenience.
+MCP_SUPPORTED = (Path(__file__).parent / "resources" / "mcp_supported.flag").exists() or STORE_BUILD
 
 APP_DATA_DIR = Path(platformdirs.user_data_dir(APP_DIR_NAME, appauthor=False))
 DATABASE_PATH = APP_DATA_DIR / "easypost_desktop.sqlite3"

@@ -2,8 +2,9 @@
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap rescap">
+  IgnorableNamespaces="uap uap5 rescap">
 
   <Identity
     Name="SFields.Easy-PostDesktop"
@@ -55,6 +56,35 @@
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png" />
+    </Application>
+
+    <!--
+      The MCP (AI-agent) server, exposed as an App Execution Alias so any MCP
+      client (Claude Desktop, Cursor, VS Code, ...) can launch it by name on
+      PATH as `easypost-mcp.exe`. This is what lets the Store build reach parity
+      with the direct download: the alias is stable across Store updates (the
+      versioned WindowsApps install path is not) and runs the helper with this
+      package's identity, so its keyring and app data match the GUI's.
+
+      AppListEntry="none" keeps this helper off the Start menu — it is launched
+      by MCP clients, never by a person. It is the same console executable the
+      direct build ships (packaging/build_exe.spec's easypost-mcp).
+    -->
+    <Application Id="EasyPostMcp" Executable="EasyPostDesktop\easypost-mcp.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        AppListEntry="none"
+        DisplayName="Easy-Post Desktop MCP server"
+        Description="MCP server that lets an AI agent read your EasyPost shipping data."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png" />
+      <Extensions>
+        <uap5:Extension Category="windows.appExecutionAlias" Executable="EasyPostDesktop\easypost-mcp.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:AppExecutionAlias>
+            <uap5:ExecutionAlias Alias="easypost-mcp.exe" />
+          </uap5:AppExecutionAlias>
+        </uap5:Extension>
+      </Extensions>
     </Application>
   </Applications>
 </Package>

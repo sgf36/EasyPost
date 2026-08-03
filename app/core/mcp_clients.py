@@ -29,6 +29,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+from app.config import STORE_BUILD
+
 SERVER_KEY = "easypost-desktop"
 
 
@@ -89,10 +91,18 @@ def detect() -> list[McpClient]:
 def server_command() -> tuple[str, list[str]]:
     """How a client should launch our server.
 
-    Frozen builds expose a dedicated executable beside the main app, so the
-    client never needs a Python interpreter. From source we fall back to the
-    running interpreter and `-m`.
+    Microsoft Store build: the helper ships in the package and is exposed as an
+    App Execution Alias, so clients launch it by name on PATH. Crucially we do
+    NOT hand out the absolute install path — under MSIX that path is version
+    -stamped (it changes on every Store update) and ACL-locked, so a config
+    pointing at it would break. The bare alias is stable and carries the package
+    identity, so the helper's keyring and app data match the GUI's.
+
+    Frozen direct-download builds expose a dedicated executable beside the main
+    app. From source we fall back to the running interpreter and `-m`.
     """
+    if STORE_BUILD:
+        return "easypost-mcp.exe", []
     if getattr(sys, "frozen", False):
         exe_dir = Path(sys.executable).parent
         helper = exe_dir / ("easypost-mcp.exe" if sys.platform.startswith("win") else "easypost-mcp")
