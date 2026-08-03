@@ -28,9 +28,12 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $PSScriptRoot
 if (-not $MsixPath) {
-    $MsixPath = Join-Path $repo "store_assets\submission\EasyPostDesktop_1.0.5.0.msix"
+    $MsixPath = Join-Path $repo "dist\EasyPostDesktop.msix"
 }
 if (-not (Test-Path $MsixPath)) { throw "MSIX not found: $MsixPath" }
+# appcert.exe rejects a relative -reportoutputpath ("must be valid path to the
+# report file"), so always hand it an absolute path.
+$MsixPath = (Resolve-Path -LiteralPath $MsixPath).Path
 
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) { throw "Run this from an elevated PowerShell (Run as administrator) — appcert.exe needs admin." }
@@ -39,7 +42,12 @@ $appcert = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\App Certificati
     Select-Object -First 1
 if (-not $appcert) { throw "appcert.exe not found. Install the Windows App Certification Kit (part of the Windows SDK)." }
 
-$report  = [IO.Path]::ChangeExtension($MsixPath, $null) + "WACK-report.xml"
+# appcert writes the report itself, and is unreliable when the path contains
+# spaces (the repo lives under "OneDrive - Spencer Fields"). Generate into a
+# space-free temp dir, then copy the result next to the package for convenience.
+$workDir = Join-Path $env:TEMP "epd-wack"
+New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+$report  = Join-Path $workDir "EasyPostDesktop.WACK-report.xml"
 $summary = [IO.Path]::ChangeExtension($MsixPath, $null) + "WACK-summary.txt"
 
 # 1) Trust the package's signing certificate so Windows will deploy it for testing.
