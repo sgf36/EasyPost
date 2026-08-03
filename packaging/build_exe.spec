@@ -44,16 +44,31 @@ variant_flags = [
     if (project_root / "app" / "resources" / name).exists()
 ]
 
+# The Store build's production-unlock check reads Windows.Services.Store through
+# the winrt (PyWinRT) packages. app/core/store_entitlement.py imports them
+# lazily and inside try/except, so PyInstaller's static import graph never sees
+# them and would not bundle them — leaving the shipped Store build unable to
+# read the entitlement (production would stay locked for everyone). Collect the
+# whole winrt namespace explicitly, Windows-only (the packages are win32-only).
+winrt_datas, winrt_binaries, winrt_hiddenimports = [], [], []
+if sys.platform.startswith("win"):
+    try:
+        from PyInstaller.utils.hooks import collect_all
+        winrt_datas, winrt_binaries, winrt_hiddenimports = collect_all("winrt")
+    except Exception as exc:  # never break the direct build over this
+        print(f"[build_exe.spec] winrt collect_all skipped: {exc}")
+
 a = Analysis(
     [str(project_root / "app" / "main.py")],
     pathex=[str(project_root)],
-    binaries=[],
+    binaries=[*winrt_binaries],
     datas=[
         (str(project_root / "app" / "resources" / "locales"), "app/resources/locales"),
         (str(project_root / "app" / "resources" / "icons"), "app/resources/icons"),
         *variant_flags,
+        *winrt_datas,
     ],
-    hiddenimports=[],
+    hiddenimports=[*winrt_hiddenimports],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
