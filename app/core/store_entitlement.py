@@ -37,9 +37,9 @@ IN_APP_OFFER_TOKEN = "production_unlock"
 
 # The add-on's Store ID (the 12-char product Store ID). Needed only for the
 # in-app purchase call and the Store deep link — NOT for the ownership read.
-# Set this once the add-on exists in Partner Center. Empty until then: the
-# purchase path falls back to opening the app's own Store page.
-STORE_ADDON_STORE_ID = ""
+# This is the "Production unlock" durable add-on created under the parent app
+# (Product ID `production_unlock`, matched by IN_APP_OFFER_TOKEN above).
+STORE_ADDON_STORE_ID = "9P9LV9X3K079"
 
 # The parent app's Store ID, for the Store deep-link fallback.
 APP_STORE_ID = "9NDSDL5LV5B5"
