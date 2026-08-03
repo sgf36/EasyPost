@@ -1,19 +1,28 @@
 # Go-live checklist
 
-State as of 2026-07-23. Everything in the repository is finished, committed and
+State as of 2026-08-03. Everything in the repository is finished, committed and
 pushed. What remains needs either a credential this project does not hold or a
 button only the account owner should press.
 
-## Production-mode licence model — deploy WITH the next signed release
+## Production-mode licence model
 
-The app now opens free in EasyPost **test** mode; a licence is required only for
-**production** (real labels). Code is done, tested and on `main`. The public
-copy below describes behaviour that only exists in a build containing this code,
-so it must be deployed **at the moment the new direct-download build is released**
-(itself gated on the Certum code-signing) — not before, or it would misdescribe
-the currently downloadable v1.0.4.
+The app opens free in EasyPost **test** mode; production (real labels) is gated.
 
-To deploy at release (all drafted, none live yet):
+**Microsoft Store — DONE (submitted 2026-08-03, in certification).** The Store
+build `1.0.6.0` ships the model: free download, production gated behind a one-time
+**$29.99 "Production unlock" add-on** (Store ID `9P9LV9X3K079`, Product ID
+`production_unlock`) read via `Windows.Services.Store`, plus **MCP parity** (the
+helper exposed as an App Execution Alias). The 47-language free-model Store listing
+(new Description + feature bullets) was imported. See the memory
+`project-easypost-licensing-model`.
+
+**Website + direct download — still pending the signed release.** The public site
+copy below describes behaviour only the new signed direct build has, so it must be
+deployed **at the moment the new direct-download build is released** (itself gated
+on the Certum Standard Code Signing) — not before, or it would misdescribe the
+currently downloadable v1.0.4.
+
+To deploy at the direct release (all drafted, none live yet):
 
 - **site/pricing.html** — reframe the direct-download line to "free to try in
   test mode; a licence unlocks production (real labels)". Keep the tiers.
@@ -47,7 +56,7 @@ Store** build is unaffected — Microsoft signs it on publish.
 
 | Piece | State |
 |---|---|
-| Store package `1.0.5.0` | **Uploaded to Partner Center and IN CERTIFICATION** (resubmitted 2026-07-29). Verified in the submission: single package, `v1.0.5.0` X64, `resources.pri` present, single `en-US` resource language. WACK = **PASS**. This fixes the prior cert failure (10.3.4 "App Is Testable": the old `1.0.3.0` declared invalid resource language `ha` with no `resources.pri`, so Windows could not register it — `0x80070057`). The failed submission had still been carrying `1.0.3.0`; `1.0.4.0` then `1.0.5.0` were the fixes, and `1.0.5.0` (which also clears the DPI warning) is what is now certifying. Old `1.0.4.0` removed on save as superseded |
+| Store package `1.0.6.0` | **Submitted to Partner Center and IN CERTIFICATION** (2026-08-03) with the full free model: free download, production gated behind the `production_unlock` Store add-on, MCP parity via App Execution Alias, and the 47-language free-model listing imported. WACK = **WARNING** (fine for submission; sole warning was DPI on the headless MCP helper, since silenced). A first upload was rejected for a *headless app* (the MCP helper had `AppListEntry="none"`); fixed by moving the alias onto the single visible Application. Supersedes `1.0.5.0` (which had fixed the earlier 10.3.4 install failure: `1.0.3.0` declared invalid resource language `ha` with no `resources.pri` → `0x80070057`) |
 | Store listings | 47 languages, 9 screenshots and 9 captions each, imported and verified |
 | Paddle catalogue | Product `pro_01ky2h8cfe2ven8ypchnmfbena`; Personal $29 one-time, Business $149/yr, Organisation $349/yr — matches the Worker's `PRICE_TIERS` exactly |
 | Webhook destination | `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh`, active, subscribed to the eight events the Worker handles |

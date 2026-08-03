@@ -100,11 +100,11 @@ same build.
 | | Microsoft Store | Direct download |
 |---|---|---|
 | Package | `.msix` | `.dmg` (macOS), `.exe` folder (Windows) |
-| Price | Set in Partner Center | $29 one-time, or $149/$349 a year via Paddle |
-| Licence gate | **Off** | **Production mode only** — test mode is free |
-| MCP / AI agents | **Off** | **On** |
-| Signing | Store re-signs on publish | Apple Developer ID + notarization |
-| Status | `1.0.5.0` **in certification** (resubmitted after fixing the 1.0.3.0 install failure) | Windows signing switched to Certum Standard Code Signing (pending) |
+| Price | **Free**, plus a one-time **$29.99 "Production unlock" add-on** | $29 one-time, or $149/$349 a year via Paddle |
+| Licence gate | **Production mode only** — test mode is free; unlocked by the Store add-on (read via `Windows.Services.Store`) | **Production mode only** — test mode is free; unlocked by an Ed25519 licence key |
+| MCP / AI agents | **On** — helper exposed as an App Execution Alias (`easypost-mcp.exe`) | **On** — helper beside the app |
+| Signing | Store re-signs on publish | Apple Developer ID + notarization (macOS); Certum Standard Code Signing pending (Windows) |
+| Status | `1.0.6.0` **in certification** — free + Production-unlock add-on + MCP parity | Windows signing → Certum Standard Code Signing (pending) |
 
 Both differences are compiled in or out by **variant flag files** under
 `app/resources/`, created at package time by CI and never committed:
