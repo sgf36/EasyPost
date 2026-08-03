@@ -30,6 +30,10 @@ class AppSettings:
     # so an outage of ours never locks a paying customer out of their own app.
     activation_grace_until: Optional[str] = None
     device_label: Optional[str] = None
+    # Store build only: when the Microsoft Store last confirmed this account owns
+    # the "Production unlock" add-on. Trusted offline for a grace window so a
+    # Store outage never revokes production (see app/core/store_entitlement.py).
+    store_unlock_confirmed_at: Optional[str] = None
     # Preferred printed-label format/size (see app/core/label_options.py).
     # Applies to every shipment created, since EasyPost only honours
     # label_size at shipment-creation time.

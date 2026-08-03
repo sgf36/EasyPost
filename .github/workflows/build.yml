@@ -54,6 +54,16 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: touch app/resources/mcp_supported.flag
 
+      # The Windows leg's FIRST PyInstaller build feeds the Store MSIX, so the
+      # Store-variant flag must exist now, before that build. It is removed
+      # again before the direct-download rebuild further down. store_build.flag
+      # makes app/config.STORE_BUILD true, gating production behind the Store
+      # "Production unlock" add-on (see app/core/store_entitlement.py).
+      - name: Mark the Windows Store build
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: touch app/resources/store_build.flag
+
       - name: Build with PyInstaller
         run: pyinstaller packaging/build_exe.spec --noconfirm --distpath dist --workpath build
 
@@ -193,6 +203,9 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: bash
         run: |
+          # The MSIX is already packaged; this tree now becomes the direct
+          # download, which is the Paddle-gated variant — never the Store one.
+          rm -f app/resources/store_build.flag
           touch app/resources/license_required.flag
           touch app/resources/mcp_supported.flag
 

@@ -126,29 +126,52 @@ def pack() -> None:
     )
 
 
+# Flags that belong ONLY to the direct-download build. Their presence in the
+# Store package would gate a Store purchase behind the app's own second paywall,
+# which breaches Microsoft's policies.
+DIRECT_ONLY_FLAGS = ("license_required.flag", "mcp_supported.flag")
+# The Store build must carry exactly this one, so production is gated behind the
+# Store "Production unlock" add-on rather than being free-for-all.
+REQUIRED_STORE_FLAG = "store_build.flag"
+
+
 def verify_store_variant() -> None:
-    """The Store package must carry neither variant flag nor the MCP helper.
+    """The Store package must carry store_build.flag and NOT the direct-only
+    flags or the MCP helper.
 
     The mirror of packaging/verify_variant_flags.sh: that one fails the build
-    when the direct download *loses* a flag, this one fails when the Store
-    build *gains* one. A flag smuggled in here would gate a Store purchase
-    behind a second paid unlock, which breaches Microsoft's policies.
+    when the direct download loses a flag; this one fails when the Store build
+    carries the wrong ones. store_build.flag makes app/config.STORE_BUILD true so
+    production is gated behind the Store add-on; a direct-only flag smuggled in
+    here would instead impose the Paddle key gate on top of a Store purchase.
     """
     with zipfile.ZipFile(output_msix) as archive:
         names = archive.namelist()
 
-    strays = [n for n in names if n.endswith(".flag") or "easypost-mcp" in n]
+    strays = [
+        n for n in names
+        if "easypost-mcp" in n or any(n.endswith(f) for f in DIRECT_ONLY_FLAGS)
+    ]
     if strays:
         raise SystemExit(
             "MSIX contains files that belong only to the direct download:\n  "
             + "\n  ".join(strays)
+        )
+    if not any(n.endswith(REQUIRED_STORE_FLAG) for n in names):
+        raise SystemExit(
+            f"MSIX is missing {REQUIRED_STORE_FLAG} — the Store build must gate "
+            "production behind the Store add-on. Create "
+            f"app/resources/{REQUIRED_STORE_FLAG} before the PyInstaller build."
         )
     if "resources.pri" not in names:
         raise SystemExit(
             "MSIX has no resources.pri — Store deployment (cert 10.3.4) will "
             "reject it. generate_pri() must run before pack()."
         )
-    print("Store variant verified: no licence flag, no MCP helper, resources.pri present.")
+    print(
+        "Store variant verified: store_build.flag present, no direct-only flag, "
+        "no MCP helper, resources.pri present."
+    )
 
 
 if __name__ == "__main__":

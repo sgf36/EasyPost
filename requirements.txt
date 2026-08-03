@@ -5,3 +5,10 @@ keyring>=24.0.0
 platformdirs>=4.0.0
 cryptography>=42.0.0
 mcp>=1.28.0
+# Microsoft Store add-on entitlement (Store build only; see
+# app/core/store_entitlement.py). Windows-only, imported lazily and guarded, so
+# their absence never breaks a non-Store or non-Windows build.
+winrt-runtime>=3.2; sys_platform == "win32"
+winrt-Windows.Services.Store>=3.2; sys_platform == "win32"
+winrt-Windows.Foundation>=3.2; sys_platform == "win32"
+winrt-Windows.Foundation.Collections>=3.2; sys_platform == "win32"

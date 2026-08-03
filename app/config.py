@@ -17,6 +17,20 @@ ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
 # direct-download build (CI does this on the macOS leg).
 LICENSE_REQUIRED = (Path(__file__).parent / "resources" / "license_required.flag").exists()
 
+# The Microsoft Store build gates production behind a Store "Production unlock"
+# add-on instead of a pasted Paddle licence key: test mode is free, production
+# needs the in-app purchase. This flag marks that build so the entitlement is
+# read from Windows.Services.Store (see app/core/store_entitlement.py) rather
+# than the Ed25519 licence path. Mutually exclusive with LICENSE_REQUIRED — a
+# build is either the direct-download one or the Store one, never both.
+# packaging/build_msix.py writes app/resources/store_build.flag into the MSIX.
+STORE_BUILD = (Path(__file__).parent / "resources" / "store_build.flag").exists()
+
+# Where multi-computer and organisation buyers are sent from inside the Store
+# build. The Store add-on unlocks a single computer; seat-managed multi-device
+# and team licences live on the website, so the Store unlock screen links here.
+MULTI_SEAT_URL = "https://easy-post.spencerfields.com/pricing.html"
+
 # The AI-agent (MCP) bridge is likewise direct-download only for now, and
 # gated on its own flag rather than reusing LICENSE_REQUIRED — they answer
 # different questions and will not always move together.
