@@ -28,4 +28,14 @@ if [ "$missing" -ne 0 ]; then
   echo "::error::The direct-download build would ship without its licence gate."
   exit 1
 fi
-echo "Both variant flags are present in the bundle."
+
+# The Store-only flag must NOT be here: on a direct build it would gate
+# production behind a Store add-on that this variant cannot sell.
+stray="$(find "$root" -name store_build.flag -print -quit 2>/dev/null || true)"
+if [ -n "$stray" ]; then
+  echo "::error::store_build.flag leaked into the direct-download bundle: $stray"
+  echo "::error::Production would be gated behind a Store add-on that isn't sold here."
+  exit 1
+fi
+
+echo "Both variant flags are present, and store_build.flag is absent, as required."

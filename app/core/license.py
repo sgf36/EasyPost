@@ -22,7 +22,7 @@ from typing import Optional
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from app.config import LICENSE_REQUIRED
+from app.config import LICENSE_REQUIRED, STORE_BUILD
 from app.core.settings import load_settings, save_settings
 
 # Public half of the license signing key. The private half is NOT in the repo.
@@ -160,18 +160,29 @@ def is_licensed() -> bool:
 def production_allowed() -> bool:
     """Whether this build may operate in EasyPost production mode.
 
-    Test mode is always free. Production — real labels, real money — requires a
-    licence in direct-download builds (LICENSE_REQUIRED). Store builds carry no
-    such flag and are unrestricted.
+    Test mode is always free. Production — real labels, real money — is gated,
+    by one of two mechanisms depending on the build:
 
-    The gate keys off a licence being present, never off which UI field a key
-    sits in: a production key is classified as production wherever it is entered
-    (see app/core/easypost_keys.py), so it cannot be run for free by pasting it
-    into the test field.
+    - **Direct-download build** (LICENSE_REQUIRED): a valid Ed25519 licence key.
+    - **Microsoft Store build** (STORE_BUILD): ownership of the "Production
+      unlock" Store add-on, read from Windows.Services.Store
+      (see app/core/store_entitlement.py). No pasted key.
+    - **Neither** (dev / unflagged): unrestricted.
+
+    The gate keys off entitlement, never off which UI field a key sits in: a
+    production key is classified as production wherever it is entered (see
+    app/core/easypost_keys.py), so it cannot be run for free by pasting it into
+    the test field.
     """
-    if not LICENSE_REQUIRED:
-        return True
-    return is_licensed()
+    if LICENSE_REQUIRED:
+        return is_licensed()
+    if STORE_BUILD:
+        # Imported lazily so the winrt dependency is only ever touched on the
+        # Store build, never on direct-download or non-Windows builds.
+        from app.core.store_entitlement import production_unlocked
+
+        return production_unlocked()
+    return True
 
 
 def activate(key: str) -> Optional[LicenseInfo]:

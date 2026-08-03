@@ -39,6 +39,20 @@ def test_production_allowed_with_licence_in_direct_build(monkeypatch):
     assert lic.production_allowed() is True
 
 
+def test_store_build_defers_to_store_entitlement(monkeypatch):
+    """Store build: production follows Store add-on ownership, not a key."""
+    import app.core.store_entitlement as se
+
+    monkeypatch.setattr(lic, "LICENSE_REQUIRED", False)
+    monkeypatch.setattr(lic, "STORE_BUILD", True)
+
+    monkeypatch.setattr(se, "production_unlocked", lambda: True)
+    assert lic.production_allowed() is True
+
+    monkeypatch.setattr(se, "production_unlocked", lambda: False)
+    assert lic.production_allowed() is False
+
+
 # --- detect_mode ---------------------------------------------------------
 
 def _fake_easypost(mode_or_exc):

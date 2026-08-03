@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import APP_NAME, LICENSE_REQUIRED, MODE_PRODUCTION, MODE_TEST
+from app.config import APP_NAME, LICENSE_REQUIRED, MODE_PRODUCTION, MODE_TEST, STORE_BUILD
 from app.core.client import client_manager
 from app.core.activation import ensure_seat
 from app.core.credential_store import load_credentials, save_credentials
@@ -29,6 +29,7 @@ from app.ui.views.history_view import HistoryView
 from app.ui.views.hts_lookup_view import HtsLookupView
 from app.ui.views.insurance_view import InsuranceView
 from app.ui.views.license_gate import LicenseGate
+from app.ui.views.store_unlock import StoreUnlockGate
 from app.ui.views.pickups_view import PickupsView
 from app.ui.views.reports_view import ReportsView
 from app.ui.views.settings_view import SettingsView
@@ -51,7 +52,10 @@ class MainWindow(QMainWindow):
         # (rather than as a first-run wall). Governs where activation returns to.
         self._pending_production = False
 
-        self._license_gate = LicenseGate()
+        # The Store build unlocks production by buying a Store add-on, not by
+        # pasting a key, so it shows a different gate. Both expose the same
+        # activated / use_test_requested signals, so nothing downstream changes.
+        self._license_gate = StoreUnlockGate() if STORE_BUILD else LicenseGate()
         self._license_gate.activated.connect(self._on_license_activated)
         self._license_gate.use_test_requested.connect(self._on_use_test_mode)
         self._root_stack.addWidget(self._license_gate)
@@ -240,11 +244,16 @@ class MainWindow(QMainWindow):
             self._root_stack.setCurrentWidget(self._setup_wizard)
 
     def _production_ok(self) -> bool:
-        """Entitled to production right now: either a build with no licence gate,
-        or a valid licence with a seat on this computer."""
-        if not LICENSE_REQUIRED:
-            return True
-        return self._license_ok()
+        """Entitled to production right now: a valid licence with a seat
+        (direct build), ownership of the Store unlock add-on (Store build), or
+        no gate at all (dev/unflagged)."""
+        if LICENSE_REQUIRED:
+            return self._license_ok()
+        if STORE_BUILD:
+            from app.core.store_entitlement import production_unlocked
+
+            return production_unlocked()
+        return True
 
     def _license_ok(self) -> bool:
         """A valid key, and a seat on this computer to go with it.

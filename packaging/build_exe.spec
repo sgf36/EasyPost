@@ -31,10 +31,16 @@ gui_manifest = str(project_root / "packaging" / "EasyPostDesktop.exe.manifest")
 # never bundled, which silently left LICENSE_REQUIRED False in the shipped
 # build: the paid direct-download app launched with no licence gate at all.
 # Listed individually and conditionally, because copying the whole resources
-# directory would sweep the flags into the Store build too.
+# directory would sweep the flags into the wrong build.
+#
+# The variants are mutually exclusive and each build creates only its own
+# flag(s) in the source tree before this spec runs:
+#   - direct download: license_required.flag (+ mcp_supported.flag)
+#   - Microsoft Store:  store_build.flag  → gates production behind the Store
+#                       "Production unlock" add-on (see app/core/store_entitlement.py)
 variant_flags = [
     (str(project_root / "app" / "resources" / name), "app/resources")
-    for name in ("license_required.flag", "mcp_supported.flag")
+    for name in ("license_required.flag", "mcp_supported.flag", "store_build.flag")
     if (project_root / "app" / "resources" / name).exists()
 ]
 
