@@ -113,14 +113,19 @@ Both differences are compiled in or out by **variant flag files** under
 |---|---|---|
 | `license_required.flag` | `config.LICENSE_REQUIRED` | Direct download |
 | `mcp_supported.flag` | `config.MCP_SUPPORTED` | Direct download |
+| `store_build.flag` | `config.STORE_BUILD` | Microsoft Store |
 
-`app/config.py` reads both once at import. The Store build omits the licence
+`app/config.py` reads these once at import. The Store build omits the licence
 flag because gating a Store purchase behind a second paid unlock would breach
-Microsoft's policies — and would be a poor experience regardless. It omits the
-MCP flag because a Store package cannot reliably have another application
-launch a helper process out of its install location, nor write into other
-programs' configuration files; the app says so on the Connect AI agents page
-rather than offering a button that would not work.
+Microsoft's policies — production is instead gated behind the Store "Production
+unlock" add-on (`config.STORE_BUILD` → `app/core/store_entitlement.py`).
+
+The MCP (AI-agent) bridge is enabled in **both** builds: `MCP_SUPPORTED` is
+`mcp_supported.flag or STORE_BUILD`. The Store build reaches parity without the
+install-path executable — the MSIX manifest exposes the helper as an App
+Execution Alias (`easypost-mcp.exe`), so clients launch it by name, stable
+across updates and with the package's own identity. Connecting still falls back
+to the always-works copy-paste snippet if a client's config cannot be written.
 
 Because a missing flag silently *disables* a paid feature rather than
 breaking the build, `packaging/verify_variant_flags.sh` runs in CI after each

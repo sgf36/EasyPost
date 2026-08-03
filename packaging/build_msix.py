@@ -71,15 +71,11 @@ def stage_package() -> None:
     staging_dir.mkdir(parents=True)
 
     shutil.copy2(manifest_src, staging_dir / "AppxManifest.xml")
-    # The MCP helper is direct-download only: a Store package cannot have another
-    # application launch it out of the install location. Shipping it anyway would
-    # be ~10 MB of dead weight and an invitation to wire up something that will
-    # not work, so drop it here rather than teaching the spec about variants.
-    shutil.copytree(
-        pyinstaller_output,
-        staging_dir / "EasyPostDesktop",
-        ignore=shutil.ignore_patterns("easypost-mcp", "easypost-mcp.exe"),
-    )
+    # The MCP helper (easypost-mcp.exe) ships in the Store package too: the
+    # manifest exposes it as an App Execution Alias so MCP clients can launch it
+    # by name, giving the Store build agent-bridge parity with the direct
+    # download. Copy the PyInstaller output verbatim — the helper included.
+    shutil.copytree(pyinstaller_output, staging_dir / "EasyPostDesktop")
     generate_assets(staging_dir / "Assets")
 
 
@@ -136,22 +132,22 @@ REQUIRED_STORE_FLAG = "store_build.flag"
 
 
 def verify_store_variant() -> None:
-    """The Store package must carry store_build.flag and NOT the direct-only
-    flags or the MCP helper.
+    """The Store package must carry store_build.flag and NOT the direct-only flags.
 
     The mirror of packaging/verify_variant_flags.sh: that one fails the build
     when the direct download loses a flag; this one fails when the Store build
     carries the wrong ones. store_build.flag makes app/config.STORE_BUILD true so
     production is gated behind the Store add-on; a direct-only flag smuggled in
     here would instead impose the Paddle key gate on top of a Store purchase.
+
+    The MCP helper (easypost-mcp.exe) is expected here now — the Store build has
+    agent-bridge parity via the manifest's App Execution Alias — so it is NOT
+    treated as a stray.
     """
     with zipfile.ZipFile(output_msix) as archive:
         names = archive.namelist()
 
-    strays = [
-        n for n in names
-        if "easypost-mcp" in n or any(n.endswith(f) for f in DIRECT_ONLY_FLAGS)
-    ]
+    strays = [n for n in names if any(n.endswith(f) for f in DIRECT_ONLY_FLAGS)]
     if strays:
         raise SystemExit(
             "MSIX contains files that belong only to the direct download:\n  "
@@ -163,14 +159,20 @@ def verify_store_variant() -> None:
             "production behind the Store add-on. Create "
             f"app/resources/{REQUIRED_STORE_FLAG} before the PyInstaller build."
         )
+    if not any(n.endswith("easypost-mcp.exe") for n in names):
+        raise SystemExit(
+            "MSIX is missing easypost-mcp.exe — the Store build ships the MCP "
+            "helper for the App Execution Alias. stage_package() must copy the "
+            "PyInstaller output without excluding it."
+        )
     if "resources.pri" not in names:
         raise SystemExit(
             "MSIX has no resources.pri — Store deployment (cert 10.3.4) will "
             "reject it. generate_pri() must run before pack()."
         )
     print(
-        "Store variant verified: store_build.flag present, no direct-only flag, "
-        "no MCP helper, resources.pri present."
+        "Store variant verified: store_build.flag + MCP helper present, "
+        "no direct-only flag, resources.pri present."
     )
 
 

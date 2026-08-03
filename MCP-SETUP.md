@@ -10,14 +10,11 @@ detected client. It asks before editing any file, backs up what is already
 there, and merges rather than replaces. This document covers the manual route
 and, more importantly, what the agent is and is not allowed to do.
 
-> **Direct download only.** The Microsoft Store build cannot run the MCP
-> server. A Store package cannot reliably have another application launch a
-> helper process out of its install location, nor write into other programs'
-> configuration files. The app says so on the Connect AI agents page rather
-> than offering a button that would not work. Everything else is identical
-> between the two builds — get the direct download from
-> [easy-post.spencerfields.com](https://easy-post.spencerfields.com) if you
-> want this feature.
+> **Available in both builds.** The Microsoft Store build ships the MCP server
+> too. Instead of an install-path executable, the Store package exposes it as an
+> App Execution Alias, so clients launch it by name (`easypost-mcp.exe`) — stable
+> across Store updates and run with the package's identity. If your client cannot
+> be edited automatically, the copy-paste snippet below always works.
 
 ---
 
