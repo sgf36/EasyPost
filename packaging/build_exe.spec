@@ -40,7 +40,7 @@ gui_manifest = str(project_root / "packaging" / "EasyPostDesktop.exe.manifest")
 #                       "Production unlock" add-on (see app/core/store_entitlement.py)
 variant_flags = [
     (str(project_root / "app" / "resources" / name), "app/resources")
-    for name in ("license_required.flag", "mcp_supported.flag", "store_build.flag")
+    for name in ("license_required.flag", "mcp_supported.flag", "store_build.flag", "mas_build.flag")
     if (project_root / "app" / "resources" / name).exists()
 ]
 
@@ -58,6 +58,22 @@ if sys.platform.startswith("win"):
     except Exception as exc:  # never break the direct build over this
         print(f"[build_exe.spec] winrt collect_all skipped: {exc}")
 
+# The Mac App Store build reads its StoreKit entitlement through PyObjC
+# (app/core/mac_store_entitlement.py imports StoreKit/Foundation/CoreFoundation
+# lazily, inside try/except). PyInstaller's static graph never sees those lazy
+# imports, so the frozen MAS app would ship without StoreKit and could never read
+# the purchase. Collect them explicitly on macOS when they are installed; absent
+# (e.g. the notarized-.dmg build without pyobjc-framework-StoreKit) this is a
+# harmless no-op, exactly like the winrt block above.
+storekit_hiddenimports = []
+if sys.platform == "darwin":
+    for _mod in ("StoreKit", "Foundation", "CoreFoundation", "objc"):
+        try:
+            __import__(_mod)
+            storekit_hiddenimports.append(_mod)
+        except Exception as exc:
+            print(f"[build_exe.spec] StoreKit import {_mod} skipped: {exc}")
+
 a = Analysis(
     [str(project_root / "app" / "main.py")],
     pathex=[str(project_root)],
@@ -68,7 +84,7 @@ a = Analysis(
         *variant_flags,
         *winrt_datas,
     ],
-    hiddenimports=[*winrt_hiddenimports],
+    hiddenimports=[*winrt_hiddenimports, *storekit_hiddenimports],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

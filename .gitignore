@@ -14,6 +14,7 @@ dist/
 app/resources/license_required.flag
 app/resources/mcp_supported.flag
 app/resources/store_build.flag
+app/resources/mas_build.flag
 
 # Locally downloaded build artifacts — never committed
 dist-download/
