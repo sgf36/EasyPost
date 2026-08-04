@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "ରିମୋଟ ଆକ୍ସେସ୍ ସକ୍ଷମ କରନ୍ତୁ (ସୁରକ୍ଷିତ ରିଲେ ମାଧ୍ୟମରେ)",
+  "connect_agents.relay_optin_intro": "ଇଚ୍ଛାଧୀନ ଭାବରେ, ଅନ୍ୟ ଏକ କମ୍ପ୍ୟୁଟରରୁ, କିମ୍ବା କେବଳ ଏକ URL ଗ୍ରହଣ କରୁଥିବା କ୍ଲାଏଣ୍ଟରୁ, ଏକ ସୁରକ୍ଷିତ ରିଲେ ମାଧ୍ୟମରେ ଏହି ଆପ୍ ପର୍ଯ୍ୟନ୍ତ ପହଞ୍ଚନ୍ତୁ। ଉପରୋକ୍ତ ସ୍ଥାନୀୟ ବିକଳ୍ପଟି ଡିଫଲ୍ଟ ଅଟେ ଏବଂ କୌଣସି ନେଟୱାର୍କର ଆବଶ୍ୟକତା ନାହିଁ। ରିଲେ କେବଳ ଏକ ଆଉଟବାଉଣ୍ଡ ସଂଯୋଗ ସ୍ଥାପନ କରେ, ଏହା କେବେ ବି ଆପଣଙ୍କର EasyPost କି ଦେଖେ ନାହିଁ ଏବଂ କେବେ ବି କୌଣସି ଟୁଲ୍ ଚଲାଏ ନାହିଁ; କିଣିବା ପାଇଁ ତଥାପି ନିମ୍ନରେ ଆପଣଙ୍କର ଅନୁମୋଦନ ଆବଶ୍ୟକ।"
 }

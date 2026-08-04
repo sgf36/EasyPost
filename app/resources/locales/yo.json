@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "Mú ìwọlé ọ̀nà jíjìnnà ṣiṣẹ́ (nípasẹ̀ relay tí ó ní ààbò)",
+  "connect_agents.relay_optin_intro": "Ní àṣàyàn, wọlé sí ohun èlò yìí láti kọ̀mpútà mìíràn, tàbí láti ọ̀dọ̀ oníbàárà tí ó gba orí ayélujára URL nìkan, nípasẹ̀ relay tí ó ní ààbò. Àṣàyàn agbègbè tí ó wà lókè ni àpẹẹrẹ àkọ́kọ́ tí kò sì nílò ìsopọ̀ ayélujára. Relay náà ń dá ìsopọ̀ jáde nìkan, kò rí kọ́kọ́rọ́ EasyPost rẹ láé, kò sì ń ṣiṣẹ́ irinṣẹ́ kankan láé; rírà ṣì nílò ìfọwọ́sí rẹ ní ìsàlẹ̀."
 }

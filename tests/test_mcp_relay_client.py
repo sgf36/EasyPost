@@ -21,6 +21,34 @@ def fake_keyring(monkeypatch):
     return store
 
 
+# --- when the relay should run -------------------------------------------
+
+class _S:
+    """A stand-in for AppSettings carrying only what relay_should_run reads."""
+
+    def __init__(self, mcp_enabled=False, mcp_relay_enabled=False):
+        self.mcp_enabled = mcp_enabled
+        self.mcp_relay_enabled = mcp_relay_enabled
+
+
+def test_relay_never_runs_when_ai_access_is_off(monkeypatch):
+    monkeypatch.setattr("app.config.MAS_BUILD", True)
+    assert rc.relay_should_run(_S(mcp_enabled=False, mcp_relay_enabled=True)) is False
+
+
+def test_mas_relay_follows_the_master_toggle(monkeypatch):
+    """On MAS the relay is the only transport, so the opt-in flag is irrelevant."""
+    monkeypatch.setattr("app.config.MAS_BUILD", True)
+    assert rc.relay_should_run(_S(mcp_enabled=True, mcp_relay_enabled=False)) is True
+
+
+def test_non_mas_relay_needs_the_opt_in(monkeypatch):
+    """Elsewhere the stdio helper is the default; the relay stays off unless asked."""
+    monkeypatch.setattr("app.config.MAS_BUILD", False)
+    assert rc.relay_should_run(_S(mcp_enabled=True, mcp_relay_enabled=False)) is False
+    assert rc.relay_should_run(_S(mcp_enabled=True, mcp_relay_enabled=True)) is True
+
+
 # --- token ---------------------------------------------------------------
 
 def test_get_or_create_token_persists(fake_keyring):

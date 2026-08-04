@@ -492,5 +492,7 @@
   "tracking.refreshing_button": "Refreshing…",
   "tracking.table_group_title": "Tracked shipments",
   "tracking.title": "Tracking",
-  "tracking.tracking_number_placeholder": "Tracking number"
+  "tracking.tracking_number_placeholder": "Tracking number",
+  "connect_agents.relay_enable_label": "Enable remote access (via secure relay)",
+  "connect_agents.relay_optin_intro": "Optionally reach this app from another computer, or from a client that only accepts a URL, through a secure relay. The local option above is the default and needs no network. The relay makes an outbound connection only, never sees your EasyPost key and never runs a tool; buying still needs your approval below."
 }

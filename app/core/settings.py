@@ -48,6 +48,13 @@ class AppSettings:
     mcp_allow_spending: bool = False
     mcp_max_purchase: float = 50.0
     mcp_daily_limit: float = 200.0
+    # Remote AI-agent access over the hosted relay (see app/core/mcp_relay_client.py).
+    # Off by default and opt-in: on non-MAS builds the local stdio helper is the
+    # default transport, and this opens an *additional* outbound path so a client
+    # on another machine — or one that only accepts a URL — can reach the app. On
+    # the MAS build the relay is the only transport and tracks mcp_enabled instead,
+    # so this flag is not consulted there (see mcp_relay_client.relay_should_run).
+    mcp_relay_enabled: bool = False
 
 
 def load_settings() -> AppSettings:

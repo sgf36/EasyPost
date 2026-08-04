@@ -44,6 +44,28 @@ _BACKOFF_MAX = 30.0
 _PING_INTERVAL = 30.0
 
 
+# --- when the relay should be connected ----------------------------------
+
+def relay_should_run(settings) -> bool:
+    """Whether the outbound relay connection should be up, given the build.
+
+    The relay never runs unless AI-agent access is enabled at all. Beyond that
+    the policy differs by build: on the MAS build the relay is the *only*
+    transport, so it follows ``mcp_enabled`` directly; everywhere else the local
+    stdio helper is the default and the relay is a separate opt-in
+    (``mcp_relay_enabled``), so a user who only wants the local path never opens
+    an outbound connection. Kept here, not in the view, so startup wiring and the
+    Settings screen agree.
+    """
+    from app.config import MAS_BUILD
+
+    if not getattr(settings, "mcp_enabled", False):
+        return False
+    if MAS_BUILD:
+        return True
+    return bool(getattr(settings, "mcp_relay_enabled", False))
+
+
 # --- pairing token -------------------------------------------------------
 
 def get_or_create_token() -> str:

@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "အဝေးထိန်းချုပ်ခွင့် ဖွင့်ပါ (လုံခြုံသော relay မှတစ်ဆင့်)",
+  "connect_agents.relay_optin_intro": "လုံခြုံသော relay တစ်ခုမှတစ်ဆင့် အခြားကွန်ပျူတာတစ်ခုမှ သို့မဟုတ် URL ကိုသာ လက်ခံသော client တစ်ခုမှ ဤအက်ပ်ကို ရွေးချယ်၍ ဆက်သွယ်နိုင်ပါသည်။ အထက်ပါ local ရွေးချယ်မှုသည် မူလသတ်မှတ်ချက်ဖြစ်ပြီး ကွန်ရက် မလိုအပ်ပါ။ Relay သည် outbound ချိတ်ဆက်မှုကိုသာ ပြုလုပ်ပြီး သင့် EasyPost key ကို ဘယ်တော့မှ မမြင်ရသလို tool တစ်ခုမျှ မလည်ပတ်ပါ; ဝယ်ယူမှုအတွက်မူ အောက်တွင် သင့်ခွင့်ပြုချက် ဆက်လက်လိုအပ်ပါသည်။"
 }
