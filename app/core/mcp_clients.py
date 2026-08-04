@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from app.config import STORE_BUILD
+from app.config import MAS_BUILD, STORE_BUILD
 
 SERVER_KEY = "easypost-desktop"
 
@@ -101,6 +101,9 @@ def server_command() -> tuple[str, list[str]]:
     Frozen direct-download builds expose a dedicated executable beside the main
     app. From source we fall back to the running interpreter and `-m`.
     """
+    # Note: MAS has no stdio command — it reaches AI clients through the remote
+    # relay (see app/core/mcp_relay_client.py + server/mcp-relay-worker), so the
+    # MAS Connect-AI-agents screen shows a relay URL + token, not this command.
     if STORE_BUILD:
         return "easypost-mcp.exe", []
     if getattr(sys, "frozen", False):
@@ -154,6 +157,14 @@ def backup(client: McpClient) -> Optional[Path]:
 
 def install(client: McpClient) -> tuple[bool, str]:
     """Merge our entry into the client's config. Returns (ok, message)."""
+    if MAS_BUILD:
+        # The App Sandbox forbids writing another app's config file (guideline
+        # 2.5.2). On MAS the Connect-AI-agents screen offers copy-paste only —
+        # never call this. Refuse loudly rather than silently no-op.
+        return False, (
+            f"{client.label}: add the snippet by hand — the Mac App Store build "
+            "cannot modify another app's configuration."
+        )
     data, error = read_config(client)
     if error:
         # Refuse rather than overwrite: the file belongs to another app and may
