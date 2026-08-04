@@ -31,6 +31,15 @@ STORE_BUILD = (Path(__file__).parent / "resources" / "store_build.flag").exists(
 # and team licences live on the website, so the Store unlock screen links here.
 MULTI_SEAT_URL = "https://easy-post.spencerfields.com/pricing.html"
 
+# The Mac App Store build gates production behind a StoreKit In-App Purchase
+# ("Production Unlock") instead of a pasted Paddle key or a Windows Store add-on.
+# Apple mandates StoreKit for a Mac App Store sale, so this is the macOS analogue
+# of STORE_BUILD: the entitlement is read from StoreKit (see
+# app/core/mac_store_entitlement.py), with no pasted key. Marked by a flag file
+# packaging/mas/build_mas.sh writes into the .app bundle. Mutually exclusive with
+# LICENSE_REQUIRED and STORE_BUILD — a build is exactly one channel.
+MAS_BUILD = (Path(__file__).parent / "resources" / "mas_build.flag").exists()
+
 # The AI-agent (MCP) bridge. Direct-download builds gate it on their own flag
 # (created at package time); the Store build supports it too — hence the
 # `or STORE_BUILD`.

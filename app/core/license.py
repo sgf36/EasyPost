@@ -22,7 +22,7 @@ from typing import Optional
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
-from app.config import LICENSE_REQUIRED, STORE_BUILD
+from app.config import LICENSE_REQUIRED, MAS_BUILD, STORE_BUILD
 from app.core.settings import load_settings, save_settings
 
 # Public half of the license signing key. The private half is NOT in the repo.
@@ -167,6 +167,9 @@ def production_allowed() -> bool:
     - **Microsoft Store build** (STORE_BUILD): ownership of the "Production
       unlock" Store add-on, read from Windows.Services.Store
       (see app/core/store_entitlement.py). No pasted key.
+    - **Mac App Store build** (MAS_BUILD): ownership of the "Production Unlock"
+      StoreKit In-App Purchase, read on-device
+      (see app/core/mac_store_entitlement.py). No pasted key.
     - **Neither** (dev / unflagged): unrestricted.
 
     The gate keys off entitlement, never off which UI field a key sits in: a
@@ -180,6 +183,12 @@ def production_allowed() -> bool:
         # Imported lazily so the winrt dependency is only ever touched on the
         # Store build, never on direct-download or non-Windows builds.
         from app.core.store_entitlement import production_unlocked
+
+        return production_unlocked()
+    if MAS_BUILD:
+        # Imported lazily so the StoreKit dependency is only ever touched on the
+        # Mac App Store build, never on any other build.
+        from app.core.mac_store_entitlement import production_unlocked
 
         return production_unlocked()
     return True
