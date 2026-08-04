@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Info.plist keys the Mac App Store build must carry (brief §5b). The PyInstaller
+  BUNDLE step already writes CFBundleIdentifier (com.spencerfields.easypostdesktop),
+  CFBundleName, CFBundleExecutable and the icon; build_mas.sh MERGES the keys
+  below into the generated Contents/Info.plist with PlistBuddy after the bundle is
+  built and BEFORE signing (entitlements + a sandboxed Info.plist must agree).
+
+  This file is a reference/patch source, not a standalone plist — build_mas.sh
+  reads each key from here and applies it. Keep CFBundleShortVersionString aligned
+  with the app version (Windows is at 1.0.6.0 → macOS 1.0.6).
+-->
+<plist version="1.0">
+<dict>
+  <key>CFBundleShortVersionString</key>
+  <string>1.0.6</string>
+  <key>CFBundleVersion</key>
+  <string>1.0.6</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>12.0</string>
+  <key>LSApplicationCategoryType</key>
+  <string>public.app-category.business</string>
+  <key>NSHumanReadableCopyright</key>
+  <string>© Spencer Fields. Not affiliated with EasyPost.</string>
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+</dict>
+</plist>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Mac App Store entitlements for Easy-Post Desktop (see MACOS-APP-STORE-BUILD-BRIEF §5a
+  and MACOS-APP-STORE-PLAN §5). Minimum viable set for v1:
+
+    app-sandbox                     Required for the Mac App Store.
+    network.client                  Outbound HTTPS to the user's own EasyPost
+                                    account, the USITC HTS endpoint, and Apple
+                                    StoreKit. No network.server: the real-time
+                                    push relay is out of v1 scope, so no inbound
+                                    listener is needed (tracking falls back to
+                                    polling under MAS_BUILD).
+    files.user-selected.read-write  Label save via an NSSavePanel / Qt save
+                                    dialog (user picks the location).
+    files.downloads.read-write      Default label destination (~/Downloads).
+    print                           Printing labels (PNG/PDF/ZPL/EPL).
+
+  Deliberately absent: no cloudflared/tunnel (2.5.2), no arbitrary file access,
+  no subprocess-spawned binaries (ioreg/MCP CLI) — the MAS build must not rely on
+  any of them. Add keychain-access-groups ONLY if the keyring→Keychain items
+  fail under the sandbox; the app's own items usually work without an explicit
+  group, so leave it out until testing proves otherwise.
+-->
+<plist version="1.0">
+<dict>
+  <!-- Must match the Mac App Store provisioning profile (team 7WA4F8P743) or the
+       build is TestFlight-ineligible (altool warning 90886). Team id is public. -->
+  <key>com.apple.application-identifier</key>
+  <string>7WA4F8P743.com.spencerfields.easypostdesktop</string>
+  <key>com.apple.developer.team-identifier</key>
+  <string>7WA4F8P743</string>
+  <key>com.apple.security.app-sandbox</key>
+  <true/>
+  <key>com.apple.security.network.client</key>
+  <true/>
+  <key>com.apple.security.files.user-selected.read-write</key>
+  <true/>
+  <key>com.apple.security.files.downloads.read-write</key>
+  <true/>
+  <key>com.apple.security.print</key>
+  <true/>
+</dict>
+</plist>
