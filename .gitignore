@@ -30,8 +30,8 @@ store_assets/submission/
 server/paddle-license-webhook-worker/build-bundle*.js
 server/paddle-license-webhook-worker/bundle*.b64
 
-# wrangler local state
-server/paddle-license-webhook-worker/.wrangler/
+# wrangler local state (any worker)
+**/.wrangler/
 
 # Internal marketing drafts — not for the public repo
 marketing/
