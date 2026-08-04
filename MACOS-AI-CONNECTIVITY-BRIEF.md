@@ -12,6 +12,34 @@ v1" line.
 
 ---
 
+## ⚠️ UPDATE (2026-08-04): the relay is now BUILT — prefer it over the companion helper
+
+The "future option" at the bottom of this document — a **remote MCP relay** — has
+been **built and deployed** by the Windows-side session. It **removes the need for
+the companion-helper infrastructure entirely**: no separately-notarised
+Developer-ID binary, no Homebrew tap, no website download, and **no App Group /
+shared-Keychain plumbing** (the uncertain part). The sandboxed app itself is the
+MCP backend, reached by the AI client through the relay over an **outbound**
+WebSocket the app dials.
+
+- **Relay (live):** `https://easypost-mcp-relay.sgf36.workers.dev` — transport
+  verified (health, 401, app-offline, full round-trip).
+- **App-side contract to implement:** `server/mcp-relay-worker/README.md` in the
+  repo (the "Desktop-app contract" section). Build the app-side **outbound
+  WebSocket MCP client** there instead of the companion helper below.
+
+**So: adopt the relay as the primary MCP path for MAS.** Keep the companion-helper
+approach below only as an *offline fallback* if a hosted dependency is ever
+unacceptable — but note the relay's dependency is the same Cloudflare account that
+already runs licensing/activation, and AI access is opt-in and off by default.
+Trade-off: the relay needs the app open and connected (same as the helper needing
+the app's data) and adds negligible latency; in exchange it deletes the second
+install, the second cert, and the keychain-sharing risk. The rest of this document
+(the security model, the `mcp_enabled`/spend/approval flow, enabling
+`MCP_SUPPORTED` under `MAS_BUILD`) still applies unchanged.
+
+---
+
 ## The good news: the MCP server already fits the sandbox model
 
 Study these existing files first — you are **reusing**, not rewriting:
