@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Anggep konfigurasi iki kaya sandi: token iki ngidini klien AI maca data pengiriman lan tarif blanja sampeyan (ora tau mbayar) nalika aplikasi iki dibukak. Gawe maneh yen token iki tau kebuka.",
   "connect_agents.relay_url_form_label": "Utawa, kanggo klien sing mung nampa URL (tanpa header):",
   "connect_agents.relay_enable_label": "Aktifake akses jarak jauh (liwat relay aman)",
-  "connect_agents.relay_optin_intro": "Kanthi opsional, akses aplikasi iki saka komputer liya, utawa saka klien sing mung nampa URL, liwat relay aman. Opsi lokal ing dhuwur iku standar lan ora mbutuhake jaringan. Relay mung nggawe sambungan metu, ora tau ndeleng tombol EasyPost sampeyan lan ora tau mbukak alat; tuku isih mbutuhake persetujuan sampeyan ing ngisor iki."
+  "connect_agents.relay_optin_intro": "Kanthi opsional, akses aplikasi iki saka komputer liya, utawa saka klien sing mung nampa URL, liwat relay aman. Opsi lokal ing dhuwur iku standar lan ora mbutuhake jaringan. Relay mung nggawe sambungan metu, ora tau ndeleng tombol EasyPost sampeyan lan ora tau mbukak alat; tuku isih mbutuhake persetujuan sampeyan ing ngisor iki.",
+  "store_unlock.enter_code_button": "Duwe kode buka kunci?",
+  "store_unlock.enter_code_title": "Lebokna kode buka kunci",
+  "store_unlock.enter_code_prompt": "Tempelna kode buka kunci sampeyan kanggo ngaktifake mode produksi.",
+  "store_unlock.enter_code_invalid_title": "Kode ora dikenali",
+  "store_unlock.enter_code_invalid_body": "Priksa kode lan coba maneh. Yen masalah terus ana, hubungi dhukungan.",
+  "update_banner.available": "Versi {version} kasedhiya.",
+  "update_banner.download": "Unduh",
+  "update_banner.dismiss": "Tutup"
 }

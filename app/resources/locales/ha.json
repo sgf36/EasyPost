@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Ka bi da wannan saiti kamar kalmar sirri: alamar (token) tana barin abokin cinikin AI ya karanta bayanan jigilar kayanka da farashin shago (ba zai taɓa kashe kuɗi ba) muddin wannan app tana buɗe. Sake ƙirƙiro ta idan an taɓa fallasa ta.",
   "connect_agents.relay_url_form_label": "Ko kuma, ga abokin ciniki wanda yake karɓar URL kaɗai (babu headers):",
   "connect_agents.relay_enable_label": "Kunna damar shiga daga nesa (ta hanyar relay mai aminci)",
-  "connect_agents.relay_optin_intro": "Kuna iya, in kuka zaɓa, isa ga wannan app daga wani kwamfuta, ko daga wani abokin ciniki wanda ke karɓar URL kawai, ta hanyar relay mai aminci. Zaɓin gida da ke sama shi ne tsohon zaɓi kuma baya buƙatar wani network. Relay yana yin haɗi zuwa waje kawai, ba ya taɓa ganin maɓallin EasyPost naka kuma ba ya taɓa gudanar da wani kayan aiki; siye har yanzu yana buƙatar amincewarka a ƙasa."
+  "connect_agents.relay_optin_intro": "Kuna iya, in kuka zaɓa, isa ga wannan app daga wani kwamfuta, ko daga wani abokin ciniki wanda ke karɓar URL kawai, ta hanyar relay mai aminci. Zaɓin gida da ke sama shi ne tsohon zaɓi kuma baya buƙatar wani network. Relay yana yin haɗi zuwa waje kawai, ba ya taɓa ganin maɓallin EasyPost naka kuma ba ya taɓa gudanar da wani kayan aiki; siye har yanzu yana buƙatar amincewarka a ƙasa.",
+  "store_unlock.enter_code_button": "Kana da lambar buɗewa?",
+  "store_unlock.enter_code_title": "Shigar da lambar buɗewa",
+  "store_unlock.enter_code_prompt": "Manna lambar buɗewa don kunna yanayin samarwa.",
+  "store_unlock.enter_code_invalid_title": "Ba a gane wannan lambar ba",
+  "store_unlock.enter_code_invalid_body": "Duba lambar ka sake gwadawa. Idan matsalar ta ci gaba, ka tuntuɓi tallafi.",
+  "update_banner.available": "Sigar {version} tana samuwa.",
+  "update_banner.download": "Sauke",
+  "update_banner.dismiss": "Kore"
 }

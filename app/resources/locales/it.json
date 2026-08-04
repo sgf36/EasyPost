@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Tratta questa configurazione come una password: il token consente a un client AI di leggere i tuoi dati di spedizione e le tariffe (senza mai spendere) finché questa app è aperta. Rigeneralo se viene mai esposto.",
   "connect_agents.relay_url_form_label": "Oppure, per un client che accetta solo un URL (senza header):",
   "connect_agents.relay_enable_label": "Abilita accesso remoto (tramite relay sicuro)",
-  "connect_agents.relay_optin_intro": "Facoltativamente, raggiungi questa applicazione da un altro computer, o da un client che accetta solo un URL, tramite un relay sicuro. L'opzione locale sopra indicata è quella predefinita e non richiede rete. Il relay stabilisce solo una connessione in uscita, non vede mai la tua chiave EasyPost e non esegue mai uno strumento; l'acquisto richiede comunque la tua approvazione qui sotto."
+  "connect_agents.relay_optin_intro": "Facoltativamente, raggiungi questa applicazione da un altro computer, o da un client che accetta solo un URL, tramite un relay sicuro. L'opzione locale sopra indicata è quella predefinita e non richiede rete. Il relay stabilisce solo una connessione in uscita, non vede mai la tua chiave EasyPost e non esegue mai uno strumento; l'acquisto richiede comunque la tua approvazione qui sotto.",
+  "store_unlock.enter_code_button": "Hai un codice di sblocco?",
+  "store_unlock.enter_code_title": "Inserisci il codice di sblocco",
+  "store_unlock.enter_code_prompt": "Incolla il codice di sblocco per abilitare la modalità di produzione.",
+  "store_unlock.enter_code_invalid_title": "Codice non riconosciuto",
+  "store_unlock.enter_code_invalid_body": "Controlla il codice e riprova. Se il problema persiste, contatta l'assistenza.",
+  "update_banner.available": "La versione {version} è disponibile.",
+  "update_banner.download": "Scarica",
+  "update_banner.dismiss": "Ignora"
 }

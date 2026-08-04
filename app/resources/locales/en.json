@@ -149,8 +149,10 @@
   "connect_agents.no_clients": "No MCP clients were detected. Use the manual setup below.",
   "connect_agents.reject_button": "Reject",
   "connect_agents.relay_config_label": "Paste this into your AI client's MCP configuration. Most clients nest servers under \"mcpServers\"; VS Code uses \"servers\".",
+  "connect_agents.relay_enable_label": "Enable remote access (via secure relay)",
   "connect_agents.relay_group": "Connect an AI client (via secure relay)",
   "connect_agents.relay_intro": "This app reaches AI clients through a secure relay: it makes an outbound connection only — nothing listens for incoming connections on your Mac. The relay never sees your EasyPost key and never runs a tool; every tool runs here, and buying still needs your approval below.",
+  "connect_agents.relay_optin_intro": "Optionally reach this app from another computer, or from a client that only accepts a URL, through a secure relay. The local option above is the default and needs no network. The relay makes an outbound connection only, never sees your EasyPost key and never runs a tool; buying still needs your approval below.",
   "connect_agents.relay_regenerate_button": "Regenerate token",
   "connect_agents.relay_regenerate_confirm_body": "This immediately disconnects any AI client using the current token. You will need to paste the new configuration into each client. Continue?",
   "connect_agents.relay_regenerate_confirm_title": "Regenerate pairing token?",
@@ -464,6 +466,11 @@
   "setup_wizard.title": "<h2>Connect your EasyPost account</h2>",
   "store_unlock.buy_in_store_body": "The Microsoft Store has opened to the Easy-Post Desktop page. Buy the Production unlock there, then return here and choose Restore.",
   "store_unlock.buy_in_store_title": "Finish in the Microsoft Store",
+  "store_unlock.enter_code_button": "Have an unlock code?",
+  "store_unlock.enter_code_invalid_body": "Check the code and try again. If the problem continues, contact support.",
+  "store_unlock.enter_code_invalid_title": "That code was not recognised",
+  "store_unlock.enter_code_prompt": "Paste your unlock code to enable production mode.",
+  "store_unlock.enter_code_title": "Enter unlock code",
   "store_unlock.error_body": "Something went wrong reaching the Microsoft Store. Please check your connection and try again.",
   "store_unlock.error_title": "Purchase could not be completed",
   "store_unlock.multi_seat_link": "Licensing more than one computer, or a team? Get a multi-seat licence",
@@ -493,6 +500,7 @@
   "tracking.table_group_title": "Tracked shipments",
   "tracking.title": "Tracking",
   "tracking.tracking_number_placeholder": "Tracking number",
-  "connect_agents.relay_enable_label": "Enable remote access (via secure relay)",
-  "connect_agents.relay_optin_intro": "Optionally reach this app from another computer, or from a client that only accepts a URL, through a secure relay. The local option above is the default and needs no network. The relay makes an outbound connection only, never sees your EasyPost key and never runs a tool; buying still needs your approval below."
+  "update_banner.available": "Version {version} is available.",
+  "update_banner.dismiss": "Dismiss",
+  "update_banner.download": "Download"
 }

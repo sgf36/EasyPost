@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Fi ìṣètò yìí ṣe bí ọ̀rọ̀ìpamọ́: àmì-ìdánimọ̀ náà máa jẹ́ kí oníṣẹ́ AI kà data ìfíránṣẹ́ rẹ àti owó ọjà (kò lè ná owó rí) nígbà tí ohun èlò yìí bá ṣí sílẹ̀. Ṣe àmì-ìdánimọ̀ tuntun bí ó bá farahàn ní èyíkéyìí ìgbà.",
   "connect_agents.relay_url_form_label": "Tàbí, fún oníṣẹ́ tí ó ń gba URL nìkan (láìní headers):",
   "connect_agents.relay_enable_label": "Mú ìwọlé ọ̀nà jíjìnnà ṣiṣẹ́ (nípasẹ̀ relay tí ó ní ààbò)",
-  "connect_agents.relay_optin_intro": "Ní àṣàyàn, wọlé sí ohun èlò yìí láti kọ̀mpútà mìíràn, tàbí láti ọ̀dọ̀ oníbàárà tí ó gba orí ayélujára URL nìkan, nípasẹ̀ relay tí ó ní ààbò. Àṣàyàn agbègbè tí ó wà lókè ni àpẹẹrẹ àkọ́kọ́ tí kò sì nílò ìsopọ̀ ayélujára. Relay náà ń dá ìsopọ̀ jáde nìkan, kò rí kọ́kọ́rọ́ EasyPost rẹ láé, kò sì ń ṣiṣẹ́ irinṣẹ́ kankan láé; rírà ṣì nílò ìfọwọ́sí rẹ ní ìsàlẹ̀."
+  "connect_agents.relay_optin_intro": "Ní àṣàyàn, wọlé sí ohun èlò yìí láti kọ̀mpútà mìíràn, tàbí láti ọ̀dọ̀ oníbàárà tí ó gba orí ayélujára URL nìkan, nípasẹ̀ relay tí ó ní ààbò. Àṣàyàn agbègbè tí ó wà lókè ni àpẹẹrẹ àkọ́kọ́ tí kò sì nílò ìsopọ̀ ayélujára. Relay náà ń dá ìsopọ̀ jáde nìkan, kò rí kọ́kọ́rọ́ EasyPost rẹ láé, kò sì ń ṣiṣẹ́ irinṣẹ́ kankan láé; rírà ṣì nílò ìfọwọ́sí rẹ ní ìsàlẹ̀.",
+  "store_unlock.enter_code_button": "Ṣé o ní kóòdù ìṣísílẹ̀?",
+  "store_unlock.enter_code_title": "Tẹ kóòdù ìṣísílẹ̀ sí i",
+  "store_unlock.enter_code_prompt": "Lẹ kóòdù ìṣísílẹ̀ rẹ mọ́ ọn láti ṣí ipò ìpèsè sílẹ̀.",
+  "store_unlock.enter_code_invalid_title": "A kò dá kóòdù yìí mọ̀",
+  "store_unlock.enter_code_invalid_body": "Ṣàyẹ̀wò kóòdù náà kí o sì gbìyànjú lẹ́ẹ̀kan si. Bí ìṣòro náà bá ń bá a lọ, kàn sí ẹgbẹ́ ìtìlẹ́yìn.",
+  "update_banner.available": "Ẹ̀yà {version} ti wà ní àyè.",
+  "update_banner.download": "Gbà á sílẹ̀",
+  "update_banner.dismiss": "Fi sílẹ̀"
 }

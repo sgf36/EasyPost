@@ -15,6 +15,7 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QMessageBox,
     QPushButton,
@@ -25,6 +26,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.config import MAS_BUILD, MULTI_SEAT_URL
+from app.core.license import activate
 from app.i18n import is_rtl, tr
 from app.ui.widgets.async_worker import run_async
 
@@ -114,6 +116,14 @@ class StoreUnlockGate(QWidget):
         self._multi_seat_label.setCursor(Qt.CursorShape.PointingHandCursor)
         self._multi_seat_label.linkActivated.connect(self._on_multi_seat)
 
+        # An unlock code (a signed licence key) is the free-access path: the
+        # developer can comp their own machine or a specific user, since the
+        # Store offers no promotional code for an add-on. Verified offline.
+        self._code_btn = QPushButton()
+        self._code_btn.setFlat(True)
+        self._code_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._code_btn.clicked.connect(self._on_enter_code)
+
         # There is always a free way back — this screen only appears when the
         # user reaches for production.
         self._use_test_btn = QPushButton()
@@ -127,6 +137,7 @@ class StoreUnlockGate(QWidget):
         card_layout.addLayout(button_row)
         card_layout.addWidget(self._multi_seat_label)
         card_layout.addSpacing(2)
+        card_layout.addWidget(self._code_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
         card_layout.addWidget(self._use_test_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         outer = QVBoxLayout(self)
@@ -149,6 +160,7 @@ class StoreUnlockGate(QWidget):
         self._multi_seat_label.setText(
             f'<a href="#">{tr("store_unlock.multi_seat_link")}</a>'
         )
+        self._code_btn.setText(tr("store_unlock.enter_code_button"))
         self._use_test_btn.setText(tr("store_unlock.use_test_button"))
         self.setLayoutDirection(
             Qt.LayoutDirection.RightToLeft if is_rtl() else Qt.LayoutDirection.LeftToRight
@@ -217,6 +229,25 @@ class StoreUnlockGate(QWidget):
                 self,
                 tr("store_unlock.restore_none_title"),
                 tr("store_unlock.restore_none_body"),
+            )
+
+    def _on_enter_code(self) -> None:
+        """Redeem a signed unlock code (a licence key). Verified offline; on
+        success production is unlocked exactly as a Store purchase would."""
+        code, ok = QInputDialog.getText(
+            self,
+            tr("store_unlock.enter_code_title"),
+            tr("store_unlock.enter_code_prompt"),
+        )
+        if not ok:
+            return
+        if activate((code or "").strip()):
+            self.activated.emit()
+        else:
+            QMessageBox.warning(
+                self,
+                tr("store_unlock.enter_code_invalid_title"),
+                tr("store_unlock.enter_code_invalid_body"),
             )
 
     def _on_multi_seat(self, _link: str = "") -> None:

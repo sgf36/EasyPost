@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Chukulia usanidi huu kama nenosiri: token huruhusu mteja wa AI kusoma data yako ya usafirishaji na kulinganisha bei za usafirishaji (kamwe kutumia pesa) wakati programu hii imefunguliwa. Tengeneza token mpya ikiwa itafichuliwa wakati wowote.",
   "connect_agents.relay_url_form_label": "Au, kwa mteja anayekubali URL pekee (bila headers):",
   "connect_agents.relay_enable_label": "Washa ufikiaji wa mbali (kupitia relay salama)",
-  "connect_agents.relay_optin_intro": "Kwa hiari, fikia programu hii kutoka kwa kompyuta nyingine, au kutoka kwa mteja anayekubali URL pekee, kupitia relay salama. Chaguo la ndani hapo juu ndilo chaguo-msingi na halihitaji mtandao. Relay huanzisha muunganisho unaotoka nje pekee, kamwe hauoni ufunguo wako wa EasyPost wala kuendesha zana yoyote; ununuzi bado unahitaji idhini yako hapa chini."
+  "connect_agents.relay_optin_intro": "Kwa hiari, fikia programu hii kutoka kwa kompyuta nyingine, au kutoka kwa mteja anayekubali URL pekee, kupitia relay salama. Chaguo la ndani hapo juu ndilo chaguo-msingi na halihitaji mtandao. Relay huanzisha muunganisho unaotoka nje pekee, kamwe hauoni ufunguo wako wa EasyPost wala kuendesha zana yoyote; ununuzi bado unahitaji idhini yako hapa chini.",
+  "store_unlock.enter_code_button": "Una msimbo wa kufungua?",
+  "store_unlock.enter_code_title": "Weka msimbo wa kufungua",
+  "store_unlock.enter_code_prompt": "Bandika msimbo wako wa kufungua ili kuwezesha hali ya uzalishaji.",
+  "store_unlock.enter_code_invalid_title": "Msimbo huo haukutambuliwa",
+  "store_unlock.enter_code_invalid_body": "Angalia msimbo na ujaribu tena. Tatizo likiendelea, wasiliana na usaidizi.",
+  "update_banner.available": "Toleo {version} linapatikana.",
+  "update_banner.download": "Pakua",
+  "update_banner.dismiss": "Ondoa"
 }

@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Perlakukan konfigurasi ini seperti kata sandi: token ini memungkinkan klien AI membaca data pengiriman dan tarif belanja Anda (tidak pernah membelanjakan) selama aplikasi ini terbuka. Buat ulang jika token ini pernah terekspos.",
   "connect_agents.relay_url_form_label": "Atau, untuk klien yang hanya menerima URL (tanpa header):",
   "connect_agents.relay_enable_label": "Aktifkan akses jarak jauh (melalui relay aman)",
-  "connect_agents.relay_optin_intro": "Secara opsional, akses aplikasi ini dari komputer lain, atau dari klien yang hanya menerima URL, melalui relay aman. Opsi lokal di atas adalah default dan tidak memerlukan jaringan. Relay hanya membuat koneksi keluar, tidak pernah melihat kunci EasyPost Anda dan tidak pernah menjalankan alat; pembelian tetap memerlukan persetujuan Anda di bawah."
+  "connect_agents.relay_optin_intro": "Secara opsional, akses aplikasi ini dari komputer lain, atau dari klien yang hanya menerima URL, melalui relay aman. Opsi lokal di atas adalah default dan tidak memerlukan jaringan. Relay hanya membuat koneksi keluar, tidak pernah melihat kunci EasyPost Anda dan tidak pernah menjalankan alat; pembelian tetap memerlukan persetujuan Anda di bawah.",
+  "store_unlock.enter_code_button": "Punya kode buka kunci?",
+  "store_unlock.enter_code_title": "Masukkan kode buka kunci",
+  "store_unlock.enter_code_prompt": "Tempel kode buka kunci Anda untuk mengaktifkan mode produksi.",
+  "store_unlock.enter_code_invalid_title": "Kode tidak dikenali",
+  "store_unlock.enter_code_invalid_body": "Periksa kode dan coba lagi. Jika masalah berlanjut, hubungi dukungan.",
+  "update_banner.available": "Versi {version} tersedia.",
+  "update_banner.download": "Unduh",
+  "update_banner.dismiss": "Tutup"
 }

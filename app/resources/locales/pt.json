@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Trate esta configuração como uma palavra-passe: o token permite que um cliente de IA leia os seus dados de envio e consulte tarifas (nunca gastar), enquanto esta aplicação estiver aberta. Regenere-o caso seja alguma vez exposto.",
   "connect_agents.relay_url_form_label": "Ou, para um cliente que aceita apenas um URL (sem cabeçalhos):",
   "connect_agents.relay_enable_label": "Ativar acesso remoto (através de retransmissor seguro)",
-  "connect_agents.relay_optin_intro": "Opcionalmente, aceda a esta aplicação a partir de outro computador, ou a partir de um cliente que aceita apenas um URL, através de um retransmissor seguro. A opção local acima é a predefinição e não necessita de rede. O retransmissor estabelece apenas uma ligação de saída, nunca vê a sua chave EasyPost e nunca executa uma ferramenta; a compra continua a exigir a sua aprovação abaixo."
+  "connect_agents.relay_optin_intro": "Opcionalmente, aceda a esta aplicação a partir de outro computador, ou a partir de um cliente que aceita apenas um URL, através de um retransmissor seguro. A opção local acima é a predefinição e não necessita de rede. O retransmissor estabelece apenas uma ligação de saída, nunca vê a sua chave EasyPost e nunca executa uma ferramenta; a compra continua a exigir a sua aprovação abaixo.",
+  "store_unlock.enter_code_button": "Tem um código de desbloqueio?",
+  "store_unlock.enter_code_title": "Inserir código de desbloqueio",
+  "store_unlock.enter_code_prompt": "Cole o seu código de desbloqueio para ativar o modo de produção.",
+  "store_unlock.enter_code_invalid_title": "Esse código não foi reconhecido",
+  "store_unlock.enter_code_invalid_body": "Verifique o código e tente novamente. Se o problema continuar, entre em contato com o suporte.",
+  "update_banner.available": "A versão {version} está disponível.",
+  "update_banner.download": "Baixar",
+  "update_banner.dismiss": "Dispensar"
 }

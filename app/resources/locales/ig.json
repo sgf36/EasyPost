@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Jiri nhazi a mee ihe dị ka paswọọdụ: token na-enye ngwa AI ohere ịgụ data mbupu gị na ọnụọgụ ahịa (ọ dịghị mgbe ọ na-akwụ ụgwọ) mgbe ngwa a ka mepere. Mepụtaghachi ya ma ọ bụrụ na ọ pụta ìhè mgbe ọ bụla.",
   "connect_agents.relay_url_form_label": "Ma ọ bụ, maka ngwa nabatara naanị URL (na-enweghị headers):",
   "connect_agents.relay_enable_label": "Kwado ohere ịnweta site n'ebe dị anya (site na relay nchekwa)",
-  "connect_agents.relay_optin_intro": "Site n'ohere, jiri relay nchekwa nweta ngwa a site na kọmputa ọzọ, ma ọ bụ site na ngwa na-anabata naanị URL. Nhọrọ mpaghara dị n'elu bụ nke ndabara, ọ dịghịkwa achọ netwọk. Relay na-eme naanị njikọ na-apụ apụ, ọ dịghị mgbe ọ bụla ọ hụrụ igodo EasyPost gị, ọ dịghịkwa mgbe ọ bụla ọ na-agba ngwaọrụ ọrụ; ịzụta ihe ka chọrọ nkwenye gị dị n'okpuru."
+  "connect_agents.relay_optin_intro": "Site n'ohere, jiri relay nchekwa nweta ngwa a site na kọmputa ọzọ, ma ọ bụ site na ngwa na-anabata naanị URL. Nhọrọ mpaghara dị n'elu bụ nke ndabara, ọ dịghịkwa achọ netwọk. Relay na-eme naanị njikọ na-apụ apụ, ọ dịghị mgbe ọ bụla ọ hụrụ igodo EasyPost gị, ọ dịghịkwa mgbe ọ bụla ọ na-agba ngwaọrụ ọrụ; ịzụta ihe ka chọrọ nkwenye gị dị n'okpuru.",
+  "store_unlock.enter_code_button": "Ị nwere koodu mmeghe?",
+  "store_unlock.enter_code_title": "Tinye koodu mmeghe",
+  "store_unlock.enter_code_prompt": "Mapịnye koodu mmeghe gị iji kwado ọnọdụ mmepụta.",
+  "store_unlock.enter_code_invalid_title": "Amaghị koodu ahụ",
+  "store_unlock.enter_code_invalid_body": "Lelee koodu ahụ ma nwaa ọzọ. Ọ bụrụ na nsogbu ahụ na-aga n'ihu, kpọtụrụ nkwado.",
+  "update_banner.available": "Ụdị {version} dị.",
+  "update_banner.download": "Budata",
+  "update_banner.dismiss": "Wepụ"
 }

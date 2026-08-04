@@ -47,11 +47,12 @@ def test_production_allowed_with_licence_in_direct_build(monkeypatch):
 
 
 def test_store_build_defers_to_store_entitlement(monkeypatch):
-    """Store build: production follows Store add-on ownership, not a key."""
+    """Store build: production follows Store add-on ownership when no comp key."""
     import app.core.store_entitlement as se
 
     monkeypatch.setattr(lic, "LICENSE_REQUIRED", False)
     monkeypatch.setattr(lic, "STORE_BUILD", True)
+    monkeypatch.setattr(lic, "is_licensed", lambda: False)
 
     monkeypatch.setattr(se, "production_unlocked", lambda: True)
     assert lic.production_allowed() is True
@@ -60,19 +61,46 @@ def test_store_build_defers_to_store_entitlement(monkeypatch):
     assert lic.production_allowed() is False
 
 
+def test_store_build_unlocked_by_comp_key(monkeypatch):
+    """Store build: a valid signed comp key unlocks production even when the
+    Store add-on is not owned — the developer's own free-access path, since
+    Microsoft offers no promotional code for an add-on."""
+    import app.core.store_entitlement as se
+
+    monkeypatch.setattr(lic, "LICENSE_REQUIRED", False)
+    monkeypatch.setattr(lic, "STORE_BUILD", True)
+    monkeypatch.setattr(se, "production_unlocked", lambda: False)  # add-on NOT owned
+    monkeypatch.setattr(lic, "is_licensed", lambda: True)          # but comp key present
+    assert lic.production_allowed() is True
+
+
 def test_mas_build_defers_to_mac_store_entitlement(monkeypatch):
-    """Mac App Store build: production follows StoreKit ownership, not a key."""
+    """Mac App Store build: production follows StoreKit ownership when no comp key."""
     import app.core.mac_store_entitlement as mse
 
     monkeypatch.setattr(lic, "LICENSE_REQUIRED", False)
     monkeypatch.setattr(lic, "STORE_BUILD", False)
     monkeypatch.setattr(lic, "MAS_BUILD", True)
+    monkeypatch.setattr(lic, "is_licensed", lambda: False)
 
     monkeypatch.setattr(mse, "production_unlocked", lambda: True)
     assert lic.production_allowed() is True
 
     monkeypatch.setattr(mse, "production_unlocked", lambda: False)
     assert lic.production_allowed() is False
+
+
+def test_mas_build_unlocked_by_comp_key(monkeypatch):
+    """Mac App Store build: a valid signed comp key unlocks production even when
+    the StoreKit purchase is not owned (Apple has no per-account free grant)."""
+    import app.core.mac_store_entitlement as mse
+
+    monkeypatch.setattr(lic, "LICENSE_REQUIRED", False)
+    monkeypatch.setattr(lic, "STORE_BUILD", False)
+    monkeypatch.setattr(lic, "MAS_BUILD", True)
+    monkeypatch.setattr(mse, "production_unlocked", lambda: False)
+    monkeypatch.setattr(lic, "is_licensed", lambda: True)
+    assert lic.production_allowed() is True
 
 
 # --- detect_mode ---------------------------------------------------------

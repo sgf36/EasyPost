@@ -184,13 +184,22 @@ def production_allowed() -> bool:
         # Store build, never on direct-download or non-Windows builds.
         from app.core.store_entitlement import production_unlocked
 
-        return production_unlocked()
+        # A valid signed licence key ALSO unlocks production here. Microsoft
+        # offers no promotional code for add-ons, so this is the only way to
+        # grant free access — to the developer's own machine, or to a comped
+        # user — without the Store purchase. The key is verified offline against
+        # the embedded public key exactly as on the direct build; only our
+        # private key can mint one, so it is not a backdoor.
+        return production_unlocked() or is_licensed()
     if MAS_BUILD:
         # Imported lazily so the StoreKit dependency is only ever touched on the
         # Mac App Store build, never on any other build.
         from app.core.mac_store_entitlement import production_unlocked
 
-        return production_unlocked()
+        # Same comp path as the Windows Store build: a signed key unlocks
+        # production alongside the StoreKit purchase (Apple has no per-account
+        # free grant for a non-consumable either).
+        return production_unlocked() or is_licensed()
     return True
 
 

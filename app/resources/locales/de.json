@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Behandeln Sie diese Konfiguration wie ein Passwort: Das Token ermöglicht es einem KI-Client, Ihre Versanddaten zu lesen und Versandtarife abzurufen (niemals auszugeben), solange diese App geöffnet ist. Generieren Sie es neu, falls es jemals offengelegt wird.",
   "connect_agents.relay_url_form_label": "Oder, für einen Client, der nur eine URL akzeptiert (keine Header):",
   "connect_agents.relay_enable_label": "Fernzugriff aktivieren (über sicheres Relay)",
-  "connect_agents.relay_optin_intro": "Optional können Sie über ein sicheres Relay von einem anderen Computer oder von einem Client, der nur eine URL akzeptiert, auf diese App zugreifen. Die obige lokale Option ist die Standardeinstellung und benötigt keine Netzwerkverbindung. Das Relay stellt ausschließlich eine ausgehende Verbindung her, sieht niemals Ihren EasyPost-Schlüssel und führt niemals ein Tool aus; für einen Kauf ist weiterhin Ihre Genehmigung unten erforderlich."
+  "connect_agents.relay_optin_intro": "Optional können Sie über ein sicheres Relay von einem anderen Computer oder von einem Client, der nur eine URL akzeptiert, auf diese App zugreifen. Die obige lokale Option ist die Standardeinstellung und benötigt keine Netzwerkverbindung. Das Relay stellt ausschließlich eine ausgehende Verbindung her, sieht niemals Ihren EasyPost-Schlüssel und führt niemals ein Tool aus; für einen Kauf ist weiterhin Ihre Genehmigung unten erforderlich.",
+  "store_unlock.enter_code_button": "Haben Sie einen Freischaltcode?",
+  "store_unlock.enter_code_title": "Freischaltcode eingeben",
+  "store_unlock.enter_code_prompt": "Fügen Sie Ihren Freischaltcode ein, um den Produktivmodus zu aktivieren.",
+  "store_unlock.enter_code_invalid_title": "Dieser Code wurde nicht erkannt",
+  "store_unlock.enter_code_invalid_body": "Überprüfen Sie den Code und versuchen Sie es erneut. Falls das Problem weiterhin besteht, wenden Sie sich an den Support.",
+  "update_banner.available": "Version {version} ist verfügbar.",
+  "update_banner.download": "Herunterladen",
+  "update_banner.dismiss": "Schließen"
 }
