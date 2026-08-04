@@ -28,8 +28,18 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import MCP_SUPPORTED
+from app.config import MAS_BUILD, MCP_SUPPORTED
 from app.core import mcp_approvals, mcp_clients
+from app.core.mcp_relay_client import (
+    STATE_CONNECTING,
+    STATE_ERROR,
+    STATE_RUNNING,
+    ai_client_config_json,
+    ai_client_url_path_form,
+    get_or_create_token,
+    regenerate_token,
+    relay_client,
+)
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
 from app.services.mcp_runner import execute_approved
@@ -52,8 +62,13 @@ class ConnectAgentsView(QWidget):
             layout.addStretch(1)
         else:
             layout.addWidget(self._build_enable_group())
-            layout.addWidget(self._build_clients_group())
-            layout.addWidget(self._build_manual_group())
+            if MAS_BUILD:
+                # Sandboxed: no local helper and no writing another app's config.
+                # AI clients reach the app through the outbound relay instead.
+                layout.addWidget(self._build_relay_group())
+            else:
+                layout.addWidget(self._build_clients_group())
+                layout.addWidget(self._build_manual_group())
             layout.addWidget(self._build_approvals_group())
             layout.addStretch(1)
 
@@ -88,6 +103,104 @@ class ConnectAgentsView(QWidget):
         layout.addWidget(link)
         group.setLayout(layout)
         return group
+
+    # -------------------------------------------------------- relay (MAS build)
+
+    def _build_relay_group(self) -> QGroupBox:
+        group = QGroupBox(tr("connect_agents.relay_group"))
+        token = get_or_create_token()
+
+        intro = QLabel(tr("connect_agents.relay_intro"))
+        intro.setWordWrap(True)
+
+        self._relay_status = QLabel(tr("connect_agents.relay_status_stopped"))
+        self._relay_status.setWordWrap(True)
+        self._relay_status.setStyleSheet(f"color: {TEXT_MUTED};")
+        relay_client.state_changed.connect(self._on_relay_state)
+
+        config_label = QLabel(tr("connect_agents.relay_config_label"))
+        config_label.setWordWrap(True)
+        self._relay_snippet = QPlainTextEdit()
+        self._relay_snippet.setReadOnly(True)
+        self._relay_snippet.setPlainText(ai_client_config_json(token))
+        self._relay_snippet.setFixedHeight(150)
+
+        url_label = QLabel(tr("connect_agents.relay_url_form_label"))
+        url_label.setWordWrap(True)
+        self._relay_url = QPlainTextEdit()
+        self._relay_url.setReadOnly(True)
+        self._relay_url.setPlainText(ai_client_url_path_form(token))
+        self._relay_url.setFixedHeight(56)
+
+        warning = QLabel(tr("connect_agents.relay_token_warning"))
+        warning.setWordWrap(True)
+        warning.setStyleSheet(f"color: {TEXT_MUTED}; font-size: 11px;")
+
+        copy_btn = QPushButton(tr("connect_agents.copy_button"))
+        copy_btn.clicked.connect(self._on_copy_relay)
+        regen_btn = QPushButton(tr("connect_agents.relay_regenerate_button"))
+        regen_btn.clicked.connect(self._on_regenerate_token)
+        buttons = QHBoxLayout()
+        buttons.addWidget(copy_btn)
+        buttons.addWidget(regen_btn)
+        buttons.addStretch(1)
+
+        layout = QVBoxLayout()
+        layout.addWidget(intro)
+        layout.addWidget(self._relay_status)
+        layout.addWidget(config_label)
+        layout.addWidget(self._relay_snippet)
+        layout.addWidget(url_label)
+        layout.addWidget(self._relay_url)
+        layout.addWidget(warning)
+        layout.addLayout(buttons)
+        group.setLayout(layout)
+
+        # Reflect the connection to the app's current enable state on open.
+        self._sync_relay_running(load_settings().mcp_enabled)
+        return group
+
+    def _on_relay_state(self, state: str, detail: str) -> None:
+        if state == STATE_RUNNING:
+            text = tr("connect_agents.relay_status_running")
+        elif state == STATE_CONNECTING:
+            text = tr("connect_agents.relay_status_connecting")
+        elif state == STATE_ERROR:
+            text = tr("connect_agents.relay_status_error", detail=detail or "")
+        else:
+            text = tr("connect_agents.relay_status_stopped")
+        if hasattr(self, "_relay_status"):
+            self._relay_status.setText(text)
+
+    def _sync_relay_running(self, enabled: bool) -> None:
+        """Bring the outbound relay connection in line with the enable toggle."""
+        if enabled:
+            relay_client.start()
+        else:
+            relay_client.stop()
+
+    def _on_copy_relay(self) -> None:
+        from PySide6.QtWidgets import QApplication
+
+        QApplication.clipboard().setText(self._relay_snippet.toPlainText())
+
+    def _on_regenerate_token(self) -> None:
+        confirm = QMessageBox.question(
+            self,
+            tr("connect_agents.relay_regenerate_confirm_title"),
+            tr("connect_agents.relay_regenerate_confirm_body"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+        if confirm != QMessageBox.StandardButton.Yes:
+            return
+        token = regenerate_token()
+        self._relay_snippet.setPlainText(ai_client_config_json(token))
+        self._relay_url.setPlainText(ai_client_url_path_form(token))
+        # Reconnect so the relay uses the new token immediately (if enabled).
+        if load_settings().mcp_enabled:
+            relay_client.stop()
+            relay_client.start()
 
     # ---------------------------------------------------------------- enable
 
@@ -139,6 +252,9 @@ class ConnectAgentsView(QWidget):
         settings.mcp_daily_limit = self._daily_limit.value()
         save_settings(settings)
         self._spending_check.setEnabled(settings.mcp_enabled)
+        if MAS_BUILD:
+            # The relay connection tracks the enable toggle directly.
+            self._sync_relay_running(settings.mcp_enabled)
 
     # --------------------------------------------------------------- clients
 
@@ -363,7 +479,8 @@ class ConnectAgentsView(QWidget):
     def refresh(self) -> None:
         if not MCP_SUPPORTED:
             return
-        self._populate_clients()
-        self._snippet.setPlainText(mcp_clients.config_snippet())
+        if not MAS_BUILD:
+            self._populate_clients()
+            self._snippet.setPlainText(mcp_clients.config_snippet())
         self.refresh_approvals()
         self._spending_check.setEnabled(self._enabled_check.isChecked())
