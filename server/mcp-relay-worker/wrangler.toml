@@ -1,0 +1,17 @@
+name = "easypost-mcp-relay"
+main = "src/worker.js"
+compatibility_date = "2025-06-01"
+
+# The relay holds a live WebSocket (from the desktop app) and correlates the AI
+# client's HTTP requests against it — that requires a stateful, single-addressable
+# object, i.e. a Durable Object. No inbound port is ever opened on the app.
+[[durable_objects.bindings]]
+name = "RELAY"
+class_name = "RelayHub"
+
+# SQLite-backed Durable Objects are available on the free plan. The relay keeps
+# its routing state in memory (no persistence needed), but declaring the class as
+# SQLite-backed keeps it deployable without a paid plan.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RelayHub"]
