@@ -4,7 +4,12 @@ requests>=2.31.0
 keyring>=24.0.0
 platformdirs>=4.0.0
 cryptography>=42.0.0
-mcp>=1.28.0
+# Cap below 2.0: the 2.x SDK renamed/removed mcp.server.fastmcp (which
+# app/mcp_server.py and the relay transport bridge use). Stay on the 1.x API.
+mcp>=1.28.0,<2
+# Outbound WebSocket client for the remote MCP relay (app/core/mcp_relay_client.py
+# + server/mcp-relay-worker). Cross-platform; imported lazily and guarded.
+websockets>=12.0
 # Microsoft Store add-on entitlement (Store build only; see
 # app/core/store_entitlement.py). Windows-only, imported lazily and guarded, so
 # their absence never breaks a non-Store or non-Windows build.
@@ -12,3 +17,8 @@ winrt-runtime>=3.2; sys_platform == "win32"
 winrt-Windows.Services.Store>=3.2; sys_platform == "win32"
 winrt-Windows.Foundation>=3.2; sys_platform == "win32"
 winrt-Windows.Foundation.Collections>=3.2; sys_platform == "win32"
+
+# Mac App Store 'Production Unlock' entitlement (MAS build only; see
+# app/core/mac_store_entitlement.py). macOS-only, imported lazily and guarded, so
+# its absence never breaks a non-MAS or non-macOS build.
+pyobjc-framework-StoreKit>=10.0; sys_platform == "darwin"
