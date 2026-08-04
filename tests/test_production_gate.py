@@ -53,6 +53,21 @@ def test_store_build_defers_to_store_entitlement(monkeypatch):
     assert lic.production_allowed() is False
 
 
+def test_mas_build_defers_to_mac_store_entitlement(monkeypatch):
+    """Mac App Store build: production follows StoreKit ownership, not a key."""
+    import app.core.mac_store_entitlement as mse
+
+    monkeypatch.setattr(lic, "LICENSE_REQUIRED", False)
+    monkeypatch.setattr(lic, "STORE_BUILD", False)
+    monkeypatch.setattr(lic, "MAS_BUILD", True)
+
+    monkeypatch.setattr(mse, "production_unlocked", lambda: True)
+    assert lic.production_allowed() is True
+
+    monkeypatch.setattr(mse, "production_unlocked", lambda: False)
+    assert lic.production_allowed() is False
+
+
 # --- detect_mode ---------------------------------------------------------
 
 def _fake_easypost(mode_or_exc):
