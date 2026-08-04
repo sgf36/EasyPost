@@ -74,17 +74,37 @@ if sys.platform == "darwin":
         except Exception as exc:
             print(f"[build_exe.spec] StoreKit import {_mod} skipped: {exc}")
 
+# The remote MCP relay (app/core/mcp_relay_client.py) runs the MCP server
+# IN-PROCESS inside the GUI — it dials the relay and serves app/mcp_server.py's
+# tool registry over an outbound WebSocket. That path is reached only through
+# lazy imports (inside methods), which PyInstaller's static graph never follows,
+# and the Store/direct builds keep the MCP server in a SEPARATE helper exe whose
+# modules are not in the GUI's archive. So collect the MCP SDK, websockets and
+# the server module into the GUI analysis explicitly, or the sandboxed MAS build
+# (which has no helper exe) would ImportError the moment a user enables AI access.
+mcp_datas, mcp_binaries, mcp_hiddenimports = [], [], ["app.mcp_server"]
+try:
+    from PyInstaller.utils.hooks import collect_all as _collect_all
+    for _pkg in ("mcp", "websockets"):
+        _d, _b, _h = _collect_all(_pkg)
+        mcp_datas += _d
+        mcp_binaries += _b
+        mcp_hiddenimports += _h
+except Exception as exc:  # never break a build over this
+    print(f"[build_exe.spec] MCP collect_all skipped: {exc}")
+
 a = Analysis(
     [str(project_root / "app" / "main.py")],
     pathex=[str(project_root)],
-    binaries=[*winrt_binaries],
+    binaries=[*winrt_binaries, *mcp_binaries],
     datas=[
         (str(project_root / "app" / "resources" / "locales"), "app/resources/locales"),
         (str(project_root / "app" / "resources" / "icons"), "app/resources/icons"),
         *variant_flags,
         *winrt_datas,
+        *mcp_datas,
     ],
-    hiddenimports=[*winrt_hiddenimports, *storekit_hiddenimports],
+    hiddenimports=[*winrt_hiddenimports, *storekit_hiddenimports, *mcp_hiddenimports],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
