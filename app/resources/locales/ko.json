@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "이 구성을 비밀번호처럼 취급하십시오. 이 토큰을 사용하면 앱이 열려 있는 동안 AI 클라이언트가 배송 데이터와 요금 조회 정보를 읽을 수 있습니다(지출은 절대 불가). 노출된 경우 재생성하십시오.",
   "connect_agents.relay_url_form_label": "또는 URL만 허용하는 클라이언트(헤더 없음)의 경우:",
   "connect_agents.relay_enable_label": "원격 액세스 사용(보안 릴레이를 통해)",
-  "connect_agents.relay_optin_intro": "선택 사항으로, 보안 릴레이를 통해 다른 컴퓨터나 URL만 허용하는 클라이언트에서 이 앱에 접속할 수 있습니다. 위의 로컬 옵션이 기본값이며 네트워크가 필요하지 않습니다. 릴레이는 아웃바운드 연결만 생성하며 사용자의 EasyPost 키를 확인하지 않고 어떤 도구도 실행하지 않습니다. 구매 시에는 아래에서 사용자의 승인이 필요합니다."
+  "connect_agents.relay_optin_intro": "선택 사항으로, 보안 릴레이를 통해 다른 컴퓨터나 URL만 허용하는 클라이언트에서 이 앱에 접속할 수 있습니다. 위의 로컬 옵션이 기본값이며 네트워크가 필요하지 않습니다. 릴레이는 아웃바운드 연결만 생성하며 사용자의 EasyPost 키를 확인하지 않고 어떤 도구도 실행하지 않습니다. 구매 시에는 아래에서 사용자의 승인이 필요합니다.",
+  "store_unlock.enter_code_button": "잠금 해제 코드가 있으신가요?",
+  "store_unlock.enter_code_title": "잠금 해제 코드 입력",
+  "store_unlock.enter_code_prompt": "프로덕션 모드를 활성화하려면 잠금 해제 코드를 붙여넣으세요.",
+  "store_unlock.enter_code_invalid_title": "코드를 인식할 수 없습니다",
+  "store_unlock.enter_code_invalid_body": "코드를 확인한 후 다시 시도하세요. 문제가 계속되면 지원팀에 문의하세요.",
+  "update_banner.available": "버전 {version}을(를) 사용할 수 있습니다.",
+  "update_banner.download": "다운로드",
+  "update_banner.dismiss": "닫기"
 }

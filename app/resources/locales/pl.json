@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Traktuj tę konfigurację jak hasło: token pozwala klientowi AI odczytywać dane wysyłkowe i sprawdzać stawki (nigdy nie wydawać środków), dopóki ta aplikacja jest otwarta. Wygeneruj nowy token, jeśli kiedykolwiek zostanie ujawniony.",
   "connect_agents.relay_url_form_label": "Lub, dla klienta akceptującego wyłącznie URL (bez nagłówków):",
   "connect_agents.relay_enable_label": "Włącz dostęp zdalny (przez bezpieczny przekaźnik)",
-  "connect_agents.relay_optin_intro": "Opcjonalnie uzyskaj dostęp do tej aplikacji z innego komputera lub z klienta, który akceptuje tylko adres URL, za pośrednictwem bezpiecznego przekaźnika. Powyższa opcja lokalna jest ustawieniem domyślnym i nie wymaga sieci. Przekaźnik nawiązuje wyłącznie połączenie wychodzące, nigdy nie widzi Twojego klucza EasyPost i nigdy nie uruchamia narzędzia; zakup nadal wymaga Twojej zgody poniżej."
+  "connect_agents.relay_optin_intro": "Opcjonalnie uzyskaj dostęp do tej aplikacji z innego komputera lub z klienta, który akceptuje tylko adres URL, za pośrednictwem bezpiecznego przekaźnika. Powyższa opcja lokalna jest ustawieniem domyślnym i nie wymaga sieci. Przekaźnik nawiązuje wyłącznie połączenie wychodzące, nigdy nie widzi Twojego klucza EasyPost i nigdy nie uruchamia narzędzia; zakup nadal wymaga Twojej zgody poniżej.",
+  "store_unlock.enter_code_button": "Masz kod odblokowujący?",
+  "store_unlock.enter_code_title": "Wprowadź kod odblokowujący",
+  "store_unlock.enter_code_prompt": "Wklej kod odblokowujący, aby włączyć tryb produkcyjny.",
+  "store_unlock.enter_code_invalid_title": "Nie rozpoznano tego kodu",
+  "store_unlock.enter_code_invalid_body": "Sprawdź kod i spróbuj ponownie. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną.",
+  "update_banner.available": "Dostępna jest wersja {version}.",
+  "update_banner.download": "Pobierz",
+  "update_banner.dismiss": "Zamknij"
 }

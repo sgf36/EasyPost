@@ -8,6 +8,12 @@ APP_NAME = "EasyPost Desktop"
 APP_DIR_NAME = "EasyPostDesktop"
 KEYRING_SERVICE_NAME = "EasyPostDesktop"
 
+# The running build's marketing version. The direct-download update check
+# (app/core/update_check.py) compares this against the latest GitHub release
+# tag to decide whether to prompt the user to update. Keep it in step with the
+# release tag and packaging/msix/AppxManifest.xml on every release.
+APP_VERSION = "1.0.8"
+
 ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
 
 # The Paddle license gate is enforced ONLY in direct-download builds, which

@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Hãy coi cấu hình này như mật khẩu: token cho phép ứng dụng AI đọc dữ liệu vận chuyển và giá cước cửa hàng của bạn (không bao giờ chi tiêu) khi ứng dụng này đang mở. Hãy tạo lại nếu nó từng bị lộ.",
   "connect_agents.relay_url_form_label": "Hoặc, đối với ứng dụng chỉ chấp nhận URL (không có headers):",
   "connect_agents.relay_enable_label": "Bật quyền truy cập từ xa (qua relay bảo mật)",
-  "connect_agents.relay_optin_intro": "Bạn có thể tùy chọn truy cập ứng dụng này từ một máy tính khác, hoặc từ một trình khách chỉ chấp nhận URL, thông qua một relay bảo mật. Tùy chọn cục bộ ở trên là mặc định và không cần mạng. Relay chỉ tạo kết nối đi ra ngoài, không bao giờ thấy khóa EasyPost của bạn và không bao giờ chạy công cụ nào; việc mua hàng vẫn cần sự chấp thuận của bạn bên dưới."
+  "connect_agents.relay_optin_intro": "Bạn có thể tùy chọn truy cập ứng dụng này từ một máy tính khác, hoặc từ một trình khách chỉ chấp nhận URL, thông qua một relay bảo mật. Tùy chọn cục bộ ở trên là mặc định và không cần mạng. Relay chỉ tạo kết nối đi ra ngoài, không bao giờ thấy khóa EasyPost của bạn và không bao giờ chạy công cụ nào; việc mua hàng vẫn cần sự chấp thuận của bạn bên dưới.",
+  "store_unlock.enter_code_button": "Bạn có mã mở khóa?",
+  "store_unlock.enter_code_title": "Nhập mã mở khóa",
+  "store_unlock.enter_code_prompt": "Dán mã mở khóa để bật chế độ chính thức.",
+  "store_unlock.enter_code_invalid_title": "Không nhận dạng được mã này",
+  "store_unlock.enter_code_invalid_body": "Hãy kiểm tra mã và thử lại. Nếu sự cố vẫn tiếp diễn, hãy liên hệ bộ phận hỗ trợ.",
+  "update_banner.available": "Đã có phiên bản {version}.",
+  "update_banner.download": "Tải xuống",
+  "update_banner.dismiss": "Bỏ qua"
 }

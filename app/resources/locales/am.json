@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "ይህን ውቅር እንደ የይለፍ ቃል ይያዙት፦ ቶክኑ ይህ መተግበሪያ ክፍት እስካለ ድረስ ለAI ደንበኛ የመላኪያ ውሂብዎን እንዲያነብ እና የመላኪያ ዋጋዎችን እንዲያይ ይፈቅዳል (በፍጹም ገንዘብ አያወጣም)። አንዴ ቢጋለጥ ዳግም ይፍጠሩት።",
   "connect_agents.relay_url_form_label": "ወይም፣ URL ብቻ ለሚቀበል ደንበኛ (ያለ headers)፦",
   "connect_agents.relay_enable_label": "የርቀት መዳረሻን አንቃ (በደህንነቱ በተጠበቀ ማስተላለፊያ በኩል)",
-  "connect_agents.relay_optin_intro": "በምርጫ ይህን መተግበሪያ ከሌላ ኮምፒውተር ወይም URL ብቻ ከሚቀበል ደንበኛ ጋር በደህንነቱ በተጠበቀ ማስተላለፊያ አማካኝነት ይድረሱ። ከላይ ያለው የአካባቢ አማራጭ ነባሪ ሲሆን ምንም አውታረ መረብ አያስፈልገውም። ማስተላለፊያው የውጭ ግንኙነት ብቻ ይፈጥራል፣ የEasyPost ቁልፍዎን በጭራሽ አያይም እና መሳሪያ በጭራሽ አያሄድም፤ ግዢ ግን አሁንም ከዚህ በታች ያለዎትን ማረጋገጫ ይፈልጋል።"
+  "connect_agents.relay_optin_intro": "በምርጫ ይህን መተግበሪያ ከሌላ ኮምፒውተር ወይም URL ብቻ ከሚቀበል ደንበኛ ጋር በደህንነቱ በተጠበቀ ማስተላለፊያ አማካኝነት ይድረሱ። ከላይ ያለው የአካባቢ አማራጭ ነባሪ ሲሆን ምንም አውታረ መረብ አያስፈልገውም። ማስተላለፊያው የውጭ ግንኙነት ብቻ ይፈጥራል፣ የEasyPost ቁልፍዎን በጭራሽ አያይም እና መሳሪያ በጭራሽ አያሄድም፤ ግዢ ግን አሁንም ከዚህ በታች ያለዎትን ማረጋገጫ ይፈልጋል።",
+  "store_unlock.enter_code_button": "የመክፈቻ ኮድ አለዎት?",
+  "store_unlock.enter_code_title": "የመክፈቻ ኮድ ያስገቡ",
+  "store_unlock.enter_code_prompt": "ማምረቻ ሁነታን ለማንቃት የመክፈቻ ኮድዎን ይለጥፉ።",
+  "store_unlock.enter_code_invalid_title": "ያ ኮድ አልታወቀም",
+  "store_unlock.enter_code_invalid_body": "ኮዱን አረጋግጠው እንደገና ይሞክሩ። ችግሩ ከቀጠለ ድጋፍን ያግኙ።",
+  "update_banner.available": "ስሪት {version} ይገኛል።",
+  "update_banner.download": "አውርድ",
+  "update_banner.dismiss": "አሰናብት"
 }

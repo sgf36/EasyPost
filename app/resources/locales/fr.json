@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Traitez cette configuration comme un mot de passe : le jeton permet à un client IA de lire vos données d'expédition et les tarifs des transporteurs (jamais de dépenser) tant que cette application est ouverte. Régénérez-le s'il est un jour exposé.",
   "connect_agents.relay_url_form_label": "Ou, pour un client qui n'accepte qu'une URL (sans en-têtes) :",
   "connect_agents.relay_enable_label": "Activer l'accès à distance (via relais sécurisé)",
-  "connect_agents.relay_optin_intro": "Vous pouvez éventuellement accéder à cette application depuis un autre ordinateur, ou depuis un client qui n'accepte qu'une URL, par l'intermédiaire d'un relais sécurisé. L'option locale ci-dessus est l'option par défaut et ne nécessite aucun réseau. Le relais établit uniquement une connexion sortante, n'a jamais accès à votre clé EasyPost et n'exécute jamais d'outil ; tout achat nécessite toujours votre approbation ci-dessous."
+  "connect_agents.relay_optin_intro": "Vous pouvez éventuellement accéder à cette application depuis un autre ordinateur, ou depuis un client qui n'accepte qu'une URL, par l'intermédiaire d'un relais sécurisé. L'option locale ci-dessus est l'option par défaut et ne nécessite aucun réseau. Le relais établit uniquement une connexion sortante, n'a jamais accès à votre clé EasyPost et n'exécute jamais d'outil ; tout achat nécessite toujours votre approbation ci-dessous.",
+  "store_unlock.enter_code_button": "Vous avez un code de déverrouillage ?",
+  "store_unlock.enter_code_title": "Saisir le code de déverrouillage",
+  "store_unlock.enter_code_prompt": "Collez votre code de déverrouillage pour activer le mode production.",
+  "store_unlock.enter_code_invalid_title": "Ce code n'a pas été reconnu",
+  "store_unlock.enter_code_invalid_body": "Vérifiez le code et réessayez. Si le problème persiste, contactez le support.",
+  "update_banner.available": "La version {version} est disponible.",
+  "update_banner.download": "Télécharger",
+  "update_banner.dismiss": "Ignorer"
 }

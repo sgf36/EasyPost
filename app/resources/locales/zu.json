@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Phatha le configuration njengephasiwedi: itokheni livumela iklayenti le-AI ukuthi lifunde idatha yakho yokuthumela nezinani zesitolo (alikaze lisebenzise imali) ngesikhathi le app ivuliwe. Yenza kabusha uma likhe lavezwa.",
   "connect_agents.relay_url_form_label": "Noma, kwiklayenti elemukela kuphela i-URL (ngaphandle kwamaheda):",
   "connect_agents.relay_enable_label": "Nika amandla ukufinyelela kwesikhashana (nge-relay evikelekile)",
-  "connect_agents.relay_optin_intro": "Ngokuzikhethela, finyelela kule app usuka kwelinye ikhompyutha, noma kusuka kumakhasimende amukela kuphela i-URL, ngokusebenzisa i-relay evikelekile. Inketho yasendaweni engenhla iyinketho ezenzakalelayo futhi ayidingi inethiwekhi. I-relay yenza kuphela uxhumano oluphumayo, ayikaze ibone ukhiye wakho we-EasyPost futhi ayikaze isebenzise ithuluzi; ukuthenga kusadinga imvume yakho engezansi."
+  "connect_agents.relay_optin_intro": "Ngokuzikhethela, finyelela kule app usuka kwelinye ikhompyutha, noma kusuka kumakhasimende amukela kuphela i-URL, ngokusebenzisa i-relay evikelekile. Inketho yasendaweni engenhla iyinketho ezenzakalelayo futhi ayidingi inethiwekhi. I-relay yenza kuphela uxhumano oluphumayo, ayikaze ibone ukhiye wakho we-EasyPost futhi ayikaze isebenzise ithuluzi; ukuthenga kusadinga imvume yakho engezansi.",
+  "store_unlock.enter_code_button": "Unayo ikhodi yokuvula?",
+  "store_unlock.enter_code_title": "Faka ikhodi yokuvula",
+  "store_unlock.enter_code_prompt": "Namathisela ikhodi yakho yokuvula ukuze uvule imodi yokukhiqiza.",
+  "store_unlock.enter_code_invalid_title": "Le khodi ayihlonziwanga",
+  "store_unlock.enter_code_invalid_body": "Hlola ikhodi bese uzama futhi. Uma inkinga iqhubeka, xhumana nabasekelayo.",
+  "update_banner.available": "Inguqulo {version} iyatholakala.",
+  "update_banner.download": "Landa",
+  "update_banner.dismiss": "Cashisa"
 }

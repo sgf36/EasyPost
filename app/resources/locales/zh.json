@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "请将此配置视为密码对待:该令牌允许 AI 客户端在本应用打开期间读取您的运送数据和商店费率(但绝不能进行消费)。如果该令牌曾经泄露,请将其重新生成。",
   "connect_agents.relay_url_form_label": "或者,对于仅接受 URL(不含标头)的客户端:",
   "connect_agents.relay_enable_label": "启用远程访问（通过安全中继）",
-  "connect_agents.relay_optin_intro": "您可以选择通过安全中继从另一台计算机访问此应用，或从仅接受 URL 的客户端访问。上方的本地选项为默认设置，无需联网。该中继仅建立出站连接，绝不会看到您的 EasyPost 密钥，也绝不会运行任何工具；购买操作仍需您在下方进行批准。"
+  "connect_agents.relay_optin_intro": "您可以选择通过安全中继从另一台计算机访问此应用，或从仅接受 URL 的客户端访问。上方的本地选项为默认设置，无需联网。该中继仅建立出站连接，绝不会看到您的 EasyPost 密钥，也绝不会运行任何工具；购买操作仍需您在下方进行批准。",
+  "store_unlock.enter_code_button": "有解锁码？",
+  "store_unlock.enter_code_title": "输入解锁码",
+  "store_unlock.enter_code_prompt": "粘贴您的解锁码以启用正式模式。",
+  "store_unlock.enter_code_invalid_title": "无法识别该解锁码",
+  "store_unlock.enter_code_invalid_body": "请检查解锁码后重试。如果问题仍然存在，请联系支持团队。",
+  "update_banner.available": "版本 {version} 现已可用。",
+  "update_banner.download": "下载",
+  "update_banner.dismiss": "忽略"
 }

@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Ovu konfiguraciju tretirajte kao lozinku: token omogućuje AI klijentu čitanje vaših podataka o dostavi i cijena dostave (nikad trošenje) dok je ova aplikacija otvorena. Ponovno ga generirajte ako ikada bude izložen.",
   "connect_agents.relay_url_form_label": "Ili, za klijenta koji prihvaća samo URL (bez zaglavlja):",
   "connect_agents.relay_enable_label": "Omogući daljinski pristup (putem sigurnog releja)",
-  "connect_agents.relay_optin_intro": "Po želji možete ovoj aplikaciji pristupiti s drugog računala ili putem klijenta koji prihvaća samo URL, posredstvom sigurnog releja. Gornja lokalna opcija zadana je postavka i ne zahtijeva mrežnu vezu. Relej ostvaruje samo odlaznu vezu, nikada ne vidi vaš EasyPost ključ i nikada ne pokreće alat; kupnja i dalje zahtijeva vaše odobrenje u nastavku."
+  "connect_agents.relay_optin_intro": "Po želji možete ovoj aplikaciji pristupiti s drugog računala ili putem klijenta koji prihvaća samo URL, posredstvom sigurnog releja. Gornja lokalna opcija zadana je postavka i ne zahtijeva mrežnu vezu. Relej ostvaruje samo odlaznu vezu, nikada ne vidi vaš EasyPost ključ i nikada ne pokreće alat; kupnja i dalje zahtijeva vaše odobrenje u nastavku.",
+  "store_unlock.enter_code_button": "Imate kod za otključavanje?",
+  "store_unlock.enter_code_title": "Unesite kod za otključavanje",
+  "store_unlock.enter_code_prompt": "Zalijepite svoj kod za otključavanje da biste omogućili produkcijski način rada.",
+  "store_unlock.enter_code_invalid_title": "Taj kod nije prepoznat",
+  "store_unlock.enter_code_invalid_body": "Provjerite kod i pokušajte ponovno. Ako se problem nastavi, obratite se podršci.",
+  "update_banner.available": "Verzija {version} je dostupna.",
+  "update_banner.download": "Preuzmi",
+  "update_banner.dismiss": "Odbaci"
 }

@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "この設定はパスワードと同様に扱ってください。トークンにより、本アプリが開いている間、AIクライアントは配送データと料金の照会(購入は不可)を行えるようになります。万一漏えいした場合は再生成してください。",
   "connect_agents.relay_url_form_label": "または、URLのみを受け付けるクライアントの場合(ヘッダーなし):",
   "connect_agents.relay_enable_label": "リモートアクセスを有効にする(セキュアリレー経由)",
-  "connect_agents.relay_optin_intro": "必要に応じて、セキュアリレーを通じて別のコンピューターから、またはURLのみを受け付けるクライアントからこのアプリにアクセスできます。上記のローカルオプションが既定であり、ネットワークを必要としません。リレーは送信接続のみを確立し、EasyPostキーを参照することはなく、ツールを実行することもありません。購入には引き続き以下での承認が必要です。"
+  "connect_agents.relay_optin_intro": "必要に応じて、セキュアリレーを通じて別のコンピューターから、またはURLのみを受け付けるクライアントからこのアプリにアクセスできます。上記のローカルオプションが既定であり、ネットワークを必要としません。リレーは送信接続のみを確立し、EasyPostキーを参照することはなく、ツールを実行することもありません。購入には引き続き以下での承認が必要です。",
+  "store_unlock.enter_code_button": "ロック解除コードをお持ちですか？",
+  "store_unlock.enter_code_title": "ロック解除コードを入力",
+  "store_unlock.enter_code_prompt": "本番モードを有効にするには、ロック解除コードを貼り付けてください。",
+  "store_unlock.enter_code_invalid_title": "コードを認識できませんでした",
+  "store_unlock.enter_code_invalid_body": "コードを確認してもう一度お試しください。問題が解決しない場合は、サポートにお問い合わせください。",
+  "update_banner.available": "バージョン {version} が利用可能です。",
+  "update_banner.download": "ダウンロード",
+  "update_banner.dismiss": "閉じる"
 }

@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Tratați această configurație ca pe o parolă: tokenul permite unui client de AI să citească datele dvs. de expediere și să consulte tarife (fără a cheltui niciodată), cât timp această aplicație este deschisă. Regenerați-l dacă este vreodată expus.",
   "connect_agents.relay_url_form_label": "Sau, pentru un client care acceptă doar un URL (fără antete):",
   "connect_agents.relay_enable_label": "Activează accesul de la distanță (printr-un releu securizat)",
-  "connect_agents.relay_optin_intro": "Opțional, accesează această aplicație de pe alt computer, sau dintr-un client care acceptă doar un URL, printr-un releu securizat. Opțiunea locală de mai sus este cea implicită și nu necesită rețea. Releul stabilește doar o conexiune de ieșire, nu vede niciodată cheia EasyPost și nu rulează niciodată un instrument; cumpărarea necesită în continuare aprobarea dumneavoastră mai jos."
+  "connect_agents.relay_optin_intro": "Opțional, accesează această aplicație de pe alt computer, sau dintr-un client care acceptă doar un URL, printr-un releu securizat. Opțiunea locală de mai sus este cea implicită și nu necesită rețea. Releul stabilește doar o conexiune de ieșire, nu vede niciodată cheia EasyPost și nu rulează niciodată un instrument; cumpărarea necesită în continuare aprobarea dumneavoastră mai jos.",
+  "store_unlock.enter_code_button": "Ai un cod de deblocare?",
+  "store_unlock.enter_code_title": "Introdu codul de deblocare",
+  "store_unlock.enter_code_prompt": "Lipește codul de deblocare pentru a activa modul de producție.",
+  "store_unlock.enter_code_invalid_title": "Acest cod nu a fost recunoscut",
+  "store_unlock.enter_code_invalid_body": "Verifică codul și încearcă din nou. Dacă problema persistă, contactează asistența.",
+  "update_banner.available": "Versiunea {version} este disponibilă.",
+  "update_banner.download": "Descarcă",
+  "update_banner.dismiss": "Închide"
 }

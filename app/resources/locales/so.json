@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Ula dhaqan qaabaynta tan sida furaha sirta ah: intuu app-kani furan yahay, token-ku wuxuu u oggolaadaa macmiil AI ah inuu akhriyo xogtaada rarka iyo inuu barbardhigo qiimaha rarka (waligiis lacag ma bixiyo). Dib u soo saar haddii uu goorna soo baxo.",
   "connect_agents.relay_url_form_label": "Ama, macmiil aan aqbalin wax aan URL ahayn (headers ma leh):",
   "connect_agents.relay_enable_label": "Shid gelitaanka fog (iyada oo loo marayo rilaay ammaan ah)",
-  "connect_agents.relay_optin_intro": "Si ikhtiyaari ah, kaga gaadh barnaamijkan kombiyuutar kale, ama kaydka (client) aan aqbalin waxaan URL mooyee, iyada oo loo marayo rilaay ammaan ah. Ikhtiyaarka maxalliga ah ee kore waa mid caadi ah (default) oo aan u baahnayn shabakad. Rilaayku wuxuu sameeyaa xiriir dibadda u socda oo keliya, weligiis ma arko furahaaga EasyPost, welina ma hawlgeliyo qalab (tool); iibsigu weli wuxuu u baahan yahay ogolaanshahaaga hoose."
+  "connect_agents.relay_optin_intro": "Si ikhtiyaari ah, kaga gaadh barnaamijkan kombiyuutar kale, ama kaydka (client) aan aqbalin waxaan URL mooyee, iyada oo loo marayo rilaay ammaan ah. Ikhtiyaarka maxalliga ah ee kore waa mid caadi ah (default) oo aan u baahnayn shabakad. Rilaayku wuxuu sameeyaa xiriir dibadda u socda oo keliya, weligiis ma arko furahaaga EasyPost, welina ma hawlgeliyo qalab (tool); iibsigu weli wuxuu u baahan yahay ogolaanshahaaga hoose.",
+  "store_unlock.enter_code_button": "Ma haysaa koodh furitaan?",
+  "store_unlock.enter_code_title": "Geli koodhka furitaanka",
+  "store_unlock.enter_code_prompt": "Ku dhaji koodhkaaga furitaanka si aad u daarto habka wax-soo-saarka.",
+  "store_unlock.enter_code_invalid_title": "Koodhkaas lama aqoonsan",
+  "store_unlock.enter_code_invalid_body": "Hubi koodhka oo isku day mar kale. Haddii dhibaatadu sii socoto, la xidhiidh taageerada.",
+  "update_banner.available": "Nooca {version} ayaa la heli karaa.",
+  "update_banner.download": "Soo deji",
+  "update_banner.dismiss": "Iska daa"
 }

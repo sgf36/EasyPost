@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Bu yapılandırmayı bir parola gibi ele alın: bu uygulama açıkken belirteç, bir AI istemcisinin gönderi verilerinizi okumasına ve gönderi ücretlerini karşılaştırmasına izin verir (asla para harcamaz). Herhangi bir şekilde açığa çıkarsa yeniden oluşturun.",
   "connect_agents.relay_url_form_label": "Ya da yalnızca URL kabul eden bir istemci için (headers olmadan):",
   "connect_agents.relay_enable_label": "Uzaktan erişimi etkinleştir (güvenli röle üzerinden)",
-  "connect_agents.relay_optin_intro": "Bu uygulamaya, isteğe bağlı olarak başka bir bilgisayardan veya yalnızca URL kabul eden bir istemciden, güvenli bir röle üzerinden erişebilirsiniz. Yukarıdaki yerel seçenek varsayılandır ve ağ bağlantısı gerektirmez. Röle yalnızca giden bağlantı kurar, EasyPost anahtarınızı asla görmez ve hiçbir araç çalıştırmaz; satın alma işlemi yine de aşağıdaki onayınızı gerektirir."
+  "connect_agents.relay_optin_intro": "Bu uygulamaya, isteğe bağlı olarak başka bir bilgisayardan veya yalnızca URL kabul eden bir istemciden, güvenli bir röle üzerinden erişebilirsiniz. Yukarıdaki yerel seçenek varsayılandır ve ağ bağlantısı gerektirmez. Röle yalnızca giden bağlantı kurar, EasyPost anahtarınızı asla görmez ve hiçbir araç çalıştırmaz; satın alma işlemi yine de aşağıdaki onayınızı gerektirir.",
+  "store_unlock.enter_code_button": "Kilit açma kodunuz var mı?",
+  "store_unlock.enter_code_title": "Kilit açma kodunu girin",
+  "store_unlock.enter_code_prompt": "Üretim modunu etkinleştirmek için kilit açma kodunuzu yapıştırın.",
+  "store_unlock.enter_code_invalid_title": "Bu kod tanınmadı",
+  "store_unlock.enter_code_invalid_body": "Kodu kontrol edip tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin.",
+  "update_banner.available": "{version} sürümü kullanılabilir.",
+  "update_banner.download": "İndir",
+  "update_banner.dismiss": "Kapat"
 }

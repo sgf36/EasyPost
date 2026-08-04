@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Kezelje ezt a konfigurációt jelszóként: a token lehetővé teszi egy AI-kliens számára, hogy elolvassa a szállítási adatait és díjszabási ajánlatokat kérjen (soha nem költhet), amíg ez az alkalmazás nyitva van. Generálja újra, ha valaha nyilvánosságra kerül.",
   "connect_agents.relay_url_form_label": "Vagy, ha egy kliens csak URL-t fogad el (fejlécek nélkül):",
   "connect_agents.relay_enable_label": "Távoli hozzáférés engedélyezése (biztonságos relén keresztül)",
-  "connect_agents.relay_optin_intro": "Az alkalmazás opcionálisan elérhető egy másik számítógépről, vagy egy olyan kliensből, amely csak URL-t fogad el, biztonságos relén keresztül. A fenti helyi opció az alapértelmezett, és nem igényel hálózatot. A relé kizárólag kimenő kapcsolatot hoz létre, soha nem látja az Ön EasyPost kulcsát, és soha nem futtat eszközt; a vásárláshoz továbbra is szükség van az alábbi jóváhagyására."
+  "connect_agents.relay_optin_intro": "Az alkalmazás opcionálisan elérhető egy másik számítógépről, vagy egy olyan kliensből, amely csak URL-t fogad el, biztonságos relén keresztül. A fenti helyi opció az alapértelmezett, és nem igényel hálózatot. A relé kizárólag kimenő kapcsolatot hoz létre, soha nem látja az Ön EasyPost kulcsát, és soha nem futtat eszközt; a vásárláshoz továbbra is szükség van az alábbi jóváhagyására.",
+  "store_unlock.enter_code_button": "Van feloldókódod?",
+  "store_unlock.enter_code_title": "Feloldókód megadása",
+  "store_unlock.enter_code_prompt": "Illeszd be a feloldókódot az éles mód engedélyezéséhez.",
+  "store_unlock.enter_code_invalid_title": "A kód nem ismerhető fel",
+  "store_unlock.enter_code_invalid_body": "Ellenőrizd a kódot, és próbáld újra. Ha a probléma továbbra is fennáll, fordulj az ügyfélszolgálathoz.",
+  "update_banner.available": "A(z) {version} verzió elérhető.",
+  "update_banner.download": "Letöltés",
+  "update_banner.dismiss": "Elvetés"
 }

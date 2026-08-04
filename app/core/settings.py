@@ -48,6 +48,11 @@ class AppSettings:
     mcp_allow_spending: bool = False
     mcp_max_purchase: float = 50.0
     mcp_daily_limit: float = 200.0
+    # The newest release the user has dismissed the "update available" banner
+    # for (direct-download builds only — see app/core/update_check.py). The
+    # banner reappears only once a version *newer than this* ships, so a
+    # dismissal is not nagged but a genuinely new release still gets noticed.
+    update_dismissed_version: Optional[str] = None
     # Remote AI-agent access over the hosted relay (see app/core/mcp_relay_client.py).
     # Off by default and opt-in: on non-MAS builds the local stdio helper is the
     # default transport, and this opens an *additional* outbound path so a client

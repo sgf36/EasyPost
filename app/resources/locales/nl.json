@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Behandel deze configuratie als een wachtwoord: met dit token kan een AI-client uw verzendgegevens en verzendtarieven lezen (nooit uitgeven) zolang deze app geopend is. Genereer het opnieuw als het ooit wordt blootgesteld.",
   "connect_agents.relay_url_form_label": "Of, voor een client die alleen een URL accepteert (geen headers):",
   "connect_agents.relay_enable_label": "Externe toegang inschakelen (via beveiligde relay)",
-  "connect_agents.relay_optin_intro": "Bereik deze app optioneel vanaf een andere computer, of vanaf een client die alleen een URL accepteert, via een beveiligde relay. De lokale optie hierboven is de standaardinstelling en vereist geen netwerk. De relay maakt uitsluitend een uitgaande verbinding, ziet nooit uw EasyPost-sleutel en voert nooit een tool uit; voor aankopen is nog steeds uw goedkeuring hieronder vereist."
+  "connect_agents.relay_optin_intro": "Bereik deze app optioneel vanaf een andere computer, of vanaf een client die alleen een URL accepteert, via een beveiligde relay. De lokale optie hierboven is de standaardinstelling en vereist geen netwerk. De relay maakt uitsluitend een uitgaande verbinding, ziet nooit uw EasyPost-sleutel en voert nooit een tool uit; voor aankopen is nog steeds uw goedkeuring hieronder vereist.",
+  "store_unlock.enter_code_button": "Hebt u een ontgrendelingscode?",
+  "store_unlock.enter_code_title": "Ontgrendelingscode invoeren",
+  "store_unlock.enter_code_prompt": "Plak uw ontgrendelingscode om de productiemodus in te schakelen.",
+  "store_unlock.enter_code_invalid_title": "Die code is niet herkend",
+  "store_unlock.enter_code_invalid_body": "Controleer de code en probeer het opnieuw. Als het probleem aanhoudt, neem contact op met de ondersteuning.",
+  "update_banner.available": "Versie {version} is beschikbaar.",
+  "update_banner.download": "Downloaden",
+  "update_banner.dismiss": "Sluiten"
 }

@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Layan konfigurasi ini seperti kata laluan: token ini membenarkan klien AI membaca data penghantaran dan kadar kedai anda (tidak sekali-kali membelanjakan) semasa apl ini dibuka. Jana semula jika ia pernah terdedah.",
   "connect_agents.relay_url_form_label": "Atau, untuk klien yang hanya menerima URL (tiada pengepala):",
   "connect_agents.relay_enable_label": "Dayakan akses jauh (melalui geganti selamat)",
-  "connect_agents.relay_optin_intro": "Secara pilihan, capai aplikasi ini daripada komputer lain, atau daripada klien yang hanya menerima URL, melalui geganti selamat. Pilihan tempatan di atas ialah lalai dan tidak memerlukan rangkaian. Geganti hanya membuat sambungan keluar, tidak pernah melihat kunci EasyPost anda dan tidak pernah menjalankan sebarang alat; pembelian masih memerlukan kelulusan anda di bawah."
+  "connect_agents.relay_optin_intro": "Secara pilihan, capai aplikasi ini daripada komputer lain, atau daripada klien yang hanya menerima URL, melalui geganti selamat. Pilihan tempatan di atas ialah lalai dan tidak memerlukan rangkaian. Geganti hanya membuat sambungan keluar, tidak pernah melihat kunci EasyPost anda dan tidak pernah menjalankan sebarang alat; pembelian masih memerlukan kelulusan anda di bawah.",
+  "store_unlock.enter_code_button": "Ada kod buka kunci?",
+  "store_unlock.enter_code_title": "Masukkan kod buka kunci",
+  "store_unlock.enter_code_prompt": "Tampal kod buka kunci anda untuk mendayakan mod pengeluaran.",
+  "store_unlock.enter_code_invalid_title": "Kod itu tidak dikenali",
+  "store_unlock.enter_code_invalid_body": "Semak kod dan cuba lagi. Jika masalah berterusan, hubungi sokongan.",
+  "update_banner.available": "Versi {version} tersedia.",
+  "update_banner.download": "Muat turun",
+  "update_banner.dismiss": "Ketepikan"
 }

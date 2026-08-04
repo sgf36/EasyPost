@@ -25,7 +25,7 @@ from app.config import (
 from app.core.client import client_manager
 from app.core.activation import ensure_seat
 from app.core.credential_store import load_credentials, save_credentials
-from app.core.license import load_active_license
+from app.core.license import is_licensed, load_active_license
 from app.core.settings import load_settings
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
@@ -47,6 +47,7 @@ from app.ui.views.setup_wizard import SetupWizard
 from app.ui.views.tracking_view import TrackingView
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.mode_banner import ModeBanner
+from app.ui.widgets.update_banner import UpdateBanner
 
 
 class MainWindow(QMainWindow):
@@ -58,6 +59,10 @@ class MainWindow(QMainWindow):
         self._root_stack = QStackedWidget()
         self.setCentralWidget(self._root_stack)
         self._pending_webhook_task = None
+        self._update_check_task = None
+        # The update check runs once per launch, not every time the shell is
+        # shown (it can be re-shown after the gate/wizard flows).
+        self._update_checked = False
         # True while the licence gate is being shown to unlock production
         # (rather than as a first-run wall). Governs where activation returns to.
         self._pending_production = False
@@ -106,6 +111,11 @@ class MainWindow(QMainWindow):
         outer = QVBoxLayout(shell)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
+
+        # Update-available banner (direct-download builds; hidden until a newer
+        # release is found). Above the mode banner so it reads first.
+        self._update_banner = UpdateBanner()
+        outer.addWidget(self._update_banner)
 
         self._mode_banner = ModeBanner()
         self._mode_banner.production_locked.connect(self._on_production_locked)
@@ -267,18 +277,22 @@ class MainWindow(QMainWindow):
 
     def _production_ok(self) -> bool:
         """Entitled to production right now: a valid licence with a seat
-        (direct build), ownership of the Store unlock add-on (Store build), or
-        no gate at all (dev/unflagged)."""
+        (direct build), ownership of the Store unlock add-on OR a signed comp
+        key (store builds), or no gate at all (dev/unflagged)."""
         if LICENSE_REQUIRED:
             return self._license_ok()
         if STORE_BUILD:
             from app.core.store_entitlement import production_unlocked
 
-            return production_unlocked()
+            # A signed comp key unlocks production without the Store add-on
+            # (kept in step with license.production_allowed). is_licensed is a
+            # pure offline signature check — no seat/activation, since a comp
+            # key needs no server round-trip.
+            return production_unlocked() or is_licensed()
         if MAS_BUILD:
             from app.core.mac_store_entitlement import production_unlocked
 
-            return production_unlocked()
+            return production_unlocked() or is_licensed()
         return True
 
     def _license_ok(self) -> bool:
@@ -330,6 +344,27 @@ class MainWindow(QMainWindow):
         self._root_stack.setCurrentWidget(self._app_shell)
         self._maybe_resume_webhook()
         self._maybe_resume_relay()
+        self._maybe_check_update()
+
+    def _maybe_check_update(self) -> None:
+        """Ask GitHub (once per launch, in the background) whether a newer
+        direct-download release exists, and surface the banner if so. Store and
+        Mac App Store builds update themselves, so the check no-ops there
+        (see app/core/update_check.update_check_supported)."""
+        if self._update_checked:
+            return
+        from app.core.update_check import check_for_update, update_check_supported
+
+        if not update_check_supported():
+            return
+        self._update_checked = True
+        self._update_check_task = run_async(check_for_update, self)
+        self._update_check_task.succeeded.connect(self._on_update_check_done)
+        # A failed check is a non-event: the banner simply never appears.
+
+    def _on_update_check_done(self, tag) -> None:
+        if tag:
+            self._update_banner.show_update(tag)
 
     def _maybe_resume_relay(self) -> None:
         """Reconnect the outbound MCP relay on launch when it should be running,

@@ -494,5 +494,13 @@
   "connect_agents.relay_token_warning": "Bu konfiguratsiyani parol kabi ko'ring: token AI mijoziga ilova ochiq turgan vaqtda yetkazib berish ma'lumotlaringiz va do'kon tariflarini o'qish imkonini beradi (hech qachon sarflay olmaydi). Agar u qachondir oshkor bo'lsa, uni qayta yarating.",
   "connect_agents.relay_url_form_label": "Yoki faqat URL qabul qiladigan mijoz uchun (sarlavhalarsiz):",
   "connect_agents.relay_enable_label": "Masofaviy kirishni yoqish (xavfsiz relay orqali)",
-  "connect_agents.relay_optin_intro": "Ixtiyoriy ravishda ushbu ilovaga boshqa kompyuterdan yoki faqat URL manzilini qabul qiladigan mijozdan xavfsiz relay orqali ulaning. Yuqoridagi lokal variant birlamchi bo'lib, tarmoqni talab qilmaydi. Relay faqat chiquvchi ulanish o'rnatadi, hech qachon sizning EasyPost kalitingizni ko'rmaydi va hech qachon vositani ishga tushirmaydi; xarid qilish uchun baribir quyida sizning tasdig'ingiz talab qilinadi."
+  "connect_agents.relay_optin_intro": "Ixtiyoriy ravishda ushbu ilovaga boshqa kompyuterdan yoki faqat URL manzilini qabul qiladigan mijozdan xavfsiz relay orqali ulaning. Yuqoridagi lokal variant birlamchi bo'lib, tarmoqni talab qilmaydi. Relay faqat chiquvchi ulanish o'rnatadi, hech qachon sizning EasyPost kalitingizni ko'rmaydi va hech qachon vositani ishga tushirmaydi; xarid qilish uchun baribir quyida sizning tasdig'ingiz talab qilinadi.",
+  "store_unlock.enter_code_button": "Ochish kodingiz bormi?",
+  "store_unlock.enter_code_title": "Ochish kodini kiriting",
+  "store_unlock.enter_code_prompt": "Ishlab chiqarish rejimini yoqish uchun ochish kodingizni joylashtiring.",
+  "store_unlock.enter_code_invalid_title": "Bu kod tan olinmadi",
+  "store_unlock.enter_code_invalid_body": "Kodni tekshirib, qayta urinib ko‘ring. Muammo davom etsa, qo‘llab-quvvatlash xizmatiga murojaat qiling.",
+  "update_banner.available": "{version} versiyasi mavjud.",
+  "update_banner.download": "Yuklab olish",
+  "update_banner.dismiss": "Yopish"
 }
