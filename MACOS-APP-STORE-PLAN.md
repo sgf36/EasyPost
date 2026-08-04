@@ -1,6 +1,19 @@
 # Easy-Post Desktop — Mac App Store build: a compliant, feature-maximal plan
 
-**Status:** planning document. Nothing here is built yet.
+**Status (updated 2026-08-04): BUILT and UPLOADED.** The MAS edition is
+implemented and on `main` (StoreKit `production_unlock` IAP gate mirroring the
+Microsoft Store add-on; AI-agent access via the in-process outbound relay, not a
+companion helper; the shared UI-sizing fixes). The **Phase 0 spike PASSED** — a
+sandboxed PySide6/Python `.app` clears Apple's static analysis, including the
+private-API scan (`altool` VERIFY SUCCEEDED) — so the one make-or-break unknown is
+retired. **Build 3 is signed, validated and uploaded to App Store Connect** with
+screenshots, metadata and the IAP set. Packaging lives in `packaging/mas/`
+(entitlements, Info.plist additions, `build_mas.sh`, `verify_mas_variant.sh`);
+the build is marked by an `app/resources/mas_build.flag`. The only remaining work
+is **owner-only App Store Connect UI** (primary category → Business; Pricing →
+Free; the App Privacy questionnaire; App Review notes for the AI-agent feature;
+attach the `production_unlock` IAP; then Submit for Review). The plan below is the
+original design, retained for reference.
 **Author's brief:** ship a Mac App Store (MAS) version of Easy-Post Desktop that
 keeps as many of the app's valuable features as Apple's rules allow, using
 creative architecture where a naïve port would have to drop a feature.
