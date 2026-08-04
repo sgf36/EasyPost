@@ -651,6 +651,11 @@ class CreateShipmentView(QWidget):
         # delegate rather than the widget — it would truncate longer service
         # names. Width is set from the widgets themselves once rows are built.
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
+        # Give column 0 an initial width that fits its header, so the
+        # "Carrier & service" label isn't clipped in the empty state (before any
+        # rates load and _resize_rates_table_to_content sets the real width).
+        header_hint = header.sectionSizeHint(0)
+        self._rates_table.setColumnWidth(0, max(header_hint + 16, 150))
         self._rates_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self._rates_table.verticalHeader().setVisible(False)
         # Sized to fit every row (see _resize_rates_table_to_content) instead

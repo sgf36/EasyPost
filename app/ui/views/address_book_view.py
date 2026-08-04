@@ -149,13 +149,21 @@ class AddressBookView(QWidget):
         self._table = QTableWidget(0, _COLUMN_COUNT)
         self._table.setHorizontalHeaderLabels(columns)
         self._table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        # The actions column holds three buttons (Favorite/Edit/Delete) — an
-        # equal Stretch share clips them, so give it a fixed width instead.
+        # The actions column holds three buttons (Favorite/Edit/Delete). Neither a
+        # hard-coded width nor ResizeToContents works: a fixed width clips the
+        # buttons once labels are localised, and ResizeToContents measures only the
+        # cell's (empty) item text — not the embedded widget — so it collapses the
+        # column and clips them too. Instead we keep the section Fixed and set its
+        # width from the buttons' actual sizeHint each refresh (see refresh_table),
+        # so it always fits exactly, in any style, font or language.
         self._table.horizontalHeader().setSectionResizeMode(
             _COLUMN_COUNT - 1, QHeaderView.ResizeMode.Fixed
         )
-        self._table.setColumnWidth(_COLUMN_COUNT - 1, 220)
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        # Keep cell text on a single elided line so rows stay a uniform height;
+        # wrapping made rows uneven and clipped the button widgets (see
+        # refresh_table, which sets one row height that fits the buttons).
+        self._table.setWordWrap(False)
 
         layout = QVBoxLayout()
         layout.addWidget(self._table)
@@ -320,6 +328,8 @@ class AddressBookView(QWidget):
     def refresh_table(self) -> None:
         records = list_addresses()
         self._table.setRowCount(len(records))
+        actions_width = 0
+        actions_height = 0
         for row, rec in enumerate(records):
             street = " ".join(filter(None, [rec.street1, rec.street2]))
             values = [
@@ -357,6 +367,19 @@ class AddressBookView(QWidget):
             actions_layout.addWidget(edit_btn)
             actions_layout.addWidget(delete_btn)
             self._table.setCellWidget(row, _COLUMN_COUNT - 1, actions)
+            actions.adjustSize()
+            actions_width = max(actions_width, actions.sizeHint().width())
+            actions_height = max(actions_height, actions.sizeHint().height())
+
+        # The (Fixed) actions column is sized to the widest button row so the
+        # three buttons are always fully visible; every row gets the SAME height,
+        # tall enough to fit the buttons, so rows are uniform and nothing clips
+        # vertically — regardless of locale, style or font.
+        if records:
+            self._table.setColumnWidth(_COLUMN_COUNT - 1, actions_width + 12)
+            row_height = actions_height + 10
+            for row in range(len(records)):
+                self._table.setRowHeight(row, row_height)
 
     def _toggle_favorite(self, address_id: str, favorite: bool) -> None:
         set_favorite(address_id, favorite)
