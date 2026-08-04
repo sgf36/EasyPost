@@ -53,7 +53,7 @@ IN_APP_OFFER_TOKEN = "production_unlock"
 # The app's numeric Apple ID (App Store Connect → App Information → "Apple ID"),
 # for the macappstore:// deep-link fallback. Filled once the app record exists;
 # empty is tolerated (store_listing_uri then points at the generic search).
-MAC_APP_STORE_ID = ""
+MAC_APP_STORE_ID = "6797912453"
 
 # How long a confirmed unlock is trusted without a fresh StoreKit check.
 STORE_UNLOCK_GRACE_DAYS = 30

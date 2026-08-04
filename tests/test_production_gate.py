@@ -21,8 +21,15 @@ from app.core.credential_store import Credentials
 # --- production_allowed --------------------------------------------------
 
 def test_production_allowed_when_not_a_licensed_build(monkeypatch):
-    """Store builds carry no flag: production is unrestricted."""
+    """Unflagged dev build carries no gate flag: production is unrestricted.
+
+    Patch every channel flag off explicitly so a stray build-variant flag left
+    in the working tree (e.g. a packaging run's mas_build.flag) can't silently
+    flip this case onto a gated branch.
+    """
     monkeypatch.setattr(lic, "LICENSE_REQUIRED", False)
+    monkeypatch.setattr(lic, "STORE_BUILD", False)
+    monkeypatch.setattr(lic, "MAS_BUILD", False)
     monkeypatch.setattr(lic, "is_licensed", lambda: False)
     assert lic.production_allowed() is True
 
