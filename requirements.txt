@@ -4,7 +4,7 @@ requests>=2.31.0
 keyring>=24.0.0
 platformdirs>=4.0.0
 cryptography>=42.0.0
-mcp>=1.28.0
+mcp>=1.28.0,<2
 # Microsoft Store add-on entitlement (Store build only; see
 # app/core/store_entitlement.py). Windows-only, imported lazily and guarded, so
 # their absence never breaks a non-Store or non-Windows build.
