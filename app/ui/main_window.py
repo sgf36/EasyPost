@@ -11,7 +11,14 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import APP_NAME, LICENSE_REQUIRED, MODE_PRODUCTION, MODE_TEST, STORE_BUILD
+from app.config import (
+    APP_NAME,
+    LICENSE_REQUIRED,
+    MAS_BUILD,
+    MODE_PRODUCTION,
+    MODE_TEST,
+    STORE_BUILD,
+)
 from app.core.client import client_manager
 from app.core.activation import ensure_seat
 from app.core.credential_store import load_credentials, save_credentials
@@ -55,7 +62,11 @@ class MainWindow(QMainWindow):
         # The Store build unlocks production by buying a Store add-on, not by
         # pasting a key, so it shows a different gate. Both expose the same
         # activated / use_test_requested signals, so nothing downstream changes.
-        self._license_gate = StoreUnlockGate() if STORE_BUILD else LicenseGate()
+        # Both store channels use the generic StoreUnlockGate (it resolves the
+        # right entitlement backend itself); direct-download uses LicenseGate.
+        self._license_gate = (
+            StoreUnlockGate() if (STORE_BUILD or MAS_BUILD) else LicenseGate()
+        )
         self._license_gate.activated.connect(self._on_license_activated)
         self._license_gate.use_test_requested.connect(self._on_use_test_mode)
         self._root_stack.addWidget(self._license_gate)
@@ -253,6 +264,10 @@ class MainWindow(QMainWindow):
             from app.core.store_entitlement import production_unlocked
 
             return production_unlocked()
+        if MAS_BUILD:
+            from app.core.mac_store_entitlement import production_unlocked
+
+            return production_unlocked()
         return True
 
     def _license_ok(self) -> bool:
@@ -308,5 +323,11 @@ class MainWindow(QMainWindow):
         """Re-starts the webhook push-update tunnel on launch if it was
         left enabled last session (see app/core/webhook_manager.py) —
         off by default, opt-in only."""
+        # The MAS build never runs the tunnel: the App Sandbox forbids spawning
+        # cloudflared / downloading a binary (guideline 2.5.2), so the feature is
+        # disabled for MAS v1 and polling remains the fallback (brief §4a). The
+        # Settings section that toggles it is hidden there too.
+        if MAS_BUILD:
+            return
         if load_settings().webhook_enabled:
             self._pending_webhook_task = run_async(webhook_manager.start, self)

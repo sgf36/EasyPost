@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.config import MAS_BUILD
 from app.core.credential_store import load_credentials, save_credentials
 from app.core.label_options import (
     LABEL_FORMATS,
@@ -68,7 +69,11 @@ class SettingsView(QWidget):
         layout.addLayout(button_row)
         layout.addWidget(self._build_label_group())
         layout.addWidget(self._build_language_group())
-        layout.addWidget(self._build_webhook_group())
+        # Real-time push (webhook tunnel) is disabled on the MAS build — the App
+        # Sandbox forbids the cloudflared helper (brief §4a) — so its Settings
+        # section is hidden there; polling continues to keep tracking current.
+        if not MAS_BUILD:
+            layout.addWidget(self._build_webhook_group())
         layout.addStretch(1)
 
         self.refresh()
