@@ -24,15 +24,21 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import MULTI_SEAT_URL
-from app.core.store_entitlement import (
-    PurchaseResult,
-    purchase_unlock,
-    refresh_entitlement,
-    store_listing_uri,
-)
+from app.config import MAS_BUILD, MULTI_SEAT_URL
 from app.i18n import is_rtl, tr
 from app.ui.widgets.async_worker import run_async
+
+
+def _entitlement_backend():
+    """The entitlement module this build gates on. The Windows Store and the Mac
+    App Store share this gate UI; each has a module with the same public surface
+    (PurchaseResult / purchase_unlock / refresh_entitlement / store_listing_uri),
+    so the gate stays build-agnostic and simply resolves the right one."""
+    if MAS_BUILD:
+        from app.core import mac_store_entitlement as backend
+    else:
+        from app.core import store_entitlement as backend
+    return backend
 
 _CARD_MAX_WIDTH = 460
 
@@ -63,6 +69,7 @@ class StoreUnlockGate(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._task = None
+        self._ent = _entitlement_backend()
 
         card = QFrame()
         card.setObjectName("storeUnlockCard")
@@ -157,24 +164,24 @@ class StoreUnlockGate(QWidget):
     def _on_unlock(self) -> None:
         self._set_busy(True)
         hwnd = self._window_handle()
-        self._task = run_async(lambda: purchase_unlock(hwnd), self)
+        self._task = run_async(lambda: self._ent.purchase_unlock(hwnd), self)
         self._task.succeeded.connect(self._on_purchase_done)
         self._task.failed.connect(self._on_purchase_failed)
 
     def _on_purchase_done(self, result) -> None:
         self._set_busy(False)
-        if result == PurchaseResult.PURCHASED:
+        if result == self._ent.PurchaseResult.PURCHASED:
             self.activated.emit()
-        elif result == PurchaseResult.UNAVAILABLE:
+        elif result == self._ent.PurchaseResult.UNAVAILABLE:
             # In-app purchase could not be driven here: send them to the Store
             # page to buy, then they return and Restore.
-            QDesktopServices.openUrl(QUrl(store_listing_uri()))
+            QDesktopServices.openUrl(QUrl(self._ent.store_listing_uri()))
             QMessageBox.information(
                 self,
                 tr("store_unlock.buy_in_store_title"),
                 tr("store_unlock.buy_in_store_body"),
             )
-        elif result == PurchaseResult.ERROR:
+        elif result == self._ent.PurchaseResult.ERROR:
             QMessageBox.warning(
                 self,
                 tr("store_unlock.error_title"),
@@ -190,7 +197,7 @@ class StoreUnlockGate(QWidget):
 
     def _on_restore(self) -> None:
         self._set_busy(True)
-        self._task = run_async(refresh_entitlement, self)
+        self._task = run_async(self._ent.refresh_entitlement, self)
         self._task.succeeded.connect(self._on_restore_done)
         self._task.failed.connect(self._on_purchase_failed)
 
