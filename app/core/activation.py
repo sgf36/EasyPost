@@ -241,6 +241,24 @@ def default_device_label() -> str:
     return f"{name} ({system})"[:64]
 
 
+def platform_tag() -> str:
+    """A coarse operating-system label — "windows", "macos" or "linux".
+
+    Recorded server-side on activation so paid demand can be seen per platform
+    without any client-side analytics. This is deliberately *not* obscured the
+    way the machine id is: it reveals no more than the device label already does
+    (which carries the OS name in parentheses), and it is the single signal that
+    tells us whether a macOS build earns the work of an App Store release. It is
+    advisory only — never part of the possession proof — so an old client that
+    omits it, or a spoofed value, costs nothing but a slightly fuzzier count.
+    """
+    if sys.platform.startswith("win"):
+        return "windows"
+    if sys.platform == "darwin":
+        return "macos"
+    return "linux"
+
+
 # --------------------------------------------------------------------------
 # Receipts
 # --------------------------------------------------------------------------
@@ -440,6 +458,7 @@ def activate_device(license_key: str, info: LicenseInfo, label: str = "") -> Rec
         "license": license_key.strip(),
         "device": device,
         "label": label,
+        "platform": platform_tag(),
         "ts": stamp,
         "proof": _sign_request(license_key, info.order, device, stamp),
     })

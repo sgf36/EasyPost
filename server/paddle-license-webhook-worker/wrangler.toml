@@ -28,3 +28,5 @@ CONTACT_TO_EMAIL = "Apps@spencerfields.com"
 #   ANTHROPIC_API_KEY   ← contact-form AI triage. If unset, the form still
 #                         works: it just acknowledges and routes to a human
 #                         instead of drafting an auto-reply.
+#   STATS_SECRET        ← guards GET /stats (platform/tier demand counts). If
+#                         unset, /stats returns 403 to everyone (fails closed).
