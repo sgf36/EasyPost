@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "启用远程访问（通过安全中继）",
+  "connect_agents.relay_optin_intro": "您可以选择通过安全中继从另一台计算机访问此应用，或从仅接受 URL 的客户端访问。上方的本地选项为默认设置，无需联网。该中继仅建立出站连接，绝不会看到您的 EasyPost 密钥，也绝不会运行任何工具；购买操作仍需您在下方进行批准。"
 }

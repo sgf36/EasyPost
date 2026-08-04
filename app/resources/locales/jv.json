@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "Aktifake akses jarak jauh (liwat relay aman)",
+  "connect_agents.relay_optin_intro": "Kanthi opsional, akses aplikasi iki saka komputer liya, utawa saka klien sing mung nampa URL, liwat relay aman. Opsi lokal ing dhuwur iku standar lan ora mbutuhake jaringan. Relay mung nggawe sambungan metu, ora tau ndeleng tombol EasyPost sampeyan lan ora tau mbukak alat; tuku isih mbutuhake persetujuan sampeyan ing ngisor iki."
 }

@@ -17,6 +17,7 @@ from app.config import (
     APP_NAME,
     LICENSE_REQUIRED,
     MAS_BUILD,
+    MCP_SUPPORTED,
     MODE_PRODUCTION,
     MODE_TEST,
     STORE_BUILD,
@@ -328,6 +329,20 @@ class MainWindow(QMainWindow):
         self._mode_banner.refresh()
         self._root_stack.setCurrentWidget(self._app_shell)
         self._maybe_resume_webhook()
+        self._maybe_resume_relay()
+
+    def _maybe_resume_relay(self) -> None:
+        """Reconnect the outbound MCP relay on launch when it should be running,
+        so a paired AI client can reach the app without the user first opening
+        the Connect-AI-agents view. The relay is outbound-only and opt-in: on the
+        MAS build it follows AI access; elsewhere it needs the remote-access
+        opt-in too (see mcp_relay_client.relay_should_run)."""
+        if not MCP_SUPPORTED:
+            return
+        from app.core.mcp_relay_client import relay_client, relay_should_run
+
+        if relay_should_run(load_settings()):
+            self._pending_relay_task = run_async(relay_client.start, self)
 
     def _maybe_resume_webhook(self) -> None:
         """Re-starts the webhook push-update tunnel on launch if it was

@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "የርቀት መዳረሻን አንቃ (በደህንነቱ በተጠበቀ ማስተላለፊያ በኩል)",
+  "connect_agents.relay_optin_intro": "በምርጫ ይህን መተግበሪያ ከሌላ ኮምፒውተር ወይም URL ብቻ ከሚቀበል ደንበኛ ጋር በደህንነቱ በተጠበቀ ማስተላለፊያ አማካኝነት ይድረሱ። ከላይ ያለው የአካባቢ አማራጭ ነባሪ ሲሆን ምንም አውታረ መረብ አያስፈልገውም። ማስተላለፊያው የውጭ ግንኙነት ብቻ ይፈጥራል፣ የEasyPost ቁልፍዎን በጭራሽ አያይም እና መሳሪያ በጭራሽ አያሄድም፤ ግዢ ግን አሁንም ከዚህ በታች ያለዎትን ማረጋገጫ ይፈልጋል።"
 }

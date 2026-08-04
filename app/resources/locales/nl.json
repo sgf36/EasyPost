@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "Externe toegang inschakelen (via beveiligde relay)",
+  "connect_agents.relay_optin_intro": "Bereik deze app optioneel vanaf een andere computer, of vanaf een client die alleen een URL accepteert, via een beveiligde relay. De lokale optie hierboven is de standaardinstelling en vereist geen netwerk. De relay maakt uitsluitend een uitgaande verbinding, ziet nooit uw EasyPost-sleutel en voert nooit een tool uit; voor aankopen is nog steeds uw goedkeuring hieronder vereist."
 }

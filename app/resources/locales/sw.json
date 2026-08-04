@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "Washa ufikiaji wa mbali (kupitia relay salama)",
+  "connect_agents.relay_optin_intro": "Kwa hiari, fikia programu hii kutoka kwa kompyuta nyingine, au kutoka kwa mteja anayekubali URL pekee, kupitia relay salama. Chaguo la ndani hapo juu ndilo chaguo-msingi na halihitaji mtandao. Relay huanzisha muunganisho unaotoka nje pekee, kamwe hauoni ufunguo wako wa EasyPost wala kuendesha zana yoyote; ununuzi bado unahitaji idhini yako hapa chini."
 }

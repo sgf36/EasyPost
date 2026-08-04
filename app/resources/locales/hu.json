@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "Távoli hozzáférés engedélyezése (biztonságos relén keresztül)",
+  "connect_agents.relay_optin_intro": "Az alkalmazás opcionálisan elérhető egy másik számítógépről, vagy egy olyan kliensből, amely csak URL-t fogad el, biztonságos relén keresztül. A fenti helyi opció az alapértelmezett, és nem igényel hálózatot. A relé kizárólag kimenő kapcsolatot hoz létre, soha nem látja az Ön EasyPost kulcsát, és soha nem futtat eszközt; a vásárláshoz továbbra is szükség van az alábbi jóváhagyására."
 }

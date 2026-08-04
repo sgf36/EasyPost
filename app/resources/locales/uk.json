@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "Увімкнути віддалений доступ (через захищений релей)",
+  "connect_agents.relay_optin_intro": "За бажанням отримайте доступ до цього застосунку з іншого комп'ютера або з клієнта, який приймає лише URL-адресу, через захищений релей. Наведений вище локальний варіант є типовим і не потребує мережі. Релей встановлює лише вихідне з'єднання, ніколи не бачить ваш ключ EasyPost і ніколи не запускає інструмент; для купівлі все одно потрібне ваше підтвердження нижче."
 }

@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "දුරස්ථ ප්‍රවේශය සක්‍රිය කරන්න (ආරක්ෂිත රිලේ එකක් හරහා)",
+  "connect_agents.relay_optin_intro": "විකල්පයෙන්, වෙනත් පරිගණකයකින් හෝ URL එකක් පමණක් පිළිගන්නා සේවාලාභියෙකුගෙන් මෙම යෙදුමට ආරක්ෂිත රිලේ එකක් හරහා ප්‍රවේශ විය හැක. ඉහත දේශීය විකල්පය පෙරනිමිය වන අතර ජාලයක් අවශ්‍ය නොවේ. රිලේය පිටතට යන සම්බන්ධතාවයක් පමණක් ඇති කරයි, ඔබගේ EasyPost යතුර කිසි විටෙකත් නොදකින අතර මෙවලමක් කිසි විටෙකත් ක්‍රියාත්මක නොකරයි; මිලදී ගැනීම සඳහා තවමත් පහත ඔබගේ අනුමැතිය අවශ්‍ය වේ."
 }

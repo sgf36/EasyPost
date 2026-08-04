@@ -39,6 +39,7 @@ from app.core.mcp_relay_client import (
     get_or_create_token,
     regenerate_token,
     relay_client,
+    relay_should_run,
 )
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
@@ -67,8 +68,11 @@ class ConnectAgentsView(QWidget):
                 # AI clients reach the app through the outbound relay instead.
                 layout.addWidget(self._build_relay_group())
             else:
+                # The local stdio helper is the default here; the relay is an
+                # additive opt-in for reaching the app from another machine.
                 layout.addWidget(self._build_clients_group())
                 layout.addWidget(self._build_manual_group())
+                layout.addWidget(self._build_relay_group())
             layout.addWidget(self._build_approvals_group())
             layout.addStretch(1)
 
@@ -109,9 +113,23 @@ class ConnectAgentsView(QWidget):
     def _build_relay_group(self) -> QGroupBox:
         group = QGroupBox(tr("connect_agents.relay_group"))
         token = get_or_create_token()
+        settings = load_settings()
 
-        intro = QLabel(tr("connect_agents.relay_intro"))
+        # MAS has no local helper, so the relay is the whole story; elsewhere it is
+        # an optional remote path alongside the default local helper, framed as such.
+        intro = QLabel(tr("connect_agents.relay_intro" if MAS_BUILD
+                          else "connect_agents.relay_optin_intro"))
         intro.setWordWrap(True)
+
+        # Non-MAS: a separate opt-in, so the app never opens an outbound relay
+        # connection unless the user asks for it. On MAS the relay simply tracks
+        # the master "Enable AI agent access" toggle, so no second checkbox.
+        self._relay_enabled_check = None
+        if not MAS_BUILD:
+            self._relay_enabled_check = QCheckBox(tr("connect_agents.relay_enable_label"))
+            self._relay_enabled_check.setChecked(settings.mcp_relay_enabled)
+            self._relay_enabled_check.setEnabled(settings.mcp_enabled)
+            self._relay_enabled_check.toggled.connect(self._on_relay_enable_toggled)
 
         self._relay_status = QLabel(tr("connect_agents.relay_status_stopped"))
         self._relay_status.setWordWrap(True)
@@ -147,6 +165,8 @@ class ConnectAgentsView(QWidget):
 
         layout = QVBoxLayout()
         layout.addWidget(intro)
+        if self._relay_enabled_check is not None:
+            layout.addWidget(self._relay_enabled_check)
         layout.addWidget(self._relay_status)
         layout.addWidget(config_label)
         layout.addWidget(self._relay_snippet)
@@ -156,8 +176,8 @@ class ConnectAgentsView(QWidget):
         layout.addLayout(buttons)
         group.setLayout(layout)
 
-        # Reflect the connection to the app's current enable state on open.
-        self._sync_relay_running(load_settings().mcp_enabled)
+        # Bring the connection in line with the build + settings on open.
+        self._sync_relay_running()
         return group
 
     def _on_relay_state(self, state: str, detail: str) -> None:
@@ -172,12 +192,20 @@ class ConnectAgentsView(QWidget):
         if hasattr(self, "_relay_status"):
             self._relay_status.setText(text)
 
-    def _sync_relay_running(self, enabled: bool) -> None:
-        """Bring the outbound relay connection in line with the enable toggle."""
-        if enabled:
+    def _sync_relay_running(self) -> None:
+        """Bring the outbound relay connection in line with the build + settings
+        (see mcp_relay_client.relay_should_run): MAS follows the master AI toggle,
+        elsewhere it also needs the remote-access opt-in."""
+        if relay_should_run(load_settings()):
             relay_client.start()
         else:
             relay_client.stop()
+
+    def _on_relay_enable_toggled(self, checked: bool) -> None:
+        settings = load_settings()
+        settings.mcp_relay_enabled = checked
+        save_settings(settings)
+        self._sync_relay_running()
 
     def _on_copy_relay(self) -> None:
         from PySide6.QtWidgets import QApplication
@@ -197,8 +225,8 @@ class ConnectAgentsView(QWidget):
         token = regenerate_token()
         self._relay_snippet.setPlainText(ai_client_config_json(token))
         self._relay_url.setPlainText(ai_client_url_path_form(token))
-        # Reconnect so the relay uses the new token immediately (if enabled).
-        if load_settings().mcp_enabled:
+        # Reconnect so the relay uses the new token immediately (if running).
+        if relay_should_run(load_settings()):
             relay_client.stop()
             relay_client.start()
 
@@ -252,9 +280,13 @@ class ConnectAgentsView(QWidget):
         settings.mcp_daily_limit = self._daily_limit.value()
         save_settings(settings)
         self._spending_check.setEnabled(settings.mcp_enabled)
-        if MAS_BUILD:
-            # The relay connection tracks the enable toggle directly.
-            self._sync_relay_running(settings.mcp_enabled)
+        # The remote-access opt-in only makes sense while AI access is on.
+        if getattr(self, "_relay_enabled_check", None) is not None:
+            self._relay_enabled_check.setEnabled(settings.mcp_enabled)
+        # Bring the relay connection in line whenever the master toggle changes
+        # (turning AI access off must also drop any relay connection).
+        if hasattr(self, "_relay_status"):
+            self._sync_relay_running()
 
     # --------------------------------------------------------------- clients
 

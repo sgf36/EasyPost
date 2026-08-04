@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "دور دراز رسائی فعال کریں (محفوظ ریلے کے ذریعے)",
+  "connect_agents.relay_optin_intro": "اختیاری طور پر اس ایپ تک کسی دوسرے کمپیوٹر سے، یا ایسے کلائنٹ سے رسائی حاصل کریں جو صرف URL قبول کرتا ہو، ایک محفوظ ریلے کے ذریعے۔ اوپر دیا گیا مقامی آپشن پہلے سے طے شدہ ہے اور اسے کسی نیٹ ورک کی ضرورت نہیں۔ ریلے صرف بیرونی کنکشن بناتا ہے، کبھی آپ کی EasyPost کلید نہیں دیکھتا اور کبھی کوئی ٹول نہیں چلاتا؛ خریداری کے لیے پھر بھی نیچے آپ کی منظوری درکار ہوگی۔"
 }

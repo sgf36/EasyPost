@@ -492,5 +492,7 @@
   "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
   "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
   "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
-  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):",
+  "connect_agents.relay_enable_label": "원격 액세스 사용(보안 릴레이를 통해)",
+  "connect_agents.relay_optin_intro": "선택 사항으로, 보안 릴레이를 통해 다른 컴퓨터나 URL만 허용하는 클라이언트에서 이 앱에 접속할 수 있습니다. 위의 로컬 옵션이 기본값이며 네트워크가 필요하지 않습니다. 릴레이는 아웃바운드 연결만 생성하며 사용자의 EasyPost 키를 확인하지 않고 어떤 도구도 실행하지 않습니다. 구매 시에는 아래에서 사용자의 승인이 필요합니다."
 }
