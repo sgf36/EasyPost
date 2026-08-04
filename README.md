@@ -552,6 +552,32 @@ Microsoft Store build, which Microsoft signs itself, never shows the warning.
 do for a build you compiled yourself or downloaded from this repo's own
 GitHub Actions runs.
 
+### Mac App Store package (MAS)
+
+A Mac App Store edition is built from the same codebase, marked by
+`app/resources/mas_build.flag`. It is the macOS twin of the Microsoft Store
+variant: free to install and fully usable in EasyPost test mode, with production
+(real labels) unlocked by a one-time **StoreKit In-App Purchase**
+(`production_unlock`, ~$29.99) rather than a pasted licence key — see
+`app/core/mac_store_entitlement.py`, which mirrors the public contract of
+`store_entitlement.py` over StoreKit.
+
+Apple's App Sandbox shapes a few build-specific choices, all gated on `MAS_BUILD`
+and inert on every other build: the `cloudflared` push tunnel and the in-app
+donation/updater are disabled, and AI-agent access runs over the **outbound
+relay** (`server/mcp-relay-worker/`) rather than a local subprocess — so there is
+no inbound port and no downloaded code, satisfying App Review. Packaging lives in
+`packaging/mas/`:
+
+- `EasyPostDesktop.entitlements` — the minimal sandbox set (`app-sandbox`,
+  `network.client`, user-selected + downloads file access, `print`).
+- `Info.plist.additions`, `build_mas.sh` (build → sign inside-out → `productbuild`
+  a `.pkg`), and `verify_mas_variant.sh` (the mutual-exclusion guard).
+
+Building, signing and submitting a MAS package require **macOS + Xcode + an Apple
+Developer account** — it cannot be produced on Windows. The remaining steps after
+upload are owner-only App Store Connect actions; see `MACOS-APP-STORE-PLAN.md`.
+
 ## Repository layout
 
 ```
