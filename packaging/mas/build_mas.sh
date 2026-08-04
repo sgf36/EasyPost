@@ -73,12 +73,14 @@ merge_key NSHumanReadableCopyright     string  "$(/usr/libexec/PlistBuddy -c 'Pr
 merge_key ITSAppUsesNonExemptEncryption bool  "$(/usr/libexec/PlistBuddy -c 'Print :ITSAppUsesNonExemptEncryption' "$plist_additions")"
 cp "$PROVISION_PROFILE" "$app_path/Contents/embedded.provisionprofile"
 
-# MCP is OFF for the MAS build (brief §4a) — a sandboxed MAS app can't host it.
-# The PyInstaller spec emits a second executable, Contents/MacOS/easypost-mcp,
-# purely for the MCP stdio bridge. Leaving it in the bundle also breaks MAS
-# validation: signing the .app only applies entitlements to the MAIN executable,
-# so the helper ships un-sandboxed (altool 90296). Remove it — the MAS bundle
-# has exactly one executable, the GUI app.
+# MAS reaches AI clients through the remote relay, served IN-PROCESS by the GUI
+# (app/core/mcp_relay_client.py) — the MCP runtime is bundled into the GUI itself
+# (see build_exe.spec). The spec still emits a second stdio-helper executable,
+# Contents/MacOS/easypost-mcp, for the Store/direct builds; MAS neither needs nor
+# can ship it. A second executable also breaks MAS validation: signing the .app
+# only applies entitlements to the MAIN executable, so the helper would ship
+# un-sandboxed (altool 90296). Remove it — the MAS bundle has exactly one
+# executable, the GUI app.
 rm -f "$app_path/Contents/MacOS/easypost-mcp"
 
 echo "==> [4/6] Verify variant flags in the bundle"
