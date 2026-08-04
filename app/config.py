@@ -53,7 +53,23 @@ MAS_BUILD = (Path(__file__).parent / "resources" / "mas_build.flag").exists()
 # client never depends on a redirected cross-package write: the copy-paste
 # snippet in Tools > Connect AI agents always works, with the auto-write kept
 # as a convenience.
-MCP_SUPPORTED = (Path(__file__).parent / "resources" / "mcp_supported.flag").exists() or STORE_BUILD
+#
+# The Mac App Store build reaches parity through the remote MCP relay
+# (server/mcp-relay-worker): the sandboxed app itself is the MCP backend, dialled
+# by the AI client through a Cloudflare Worker over an *outbound* WebSocket the
+# app opens (only network.client is needed — already entitled). No companion
+# helper, no shared container. Hence `or MAS_BUILD`.
+MCP_SUPPORTED = (
+    (Path(__file__).parent / "resources" / "mcp_supported.flag").exists()
+    or STORE_BUILD
+    or MAS_BUILD
+)
+
+# The deployed remote MCP relay (see server/mcp-relay-worker/README.md). The app
+# opens an outbound WebSocket to <MCP_RELAY_URL>/connect and serves MCP over it;
+# the AI client reaches the app at <MCP_RELAY_URL>/mcp using a per-app pairing
+# token generated in Tools > Connect AI agents.
+MCP_RELAY_URL = "https://easypost-mcp-relay.sgf36.workers.dev"
 
 APP_DATA_DIR = Path(platformdirs.user_data_dir(APP_DIR_NAME, appauthor=False))
 DATABASE_PATH = APP_DATA_DIR / "easypost_desktop.sqlite3"
