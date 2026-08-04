@@ -91,6 +91,16 @@ function isoMinusDays(days) {
   return new Date(Date.now() - days * 86400000).toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
+// A coarse OS label kept purely to gauge demand per platform. Anything the app
+// does not send, or sends outside this allow-list, is stored as "" and reads as
+// "unknown" in the counts — never trusted, never load-bearing.
+const KNOWN_PLATFORMS = new Set(["windows", "macos", "linux"]);
+
+function normalizePlatform(value) {
+  const v = String(value || "").toLowerCase();
+  return KNOWN_PLATFORMS.has(v) ? v : "";
+}
+
 /**
  * Verify a licence key and return its signed contents, or null.
  *
@@ -318,6 +328,7 @@ export async function handleActivate(request, env, json) {
 
   const { license, device } = auth;
   const db = env.LICENSES;
+  const platform = normalizePlatform(body.platform);
 
   // Settle how long a receipt may last before taking a seat, so a lapsed
   // subscription is refused without first consuming an allowance.
@@ -335,9 +346,13 @@ export async function handleActivate(request, env, json) {
 
   if (existing) {
     // Re-activating a computer we already know is not a new seat. Refresh the
-    // timestamp so it does not get reclaimed out from under an active user.
-    await db.prepare("UPDATE devices SET last_seen = ?, label = ? WHERE order_id = ? AND device = ?")
-      .bind(nowIso(), String(body.label || "").slice(0, 64), license.order, device).run();
+    // timestamp so it does not get reclaimed out from under an active user, and
+    // backfill the platform (COALESCE keeps the stored value when an older
+    // client sends nothing, rather than blanking it).
+    await db.prepare(
+      "UPDATE devices SET last_seen = ?, label = ?, "
+      + "platform = COALESCE(NULLIF(?, ''), platform) WHERE order_id = ? AND device = ?"
+    ).bind(nowIso(), String(body.label || "").slice(0, 64), platform, license.order, device).run();
   } else {
     if (license.seats > 0) {
       const row = await db.prepare("SELECT COUNT(*) AS n FROM devices WHERE order_id = ?")
@@ -353,10 +368,10 @@ export async function handleActivate(request, env, json) {
       }
     }
     await db.prepare(
-      "INSERT INTO devices (order_id, device, label, tier, seats, first_seen, last_seen) "
-      + "VALUES (?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO devices (order_id, device, label, platform, tier, seats, first_seen, last_seen) "
+      + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
     ).bind(
-      license.order, device, String(body.label || "").slice(0, 64),
+      license.order, device, String(body.label || "").slice(0, 64), platform,
       license.tier, license.seats, nowIso(), nowIso()
     ).run();
   }
@@ -401,6 +416,57 @@ export async function handleDeactivate(request, env, json) {
   await logAttempt(db, auth.license.order, auth.device, "deactivate", `released:${target}`);
 
   return json({ released: target, devices: await deviceList(db, auth.license.order) });
+}
+
+/**
+ * Read-only demand counts, guarded by a shared secret so they are not public.
+ *
+ * No personal data leaves here: only aggregate counts of activated computers by
+ * platform and tier, plus a 30-day-recent slice. The number that matters is
+ * macOS vs Windows — with no Mac App Store yet, every macOS activation is a
+ * direct-download customer, so this is the evidence for whether an App Store
+ * build is worth building rather than a guess. The device rows themselves are
+ * one-way hashes; nothing here can name a customer or a machine.
+ */
+export async function handleStats(request, env, json) {
+  const supplied = request.headers.get("X-EPD-Stats-Secret") || "";
+  const expected = env.STATS_SECRET || "";
+  const a = Buffer.from(supplied, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  // Unset secret fails closed, and the length check guards timingSafeEqual
+  // (which throws on mismatched lengths) before it runs.
+  if (!expected || a.length !== b.length || !timingSafeEqual(a, b)) {
+    return json({ error: "forbidden" }, 403);
+  }
+
+  const db = env.LICENSES;
+  const plat = "COALESCE(NULLIF(platform, ''), 'unknown')";
+
+  const byPlatform = (await db.prepare(
+    `SELECT ${plat} AS platform, COUNT(*) AS devices, COUNT(DISTINCT order_id) AS orders `
+    + "FROM devices GROUP BY 1 ORDER BY devices DESC"
+  ).all()).results || [];
+
+  const byTier = (await db.prepare(
+    "SELECT tier, COUNT(*) AS devices FROM devices GROUP BY tier ORDER BY devices DESC"
+  ).all()).results || [];
+
+  const recent = (await db.prepare(
+    `SELECT ${plat} AS platform, COUNT(*) AS devices FROM devices WHERE first_seen > ? `
+    + "GROUP BY 1 ORDER BY devices DESC"
+  ).bind(isoMinusDays(30)).all()).results || [];
+
+  const totals = await db.prepare(
+    "SELECT COUNT(*) AS devices, COUNT(DISTINCT order_id) AS orders FROM devices"
+  ).first();
+
+  return json({
+    generated_at: nowIso(),
+    totals: { devices: totals?.devices ?? 0, orders: totals?.orders ?? 0 },
+    by_platform: byPlatform,
+    by_tier: byTier,
+    last_30_days_by_platform: recent,
+  });
 }
 
 /** Kill a key: refunds, and freebies that turned out to be a mistake. */

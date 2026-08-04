@@ -39,6 +39,31 @@ npx wrangler deploy
 Deploy prints your URL, e.g. `https://easypost-license-webhook.<you>.workers.dev`.
 Health check: `GET /health`. Webhook endpoint: `POST /paddle/webhook`.
 
+## Demand counter: `GET /stats`
+
+Each activation records a coarse platform tag (`windows` / `macos` / `linux`) on
+the device row — no new client telemetry, just a field on the activation call
+the app already makes. `GET /stats` aggregates those into counts by platform and
+tier (plus a 30-day-recent slice), which is the evidence for questions like
+"is there enough macOS demand to justify a Mac App Store build?" — with no Mac
+App Store yet, every macOS activation is a direct-download customer.
+
+It carries no personal data: device identifiers are one-way hashes and the
+endpoint only ever returns counts. It is guarded by a shared secret so it is not
+public:
+
+```bash
+# set once (any long random value):
+npx wrangler secret put STATS_SECRET
+
+# read the counts:
+curl -H "X-EPD-Stats-Secret: <the value>" https://<your-worker-url>/stats
+```
+
+If `STATS_SECRET` is unset the endpoint returns `403` to everyone (fails closed).
+The `devices` table needs a `platform` column for this:
+`wrangler d1 execute easypost-licenses --remote --command "ALTER TABLE devices ADD COLUMN platform TEXT"`.
+
 ## Contact-form relay: `POST /contact`
 
 The product site's contact form posts here rather than calling Resend itself,

@@ -69,6 +69,55 @@ def test_device_hash_is_hex_of_fixed_width():
     assert all(c in "0123456789abcdef" for c in digest)
 
 
+# --- platform tag: the demand counter's only new bit on the wire -----------
+
+@pytest.mark.parametrize("sys_platform,expected", [
+    ("win32", "windows"), ("darwin", "macos"),
+    ("linux", "linux"), ("freebsd13", "linux"),
+])
+def test_platform_tag_maps_each_os(monkeypatch, sys_platform, expected):
+    monkeypatch.setattr(activation.sys, "platform", sys_platform)
+    assert activation.platform_tag() == expected
+
+
+def test_activate_device_reports_the_platform(monkeypatch):
+    """Activation must carry a coarse OS tag so demand can be seen per platform.
+
+    It is advisory analytics, not security — so it rides the request body but is
+    deliberately absent from the possession proof.
+    """
+    captured = {}
+
+    def fake_post(path, body):
+        captured["path"] = path
+        captured["body"] = body
+        return {"receipt": "token"}
+
+    dummy = activation.Receipt(
+        order="ORD-1", device="a" * 32, tier="personal", seats=3,
+        issued_at="2026-01-01T00:00:00Z", expires_at="2027-01-01T00:00:00Z",
+    )
+    monkeypatch.setattr(activation, "_post", fake_post)
+    monkeypatch.setattr(activation, "verify_receipt", lambda token, device: dummy)
+    monkeypatch.setattr(activation, "store_receipt", lambda token: None)
+    monkeypatch.setattr(activation, "load_settings",
+                        lambda: type("S", (), {"device_label": "", "license_key": "EPD1.a.b"})())
+    monkeypatch.setattr(activation, "save_settings", lambda s: None)
+
+    info = license_mod.LicenseInfo(
+        email="a@b.com", order="ORD-1", product="easypost-desktop",
+        issued_at="", tier="personal", seats=3,
+    )
+    activation.activate_device("EPD1.some.key", info)
+
+    assert captured["path"] == "/activate"
+    assert captured["body"]["platform"] == activation.platform_tag()
+    assert captured["body"]["platform"] in {"windows", "macos", "linux"}
+    # The proof must not depend on the platform tag, so a spoofed tag cannot
+    # invalidate a request — nor lend it any authority.
+    assert "platform" not in captured["body"]["proof"]
+
+
 # --- receipts --------------------------------------------------------------
 
 def test_valid_receipt_verifies(signing_key):

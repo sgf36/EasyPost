@@ -29,6 +29,7 @@ import {
   handleActivate,
   handleDeactivate,
   handleDevices,
+  handleStats,
   recordSubscription,
   revokeOrder,
   TIER_PLANS,
@@ -414,6 +415,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/health") return json({ ok: true });
+
+    // Aggregate demand counts by platform/tier. Guarded by X-EPD-Stats-Secret;
+    // no personal data, only counts of one-way device hashes. Read-only.
+    if (request.method === "GET" && url.pathname === "/stats") {
+      return handleStats(request, env, json);
+    }
 
     // Public, read-only: how many of the launch discount remain. Cached briefly
     // at the edge so a burst of pricing-page views collapses to one D1 read.
