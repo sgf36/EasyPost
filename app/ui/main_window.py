@@ -2,10 +2,12 @@
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QFrame,
     QHBoxLayout,
     QListWidget,
     QListWidgetItem,
     QMainWindow,
+    QScrollArea,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
@@ -208,7 +210,15 @@ class MainWindow(QMainWindow):
             header.setData(Qt.ItemDataRole.UserRole, None)
             self._nav.addItem(header)
             for label_key, view, on_show in entries:
-                stack_index = self._view_stack.addWidget(view)
+                # Wrap every page in a resizable scroll area so no view is ever
+                # clipped when the window is small: the view expands to fill a
+                # large window, and scrolls (rather than truncating) a small one.
+                # Navigation stays index-based, so wrapping changes nothing else.
+                scroller = QScrollArea()
+                scroller.setWidgetResizable(True)
+                scroller.setFrameShape(QFrame.Shape.NoFrame)
+                scroller.setWidget(view)
+                stack_index = self._view_stack.addWidget(scroller)
                 item = QListWidgetItem(tr(label_key))
                 item.setData(Qt.ItemDataRole.UserRole, stack_index)
                 self._nav.addItem(item)

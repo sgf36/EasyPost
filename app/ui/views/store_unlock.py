@@ -104,10 +104,15 @@ class StoreUnlockGate(QWidget):
         button_row.addWidget(self._unlock_btn)
 
         # Single-computer add-on → route multi-seat/org buyers to the website.
-        self._multi_seat_btn = QPushButton()
-        self._multi_seat_btn.setFlat(True)
-        self._multi_seat_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._multi_seat_btn.clicked.connect(self._on_multi_seat)
+        # A word-wrapped label link (not a fixed-width button) so the longer
+        # sentence wraps cleanly inside the card instead of being clipped.
+        self._multi_seat_label = QLabel()
+        self._multi_seat_label.setWordWrap(True)
+        self._multi_seat_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self._multi_seat_label.setTextFormat(Qt.TextFormat.RichText)
+        self._multi_seat_label.setOpenExternalLinks(False)
+        self._multi_seat_label.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._multi_seat_label.linkActivated.connect(self._on_multi_seat)
 
         # There is always a free way back — this screen only appears when the
         # user reaches for production.
@@ -120,7 +125,7 @@ class StoreUnlockGate(QWidget):
         card_layout.addWidget(self._subtitle_label)
         card_layout.addSpacing(4)
         card_layout.addLayout(button_row)
-        card_layout.addWidget(self._multi_seat_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
+        card_layout.addWidget(self._multi_seat_label)
         card_layout.addSpacing(2)
         card_layout.addWidget(self._use_test_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
@@ -141,7 +146,9 @@ class StoreUnlockGate(QWidget):
         self._subtitle_label.setText(tr("store_unlock.subtitle"))
         self._unlock_btn.setText(tr("store_unlock.unlock_button"))
         self._restore_btn.setText(tr("store_unlock.restore_button"))
-        self._multi_seat_btn.setText(tr("store_unlock.multi_seat_link"))
+        self._multi_seat_label.setText(
+            f'<a href="#">{tr("store_unlock.multi_seat_link")}</a>'
+        )
         self._use_test_btn.setText(tr("store_unlock.use_test_button"))
         self.setLayoutDirection(
             Qt.LayoutDirection.RightToLeft if is_rtl() else Qt.LayoutDirection.LeftToRight
@@ -212,5 +219,5 @@ class StoreUnlockGate(QWidget):
                 tr("store_unlock.restore_none_body"),
             )
 
-    def _on_multi_seat(self) -> None:
+    def _on_multi_seat(self, _link: str = "") -> None:
         QDesktopServices.openUrl(QUrl(MULTI_SEAT_URL))
