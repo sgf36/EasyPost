@@ -77,7 +77,7 @@
   "batch_shipments.missing_address_title": "വിലാസം ലഭ്യമല്ല",
   "batch_shipments.no_batch_label": "ഇതുവരെ ബാച്ച് സൃഷ്ടിച്ചിട്ടില്ല.",
   "batch_shipments.no_csv_loaded": "CSV ലോഡ് ചെയ്തിട്ടില്ല.",
-  "batch_shipments.preview_group_title": "2. പ്രിവ്യൂ & സാധുത പരിശോധന",
+  "batch_shipments.preview_group_title": "2. പ്രിവ്യൂ && സാധുത പരിശോധന",
   "batch_shipments.purchased_body": "ബാച്ച് വാങ്ങൽ സമർപ്പിച്ചു.",
   "batch_shipments.purchased_title": "ബാച്ച് വാങ്ങി",
   "batch_shipments.refresh_failed_body": "ബാച്ച് പുതുക്കാൻ കഴിഞ്ഞില്ല:\n{error}",
@@ -480,5 +480,17 @@
   "tracking.refreshing_button": "പുതുക്കുന്നു…",
   "tracking.table_group_title": "ട്രാക്ക് ചെയ്യുന്ന ഷിപ്മെന്റുകൾ",
   "tracking.title": "ട്രാക്കിംഗ്",
-  "tracking.tracking_number_placeholder": "ട്രാക്കിംഗ് നമ്പർ"
+  "tracking.tracking_number_placeholder": "ട്രാക്കിംഗ് നമ്പർ",
+  "connect_agents.relay_config_label": "Paste this into your AI client's MCP configuration. Most clients nest servers under \"mcpServers\"; VS Code uses \"servers\".",
+  "connect_agents.relay_group": "Connect an AI client (via secure relay)",
+  "connect_agents.relay_intro": "This app reaches AI clients through a secure relay: it makes an outbound connection only — nothing listens for incoming connections on your Mac. The relay never sees your EasyPost key and never runs a tool; every tool runs here, and buying still needs your approval below.",
+  "connect_agents.relay_regenerate_button": "Regenerate token",
+  "connect_agents.relay_regenerate_confirm_body": "This immediately disconnects any AI client using the current token. You will need to paste the new configuration into each client. Continue?",
+  "connect_agents.relay_regenerate_confirm_title": "Regenerate pairing token?",
+  "connect_agents.relay_status_connecting": "Connecting to the relay…",
+  "connect_agents.relay_status_error": "Relay connection problem: {detail}",
+  "connect_agents.relay_status_running": "Connected — AI clients can reach this app while it is open.",
+  "connect_agents.relay_status_stopped": "Not connected. Turn on “Enable AI agent access” above to start.",
+  "connect_agents.relay_token_warning": "Treat this configuration like a password: the token lets an AI client read your shipping data and shop rates (never spend) while this app is open. Regenerate it if it is ever exposed.",
+  "connect_agents.relay_url_form_label": "Or, for a client that only accepts a URL (no headers):"
 }
