@@ -10,28 +10,21 @@ upload Mac App Store package (.pkg)"). It stays a **no-op** until
 `MAS_CERTIFICATE_P12_BASE64` is set, so nothing changes until you finish this.
 
 All commands assume you have `gh` authenticated (you do). Run them once.
+**Windows PowerShell** commands are given (there is no `base64` command in
+PowerShell — use `[Convert]::ToBase64String` as below).
 
 ## 1–3. The three you can set from Windows right now
 
 These are not private keys — just the identity strings and the provisioning
 profile (already in your OneDrive `Claude MacOS/signing/` folder).
 
-**Git Bash:**
-```bash
-gh secret set MAS_SIGN_APP_IDENTITY -R sgf36/EasyPost \
-  --body "Apple Distribution: Spencer Fields (7WA4F8P743)"
-
-gh secret set MAS_SIGN_INSTALLER_IDENTITY -R sgf36/EasyPost \
-  --body "3rd Party Mac Developer Installer: Spencer Fields (7WA4F8P743)"
-
-base64 -w0 "/c/Users/SpencerFields/OneDrive - Spencer Fields/Apps/Claude MacOS/signing/EasyPost_Desktop.provisionprofile" \
-  | gh secret set MAS_PROVISION_PROFILE_BASE64 -R sgf36/EasyPost
-```
-
-**Or PowerShell** (for the profile line — the two `--body` lines work as-is):
 ```powershell
-[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\SpencerFields\OneDrive - Spencer Fields\Apps\Claude MacOS\signing\EasyPost_Desktop.provisionprofile")) `
-  | gh secret set MAS_PROVISION_PROFILE_BASE64 -R sgf36/EasyPost
+gh secret set MAS_SIGN_APP_IDENTITY -R sgf36/EasyPost --body "Apple Distribution: Spencer Fields (7WA4F8P743)"
+
+gh secret set MAS_SIGN_INSTALLER_IDENTITY -R sgf36/EasyPost --body "3rd Party Mac Developer Installer: Spencer Fields (7WA4F8P743)"
+
+$prof = [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\SpencerFields\OneDrive - Spencer Fields\Apps\Claude MacOS\signing\EasyPost_Desktop.provisionprofile"))
+gh secret set MAS_PROVISION_PROFILE_BASE64 -R sgf36/EasyPost --body $prof
 ```
 
 ## 4–5. The `.p12` — the one step that needs a Mac (once)
@@ -50,11 +43,15 @@ any Mac you re-issue them on):
    key is missing, that cert must be re-created (Xcode → Settings → Accounts →
    Manage Certificates → +), which also refreshes the profile.
 3. Right-click → **Export 2 items…** → save as `mas-certs.p12`, set a password.
-4. Set the two secrets (on the Mac, or move the `.p12` to Windows first):
-   ```bash
-   base64 -i mas-certs.p12 | gh secret set MAS_CERTIFICATE_P12_BASE64 -R sgf36/EasyPost
-   gh secret set MAS_CERTIFICATE_PASSWORD -R sgf36/EasyPost --body 'the-password-you-chose'
+4. Move `mas-certs.p12` to your Windows machine, then in **PowerShell** (edit the
+   path and the real password):
+   ```powershell
+   $p12 = [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\Users\SpencerFields\Downloads\mas-certs.p12"))
+   gh secret set MAS_CERTIFICATE_P12_BASE64 -R sgf36/EasyPost --body $p12
+
+   gh secret set MAS_CERTIFICATE_PASSWORD -R sgf36/EasyPost --body 'YOUR-REAL-P12-PASSWORD'
    ```
+   (Or on the Mac, `base64 -i mas-certs.p12 | gh secret set MAS_CERTIFICATE_P12_BASE64 -R sgf36/EasyPost` — `base64` exists there.)
 5. **Delete `mas-certs.p12`** afterwards — GitHub has it now.
 
 ## After that
