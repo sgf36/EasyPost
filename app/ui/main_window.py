@@ -47,6 +47,7 @@ from app.ui.views.setup_wizard import SetupWizard
 from app.ui.views.tracking_view import TrackingView
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.mode_banner import ModeBanner
+from app.ui.widgets.touch_scroll import enable_touch_scrolling_tree
 from app.ui.widgets.update_banner import UpdateBanner
 
 
@@ -88,6 +89,11 @@ class MainWindow(QMainWindow):
 
         client_manager.reload()
         self._route_startup()
+
+        # Enable touchscreen/pen finger-drag scrolling on every scroll area and
+        # table in the window (gate, wizard, and app shell are all built by now).
+        # Touch-only, so mouse and two-finger-touchpad scrolling are unchanged.
+        enable_touch_scrolling_tree(self)
 
     def _size_to_screen(self) -> None:
         """Open at a comfortable size that still fits the current screen
