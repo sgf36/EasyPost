@@ -19,7 +19,11 @@ from app.core.db import db_cursor
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CARRIERS = ("usps", "fedex", "ups", "dhlexpress")
+# Predefined packages are fetched for EVERY carrier EasyPost knows about, not a
+# curated subset: the useful set depends on which carriers a given user has
+# enabled (Royal Mail in the UK, Australia Post in AU, ...), which this app has
+# no business second-guessing. EasyPost's carrier-metadata endpoint returns all
+# carriers when the `carriers` filter is omitted — see list_predefined_packages.
 
 
 @dataclass
@@ -77,12 +81,10 @@ def _coerce_dimensions(value) -> str:
     return str(value) if value else ""
 
 
-def _cache_predefined_packages(carriers: tuple, packages: list[PredefinedPackage]) -> None:
+def _cache_predefined_packages(packages: list[PredefinedPackage]) -> None:
+    """Replace the whole predefined-package cache with a fresh full fetch."""
     with db_cursor() as cur:
-        cur.execute(
-            f"DELETE FROM predefined_packages_cache WHERE carrier IN ({','.join('?' * len(carriers))})",
-            carriers,
-        )
+        cur.execute("DELETE FROM predefined_packages_cache")
         for p in packages:
             cur.execute(
                 """
@@ -93,12 +95,10 @@ def _cache_predefined_packages(carriers: tuple, packages: list[PredefinedPackage
             )
 
 
-def _cached_predefined_packages(carriers: tuple) -> list[PredefinedPackage]:
+def _cached_predefined_packages() -> list[PredefinedPackage]:
     with db_cursor() as cur:
         cur.execute(
-            f"SELECT * FROM predefined_packages_cache "
-            f"WHERE carrier IN ({','.join('?' * len(carriers))}) ORDER BY carrier, name",
-            carriers,
+            "SELECT * FROM predefined_packages_cache ORDER BY carrier, name"
         )
         rows = cur.fetchall()
     return [
@@ -113,14 +113,18 @@ def _cached_predefined_packages(carriers: tuple) -> list[PredefinedPackage]:
     ]
 
 
-def list_predefined_packages(carriers: tuple = DEFAULT_CARRIERS) -> list[PredefinedPackage]:
-    """Fetches carrier predefined packages live from EasyPost; on any
-    failure, falls back to whatever was cached from a previous successful
-    fetch (possibly empty on first run with no network).
+def list_predefined_packages() -> list[PredefinedPackage]:
+    """Fetch predefined packages for EVERY carrier EasyPost supports, live.
+
+    The endpoint is called with no ``carriers`` filter, so the list reflects the
+    whole platform rather than one account's enabled carriers — a user who has
+    Royal Mail, Australia Post, or any other carrier sees its packages without
+    the app hard-coding a set. On any failure it falls back to whatever the last
+    successful fetch cached (possibly empty on a first run with no network).
     """
     try:
         client = client_manager.get_client()
-        result = client.carrier_metadata.retrieve(carriers=list(carriers), types=["predefined_packages"])
+        result = client.carrier_metadata.retrieve(types=["predefined_packages"])
         packages = [
             PredefinedPackage(
                 carrier=pkg["carrier"],
@@ -134,8 +138,8 @@ def list_predefined_packages(carriers: tuple = DEFAULT_CARRIERS) -> list[Predefi
         ]
     except Exception:
         logger.exception("Live carrier predefined-package fetch failed; falling back to cache")
-        return _cached_predefined_packages(carriers)
+        return _cached_predefined_packages()
 
     if packages:
-        _cache_predefined_packages(carriers, packages)
+        _cache_predefined_packages(packages)
     return packages

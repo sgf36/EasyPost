@@ -1,5 +1,6 @@
 """Create a shipment, shop rates, buy a label, and save/open it."""
 
+import re
 import webbrowser
 from functools import partial
 
@@ -174,9 +175,13 @@ class CreateShipmentView(QWidget):
         self._zip_widget = self._build_zip_row()
         self._zip_widget.setVisible(False)
 
-        self._length_input = self._spin(1, 1000, 6)
-        self._width_input = self._spin(1, 1000, 6)
-        self._height_input = self._spin(1, 1000, 6)
+        # Minimum 0, not 1: a document/letter is under 1 inch (or cm) thick, and
+        # forcing every dimension to >= 1 made the parcel read as a box — which
+        # stopped carriers without a predefined letter package from quoting
+        # letter/document services. The carrier still validates the final values.
+        self._length_input = self._spin(0, 1000, 6)
+        self._width_input = self._spin(0, 1000, 6)
+        self._height_input = self._spin(0, 1000, 6)
         self._weight_input = self._spin(0.1, 5000, 16)
         self._reference_input = QLineEdit()
 
@@ -361,9 +366,11 @@ class CreateShipmentView(QWidget):
 
         if is_saved:
             pkg = data[1]
-            self._length_input.setValue(pkg.length or 1)
-            self._width_input.setValue(pkg.width or 1)
-            self._height_input.setValue(pkg.height or 1)
+            # `is not None`, not `or`: 0 is a legitimate (thin/letter) dimension
+            # now that the minimum is 0, and `pkg.length or 1` would clobber it.
+            self._length_input.setValue(pkg.length if pkg.length is not None else 1)
+            self._width_input.setValue(pkg.width if pkg.width is not None else 1)
+            self._height_input.setValue(pkg.height if pkg.height is not None else 1)
             self._weight_input.setValue(pkg.weight)
 
     def _on_save_package_clicked(self) -> None:
@@ -646,17 +653,20 @@ class CreateShipmentView(QWidget):
         self._rates_table = QTableWidget(0, _RATE_COLUMN_COUNT)
         self._rates_table.setHorizontalHeaderLabels(rate_columns)
         header = self._rates_table.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        # Column 0 holds a cell widget, and ResizeToContents measures the
-        # delegate rather than the widget — it would truncate longer service
-        # names. Width is set from the widgets themselves once rows are built.
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
-        # Give column 0 an initial width that fits its header, so the
-        # "Carrier & service" label isn't clipped in the empty state (before any
-        # rates load and _resize_rates_table_to_content sets the real width).
-        header_hint = header.sectionSizeHint(0)
-        self._rates_table.setColumnWidth(0, max(header_hint + 16, 150))
+        # Carrier & service (col 0) absorbs the slack; the compact columns —
+        # Rate, Est. days, and the Buy button — size to their own content. The
+        # earlier arrangement (col 0 sized to the widest service name, the rest
+        # stretched) collapsed those three to nothing whenever a carrier returned
+        # very long run-together service names (e.g. Royal Mail v3's
+        # "InternationalBusinessParcelTrackedCountryPriced…"), truncating the
+        # headers and clipping the Buy buttons.
+        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self._rates_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        # A long service name clips at the (stretched) column edge rather than
+        # forcing the table wider; the full name is humanised and shown, and the
+        # identity cell carries a tooltip with the untruncated text.
+        self._rates_table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self._rates_table.verticalHeader().setVisible(False)
         # Sized to fit every row (see _resize_rates_table_to_content) instead
         # of scrolling internally — the outer QScrollArea handles overflow.
@@ -673,6 +683,23 @@ class CreateShipmentView(QWidget):
         group.setLayout(layout)
         return group
 
+    _CAMEL_SPLIT = re.compile(
+        r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=[0-9])"
+    )
+
+    @classmethod
+    def _humanize_service(cls, name: str) -> str:
+        """Space out a run-together carrier service name so it reads as words.
+
+        EasyPost returns names like ``InternationalBusinessParcelsTracked30kg``;
+        splitting at camelCase and letter/digit boundaries gives ``International
+        Business Parcels Tracked 30kg``, which is far quicker to scan and lets a
+        clipped name break at a sensible point. Names that already contain
+        spaces are left untouched."""
+        if not name or " " in name:
+            return name
+        return cls._CAMEL_SPLIT.sub(" ", name)
+
     def _build_rate_identity_cell(self, rate, *, cheapest: bool, fastest: bool) -> QWidget:
         """One cell holding the carrier chip, the service name, and any
         cheapest/fastest marker — the column that used to be three."""
@@ -681,7 +708,12 @@ class CreateShipmentView(QWidget):
         row.setContentsMargins(6, 4, 6, 4)
         row.setSpacing(8)
         row.addWidget(carrier_chip(getattr(rate, "carrier", "")))
-        row.addWidget(QLabel(getattr(rate, "service", "") or "—"))
+        service = self._humanize_service(getattr(rate, "service", "") or "") or "—"
+        service_label = QLabel(service)
+        # The column clips very long names rather than widening the table, so
+        # carry the full text in a tooltip.
+        service_label.setToolTip(service)
+        row.addWidget(service_label)
         if cheapest:
             row.addWidget(badge(tr("create_shipment.badge_cheapest")))
         if fastest:
@@ -701,25 +733,20 @@ class CreateShipmentView(QWidget):
         table = self._rates_table
         table.resizeRowsToContents()
 
-        identity_width = 0
         total_height = table.horizontalHeader().height() + 2 * table.frameWidth()
         for row in range(table.rowCount()):
             widget_height = 0
             for col in range(table.columnCount()):
                 widget = table.cellWidget(row, col)
-                if widget is None:
-                    continue
-                hint = widget.sizeHint()
-                widget_height = max(widget_height, hint.height())
-                if col == 0:
-                    identity_width = max(identity_width, hint.width())
+                if widget is not None:
+                    widget_height = max(widget_height, widget.sizeHint().height())
             # +6 so the Buy button isn't flush against the row borders.
             if widget_height + 6 > table.rowHeight(row):
                 table.setRowHeight(row, widget_height + 6)
             total_height += table.rowHeight(row)
 
-        if identity_width:
-            table.setColumnWidth(0, identity_width + 12)
+        # Column widths are governed by the header resize modes (col 0 stretches,
+        # the rest fit their content — see _build_rates_group), not set here.
         table.setFixedHeight(total_height + 2)
 
     def _build_result_group(self) -> QGroupBox:
