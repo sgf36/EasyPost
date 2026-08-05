@@ -172,12 +172,35 @@ QComboBox::drop-down {{
     border: none;
     width: 22px;
 }}
+/* Force the non-native, list-with-scrollbar popup. Without this the dropdown
+   uses the platform's native popup, which on a long list (e.g. the Package
+   selector) scrolls only via hover-arrows at the top/bottom — no scrollbar,
+   no mouse-wheel, no touch. combobox-popup:0 gives a proper scrollable list
+   the wheel, scrollbar, and (via touch_scroll) a finger all drive. */
+QComboBox {{
+    combobox-popup: 0;
+}}
 QComboBox QAbstractItemView {{
     background: {PANEL_BG};
     border: 1px solid {BORDER};
     selection-background-color: {ACCENT_SOFT};
     selection-color: {ACCENT};
     outline: 0;
+}}
+/* A visible, comfortably-wide scrollbar inside the dropdown list. */
+QComboBox QAbstractItemView QScrollBar:vertical {{
+    width: 12px;
+    background: {PANEL_BG};
+    margin: 0;
+}}
+QComboBox QAbstractItemView QScrollBar::handle:vertical {{
+    background: {BORDER_STRONG};
+    border-radius: 6px;
+    min-height: 28px;
+}}
+QComboBox QAbstractItemView QScrollBar::add-line:vertical,
+QComboBox QAbstractItemView QScrollBar::sub-line:vertical {{
+    height: 0;
 }}
 
 /* ---- buttons (default) ---- */

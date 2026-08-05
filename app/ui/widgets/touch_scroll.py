@@ -24,7 +24,12 @@ tree.
 from __future__ import annotations
 
 from PySide6.QtCore import QEvent, QObject, Qt
-from PySide6.QtWidgets import QAbstractScrollArea, QApplication, QScroller
+from PySide6.QtWidgets import (
+    QAbstractScrollArea,
+    QApplication,
+    QComboBox,
+    QScroller,
+)
 
 
 def _closest_scrollable_ancestor(widget) -> QAbstractScrollArea | None:
@@ -71,10 +76,27 @@ def enable_touch_scrolling(area: QAbstractScrollArea) -> None:
         viewport.installEventFilter(bubbler)
 
 
+def enable_combo_touch_scrolling(combo: QComboBox) -> None:
+    """Enable finger/pen kinetic scrolling inside a combo box's dropdown list.
+
+    The dropdown already scrolls with the wheel and a scrollbar once the popup
+    is forced to the list form (``combobox-popup: 0`` in the theme); this adds
+    touchscreen finger-drag on top. ``view()`` instantiates the popup list, and
+    the same view is reused when the popup opens, so grabbing here sticks."""
+    view = combo.view()
+    if view is None:
+        return
+    viewport = view.viewport()
+    if viewport is None:
+        return
+    QScroller.grabGesture(viewport, QScroller.ScrollerGestureType.TouchGesture)
+
+
 def enable_touch_scrolling_tree(root) -> None:
     """Enable finger/pen scrolling — and no-scroll wheel bubbling — on every
-    scroll area under ``root`` (and on ``root`` itself if it is one). Best-effort
-    and idempotent; a widget that objects is simply skipped."""
+    scroll area under ``root`` (and on ``root`` itself if it is one), plus the
+    dropdown list of every combo box. Best-effort and idempotent; a widget that
+    objects is simply skipped."""
     areas = list(root.findChildren(QAbstractScrollArea))
     if isinstance(root, QAbstractScrollArea):
         areas.append(root)
@@ -88,4 +110,9 @@ def enable_touch_scrolling_tree(root) -> None:
         except Exception:
             # A scrolling nicety must never be the thing that stops the window
             # opening; skip anything that objects.
+            pass
+    for combo in root.findChildren(QComboBox):
+        try:
+            enable_combo_touch_scrolling(combo)
+        except Exception:
             pass
