@@ -106,6 +106,55 @@ def _format_delivery(rate) -> str:
     return str(days)
 
 
+# Anything at or below this (in the rate's own currency) is treated as a
+# non-purchasable placeholder, not a real quote. Some carriers — notably Royal
+# Mail V3 via EasyPost — return their whole service catalogue as rates, including
+# services that don't apply to the route, priced at a nominal 0.01 that cannot be
+# bought. No real shipping service costs a penny, so these are hidden when
+# genuine quotes exist (see _on_rates_received).
+_MIN_REAL_RATE = 0.02
+
+
+def _is_placeholder_rate(rate) -> bool:
+    try:
+        return float(getattr(rate, "rate", None)) < _MIN_REAL_RATE
+    except (TypeError, ValueError):
+        return False
+
+
+def _size_widget_column(table, col: int, *, padding: int = 16) -> None:
+    """Widen `col` to fit its widest cell *widget*. Qt's ResizeToContents
+    measures the item delegate, not widgets set via setCellWidget, so a column
+    holding only a widget (e.g. the Buy button) otherwise collapses and clips.
+    The column must be in Interactive/Fixed mode for this to take effect."""
+    width = 0
+    for row in range(table.rowCount()):
+        widget = table.cellWidget(row, col)
+        if widget is not None:
+            width = max(width, widget.sizeHint().width())
+    if width:
+        table.setColumnWidth(col, width + padding)
+
+
+def _fit_columns_to_widgets(table, *, stretch_col: int = 0, padding: int = 20) -> None:
+    """Size each non-stretch column to fit the wider of its header text and its
+    widest cell widget. Used for tables whose cells are all widgets (spin boxes,
+    combos, buttons) with headers like "HTS number (optional)" that Qt's
+    ResizeToContents would clip because it ignores the widgets. One column
+    stretches to absorb the remaining width."""
+    fm = table.horizontalHeader().fontMetrics()
+    for col in range(table.columnCount()):
+        if col == stretch_col:
+            continue
+        item = table.horizontalHeaderItem(col)
+        width = (fm.horizontalAdvance(item.text()) if item else 0) + 28
+        for row in range(table.rowCount()):
+            widget = table.cellWidget(row, col)
+            if widget is not None:
+                width = max(width, widget.sizeHint().width() + padding)
+        table.setColumnWidth(col, width)
+
+
 class CreateShipmentView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -546,6 +595,11 @@ class CreateShipmentView(QWidget):
         remove_btn.clicked.connect(partial(self._on_remove_customs_item, remove_btn))
         self._customs_items_table.setCellWidget(row, _CUSTOMS_ITEM_COLUMN_COUNT - 1, remove_btn)
 
+        # Every cell in this table is a widget, which ResizeToContents can't
+        # measure — without this the header for a widget-only column (e.g. "HTS
+        # number (optional)") clips. Fit each column to header + widget.
+        _fit_columns_to_widgets(self._customs_items_table, stretch_col=0)
+
     def _on_remove_customs_item(self, button: QPushButton) -> None:
         for row in range(self._customs_items_table.rowCount()):
             if self._customs_items_table.cellWidget(row, _CUSTOMS_ITEM_COLUMN_COUNT - 1) is button:
@@ -662,6 +716,10 @@ class CreateShipmentView(QWidget):
         # headers and clipping the Buy buttons.
         header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        # The Buy column holds a widget, which ResizeToContents can't measure —
+        # left to itself it collapses and clips the button. Size it explicitly
+        # in _resize_rates_table_to_content instead.
+        header.setSectionResizeMode(_RATE_COLUMN_COUNT - 1, QHeaderView.ResizeMode.Fixed)
         self._rates_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         # A long service name clips at the (stretched) column edge rather than
         # forcing the table wider; the full name is humanised and shown, and the
@@ -745,8 +803,10 @@ class CreateShipmentView(QWidget):
                 table.setRowHeight(row, widget_height + 6)
             total_height += table.rowHeight(row)
 
-        # Column widths are governed by the header resize modes (col 0 stretches,
-        # the rest fit their content — see _build_rates_group), not set here.
+        # Col 0 stretches and the two text columns fit their content via the
+        # header resize modes; the Buy column holds a widget Qt won't measure, so
+        # size it to the button here (see _build_rates_group).
+        _size_widget_column(table, _RATE_COLUMN_COUNT - 1)
         table.setFixedHeight(total_height + 2)
 
     def _build_result_group(self) -> QGroupBox:
@@ -942,7 +1002,13 @@ class CreateShipmentView(QWidget):
         self._get_rates_btn.setText(tr("create_shipment.get_rates_button"))
         self._current_shipment = shipment
 
-        rates = sorted(getattr(shipment, "rates", None) or [], key=_rate_sort_key)
+        all_rates = sorted(getattr(shipment, "rates", None) or [], key=_rate_sort_key)
+        # Drop non-purchasable placeholder rates (e.g. Royal Mail V3 catalogue
+        # services that don't apply to the route, priced at 0.01). If that would
+        # empty the table, fall back to showing everything so a genuine
+        # all-low-cost result is never hidden.
+        real_rates = [r for r in all_rates if not _is_placeholder_rate(r)]
+        rates = real_rates or all_rates
         cheapest_id = rates[0].id if rates else None
         fastest_id = _fastest_rate_id(rates)
 
