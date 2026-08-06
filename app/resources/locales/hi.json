@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "कोड जाँचें और फिर से प्रयास करें। यदि समस्या बनी रहे, तो सहायता से संपर्क करें।",
   "update_banner.available": "संस्करण {version} उपलब्ध है।",
   "update_banner.download": "डाउनलोड करें",
-  "update_banner.dismiss": "खारिज करें"
+  "update_banner.dismiss": "खारिज करें",
+  "main_window.nav_pair_mobile": "मोबाइल ऐप जोड़ें",
+  "pair_mobile.title": "मोबाइल ऐप जोड़ें",
+  "pair_mobile.intro": "फ़ोन से शिपमेंट को ट्रैक और प्रबंधित करने के लिए Easy-Post Mobile Companion को कनेक्ट करें। मोबाइल ऐप जल्द ही App Store और Google Play पर आ रहे हैं; यहां जनरेट किया गया कोड उनके उपलब्ध होते ही जोड़ा जा सकेगा।",
+  "pair_mobile.qr_group": "जोड़ने के लिए स्कैन करें",
+  "pair_mobile.generate_button": "जोड़ी कोड जनरेट करें",
+  "pair_mobile.generating_button": "जनरेट हो रहा है…",
+  "pair_mobile.regenerate_button": "नया कोड जनरेट करें",
+  "pair_mobile.expiry_note": "यह कोड दस मिनट के लिए मान्य है और इसे एक बार उपयोग किया जा सकता है।",
+  "pair_mobile.steps": "1. फ़ोन पर Easy-Post Mobile Companion इंस्टॉल करें।\n2. ऐप खोलें और जोड़ें चुनें।\n3. ऊपर दिए गए कोड को स्कैन करें।",
+  "pair_mobile.security_note": "प्रोडक्शन API कुंजी कोड में कभी नहीं दिखाई जाती और इसे कभी भी पठनीय रूप में संग्रहीत नहीं किया जाता। नया कोड जनरेट करने से पिछला कोड बदल जाता है।",
+  "pair_mobile.needs_production": "जोड़ने के लिए प्रोडक्शन संस्करण आवश्यक है। मोबाइल कम्पैनियन का उपयोग करने के लिए प्रोडक्शन लाइसेंस सक्रिय करें।",
+  "pair_mobile.needs_key": "मोबाइल कम्पैनियन को जोड़ने के लिए सेटिंग्स के तहत एक प्रोडक्शन EasyPost API कुंजी जोड़ें।",
+  "pair_mobile.error_no_production_key": "मोबाइल कम्पैनियन को जोड़ने के लिए सेटिंग्स के तहत एक प्रोडक्शन EasyPost API कुंजी जोड़ें।",
+  "pair_mobile.error_no_license": "जोड़ने से पहले प्रोडक्शन लाइसेंस आवश्यक है। लाइसेंस सक्रिय करें, फिर पुनः प्रयास करें।",
+  "pair_mobile.error_invalid_license": "लाइसेंस सत्यापित नहीं किया जा सका। सेटिंग्स के तहत लाइसेंस जांचें, फिर पुनः प्रयास करें।",
+  "pair_mobile.error_network": "जोड़ी सेवा तक नहीं पहुंचा जा सका। कनेक्शन जांचें, फिर पुनः प्रयास करें।",
+  "pair_mobile.error_server": "जोड़ी सेवा ने एक त्रुटि लौटाई। कृपया थोड़ी देर में पुनः प्रयास करें।"
 }

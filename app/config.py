@@ -12,7 +12,7 @@ KEYRING_SERVICE_NAME = "EasyPostDesktop"
 # (app/core/update_check.py) compares this against the latest GitHub release
 # tag to decide whether to prompt the user to update. Keep it in step with the
 # release tag and packaging/msix/AppxManifest.xml on every release.
-APP_VERSION = "1.0.10"
+APP_VERSION = "1.1.0"
 
 ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
 
@@ -36,6 +36,12 @@ STORE_BUILD = (Path(__file__).parent / "resources" / "store_build.flag").exists(
 # build. The Store add-on unlocks a single computer; seat-managed multi-device
 # and team licences live on the website, so the Store unlock screen links here.
 MULTI_SEAT_URL = "https://easy-post.spencerfields.com/pricing.html"
+
+# Backend for pairing the Easy-Post Mobile Companion. The desktop shows a QR the
+# phone scans; the phone then pairs against this proxy, which stores only an
+# encrypted copy of the production key that it cannot read without the phone's
+# key. See server/easypost-mobile-proxy and MOBILE-COMPANION-BUILD-BRIEF.md.
+PAIR_PROXY_URL = "https://easypost-mobile-proxy.sgf36.workers.dev"
 
 # The Mac App Store build gates production behind a StoreKit In-App Purchase
 # ("Production Unlock") instead of a pasted Paddle key or a Windows Store add-on.

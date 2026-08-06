@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "تحقق من الرمز وحاول مرة أخرى. إذا استمرت المشكلة، فتواصل مع الدعم.",
   "update_banner.available": "الإصدار {version} متاح.",
   "update_banner.download": "تنزيل",
-  "update_banner.dismiss": "تجاهل"
+  "update_banner.dismiss": "تجاهل",
+  "main_window.nav_pair_mobile": "إقران التطبيق المحمول",
+  "pair_mobile.title": "إقران التطبيق المحمول",
+  "pair_mobile.intro": "قم بتوصيل Easy-Post Mobile Companion لتتبع الشحنات وإدارتها من هاتفك. ستتوفر التطبيقات المحمولة قريبًا على App Store وGoogle Play؛ وسيتم إقران أي رمز يُنشأ هنا بمجرد توفرها.",
+  "pair_mobile.qr_group": "امسح ضوئيًا للإقران",
+  "pair_mobile.generate_button": "إنشاء رمز الإقران",
+  "pair_mobile.generating_button": "جارٍ الإنشاء…",
+  "pair_mobile.regenerate_button": "إنشاء رمز جديد",
+  "pair_mobile.expiry_note": "هذا الرمز صالح لمدة عشر دقائق ويمكن استخدامه مرة واحدة.",
+  "pair_mobile.steps": "1. ثبّت Easy-Post Mobile Companion على الهاتف.\n2. افتح التطبيق واختر إقران.\n3. امسح الرمز أعلاه ضوئيًا.",
+  "pair_mobile.security_note": "لا يُعرض مفتاح واجهة برمجة تطبيقات الإنتاج أبدًا في الرمز ولا يُخزَّن أبدًا بصيغة قابلة للقراءة. يؤدي إنشاء رمز جديد إلى استبدال الرمز السابق.",
+  "pair_mobile.needs_production": "يتطلب الإقران إصدار الإنتاج. فعّل ترخيص إنتاج لاستخدام التطبيق المرافق للجوال.",
+  "pair_mobile.needs_key": "أضف مفتاح واجهة برمجة تطبيقات إنتاج من EasyPost ضمن الإعدادات لإقران التطبيق المرافق للجوال.",
+  "pair_mobile.error_no_production_key": "أضف مفتاح واجهة برمجة تطبيقات إنتاج من EasyPost ضمن الإعدادات لإقران التطبيق المرافق للجوال.",
+  "pair_mobile.error_no_license": "يلزم وجود ترخيص إنتاج قبل الإقران. فعّل ترخيصًا ثم أعد المحاولة.",
+  "pair_mobile.error_invalid_license": "تعذّر التحقق من الترخيص. تحقق من الترخيص ضمن الإعدادات ثم أعد المحاولة.",
+  "pair_mobile.error_network": "تعذّر الوصول إلى خدمة الإقران. تحقق من الاتصال ثم أعد المحاولة.",
+  "pair_mobile.error_server": "أعادت خدمة الإقران خطأ. يرجى إعادة المحاولة بعد قليل."
 }

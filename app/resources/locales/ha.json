@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Duba lambar ka sake gwadawa. Idan matsalar ta ci gaba, ka tuntuɓi tallafi.",
   "update_banner.available": "Sigar {version} tana samuwa.",
   "update_banner.download": "Sauke",
-  "update_banner.dismiss": "Kore"
+  "update_banner.dismiss": "Kore",
+  "main_window.nav_pair_mobile": "Haɗa manhajar wayar hannu",
+  "pair_mobile.title": "Haɗa manhajar wayar hannu",
+  "pair_mobile.intro": "Haɗa Easy-Post Mobile Companion don bin diddigi da sarrafa kayan da ake turawa daga waya. Manhajojin wayar hannu za su fito ba da jimawa ba a App Store da Google Play; lambar da aka ƙirƙira a nan za ta haɗu da zarar sun samu.",
+  "pair_mobile.qr_group": "Yi scan don haɗawa",
+  "pair_mobile.generate_button": "Ƙirƙiri lambar haɗawa",
+  "pair_mobile.generating_button": "Ana ƙirƙirawa…",
+  "pair_mobile.regenerate_button": "Ƙirƙiri sabuwar lamba",
+  "pair_mobile.expiry_note": "Wannan lambar tana aiki har na minti goma kuma ana iya amfani da ita sau ɗaya kawai.",
+  "pair_mobile.steps": "1. Sanya Easy-Post Mobile Companion a wayar.\n2. Buɗe manhajar sannan a zaɓi Haɗa.\n3. Yi scan na lambar da ke sama.",
+  "pair_mobile.security_note": "Ba a taɓa nuna maɓallin API na production a cikin lambar ba kuma ba a taɓa ajiye shi a wani salo da za a iya karantawa ba. Ƙirƙirar sabuwar lamba tana maye gurbin ta baya.",
+  "pair_mobile.needs_production": "Haɗawa yana buƙatar sigar production. A kunna lasisin production don amfani da abokin waya.",
+  "pair_mobile.needs_key": "A ƙara maɓallin API na EasyPost na production a ƙarƙashin Saitunan don haɗa abokin waya.",
+  "pair_mobile.error_no_production_key": "A ƙara maɓallin API na EasyPost na production a ƙarƙashin Saitunan don haɗa abokin waya.",
+  "pair_mobile.error_no_license": "Ana buƙatar lasisin production kafin haɗawa. A kunna lasisi, sannan a sake gwadawa.",
+  "pair_mobile.error_invalid_license": "Ba a iya tabbatar da lasisin ba. A duba lasisin a ƙarƙashin Saitunan, sannan a sake gwadawa.",
+  "pair_mobile.error_network": "Ba a iya isa ga sabis na haɗawa ba. A duba haɗin intanet, sannan a sake gwadawa.",
+  "pair_mobile.error_server": "Sabis na haɗawa ya mayar da kuskure. Don Allah a sake gwadawa nan da ɗan lokaci."
 }

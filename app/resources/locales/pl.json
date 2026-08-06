@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Sprawdź kod i spróbuj ponownie. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną.",
   "update_banner.available": "Dostępna jest wersja {version}.",
   "update_banner.download": "Pobierz",
-  "update_banner.dismiss": "Zamknij"
+  "update_banner.dismiss": "Zamknij",
+  "main_window.nav_pair_mobile": "Sparuj aplikację mobilną",
+  "pair_mobile.title": "Sparuj aplikację mobilną",
+  "pair_mobile.intro": "Połącz aplikację Easy-Post Mobile Companion, aby śledzić przesyłki i zarządzać nimi z telefonu. Aplikacje mobilne pojawią się wkrótce w App Store i Google Play; kod wygenerowany tutaj sparuje się, gdy tylko staną się dostępne.",
+  "pair_mobile.qr_group": "Zeskanuj, aby sparować",
+  "pair_mobile.generate_button": "Wygeneruj kod parowania",
+  "pair_mobile.generating_button": "Generowanie…",
+  "pair_mobile.regenerate_button": "Wygeneruj nowy kod",
+  "pair_mobile.expiry_note": "Ten kod jest ważny przez dziesięć minut i można go użyć jednorazowo.",
+  "pair_mobile.steps": "1. Zainstaluj Easy-Post Mobile Companion na telefonie.\n2. Otwórz aplikację i wybierz Sparuj.\n3. Zeskanuj kod powyżej.",
+  "pair_mobile.security_note": "Klucz API środowiska produkcyjnego nigdy nie jest wyświetlany w kodzie ani przechowywany w formie czytelnej dla człowieka. Wygenerowanie nowego kodu zastępuje poprzedni.",
+  "pair_mobile.needs_production": "Parowanie wymaga wersji produkcyjnej. Aktywuj licencję produkcyjną, aby korzystać z aplikacji towarzyszącej na telefonie.",
+  "pair_mobile.needs_key": "Dodaj produkcyjny klucz API EasyPost w Ustawieniach, aby sparować aplikację mobilną.",
+  "pair_mobile.error_no_production_key": "Dodaj produkcyjny klucz API EasyPost w Ustawieniach, aby sparować aplikację mobilną.",
+  "pair_mobile.error_no_license": "Przed sparowaniem wymagana jest licencja produkcyjna. Aktywuj licencję, a następnie spróbuj ponownie.",
+  "pair_mobile.error_invalid_license": "Nie udało się zweryfikować licencji. Sprawdź licencję w Ustawieniach, a następnie spróbuj ponownie.",
+  "pair_mobile.error_network": "Nie udało się połączyć z usługą parowania. Sprawdź połączenie, a następnie spróbuj ponownie.",
+  "pair_mobile.error_server": "Usługa parowania zwróciła błąd. Spróbuj ponownie za chwilę."
 }

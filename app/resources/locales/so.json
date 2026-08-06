@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Hubi koodhka oo isku day mar kale. Haddii dhibaatadu sii socoto, la xidhiidh taageerada.",
   "update_banner.available": "Nooca {version} ayaa la heli karaa.",
   "update_banner.download": "Soo deji",
-  "update_banner.dismiss": "Iska daa"
+  "update_banner.dismiss": "Iska daa",
+  "main_window.nav_pair_mobile": "Isku xir aaladda mobilka",
+  "pair_mobile.title": "Isku xir aaladda mobilka",
+  "pair_mobile.intro": "Ku xidh Easy-Post Mobile Companion si aad uga soconto oo uga maamusho shixnadaha taleefanka. Aaladaha mobilka ayaa dhawaan ka heli doona App Store iyo Google Play; koodhka halkan laga sameeyo ayaa isku xidhi doona isla marka ay diyaar noqdaan.",
+  "pair_mobile.qr_group": "Iskaan si aad u isku xirto",
+  "pair_mobile.generate_button": "Samee koodhka isku xirka",
+  "pair_mobile.generating_button": "Waa la samaynayaa…",
+  "pair_mobile.regenerate_button": "Samee koodh cusub",
+  "pair_mobile.expiry_note": "Koodhkani wuxuu shaqeeyaa toban daqiiqo oo waxaa lagu isticmaali karaa hal mar.",
+  "pair_mobile.steps": "1. Ku rakib Easy-Post Mobile Companion taleefanka.\n2. Fur app-ka oo dooro Isku xir.\n3. Iskaan koodhka kore.",
+  "pair_mobile.security_note": "Furaha API-ga wax-soo-saarka weligiis kuma muuqdo koodhka mana lagu kaydiyo qaab la akhrin karo. Samaynta koodh cusub waxay bedeshaa kii hore.",
+  "pair_mobile.needs_production": "Isku xirku wuxuu u baahan yahay nooca wax-soo-saarka. Kici shatiga wax-soo-saarka si aad u isticmaasho appka mobilka la socda.",
+  "pair_mobile.needs_key": "Ku dar furaha API-ga EasyPost ee wax-soo-saarka Dejinta si aad u isku xidho appka mobilka la socda.",
+  "pair_mobile.error_no_production_key": "Ku dar furaha API-ga EasyPost ee wax-soo-saarka Dejinta si aad u isku xidho appka mobilka la socda.",
+  "pair_mobile.error_no_license": "Shati wax-soo-saar ah ayaa loo baahan yahay ka hor isku xirka. Kici shatiga, ka dibna isku day mar kale.",
+  "pair_mobile.error_invalid_license": "Shatiga lama xaqiijin karin. Hubi shatiga Dejinta, ka dibna isku day mar kale.",
+  "pair_mobile.error_network": "Adeegga isku xirka lama gaarsiin karin. Hubi xidhiidhka, ka dibna isku day mar kale.",
+  "pair_mobile.error_server": "Adeegga isku xirka wuxuu soo celiyay khalad. Fadlan isku day mar kale wax yar ka dib."
 }

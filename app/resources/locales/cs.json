@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Zkontrolujte kód a zkuste to znovu. Pokud problém přetrvává, kontaktujte podporu.",
   "update_banner.available": "Verze {version} je k dispozici.",
   "update_banner.download": "Stáhnout",
-  "update_banner.dismiss": "Zavřít"
+  "update_banner.dismiss": "Zavřít",
+  "main_window.nav_pair_mobile": "Spárovat mobilní aplikaci",
+  "pair_mobile.title": "Spárovat mobilní aplikaci",
+  "pair_mobile.intro": "Připojte Easy-Post Mobile Companion a sledujte a spravujte zásilky z telefonu. Mobilní aplikace budou brzy k dispozici v App Store a Google Play; kód vygenerovaný zde se spáruje, jakmile budou dostupné.",
+  "pair_mobile.qr_group": "Naskenováním spárujete",
+  "pair_mobile.generate_button": "Vygenerovat párovací kód",
+  "pair_mobile.generating_button": "Generuje se…",
+  "pair_mobile.regenerate_button": "Vygenerovat nový kód",
+  "pair_mobile.expiry_note": "Tento kód je platný deset minut a lze jej použít jednou.",
+  "pair_mobile.steps": "1. Nainstalujte Easy-Post Mobile Companion do telefonu.\n2. Otevřete aplikaci a zvolte Spárovat.\n3. Naskenujte kód výše.",
+  "pair_mobile.security_note": "Produkční API klíč se v kódu nikdy nezobrazuje a nikdy se neukládá v čitelné podobě. Vygenerováním nového kódu se nahradí ten předchozí.",
+  "pair_mobile.needs_production": "Párování vyžaduje produkční verzi. Aktivujte produkční licenci pro použití mobilního companiona.",
+  "pair_mobile.needs_key": "Přidejte produkční API klíč EasyPost v Nastavení, abyste mohli spárovat mobilního companiona.",
+  "pair_mobile.error_no_production_key": "Přidejte produkční API klíč EasyPost v Nastavení, abyste mohli spárovat mobilního companiona.",
+  "pair_mobile.error_no_license": "Před párováním je vyžadována produkční licence. Aktivujte licenci a zkuste to znovu.",
+  "pair_mobile.error_invalid_license": "Licenci se nepodařilo ověřit. Zkontrolujte licenci v Nastavení a zkuste to znovu.",
+  "pair_mobile.error_network": "Párovací službu se nepodařilo kontaktovat. Zkontrolujte připojení a zkuste to znovu.",
+  "pair_mobile.error_server": "Párovací služba vrátila chybu. Zkuste to prosím za chvíli znovu."
 }

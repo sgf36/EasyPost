@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Ellenőrizd a kódot, és próbáld újra. Ha a probléma továbbra is fennáll, fordulj az ügyfélszolgálathoz.",
   "update_banner.available": "A(z) {version} verzió elérhető.",
   "update_banner.download": "Letöltés",
-  "update_banner.dismiss": "Elvetés"
+  "update_banner.dismiss": "Elvetés",
+  "main_window.nav_pair_mobile": "Mobilalkalmazás párosítása",
+  "pair_mobile.title": "Mobilalkalmazás párosítása",
+  "pair_mobile.intro": "Csatlakoztassa az Easy-Post Mobile Companion alkalmazást a szállítmányok telefonról történő nyomon követéséhez és kezeléséhez. A mobilalkalmazások hamarosan elérhetők lesznek az App Store-ban és a Google Play-en; az itt létrehozott kód azonnal párosítható lesz, amint elérhetővé válnak.",
+  "pair_mobile.qr_group": "Beolvasás a párosításhoz",
+  "pair_mobile.generate_button": "Párosítási kód létrehozása",
+  "pair_mobile.generating_button": "Létrehozás…",
+  "pair_mobile.regenerate_button": "Új kód létrehozása",
+  "pair_mobile.expiry_note": "Ez a kód tíz percig érvényes, és egyszer használható fel.",
+  "pair_mobile.steps": "1. Telepítse az Easy-Post Mobile Companion alkalmazást a telefonra.\n2. Nyissa meg az alkalmazást, és válassza a Párosítás lehetőséget.\n3. Olvassa be a fenti kódot.",
+  "pair_mobile.security_note": "Az éles API-kulcs soha nem jelenik meg a kódban, és soha nem kerül olvasható formában tárolásra. Új kód létrehozásakor az előző kód érvényét veszti.",
+  "pair_mobile.needs_production": "A párosításhoz éles verzió szükséges. Aktiváljon éles licencet a mobil kísérő használatához.",
+  "pair_mobile.needs_key": "Adjon hozzá egy éles EasyPost API-kulcsot a Beállítások alatt a mobil kísérő párosításához.",
+  "pair_mobile.error_no_production_key": "Adjon hozzá egy éles EasyPost API-kulcsot a Beállítások alatt a mobil kísérő párosításához.",
+  "pair_mobile.error_no_license": "A párosítás előtt éles licenc szükséges. Aktiváljon licencet, majd próbálja újra.",
+  "pair_mobile.error_invalid_license": "A licencet nem sikerült ellenőrizni. Ellenőrizze a licencet a Beállítások alatt, majd próbálja újra.",
+  "pair_mobile.error_network": "A párosítási szolgáltatás nem érhető el. Ellenőrizze a kapcsolatot, majd próbálja újra.",
+  "pair_mobile.error_server": "A párosítási szolgáltatás hibát adott vissza. Kérjük, próbálja újra röviddel később."
 }

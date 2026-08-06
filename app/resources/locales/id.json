@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Periksa kode dan coba lagi. Jika masalah berlanjut, hubungi dukungan.",
   "update_banner.available": "Versi {version} tersedia.",
   "update_banner.download": "Unduh",
-  "update_banner.dismiss": "Tutup"
+  "update_banner.dismiss": "Tutup",
+  "main_window.nav_pair_mobile": "Pasangkan aplikasi seluler",
+  "pair_mobile.title": "Pasangkan aplikasi seluler",
+  "pair_mobile.intro": "Hubungkan Easy-Post Mobile Companion untuk melacak dan mengelola pengiriman dari ponsel. Aplikasi seluler akan segera hadir di App Store dan Google Play; kode yang dibuat di sini akan langsung dapat dipasangkan begitu aplikasi tersedia.",
+  "pair_mobile.qr_group": "Pindai untuk memasangkan",
+  "pair_mobile.generate_button": "Buat kode pemasangan",
+  "pair_mobile.generating_button": "Membuat…",
+  "pair_mobile.regenerate_button": "Buat kode baru",
+  "pair_mobile.expiry_note": "Kode ini berlaku selama sepuluh menit dan hanya dapat digunakan satu kali.",
+  "pair_mobile.steps": "1. Instal Easy-Post Mobile Companion di ponsel.\n2. Buka aplikasi dan pilih Pasangkan.\n3. Pindai kode di atas.",
+  "pair_mobile.security_note": "Kunci API produksi tidak pernah ditampilkan dalam kode dan tidak pernah disimpan dalam bentuk yang dapat dibaca. Membuat kode baru akan menggantikan kode sebelumnya.",
+  "pair_mobile.needs_production": "Pemasangan memerlukan versi produksi. Aktifkan lisensi produksi untuk menggunakan pendamping seluler.",
+  "pair_mobile.needs_key": "Tambahkan kunci API EasyPost produksi di Pengaturan untuk memasangkan pendamping seluler.",
+  "pair_mobile.error_no_production_key": "Tambahkan kunci API EasyPost produksi di Pengaturan untuk memasangkan pendamping seluler.",
+  "pair_mobile.error_no_license": "Lisensi produksi diperlukan sebelum pemasangan. Aktifkan lisensi, lalu coba lagi.",
+  "pair_mobile.error_invalid_license": "Lisensi tidak dapat diverifikasi. Periksa lisensi di Pengaturan, lalu coba lagi.",
+  "pair_mobile.error_network": "Layanan pemasangan tidak dapat dijangkau. Periksa koneksi, lalu coba lagi.",
+  "pair_mobile.error_server": "Layanan pemasangan mengembalikan kesalahan. Silakan coba lagi sebentar lagi."
 }

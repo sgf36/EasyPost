@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Kontrollera koden och försök igen. Om problemet kvarstår, kontakta supporten.",
   "update_banner.available": "Version {version} är tillgänglig.",
   "update_banner.download": "Ladda ner",
-  "update_banner.dismiss": "Avfärda"
+  "update_banner.dismiss": "Avfärda",
+  "main_window.nav_pair_mobile": "Parkoppla mobilapp",
+  "pair_mobile.title": "Parkoppla mobilapp",
+  "pair_mobile.intro": "Anslut Easy-Post Mobile Companion för att spåra och hantera sändningar från en telefon. Mobilapparna lanseras snart i App Store och Google Play; en kod som skapas här parkopplas så snart de blir tillgängliga.",
+  "pair_mobile.qr_group": "Skanna för att parkoppla",
+  "pair_mobile.generate_button": "Skapa parkopplingskod",
+  "pair_mobile.generating_button": "Skapar…",
+  "pair_mobile.regenerate_button": "Skapa en ny kod",
+  "pair_mobile.expiry_note": "Koden är giltig i tio minuter och kan endast användas en gång.",
+  "pair_mobile.steps": "1. Installera Easy-Post Mobile Companion på telefonen.\n2. Öppna appen och välj Parkoppla.\n3. Skanna koden ovan.",
+  "pair_mobile.security_note": "Produktions-API-nyckeln visas aldrig i koden och lagras aldrig i läsbar form. Att skapa en ny kod ersätter den föregående.",
+  "pair_mobile.needs_production": "Parkoppling kräver produktionsversionen. Aktivera en produktionslicens för att använda mobilappen.",
+  "pair_mobile.needs_key": "Lägg till en produktions-API-nyckel för EasyPost under Inställningar för att parkoppla mobilappen.",
+  "pair_mobile.error_no_production_key": "Lägg till en produktions-API-nyckel för EasyPost under Inställningar för att parkoppla mobilappen.",
+  "pair_mobile.error_no_license": "En produktionslicens krävs innan parkoppling. Aktivera en licens och försök igen.",
+  "pair_mobile.error_invalid_license": "Licensen kunde inte verifieras. Kontrollera licensen under Inställningar och försök igen.",
+  "pair_mobile.error_network": "Parkopplingstjänsten kunde inte nås. Kontrollera anslutningen och försök igen.",
+  "pair_mobile.error_server": "Parkopplingstjänsten returnerade ett fel. Försök igen om en liten stund."
 }

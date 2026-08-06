@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "कोड तपासा आणि पुन्हा प्रयत्न करा. समस्या कायम राहिल्यास, समर्थनाशी संपर्क साधा.",
   "update_banner.available": "आवृत्ती {version} उपलब्ध आहे.",
   "update_banner.download": "डाउनलोड करा",
-  "update_banner.dismiss": "बंद करा"
+  "update_banner.dismiss": "बंद करा",
+  "main_window.nav_pair_mobile": "मोबाइल अॅप जोडा",
+  "pair_mobile.title": "मोबाइल अॅप जोडा",
+  "pair_mobile.intro": "फोनवरून शिपमेंट ट्रॅक आणि व्यवस्थापित करण्यासाठी Easy-Post Mobile Companion कनेक्ट करा. मोबाइल अॅप्स लवकरच App Store आणि Google Play वर येत आहेत; येथे तयार केलेला कोड ते उपलब्ध होताच जोडला जाईल.",
+  "pair_mobile.qr_group": "जोडण्यासाठी स्कॅन करा",
+  "pair_mobile.generate_button": "जोडणी कोड तयार करा",
+  "pair_mobile.generating_button": "तयार करत आहे…",
+  "pair_mobile.regenerate_button": "नवीन कोड तयार करा",
+  "pair_mobile.expiry_note": "हा कोड दहा मिनिटांसाठी वैध आहे आणि एकदाच वापरता येतो.",
+  "pair_mobile.steps": "1. फोनवर Easy-Post Mobile Companion इंस्टॉल करा.\n2. अॅप उघडा आणि जोडा निवडा.\n3. वरील कोड स्कॅन करा.",
+  "pair_mobile.security_note": "प्रोडक्शन API की कधीही कोडमध्ये दाखवली जात नाही आणि वाचता येण्याजोग्या स्वरूपात कधीही साठवली जात नाही. नवीन कोड तयार केल्याने आधीचा कोड बदलला जातो.",
+  "pair_mobile.needs_production": "जोडणीसाठी प्रोडक्शन आवृत्ती आवश्यक आहे. मोबाइल कंपॅनियन वापरण्यासाठी प्रोडक्शन परवाना सक्रिय करा.",
+  "pair_mobile.needs_key": "मोबाइल कंपॅनियन जोडण्यासाठी सेटिंग्जमध्ये प्रोडक्शन EasyPost API की जोडा.",
+  "pair_mobile.error_no_production_key": "मोबाइल कंपॅनियन जोडण्यासाठी सेटिंग्जमध्ये प्रोडक्शन EasyPost API की जोडा.",
+  "pair_mobile.error_no_license": "जोडणीपूर्वी प्रोडक्शन परवाना आवश्यक आहे. परवाना सक्रिय करा, नंतर पुन्हा प्रयत्न करा.",
+  "pair_mobile.error_invalid_license": "परवाना सत्यापित करता आला नाही. सेटिंग्जमध्ये परवाना तपासा, नंतर पुन्हा प्रयत्न करा.",
+  "pair_mobile.error_network": "जोडणी सेवेपर्यंत पोहोचता आले नाही. कनेक्शन तपासा, नंतर पुन्हा प्रयत्न करा.",
+  "pair_mobile.error_server": "जोडणी सेवेने त्रुटी परत दिली. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा."
 }

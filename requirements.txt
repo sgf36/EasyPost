@@ -4,6 +4,9 @@ requests>=2.31.0
 keyring>=24.0.0
 platformdirs>=4.0.0
 cryptography>=42.0.0
+# QR code generation for pairing the Easy-Post Mobile Companion (pure Python,
+# no extra dependencies). Rendered to a Qt pixmap in the Pair mobile app screen.
+segno>=1.6.0
 # Cap below 2.0: the 2.x SDK renamed/removed mcp.server.fastmcp (which
 # app/mcp_server.py and the relay transport bridge use). Stay on the 1.x API.
 mcp>=1.28.0,<2

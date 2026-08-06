@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Controleer de code en probeer het opnieuw. Als het probleem aanhoudt, neem contact op met de ondersteuning.",
   "update_banner.available": "Versie {version} is beschikbaar.",
   "update_banner.download": "Downloaden",
-  "update_banner.dismiss": "Sluiten"
+  "update_banner.dismiss": "Sluiten",
+  "main_window.nav_pair_mobile": "Mobiele app koppelen",
+  "pair_mobile.title": "Mobiele app koppelen",
+  "pair_mobile.intro": "Verbind de Easy-Post Mobile Companion om zendingen vanaf een telefoon te volgen en te beheren. De mobiele apps verschijnen binnenkort in de App Store en Google Play; een hier gegenereerde code wordt gekoppeld zodra ze beschikbaar zijn.",
+  "pair_mobile.qr_group": "Scannen om te koppelen",
+  "pair_mobile.generate_button": "Koppelingscode genereren",
+  "pair_mobile.generating_button": "Bezig met genereren…",
+  "pair_mobile.regenerate_button": "Nieuwe code genereren",
+  "pair_mobile.expiry_note": "Deze code is tien minuten geldig en kan eenmalig worden gebruikt.",
+  "pair_mobile.steps": "1. Installeer Easy-Post Mobile Companion op de telefoon.\n2. Open de app en kies Koppelen.\n3. Scan de code hierboven.",
+  "pair_mobile.security_note": "De productie-API-sleutel wordt nooit in de code getoond en nooit in leesbare vorm opgeslagen. Het genereren van een nieuwe code vervangt de vorige.",
+  "pair_mobile.needs_production": "Koppelen vereist de productieversie. Activeer een productielicentie om de mobiele companion te gebruiken.",
+  "pair_mobile.needs_key": "Voeg onder Instellingen een productie-EasyPost-API-sleutel toe om de mobiele companion te koppelen.",
+  "pair_mobile.error_no_production_key": "Voeg onder Instellingen een productie-EasyPost-API-sleutel toe om de mobiele companion te koppelen.",
+  "pair_mobile.error_no_license": "Voor het koppelen is een productielicentie vereist. Activeer een licentie en probeer het opnieuw.",
+  "pair_mobile.error_invalid_license": "De licentie kon niet worden geverifieerd. Controleer de licentie onder Instellingen en probeer het opnieuw.",
+  "pair_mobile.error_network": "De koppelingsservice kon niet worden bereikt. Controleer de verbinding en probeer het opnieuw.",
+  "pair_mobile.error_server": "De koppelingsservice heeft een fout geretourneerd. Probeer het straks opnieuw."
 }

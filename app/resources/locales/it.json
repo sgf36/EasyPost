@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Controlla il codice e riprova. Se il problema persiste, contatta l'assistenza.",
   "update_banner.available": "La versione {version} è disponibile.",
   "update_banner.download": "Scarica",
-  "update_banner.dismiss": "Ignora"
+  "update_banner.dismiss": "Ignora",
+  "main_window.nav_pair_mobile": "Associa app mobile",
+  "pair_mobile.title": "Associa app mobile",
+  "pair_mobile.intro": "Collega Easy-Post Mobile Companion per monitorare e gestire le spedizioni da telefono. Le app mobili saranno presto disponibili su App Store e Google Play; un codice generato qui si assocerà non appena saranno disponibili.",
+  "pair_mobile.qr_group": "Scansiona per associare",
+  "pair_mobile.generate_button": "Genera codice di associazione",
+  "pair_mobile.generating_button": "Generazione…",
+  "pair_mobile.regenerate_button": "Genera un nuovo codice",
+  "pair_mobile.expiry_note": "Questo codice è valido per dieci minuti e può essere utilizzato una sola volta.",
+  "pair_mobile.steps": "1. Installa Easy-Post Mobile Companion sul telefono.\n2. Apri l'app e scegli Associa.\n3. Scansiona il codice sopra.",
+  "pair_mobile.security_note": "La chiave API di produzione non viene mai mostrata nel codice e non viene mai memorizzata in forma leggibile. Generare un nuovo codice sostituisce quello precedente.",
+  "pair_mobile.needs_production": "L'associazione richiede la versione di produzione. Attiva una licenza di produzione per utilizzare il companion mobile.",
+  "pair_mobile.needs_key": "Aggiungi una chiave API EasyPost di produzione in Impostazioni per associare il companion mobile.",
+  "pair_mobile.error_no_production_key": "Aggiungi una chiave API EasyPost di produzione in Impostazioni per associare il companion mobile.",
+  "pair_mobile.error_no_license": "È necessaria una licenza di produzione prima dell'associazione. Attiva una licenza, quindi riprova.",
+  "pair_mobile.error_invalid_license": "Non è stato possibile verificare la licenza. Controlla la licenza in Impostazioni, quindi riprova.",
+  "pair_mobile.error_network": "Non è stato possibile raggiungere il servizio di associazione. Controlla la connessione, quindi riprova.",
+  "pair_mobile.error_server": "Il servizio di associazione ha restituito un errore. Riprova tra poco."
 }

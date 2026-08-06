@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "કોડ તપાસો અને ફરી પ્રયાસ કરો. જો સમસ્યા ચાલુ રહે, તો સપોર્ટનો સંપર્ક કરો.",
   "update_banner.available": "સંસ્કરણ {version} ઉપલબ્ધ છે.",
   "update_banner.download": "ડાઉનલોડ કરો",
-  "update_banner.dismiss": "કાઢી નાખો"
+  "update_banner.dismiss": "કાઢી નાખો",
+  "main_window.nav_pair_mobile": "મોબાઇલ એપ જોડો",
+  "pair_mobile.title": "મોબાઇલ એપ જોડો",
+  "pair_mobile.intro": "ફોન પરથી શિપમેન્ટ ટ્રૅક અને મેનેજ કરવા માટે Easy-Post Mobile Companion ને કનેક્ટ કરો. મોબાઇલ એપ્સ ટૂંક સમયમાં App Store અને Google Play પર આવી રહી છે; અહીં જનરેટ કરેલો કોડ તે ઉપલબ્ધ થતાં જ જોડાઈ જશે.",
+  "pair_mobile.qr_group": "જોડવા માટે સ્કેન કરો",
+  "pair_mobile.generate_button": "જોડાણ કોડ જનરેટ કરો",
+  "pair_mobile.generating_button": "જનરેટ થઈ રહ્યું છે…",
+  "pair_mobile.regenerate_button": "નવો કોડ જનરેટ કરો",
+  "pair_mobile.expiry_note": "આ કોડ દસ મિનિટ માટે માન્ય છે અને એક વાર ઉપયોગમાં લઈ શકાય છે.",
+  "pair_mobile.steps": "1. ફોન પર Easy-Post Mobile Companion ઇન્સ્ટોલ કરો.\n2. એપ ખોલો અને જોડો પસંદ કરો.\n3. ઉપરનો કોડ સ્કેન કરો.",
+  "pair_mobile.security_note": "પ્રોડક્શન API કી ક્યારેય કોડમાં દેખાડવામાં આવતી નથી અને ક્યારેય વાંચી શકાય તેવા સ્વરૂપમાં સંગ્રહાતી નથી. નવો કોડ જનરેટ કરવાથી અગાઉનો કોડ બદલાઈ જાય છે.",
+  "pair_mobile.needs_production": "જોડાણ માટે પ્રોડક્શન વર્ઝન જરૂરી છે. મોબાઇલ કમ્પેનિયનનો ઉપયોગ કરવા માટે પ્રોડક્શન લાયસન્સ સક્રિય કરો.",
+  "pair_mobile.needs_key": "મોબાઇલ કમ્પેનિયનને જોડવા માટે સેટિંગ્સ હેઠળ પ્રોડક્શન EasyPost API કી ઉમેરો.",
+  "pair_mobile.error_no_production_key": "મોબાઇલ કમ્પેનિયનને જોડવા માટે સેટિંગ્સ હેઠળ પ્રોડક્શન EasyPost API કી ઉમેરો.",
+  "pair_mobile.error_no_license": "જોડાણ કરતાં પહેલાં પ્રોડક્શન લાયસન્સ જરૂરી છે. લાયસન્સ સક્રિય કરો, પછી ફરી પ્રયાસ કરો.",
+  "pair_mobile.error_invalid_license": "લાયસન્સ ચકાસી શકાયું નથી. સેટિંગ્સ હેઠળ લાયસન્સ તપાસો, પછી ફરી પ્રયાસ કરો.",
+  "pair_mobile.error_network": "જોડાણ સેવા સુધી પહોંચી શકાયું નથી. કનેક્શન તપાસો, પછી ફરી પ્રયાસ કરો.",
+  "pair_mobile.error_server": "જોડાણ સેવાએ ભૂલ પરત આપી. કૃપા કરીને થોડી વારમાં ફરી પ્રયાસ કરો."
 }
