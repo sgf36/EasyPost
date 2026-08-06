@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Semak kod dan cuba lagi. Jika masalah berterusan, hubungi sokongan.",
   "update_banner.available": "Versi {version} tersedia.",
   "update_banner.download": "Muat turun",
-  "update_banner.dismiss": "Ketepikan"
+  "update_banner.dismiss": "Ketepikan",
+  "main_window.nav_pair_mobile": "Gandingkan aplikasi mudah alih",
+  "pair_mobile.title": "Gandingkan aplikasi mudah alih",
+  "pair_mobile.intro": "Sambungkan Easy-Post Mobile Companion untuk menjejak dan menguruskan penghantaran daripada telefon. Aplikasi mudah alih akan tersedia tidak lama lagi di App Store dan Google Play; kod yang dijana di sini akan digandingkan sebaik sahaja ia tersedia.",
+  "pair_mobile.qr_group": "Imbas untuk menggandingkan",
+  "pair_mobile.generate_button": "Jana kod penggandingan",
+  "pair_mobile.generating_button": "Menjana…",
+  "pair_mobile.regenerate_button": "Jana kod baharu",
+  "pair_mobile.expiry_note": "Kod ini sah selama sepuluh minit dan boleh digunakan sekali sahaja.",
+  "pair_mobile.steps": "1. Pasang Easy-Post Mobile Companion pada telefon.\n2. Buka aplikasi dan pilih Gandingkan.\n3. Imbas kod di atas.",
+  "pair_mobile.security_note": "Kunci API pengeluaran tidak sekali-kali dipaparkan dalam kod dan tidak sekali-kali disimpan dalam bentuk yang boleh dibaca. Menjana kod baharu akan menggantikan kod sebelumnya.",
+  "pair_mobile.needs_production": "Penggandingan memerlukan versi pengeluaran. Aktifkan lesen pengeluaran untuk menggunakan aplikasi pendamping mudah alih.",
+  "pair_mobile.needs_key": "Tambah kunci API EasyPost pengeluaran di bawah Tetapan untuk menggandingkan aplikasi pendamping mudah alih.",
+  "pair_mobile.error_no_production_key": "Tambah kunci API EasyPost pengeluaran di bawah Tetapan untuk menggandingkan aplikasi pendamping mudah alih.",
+  "pair_mobile.error_no_license": "Lesen pengeluaran diperlukan sebelum penggandingan. Aktifkan lesen, kemudian cuba lagi.",
+  "pair_mobile.error_invalid_license": "Lesen tidak dapat disahkan. Semak lesen di bawah Tetapan, kemudian cuba lagi.",
+  "pair_mobile.error_network": "Perkhidmatan penggandingan tidak dapat dihubungi. Semak sambungan, kemudian cuba lagi.",
+  "pair_mobile.error_server": "Perkhidmatan penggandingan mengembalikan ralat. Sila cuba lagi sebentar lagi."
 }

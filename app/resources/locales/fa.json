@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "کد را بررسی کنید و دوباره تلاش کنید. اگر مشکل ادامه یافت، با پشتیبانی تماس بگیرید.",
   "update_banner.available": "نسخه {version} در دسترس است.",
   "update_banner.download": "دانلود",
-  "update_banner.dismiss": "رد کردن"
+  "update_banner.dismiss": "رد کردن",
+  "main_window.nav_pair_mobile": "جفت‌سازی برنامه موبایل",
+  "pair_mobile.title": "جفت‌سازی برنامه موبایل",
+  "pair_mobile.intro": "برای ردیابی و مدیریت مرسولات از طریق تلفن، به Easy-Post Mobile Companion متصل شوید. برنامه‌های موبایل به‌زودی در App Store و Google Play در دسترس قرار می‌گیرند؛ کدی که اینجا تولید می‌شود به محض در دسترس بودن آن‌ها جفت خواهد شد.",
+  "pair_mobile.qr_group": "برای جفت‌سازی اسکن کنید",
+  "pair_mobile.generate_button": "تولید کد جفت‌سازی",
+  "pair_mobile.generating_button": "در حال تولید…",
+  "pair_mobile.regenerate_button": "تولید کد جدید",
+  "pair_mobile.expiry_note": "این کد به مدت ده دقیقه معتبر است و فقط یک‌بار قابل استفاده است.",
+  "pair_mobile.steps": "1. Easy-Post Mobile Companion را روی تلفن نصب کنید.\n2. برنامه را باز کرده و جفت‌سازی را انتخاب کنید.\n3. کد بالا را اسکن کنید.",
+  "pair_mobile.security_note": "کلید API نسخه تولید هرگز در کد نمایش داده نمی‌شود و هرگز به‌صورت قابل‌خواندن ذخیره نمی‌شود. تولید کد جدید، کد قبلی را جایگزین می‌کند.",
+  "pair_mobile.needs_production": "جفت‌سازی به نسخه تولید نیاز دارد. برای استفاده از همراه موبایل، یک مجوز تولید فعال کنید.",
+  "pair_mobile.needs_key": "برای جفت‌سازی همراه موبایل، یک کلید API تولید EasyPost در بخش تنظیمات اضافه کنید.",
+  "pair_mobile.error_no_production_key": "برای جفت‌سازی همراه موبایل، یک کلید API تولید EasyPost در بخش تنظیمات اضافه کنید.",
+  "pair_mobile.error_no_license": "پیش از جفت‌سازی، به یک مجوز تولید نیاز است. مجوزی را فعال کرده و دوباره تلاش کنید.",
+  "pair_mobile.error_invalid_license": "مجوز قابل تأیید نبود. مجوز را در بخش تنظیمات بررسی کرده و دوباره تلاش کنید.",
+  "pair_mobile.error_network": "امکان دسترسی به سرویس جفت‌سازی وجود نداشت. اتصال را بررسی کرده و دوباره تلاش کنید.",
+  "pair_mobile.error_server": "سرویس جفت‌سازی خطایی بازگرداند. لطفاً کمی بعد دوباره تلاش کنید."
 }

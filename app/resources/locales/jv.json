@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Priksa kode lan coba maneh. Yen masalah terus ana, hubungi dhukungan.",
   "update_banner.available": "Versi {version} kasedhiya.",
   "update_banner.download": "Unduh",
-  "update_banner.dismiss": "Tutup"
+  "update_banner.dismiss": "Tutup",
+  "main_window.nav_pair_mobile": "Pasangake aplikasi seluler",
+  "pair_mobile.title": "Pasangake aplikasi seluler",
+  "pair_mobile.intro": "Sambungake Easy-Post Mobile Companion kanggo nglacak lan ngatur pengiriman saka telpon. Aplikasi seluler bakal enggal rawuh ing App Store lan Google Play; kode sing digawe ing kene bakal dipasangake sanalika wis kasedhiya.",
+  "pair_mobile.qr_group": "Pindai kanggo masang",
+  "pair_mobile.generate_button": "Gawe kode pemasangan",
+  "pair_mobile.generating_button": "Nggawe…",
+  "pair_mobile.regenerate_button": "Gawe kode anyar",
+  "pair_mobile.expiry_note": "Kode iki sah sajrone sepuluh menit lan mung bisa digunakake sepisan.",
+  "pair_mobile.steps": "1. Instal Easy-Post Mobile Companion ing telpon.\n2. Bukak aplikasi banjur pilih Pasang.\n3. Pindai kode ing dhuwur.",
+  "pair_mobile.security_note": "Kunci API produksi ora tau ditampilake ing kode lan ora tau disimpen ing wangun sing bisa diwaca. Nggawe kode anyar bakal ngganti kode sadurunge.",
+  "pair_mobile.needs_production": "Pemasangan mbutuhake versi produksi. Aktifake lisensi produksi kanggo nggunakake companion seluler.",
+  "pair_mobile.needs_key": "Tambahake kunci API EasyPost produksi ing Setelan kanggo masang companion seluler.",
+  "pair_mobile.error_no_production_key": "Tambahake kunci API EasyPost produksi ing Setelan kanggo masang companion seluler.",
+  "pair_mobile.error_no_license": "Lisensi produksi dibutuhake sadurunge masang. Aktifake lisensi, banjur coba maneh.",
+  "pair_mobile.error_invalid_license": "Lisensi ora bisa divalidasi. Priksa lisensi ing Setelan, banjur coba maneh.",
+  "pair_mobile.error_network": "Layanan pemasangan ora bisa dijangkau. Priksa sambungan, banjur coba maneh.",
+  "pair_mobile.error_server": "Layanan pemasangan mbalekake kesalahan. Mangga coba maneh sedhela maneh."
 }

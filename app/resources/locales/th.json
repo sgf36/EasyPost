@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "ตรวจสอบรหัสแล้วลองอีกครั้ง หากยังพบปัญหา โปรดติดต่อฝ่ายสนับสนุน",
   "update_banner.available": "เวอร์ชัน {version} พร้อมใช้งานแล้ว",
   "update_banner.download": "ดาวน์โหลด",
-  "update_banner.dismiss": "ปิด"
+  "update_banner.dismiss": "ปิด",
+  "main_window.nav_pair_mobile": "จับคู่แอปมือถือ",
+  "pair_mobile.title": "จับคู่แอปมือถือ",
+  "pair_mobile.intro": "เชื่อมต่อ Easy-Post Mobile Companion เพื่อติดตามและจัดการการจัดส่งจากโทรศัพท์ แอปมือถือกำลังจะเปิดตัวเร็ว ๆ นี้บน App Store และ Google Play รหัสที่สร้างขึ้นที่นี่จะสามารถจับคู่ได้ทันทีที่แอปพร้อมใช้งาน",
+  "pair_mobile.qr_group": "สแกนเพื่อจับคู่",
+  "pair_mobile.generate_button": "สร้างรหัสจับคู่",
+  "pair_mobile.generating_button": "กำลังสร้าง…",
+  "pair_mobile.regenerate_button": "สร้างรหัสใหม่",
+  "pair_mobile.expiry_note": "รหัสนี้ใช้ได้นานสิบนาทีและใช้ได้เพียงครั้งเดียว",
+  "pair_mobile.steps": "1. ติดตั้ง Easy-Post Mobile Companion บนโทรศัพท์\n2. เปิดแอปแล้วเลือกจับคู่\n3. สแกนรหัสด้านบน",
+  "pair_mobile.security_note": "คีย์ API สำหรับใช้งานจริงจะไม่ถูกแสดงในรหัสและจะไม่ถูกจัดเก็บในรูปแบบที่อ่านได้ การสร้างรหัสใหม่จะแทนที่รหัสเดิม",
+  "pair_mobile.needs_production": "การจับคู่ต้องใช้เวอร์ชันใช้งานจริง เปิดใช้งานใบอนุญาตแบบใช้งานจริงเพื่อใช้แอปคู่หูมือถือ",
+  "pair_mobile.needs_key": "เพิ่มคีย์ API ของ EasyPost สำหรับใช้งานจริงในการตั้งค่าเพื่อจับคู่แอปคู่หูมือถือ",
+  "pair_mobile.error_no_production_key": "เพิ่มคีย์ API ของ EasyPost สำหรับใช้งานจริงในการตั้งค่าเพื่อจับคู่แอปคู่หูมือถือ",
+  "pair_mobile.error_no_license": "ต้องมีใบอนุญาตแบบใช้งานจริงก่อนจึงจะจับคู่ได้ เปิดใช้งานใบอนุญาตแล้วลองอีกครั้ง",
+  "pair_mobile.error_invalid_license": "ไม่สามารถตรวจสอบใบอนุญาตได้ ตรวจสอบใบอนุญาตในการตั้งค่าแล้วลองอีกครั้ง",
+  "pair_mobile.error_network": "ไม่สามารถเชื่อมต่อกับบริการจับคู่ได้ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+  "pair_mobile.error_server": "บริการจับคู่ส่งคืนข้อผิดพลาด โปรดลองอีกครั้งในอีกสักครู่"
 }

@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Kodni tekshirib, qayta urinib ko‘ring. Muammo davom etsa, qo‘llab-quvvatlash xizmatiga murojaat qiling.",
   "update_banner.available": "{version} versiyasi mavjud.",
   "update_banner.download": "Yuklab olish",
-  "update_banner.dismiss": "Yopish"
+  "update_banner.dismiss": "Yopish",
+  "main_window.nav_pair_mobile": "Mobil ilovani ulash",
+  "pair_mobile.title": "Mobil ilovani ulash",
+  "pair_mobile.intro": "Jo'natmalarni telefondan kuzatish va boshqarish uchun Easy-Post Mobile Companion ilovasini ulang. Mobil ilovalar tez orada App Store va Google Play'da paydo bo'ladi; bu yerda yaratilgan kod ular mavjud bo'lishi bilanoq ulanadi.",
+  "pair_mobile.qr_group": "Ulash uchun skanerlang",
+  "pair_mobile.generate_button": "Ulash kodini yaratish",
+  "pair_mobile.generating_button": "Yaratilmoqda…",
+  "pair_mobile.regenerate_button": "Yangi kod yaratish",
+  "pair_mobile.expiry_note": "Bu kod o'n daqiqa amal qiladi va faqat bir marta ishlatilishi mumkin.",
+  "pair_mobile.steps": "1. Telefonga Easy-Post Mobile Companion ilovasini o'rnating.\n2. Ilovani oching va Ulash tugmasini tanlang.\n3. Yuqoridagi kodni skanerlang.",
+  "pair_mobile.security_note": "Ishlab chiqarish API kaliti kodda hech qachon ko'rsatilmaydi va o'qiladigan shaklda hech qachon saqlanmaydi. Yangi kod yaratish oldingisini almashtiradi.",
+  "pair_mobile.needs_production": "Ulash uchun ishlab chiqarish versiyasi talab qilinadi. Mobil hamrohni ishlatish uchun ishlab chiqarish litsenziyasini faollashtiring.",
+  "pair_mobile.needs_key": "Mobil hamrohni ulash uchun Sozlamalar bo'limida ishlab chiqarish EasyPost API kalitini qo'shing.",
+  "pair_mobile.error_no_production_key": "Mobil hamrohni ulash uchun Sozlamalar bo'limida ishlab chiqarish EasyPost API kalitini qo'shing.",
+  "pair_mobile.error_no_license": "Ulashdan oldin ishlab chiqarish litsenziyasi talab qilinadi. Litsenziyani faollashtiring, so'ngra qayta urinib ko'ring.",
+  "pair_mobile.error_invalid_license": "Litsenziyani tekshirib bo'lmadi. Sozlamalar bo'limida litsenziyani tekshiring, so'ngra qayta urinib ko'ring.",
+  "pair_mobile.error_network": "Ulash xizmatiga ulanib bo'lmadi. Ulanishni tekshiring, so'ngra qayta urinib ko'ring.",
+  "pair_mobile.error_server": "Ulash xizmati xatolik qaytardi. Iltimos, birozdan so'ng qayta urinib ko'ring."
 }

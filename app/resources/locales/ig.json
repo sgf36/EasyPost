@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Lelee koodu ahụ ma nwaa ọzọ. Ọ bụrụ na nsogbu ahụ na-aga n'ihu, kpọtụrụ nkwado.",
   "update_banner.available": "Ụdị {version} dị.",
   "update_banner.download": "Budata",
-  "update_banner.dismiss": "Wepụ"
+  "update_banner.dismiss": "Wepụ",
+  "main_window.nav_pair_mobile": "Jikọọ ngwa ekwentị",
+  "pair_mobile.title": "Jikọọ ngwa ekwentị",
+  "pair_mobile.intro": "Jikọọ Easy-Post Mobile Companion iji soro ma jikwaa mbupu site na ekwentị. Ngwa ekwentị na-abịa n'oge na-adịghị anya na App Store na Google Play; koodu emepụtara ebe a ga-ejikọ ozugbo ha dịrị.",
+  "pair_mobile.qr_group": "Skenụ iji jikọọ",
+  "pair_mobile.generate_button": "Mepụta koodu njikọ",
+  "pair_mobile.generating_button": "Na-emepụta…",
+  "pair_mobile.regenerate_button": "Mepụta koodu ọhụrụ",
+  "pair_mobile.expiry_note": "Koodu a bara uru maka nkeji iri, a pụkwara iji ya naanị otu ugbo.",
+  "pair_mobile.steps": "1. Wụnye Easy-Post Mobile Companion na ekwentị.\n2. Meghee ngwa ahụ wee họrọ Jikọọ.\n3. Skenụ koodu dị n'elu.",
+  "pair_mobile.security_note": "A dịghị egosi igodo API nke prọdọkshọn n'ime koodu ahụ, a dịghịkwa echekwa ya n'ụdị enwere ike ịgụ. Ịmepụta koodu ọhụrụ ga-anọchi nke gara aga.",
+  "pair_mobile.needs_production": "Ijikọ chọrọ ụdị prọdọkshọn. Mee ka laịsens prọdọkshọn rụọ ọrụ iji jiri ngwa ekwentị ahụ.",
+  "pair_mobile.needs_key": "Tinye igodo API EasyPost prọdọkshọn n'okpuru Settings iji jikọọ ngwa ekwentị ahụ.",
+  "pair_mobile.error_no_production_key": "Tinye igodo API EasyPost prọdọkshọn n'okpuru Settings iji jikọọ ngwa ekwentị ahụ.",
+  "pair_mobile.error_no_license": "Achọrọ laịsens prọdọkshọn tupu ijikọ. Mee ka laịsens ahụ rụọ ọrụ, gbaa mgbọ ọzọ.",
+  "pair_mobile.error_invalid_license": "Enweghị ike inyocha laịsens ahụ. Lelee laịsens ahụ n'okpuru Settings, gbaa mgbọ ọzọ.",
+  "pair_mobile.error_network": "Enweghị ike iru ọrụ njikọ ahụ. Lelee njikọ ịntanetị gị, gbaa mgbọ ọzọ.",
+  "pair_mobile.error_server": "Ọrụ njikọ ahụ nyeghachiri njehie. Biko gbaa mgbọ ọzọ n'oge na-adịghị anya."
 }

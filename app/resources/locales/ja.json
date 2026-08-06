@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "コードを確認してもう一度お試しください。問題が解決しない場合は、サポートにお問い合わせください。",
   "update_banner.available": "バージョン {version} が利用可能です。",
   "update_banner.download": "ダウンロード",
-  "update_banner.dismiss": "閉じる"
+  "update_banner.dismiss": "閉じる",
+  "main_window.nav_pair_mobile": "モバイルアプリをペアリング",
+  "pair_mobile.title": "モバイルアプリをペアリング",
+  "pair_mobile.intro": "Easy-Post Mobile Companionを接続すると、電話から配送状況を追跡・管理できます。モバイルアプリはまもなくApp StoreとGoogle Playに登場します。ここで生成したコードは、提供され次第ペアリングに使用できます。",
+  "pair_mobile.qr_group": "スキャンしてペアリング",
+  "pair_mobile.generate_button": "ペアリングコードを生成",
+  "pair_mobile.generating_button": "生成中…",
+  "pair_mobile.regenerate_button": "新しいコードを生成",
+  "pair_mobile.expiry_note": "このコードの有効期限は10分で、1回のみ使用できます。",
+  "pair_mobile.steps": "1. 電話にEasy-Post Mobile Companionをインストールします。\n2. アプリを開き、「ペアリング」を選択します。\n3. 上のコードをスキャンします。",
+  "pair_mobile.security_note": "本番用APIキーがコードに表示されることはなく、読み取り可能な形式で保存されることもありません。新しいコードを生成すると、以前のコードは置き換えられます。",
+  "pair_mobile.needs_production": "ペアリングには本番バージョンが必要です。モバイルコンパニオンを使用するには、本番ライセンスを有効化してください。",
+  "pair_mobile.needs_key": "モバイルコンパニオンとペアリングするには、設定で本番用EasyPost APIキーを追加してください。",
+  "pair_mobile.error_no_production_key": "モバイルコンパニオンとペアリングするには、設定で本番用EasyPost APIキーを追加してください。",
+  "pair_mobile.error_no_license": "ペアリングする前に本番ライセンスが必要です。ライセンスを有効化してから、もう一度お試しください。",
+  "pair_mobile.error_invalid_license": "ライセンスを確認できませんでした。設定でライセンスを確認してから、もう一度お試しください。",
+  "pair_mobile.error_network": "ペアリングサービスに接続できませんでした。接続を確認してから、もう一度お試しください。",
+  "pair_mobile.error_server": "ペアリングサービスがエラーを返しました。しばらくしてからもう一度お試しください。"
 }

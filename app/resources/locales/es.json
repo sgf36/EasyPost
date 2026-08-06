@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Comprueba el código e inténtalo de nuevo. Si el problema continúa, ponte en contacto con soporte.",
   "update_banner.available": "La versión {version} está disponible.",
   "update_banner.download": "Descargar",
-  "update_banner.dismiss": "Descartar"
+  "update_banner.dismiss": "Descartar",
+  "main_window.nav_pair_mobile": "Emparejar aplicación móvil",
+  "pair_mobile.title": "Emparejar aplicación móvil",
+  "pair_mobile.intro": "Conecte Easy-Post Mobile Companion para rastrear y gestionar envíos desde un teléfono. Las aplicaciones móviles estarán disponibles próximamente en App Store y Google Play; un código generado aquí se emparejará en cuanto estén disponibles.",
+  "pair_mobile.qr_group": "Escanear para emparejar",
+  "pair_mobile.generate_button": "Generar código de emparejamiento",
+  "pair_mobile.generating_button": "Generando…",
+  "pair_mobile.regenerate_button": "Generar un nuevo código",
+  "pair_mobile.expiry_note": "Este código es válido durante diez minutos y solo puede usarse una vez.",
+  "pair_mobile.steps": "1. Instale Easy-Post Mobile Companion en el teléfono.\n2. Abra la aplicación y seleccione Emparejar.\n3. Escanee el código anterior.",
+  "pair_mobile.security_note": "La clave de API de producción nunca se muestra en el código ni se almacena en forma legible. Generar un nuevo código reemplaza al anterior.",
+  "pair_mobile.needs_production": "El emparejamiento requiere la versión de producción. Active una licencia de producción para usar el companion móvil.",
+  "pair_mobile.needs_key": "Añada una clave de API de producción de EasyPost en Configuración para emparejar el companion móvil.",
+  "pair_mobile.error_no_production_key": "Añada una clave de API de producción de EasyPost en Configuración para emparejar el companion móvil.",
+  "pair_mobile.error_no_license": "Se requiere una licencia de producción antes de emparejar. Active una licencia y vuelva a intentarlo.",
+  "pair_mobile.error_invalid_license": "No se pudo verificar la licencia. Compruebe la licencia en Configuración y vuelva a intentarlo.",
+  "pair_mobile.error_network": "No se pudo contactar con el servicio de emparejamiento. Compruebe la conexión y vuelva a intentarlo.",
+  "pair_mobile.error_server": "El servicio de emparejamiento devolvió un error. Inténtelo de nuevo en unos instantes."
 }

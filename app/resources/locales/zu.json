@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Hlola ikhodi bese uzama futhi. Uma inkinga iqhubeka, xhumana nabasekelayo.",
   "update_banner.available": "Inguqulo {version} iyatholakala.",
   "update_banner.download": "Landa",
-  "update_banner.dismiss": "Cashisa"
+  "update_banner.dismiss": "Cashisa",
+  "main_window.nav_pair_mobile": "Bhangqa uhlelo lokusebenza lweselula",
+  "pair_mobile.title": "Bhangqa uhlelo lokusebenza lweselula",
+  "pair_mobile.intro": "Xhuma i-Easy-Post Mobile Companion ukuze ulandelele futhi uphathe izithuthwa usebenzisa ifoni. Izinhlelo zokusebenza zeselula zizofika maduze ku-App Store nakuGoogle Play; ikhodi ekhiqizwe lapha izobhangqana ngokushesha lapho sezitholakala.",
+  "pair_mobile.qr_group": "Skena ukuze ubhangqe",
+  "pair_mobile.generate_button": "Khiqiza ikhodi yokubhangqa",
+  "pair_mobile.generating_button": "Iyakhiqizwa…",
+  "pair_mobile.regenerate_button": "Khiqiza ikhodi entsha",
+  "pair_mobile.expiry_note": "Le khodi isebenza imizuzu eyishumi futhi ingasetshenziswa kanye kuphela.",
+  "pair_mobile.steps": "1. Faka i-Easy-Post Mobile Companion efonini.\n2. Vula uhlelo lokusebenza bese ukhetha Bhangqa.\n3. Skena ikhodi engenhla.",
+  "pair_mobile.security_note": "Ukhiye we-API wokusebenza ngempela awukaze uboniswe ekhodini futhi awukaze ugcinwe ngendlela efundekayo. Ukukhiqiza ikhodi entsha kuthatha indawo yaleyo eyayikhona ngaphambilini.",
+  "pair_mobile.needs_production": "Ukubhangqa kudinga inguqulo yokusebenza ngempela. Yenza umvumo wokusebenza ngempela ube sebenza ukuze usebenzise i-mobile companion.",
+  "pair_mobile.needs_key": "Engeza ukhiye we-EasyPost API wokusebenza ngempela ngaphansi kwezinga elithi Izilungiselelo ukuze ubhangqe i-mobile companion.",
+  "pair_mobile.error_no_production_key": "Engeza ukhiye we-EasyPost API wokusebenza ngempela ngaphansi kwezinga elithi Izilungiselelo ukuze ubhangqe i-mobile companion.",
+  "pair_mobile.error_no_license": "Umvumo wokusebenza ngempela uyadingeka ngaphambi kokubhangqa. Yenza umvumo usebenze, bese uzama futhi.",
+  "pair_mobile.error_invalid_license": "Umvumo awukwazanga ukuqinisekiswa. Hlola umvumo ngaphansi kwezinga elithi Izilungiselelo, bese uzama futhi.",
+  "pair_mobile.error_network": "Isevisi yokubhangqa ayifinyelelekanga. Hlola uxhumano, bese uzama futhi.",
+  "pair_mobile.error_server": "Isevisi yokubhangqa ibuyise iphutha. Sicela uzame futhi maduzane."
 }

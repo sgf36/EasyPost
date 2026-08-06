@@ -39,6 +39,7 @@ from app.ui.views.history_view import HistoryView
 from app.ui.views.hts_lookup_view import HtsLookupView
 from app.ui.views.insurance_view import InsuranceView
 from app.ui.views.license_gate import LicenseGate
+from app.ui.views.pair_mobile_view import PairMobileView
 from app.ui.views.store_unlock import StoreUnlockGate
 from app.ui.views.pickups_view import PickupsView
 from app.ui.views.reports_view import ReportsView
@@ -145,6 +146,7 @@ class MainWindow(QMainWindow):
         self._batch_view = BatchView()
         self._reports_view = ReportsView()
         self._hts_lookup_view = HtsLookupView()
+        self._pair_mobile_view = PairMobileView()
         self._connect_agents_view = ConnectAgentsView()
         self._settings_view = SettingsView()
 
@@ -208,6 +210,7 @@ class MainWindow(QMainWindow):
                 [
                     ("main_window.nav_reports", self._reports_view, self._reports_view.refresh),
                     ("main_window.nav_hts_lookup", self._hts_lookup_view, None),
+                    ("main_window.nav_pair_mobile", self._pair_mobile_view, self._pair_mobile_view.refresh),
                     (
                         "main_window.nav_connect_agents",
                         self._connect_agents_view,

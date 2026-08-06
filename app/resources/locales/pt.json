@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Verifique o código e tente novamente. Se o problema continuar, entre em contato com o suporte.",
   "update_banner.available": "A versão {version} está disponível.",
   "update_banner.download": "Baixar",
-  "update_banner.dismiss": "Dispensar"
+  "update_banner.dismiss": "Dispensar",
+  "main_window.nav_pair_mobile": "Parear aplicativo móvel",
+  "pair_mobile.title": "Parear aplicativo móvel",
+  "pair_mobile.intro": "Conecte o Easy-Post Mobile Companion para acompanhar e gerenciar remessas a partir de um telefone. Os aplicativos móveis chegarão em breve à App Store e ao Google Play; um código gerado aqui será pareado assim que estiverem disponíveis.",
+  "pair_mobile.qr_group": "Digitalizar para parear",
+  "pair_mobile.generate_button": "Gerar código de pareamento",
+  "pair_mobile.generating_button": "Gerando…",
+  "pair_mobile.regenerate_button": "Gerar um novo código",
+  "pair_mobile.expiry_note": "Este código é válido por dez minutos e pode ser usado uma vez.",
+  "pair_mobile.steps": "1. Instale o Easy-Post Mobile Companion no telefone.\n2. Abra o aplicativo e escolha Parear.\n3. Digitalize o código acima.",
+  "pair_mobile.security_note": "A chave de API de produção nunca é exibida no código e nunca é armazenada em formato legível. Gerar um novo código substitui o anterior.",
+  "pair_mobile.needs_production": "O pareamento requer a versão de produção. Ative uma licença de produção para usar o aplicativo complementar móvel.",
+  "pair_mobile.needs_key": "Adicione uma chave de API de produção da EasyPost em Configurações para parear o aplicativo complementar móvel.",
+  "pair_mobile.error_no_production_key": "Adicione uma chave de API de produção da EasyPost em Configurações para parear o aplicativo complementar móvel.",
+  "pair_mobile.error_no_license": "É necessária uma licença de produção antes do pareamento. Ative uma licença e tente novamente.",
+  "pair_mobile.error_invalid_license": "Não foi possível verificar a licença. Verifique a licença em Configurações e tente novamente.",
+  "pair_mobile.error_network": "Não foi possível acessar o serviço de pareamento. Verifique a conexão e tente novamente.",
+  "pair_mobile.error_server": "O serviço de pareamento retornou um erro. Tente novamente em breve."
 }

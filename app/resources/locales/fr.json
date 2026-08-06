@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Vérifiez le code et réessayez. Si le problème persiste, contactez le support.",
   "update_banner.available": "La version {version} est disponible.",
   "update_banner.download": "Télécharger",
-  "update_banner.dismiss": "Ignorer"
+  "update_banner.dismiss": "Ignorer",
+  "main_window.nav_pair_mobile": "Jumeler l'application mobile",
+  "pair_mobile.title": "Jumeler l'application mobile",
+  "pair_mobile.intro": "Connectez Easy-Post Mobile Companion pour suivre et gérer les envois depuis un téléphone. Les applications mobiles arrivent bientôt sur l'App Store et Google Play ; un code généré ici se jumellera dès qu'elles seront disponibles.",
+  "pair_mobile.qr_group": "Scanner pour jumeler",
+  "pair_mobile.generate_button": "Générer un code de jumelage",
+  "pair_mobile.generating_button": "Génération…",
+  "pair_mobile.regenerate_button": "Générer un nouveau code",
+  "pair_mobile.expiry_note": "Ce code est valable dix minutes et ne peut être utilisé qu'une seule fois.",
+  "pair_mobile.steps": "1. Installez Easy-Post Mobile Companion sur le téléphone.\n2. Ouvrez l'application et choisissez Jumeler.\n3. Scannez le code ci-dessus.",
+  "pair_mobile.security_note": "La clé API de production n'est jamais affichée dans le code et n'est jamais stockée sous une forme lisible. Générer un nouveau code remplace le précédent.",
+  "pair_mobile.needs_production": "Le jumelage nécessite la version de production. Activez une licence de production pour utiliser le compagnon mobile.",
+  "pair_mobile.needs_key": "Ajoutez une clé API EasyPost de production sous Paramètres pour jumeler le compagnon mobile.",
+  "pair_mobile.error_no_production_key": "Ajoutez une clé API EasyPost de production sous Paramètres pour jumeler le compagnon mobile.",
+  "pair_mobile.error_no_license": "Une licence de production est requise avant le jumelage. Activez une licence, puis réessayez.",
+  "pair_mobile.error_invalid_license": "La licence n'a pas pu être vérifiée. Vérifiez la licence sous Paramètres, puis réessayez.",
+  "pair_mobile.error_network": "Le service de jumelage n'a pas pu être contacté. Vérifiez la connexion, puis réessayez.",
+  "pair_mobile.error_server": "Le service de jumelage a renvoyé une erreur. Veuillez réessayer sous peu."
 }

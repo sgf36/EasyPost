@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Kodu kontrol edip tekrar deneyin. Sorun devam ederse destek ekibiyle iletişime geçin.",
   "update_banner.available": "{version} sürümü kullanılabilir.",
   "update_banner.download": "İndir",
-  "update_banner.dismiss": "Kapat"
+  "update_banner.dismiss": "Kapat",
+  "main_window.nav_pair_mobile": "Mobil uygulamayı eşleştir",
+  "pair_mobile.title": "Mobil uygulamayı eşleştir",
+  "pair_mobile.intro": "Gönderileri telefondan takip etmek ve yönetmek için Easy-Post Mobile Companion uygulamasını bağlayın. Mobil uygulamalar yakında App Store ve Google Play'de kullanıma sunulacak; burada oluşturulan bir kod, uygulamalar kullanılabilir olur olmaz eşleşecektir.",
+  "pair_mobile.qr_group": "Eşleştirmek için tarayın",
+  "pair_mobile.generate_button": "Eşleştirme kodu oluştur",
+  "pair_mobile.generating_button": "Oluşturuluyor…",
+  "pair_mobile.regenerate_button": "Yeni bir kod oluştur",
+  "pair_mobile.expiry_note": "Bu kod on dakika geçerlidir ve yalnızca bir kez kullanılabilir.",
+  "pair_mobile.steps": "1. Easy-Post Mobile Companion uygulamasını telefona yükleyin.\n2. Uygulamayı açın ve Eşleştir seçeneğini belirleyin.\n3. Yukarıdaki kodu tarayın.",
+  "pair_mobile.security_note": "Üretim API anahtarı kodda hiçbir zaman gösterilmez ve okunabilir biçimde hiçbir zaman saklanmaz. Yeni bir kod oluşturmak öncekini değiştirir.",
+  "pair_mobile.needs_production": "Eşleştirme için üretim sürümü gereklidir. Mobil companion uygulamasını kullanmak için bir üretim lisansı etkinleştirin.",
+  "pair_mobile.needs_key": "Mobil companion uygulamasını eşleştirmek için Ayarlar altında bir üretim EasyPost API anahtarı ekleyin.",
+  "pair_mobile.error_no_production_key": "Mobil companion uygulamasını eşleştirmek için Ayarlar altında bir üretim EasyPost API anahtarı ekleyin.",
+  "pair_mobile.error_no_license": "Eşleştirmeden önce bir üretim lisansı gereklidir. Bir lisansı etkinleştirin, ardından tekrar deneyin.",
+  "pair_mobile.error_invalid_license": "Lisans doğrulanamadı. Ayarlar altındaki lisansı kontrol edin, ardından tekrar deneyin.",
+  "pair_mobile.error_network": "Eşleştirme hizmetine ulaşılamadı. Bağlantıyı kontrol edin, ardından tekrar deneyin.",
+  "pair_mobile.error_server": "Eşleştirme hizmeti bir hata döndürdü. Lütfen kısa süre sonra tekrar deneyin."
 }

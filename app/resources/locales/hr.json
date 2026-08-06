@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Provjerite kod i pokušajte ponovno. Ako se problem nastavi, obratite se podršci.",
   "update_banner.available": "Verzija {version} je dostupna.",
   "update_banner.download": "Preuzmi",
-  "update_banner.dismiss": "Odbaci"
+  "update_banner.dismiss": "Odbaci",
+  "main_window.nav_pair_mobile": "Uparivanje mobilne aplikacije",
+  "pair_mobile.title": "Uparivanje mobilne aplikacije",
+  "pair_mobile.intro": "Povežite Easy-Post Mobile Companion za praćenje i upravljanje pošiljkama s telefona. Mobilne aplikacije uskoro stižu na App Store i Google Play; kôd generiran ovdje uparit će se čim postanu dostupne.",
+  "pair_mobile.qr_group": "Skeniraj za uparivanje",
+  "pair_mobile.generate_button": "Generiraj kôd za uparivanje",
+  "pair_mobile.generating_button": "Generiranje…",
+  "pair_mobile.regenerate_button": "Generiraj novi kôd",
+  "pair_mobile.expiry_note": "Ovaj kôd vrijedi deset minuta i može se upotrijebiti jednom.",
+  "pair_mobile.steps": "1. Instalirajte Easy-Post Mobile Companion na telefonu.\n2. Otvorite aplikaciju i odaberite Upari.\n3. Skenirajte kôd iznad.",
+  "pair_mobile.security_note": "Proizvodni API ključ nikada se ne prikazuje u kodu i nikada se ne pohranjuje u čitljivom obliku. Generiranjem novog koda zamjenjuje se prethodni.",
+  "pair_mobile.needs_production": "Uparivanje zahtijeva proizvodnu verziju. Aktivirajte proizvodnu licencu za korištenje mobilnog pratitelja.",
+  "pair_mobile.needs_key": "Dodajte proizvodni EasyPost API ključ u Postavkama kako biste uparili mobilnog pratitelja.",
+  "pair_mobile.error_no_production_key": "Dodajte proizvodni EasyPost API ključ u Postavkama kako biste uparili mobilnog pratitelja.",
+  "pair_mobile.error_no_license": "Prije uparivanja potrebna je proizvodna licenca. Aktivirajte licencu, a zatim pokušajte ponovno.",
+  "pair_mobile.error_invalid_license": "Licencu nije bilo moguće provjeriti. Provjerite licencu u Postavkama, a zatim pokušajte ponovno.",
+  "pair_mobile.error_network": "Uslugu uparivanja nije bilo moguće dosegnuti. Provjerite vezu, a zatim pokušajte ponovno.",
+  "pair_mobile.error_server": "Usluga uparivanja vratila je pogrešku. Pokušajte ponovno uskoro."
 }

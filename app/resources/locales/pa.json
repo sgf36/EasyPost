@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "ਕੋਡ ਦੀ ਜਾਂਚ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ। ਜੇ ਸਮੱਸਿਆ ਬਣੀ ਰਹੇ, ਤਾਂ ਸਹਾਇਤਾ ਨਾਲ ਸੰਪਰਕ ਕਰੋ।",
   "update_banner.available": "ਵਰਜਨ {version} ਉਪਲਬਧ ਹੈ।",
   "update_banner.download": "ਡਾਊਨਲੋਡ ਕਰੋ",
-  "update_banner.dismiss": "ਖਾਰਜ ਕਰੋ"
+  "update_banner.dismiss": "ਖਾਰਜ ਕਰੋ",
+  "main_window.nav_pair_mobile": "ਮੋਬਾਈਲ ਐਪ ਪੇਅਰ ਕਰੋ",
+  "pair_mobile.title": "ਮੋਬਾਈਲ ਐਪ ਪੇਅਰ ਕਰੋ",
+  "pair_mobile.intro": "ਫ਼ੋਨ ਤੋਂ ਸ਼ਿਪਮੈਂਟਾਂ ਨੂੰ ਟਰੈਕ ਅਤੇ ਪ੍ਰਬੰਧਿਤ ਕਰਨ ਲਈ Easy-Post Mobile Companion ਨਾਲ ਜੁੜੋ। ਮੋਬਾਈਲ ਐਪਸ ਜਲਦੀ ਹੀ App Store ਅਤੇ Google Play ਉੱਤੇ ਆ ਰਹੀਆਂ ਹਨ; ਇੱਥੇ ਤਿਆਰ ਕੀਤਾ ਗਿਆ ਕੋਡ ਉਹਨਾਂ ਦੇ ਉਪਲਬਧ ਹੁੰਦੇ ਹੀ ਪੇਅਰ ਹੋ ਜਾਵੇਗਾ।",
+  "pair_mobile.qr_group": "ਪੇਅਰ ਕਰਨ ਲਈ ਸਕੈਨ ਕਰੋ",
+  "pair_mobile.generate_button": "ਪੇਅਰਿੰਗ ਕੋਡ ਤਿਆਰ ਕਰੋ",
+  "pair_mobile.generating_button": "ਤਿਆਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ…",
+  "pair_mobile.regenerate_button": "ਨਵਾਂ ਕੋਡ ਤਿਆਰ ਕਰੋ",
+  "pair_mobile.expiry_note": "ਇਹ ਕੋਡ ਦਸ ਮਿੰਟ ਲਈ ਵੈਧ ਹੈ ਅਤੇ ਇੱਕ ਵਾਰ ਵਰਤਿਆ ਜਾ ਸਕਦਾ ਹੈ।",
+  "pair_mobile.steps": "1. ਫ਼ੋਨ ਉੱਤੇ Easy-Post Mobile Companion ਇੰਸਟੌਲ ਕਰੋ।\n2. ਐਪ ਖੋਲ੍ਹੋ ਅਤੇ ਪੇਅਰ ਚੁਣੋ।\n3. ਉੱਪਰ ਦਿੱਤੇ ਕੋਡ ਨੂੰ ਸਕੈਨ ਕਰੋ।",
+  "pair_mobile.security_note": "ਪ੍ਰੋਡਕਸ਼ਨ API ਕੁੰਜੀ ਕਦੇ ਵੀ ਕੋਡ ਵਿੱਚ ਨਹੀਂ ਦਿਖਾਈ ਜਾਂਦੀ ਅਤੇ ਕਦੇ ਵੀ ਪੜ੍ਹਨਯੋਗ ਰੂਪ ਵਿੱਚ ਸਟੋਰ ਨਹੀਂ ਕੀਤੀ ਜਾਂਦੀ। ਨਵਾਂ ਕੋਡ ਤਿਆਰ ਕਰਨ ਨਾਲ ਪਿਛਲਾ ਕੋਡ ਬਦਲ ਜਾਂਦਾ ਹੈ।",
+  "pair_mobile.needs_production": "ਪੇਅਰਿੰਗ ਲਈ ਪ੍ਰੋਡਕਸ਼ਨ ਵਰਜ਼ਨ ਲੋੜੀਂਦਾ ਹੈ। ਮੋਬਾਈਲ ਕੰਪੈਨੀਅਨ ਵਰਤਣ ਲਈ ਇੱਕ ਪ੍ਰੋਡਕਸ਼ਨ ਲਾਇਸੰਸ ਸਰਗਰਮ ਕਰੋ।",
+  "pair_mobile.needs_key": "ਮੋਬਾਈਲ ਕੰਪੈਨੀਅਨ ਨੂੰ ਪੇਅਰ ਕਰਨ ਲਈ Settings ਹੇਠ ਇੱਕ ਪ੍ਰੋਡਕਸ਼ਨ EasyPost API ਕੁੰਜੀ ਸ਼ਾਮਲ ਕਰੋ।",
+  "pair_mobile.error_no_production_key": "ਮੋਬਾਈਲ ਕੰਪੈਨੀਅਨ ਨੂੰ ਪੇਅਰ ਕਰਨ ਲਈ Settings ਹੇਠ ਇੱਕ ਪ੍ਰੋਡਕਸ਼ਨ EasyPost API ਕੁੰਜੀ ਸ਼ਾਮਲ ਕਰੋ।",
+  "pair_mobile.error_no_license": "ਪੇਅਰਿੰਗ ਤੋਂ ਪਹਿਲਾਂ ਇੱਕ ਪ੍ਰੋਡਕਸ਼ਨ ਲਾਇਸੰਸ ਲੋੜੀਂਦਾ ਹੈ। ਲਾਇਸੰਸ ਸਰਗਰਮ ਕਰੋ, ਫਿਰ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "pair_mobile.error_invalid_license": "ਲਾਇਸੰਸ ਦੀ ਪੁਸ਼ਟੀ ਨਹੀਂ ਹੋ ਸਕੀ। Settings ਹੇਠ ਲਾਇਸੰਸ ਦੀ ਜਾਂਚ ਕਰੋ, ਫਿਰ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "pair_mobile.error_network": "ਪੇਅਰਿੰਗ ਸੇਵਾ ਤੱਕ ਨਹੀਂ ਪਹੁੰਚਿਆ ਜਾ ਸਕਿਆ। ਕਨੈਕਸ਼ਨ ਦੀ ਜਾਂਚ ਕਰੋ, ਫਿਰ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+  "pair_mobile.error_server": "ਪੇਅਰਿੰਗ ਸੇਵਾ ਨੇ ਇੱਕ ਗ਼ਲਤੀ ਵਾਪਸ ਭੇਜੀ। ਕਿਰਪਾ ਕਰਕੇ ਥੋੜ੍ਹੀ ਦੇਰ ਬਾਅਦ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
 }

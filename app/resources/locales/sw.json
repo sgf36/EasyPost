@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Angalia msimbo na ujaribu tena. Tatizo likiendelea, wasiliana na usaidizi.",
   "update_banner.available": "Toleo {version} linapatikana.",
   "update_banner.download": "Pakua",
-  "update_banner.dismiss": "Ondoa"
+  "update_banner.dismiss": "Ondoa",
+  "main_window.nav_pair_mobile": "Oanisha programu ya simu",
+  "pair_mobile.title": "Oanisha programu ya simu",
+  "pair_mobile.intro": "Unganisha Easy-Post Mobile Companion ili kufuatilia na kudhibiti shehena kutoka kwa simu. Programu za simu zitapatikana hivi karibuni kwenye App Store na Google Play; msimbo utakaozalishwa hapa utaoanishwa mara tu zitakapopatikana.",
+  "pair_mobile.qr_group": "Changanua ili kuoanisha",
+  "pair_mobile.generate_button": "Zalisha msimbo wa kuoanisha",
+  "pair_mobile.generating_button": "Inazalisha…",
+  "pair_mobile.regenerate_button": "Zalisha msimbo mpya",
+  "pair_mobile.expiry_note": "Msimbo huu ni halali kwa dakika kumi na unaweza kutumika mara moja tu.",
+  "pair_mobile.steps": "1. Sakinisha Easy-Post Mobile Companion kwenye simu.\n2. Fungua programu na uchague Oanisha.\n3. Changanua msimbo ulio hapo juu.",
+  "pair_mobile.security_note": "Ufunguo wa API wa uzalishaji haujaonyeshwa kamwe kwenye msimbo na haujawahi kuhifadhiwa katika hali inayosomeka. Kuzalisha msimbo mpya huchukua nafasi ya uliopita.",
+  "pair_mobile.needs_production": "Kuoanisha kunahitaji toleo la uzalishaji. Amilisha leseni ya uzalishaji ili kutumia programu shirikishi ya simu.",
+  "pair_mobile.needs_key": "Ongeza ufunguo wa API wa EasyPost wa uzalishaji chini ya Mipangilio ili kuoanisha programu shirikishi ya simu.",
+  "pair_mobile.error_no_production_key": "Ongeza ufunguo wa API wa EasyPost wa uzalishaji chini ya Mipangilio ili kuoanisha programu shirikishi ya simu.",
+  "pair_mobile.error_no_license": "Leseni ya uzalishaji inahitajika kabla ya kuoanisha. Amilisha leseni, kisha jaribu tena.",
+  "pair_mobile.error_invalid_license": "Leseni haikuweza kuthibitishwa. Angalia leseni chini ya Mipangilio, kisha ujaribu tena.",
+  "pair_mobile.error_network": "Huduma ya kuoanisha haikuweza kufikiwa. Angalia muunganisho, kisha ujaribu tena.",
+  "pair_mobile.error_server": "Huduma ya kuoanisha ilirudisha hitilafu. Tafadhali jaribu tena baada ya muda mfupi."
 }

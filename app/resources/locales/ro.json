@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Verifică codul și încearcă din nou. Dacă problema persistă, contactează asistența.",
   "update_banner.available": "Versiunea {version} este disponibilă.",
   "update_banner.download": "Descarcă",
-  "update_banner.dismiss": "Închide"
+  "update_banner.dismiss": "Închide",
+  "main_window.nav_pair_mobile": "Asociere aplicație mobilă",
+  "pair_mobile.title": "Asociere aplicație mobilă",
+  "pair_mobile.intro": "Conectați Easy-Post Mobile Companion pentru a urmări și gestiona expedierile de pe telefon. Aplicațiile mobile vor fi disponibile în curând pe App Store și Google Play; un cod generat aici se va asocia imediat ce acestea devin disponibile.",
+  "pair_mobile.qr_group": "Scanați pentru asociere",
+  "pair_mobile.generate_button": "Generați codul de asociere",
+  "pair_mobile.generating_button": "Se generează…",
+  "pair_mobile.regenerate_button": "Generați un cod nou",
+  "pair_mobile.expiry_note": "Acest cod este valabil timp de zece minute și poate fi utilizat o singură dată.",
+  "pair_mobile.steps": "1. Instalați Easy-Post Mobile Companion pe telefon.\n2. Deschideți aplicația și alegeți Asociere.\n3. Scanați codul de mai sus.",
+  "pair_mobile.security_note": "Cheia API de producție nu este niciodată afișată în cod și nu este niciodată stocată într-o formă lizibilă. Generarea unui cod nou îl înlocuiește pe cel anterior.",
+  "pair_mobile.needs_production": "Asocierea necesită versiunea de producție. Activați o licență de producție pentru a utiliza aplicația mobilă însoțitoare.",
+  "pair_mobile.needs_key": "Adăugați o cheie API EasyPost de producție în Setări pentru a asocia aplicația mobilă însoțitoare.",
+  "pair_mobile.error_no_production_key": "Adăugați o cheie API EasyPost de producție în Setări pentru a asocia aplicația mobilă însoțitoare.",
+  "pair_mobile.error_no_license": "Este necesară o licență de producție înainte de asociere. Activați o licență, apoi încercați din nou.",
+  "pair_mobile.error_invalid_license": "Licența nu a putut fi verificată. Verificați licența în Setări, apoi încercați din nou.",
+  "pair_mobile.error_network": "Serviciul de asociere nu a putut fi contactat. Verificați conexiunea, apoi încercați din nou.",
+  "pair_mobile.error_server": "Serviciul de asociere a returnat o eroare. Vă rugăm să încercați din nou în scurt timp."
 }

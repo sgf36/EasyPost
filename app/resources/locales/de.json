@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Überprüfen Sie den Code und versuchen Sie es erneut. Falls das Problem weiterhin besteht, wenden Sie sich an den Support.",
   "update_banner.available": "Version {version} ist verfügbar.",
   "update_banner.download": "Herunterladen",
-  "update_banner.dismiss": "Schließen"
+  "update_banner.dismiss": "Schließen",
+  "main_window.nav_pair_mobile": "Mobile App koppeln",
+  "pair_mobile.title": "Mobile App koppeln",
+  "pair_mobile.intro": "Verbinden Sie den Easy-Post Mobile Companion, um Sendungen vom Telefon aus zu verfolgen und zu verwalten. Die mobilen Apps erscheinen in Kürze im App Store und bei Google Play; ein hier generierter Code wird gekoppelt, sobald sie verfügbar sind.",
+  "pair_mobile.qr_group": "Zum Koppeln scannen",
+  "pair_mobile.generate_button": "Kopplungscode generieren",
+  "pair_mobile.generating_button": "Wird generiert…",
+  "pair_mobile.regenerate_button": "Neuen Code generieren",
+  "pair_mobile.expiry_note": "Dieser Code ist zehn Minuten lang gültig und kann einmal verwendet werden.",
+  "pair_mobile.steps": "1. Easy-Post Mobile Companion auf dem Telefon installieren.\n2. Die App öffnen und Koppeln auswählen.\n3. Den obigen Code scannen.",
+  "pair_mobile.security_note": "Der Produktions-API-Schlüssel wird im Code nie angezeigt und niemals in lesbarer Form gespeichert. Durch das Generieren eines neuen Codes wird der vorherige ersetzt.",
+  "pair_mobile.needs_production": "Zum Koppeln ist die Produktionsversion erforderlich. Aktivieren Sie eine Produktionslizenz, um den Mobile Companion zu nutzen.",
+  "pair_mobile.needs_key": "Fügen Sie unter Einstellungen einen EasyPost-Produktions-API-Schlüssel hinzu, um den Mobile Companion zu koppeln.",
+  "pair_mobile.error_no_production_key": "Fügen Sie unter Einstellungen einen EasyPost-Produktions-API-Schlüssel hinzu, um den Mobile Companion zu koppeln.",
+  "pair_mobile.error_no_license": "Vor dem Koppeln ist eine Produktionslizenz erforderlich. Aktivieren Sie eine Lizenz und versuchen Sie es erneut.",
+  "pair_mobile.error_invalid_license": "Die Lizenz konnte nicht überprüft werden. Überprüfen Sie die Lizenz unter Einstellungen und versuchen Sie es erneut.",
+  "pair_mobile.error_network": "Der Kopplungsdienst konnte nicht erreicht werden. Überprüfen Sie die Verbindung und versuchen Sie es erneut.",
+  "pair_mobile.error_server": "Der Kopplungsdienst hat einen Fehler zurückgegeben. Bitte versuchen Sie es in Kürze erneut."
 }

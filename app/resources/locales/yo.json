@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Ṣàyẹ̀wò kóòdù náà kí o sì gbìyànjú lẹ́ẹ̀kan si. Bí ìṣòro náà bá ń bá a lọ, kàn sí ẹgbẹ́ ìtìlẹ́yìn.",
   "update_banner.available": "Ẹ̀yà {version} ti wà ní àyè.",
   "update_banner.download": "Gbà á sílẹ̀",
-  "update_banner.dismiss": "Fi sílẹ̀"
+  "update_banner.dismiss": "Fi sílẹ̀",
+  "main_window.nav_pair_mobile": "So app alágbèéká pọ̀",
+  "pair_mobile.title": "So app alágbèéká pọ̀",
+  "pair_mobile.intro": "So Easy-Post Mobile Companion pọ̀ láti tọpasẹ̀ àti láti ṣàkóso àwọn ẹrù tí a fi ránṣẹ́ láti orí fóònù. Àwọn app alágbèéká yóò dé láìpẹ́ lórí App Store àti Google Play; koodu tí a bá dá sílẹ̀ níhìn-ín yóò so pọ̀ ní kété tí wọ́n bá ti wà.",
+  "pair_mobile.qr_group": "Ṣàyẹ̀wò láti so pọ̀",
+  "pair_mobile.generate_button": "Dá koodu ìjápọ̀ sílẹ̀",
+  "pair_mobile.generating_button": "Ń dá sílẹ̀…",
+  "pair_mobile.regenerate_button": "Dá koodu tuntun sílẹ̀",
+  "pair_mobile.expiry_note": "Koodu yìí wúlò fún ìṣẹ́jú mẹ́wàá, a sì lè lò ó ẹ̀ẹ̀kan ṣoṣo.",
+  "pair_mobile.steps": "1. Fi Easy-Post Mobile Companion sórí fóònù.\n2. Ṣí app náà kí o sì yan So Pọ̀.\n3. Ṣàyẹ̀wò koodu tó wà lókè.",
+  "pair_mobile.security_note": "A kì í fi kọ́kọ́rọ́ API ìṣàmúlò gidi hàn nínú koodu, a kì í sì fi pamọ́ ní ọ̀nà tí ẹnikẹ́ni lè kà. Dídá koodu tuntun sílẹ̀ á rọ́pò èyí tí ó ti wà tẹ́lẹ̀.",
+  "pair_mobile.needs_production": "Ìso-pọ̀ nílò ẹ̀yà ìṣàmúlò gidi. Mú ìwé àṣẹ ìṣàmúlò gidi ṣiṣẹ́ láti lo companion alágbèéká.",
+  "pair_mobile.needs_key": "Fi kọ́kọ́rọ́ API EasyPost ìṣàmúlò gidi kún abẹ́ Ètò láti so companion alágbèéká pọ̀.",
+  "pair_mobile.error_no_production_key": "Fi kọ́kọ́rọ́ API EasyPost ìṣàmúlò gidi kún abẹ́ Ètò láti so companion alágbèéká pọ̀.",
+  "pair_mobile.error_no_license": "Ìwé àṣẹ ìṣàmúlò gidi nílò kí a tó so pọ̀. Mú ìwé àṣẹ kan ṣiṣẹ́, kí o sì tún gbìyànjú.",
+  "pair_mobile.error_invalid_license": "A kò lè fi ìdí ìwé àṣẹ múlẹ̀. Ṣàyẹ̀wò ìwé àṣẹ náà abẹ́ Ètò, kí o sì tún gbìyànjú.",
+  "pair_mobile.error_network": "A kò lè dé ọ̀dọ̀ iṣẹ́ ìjápọ̀ náà. Ṣàyẹ̀wò ìsopọ̀ rẹ, kí o sì tún gbìyànjú.",
+  "pair_mobile.error_server": "Iṣẹ́ ìjápọ̀ náà dá àṣìṣe padà. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
 }

@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "کوڈ جانچیں اور دوبارہ کوشش کریں۔ اگر مسئلہ برقرار رہے تو سپورٹ سے رابطہ کریں۔",
   "update_banner.available": "ورژن {version} دستیاب ہے۔",
   "update_banner.download": "ڈاؤن لوڈ کریں",
-  "update_banner.dismiss": "برخاست کریں"
+  "update_banner.dismiss": "برخاست کریں",
+  "main_window.nav_pair_mobile": "موبائل ایپ جوڑیں",
+  "pair_mobile.title": "موبائل ایپ جوڑیں",
+  "pair_mobile.intro": "فون سے ترسیلات کو ٹریک اور منظم کرنے کے لیے Easy-Post Mobile Companion کو مربوط کریں۔ موبائل ایپس جلد ہی App Store اور Google Play پر دستیاب ہوں گی؛ یہاں تیار کردہ کوڈ ان کے دستیاب ہوتے ہی جوڑا جا سکے گا۔",
+  "pair_mobile.qr_group": "جوڑنے کے لیے اسکین کریں",
+  "pair_mobile.generate_button": "جوڑنے کا کوڈ تیار کریں",
+  "pair_mobile.generating_button": "تیار کیا جا رہا ہے…",
+  "pair_mobile.regenerate_button": "نیا کوڈ تیار کریں",
+  "pair_mobile.expiry_note": "یہ کوڈ دس منٹ کے لیے کارآمد ہے اور صرف ایک بار استعمال کیا جا سکتا ہے۔",
+  "pair_mobile.steps": "1. فون پر Easy-Post Mobile Companion انسٹال کریں۔\n2. ایپ کھولیں اور جوڑیں کا انتخاب کریں۔\n3. اوپر دیا گیا کوڈ اسکین کریں۔",
+  "pair_mobile.security_note": "پروڈکشن API کلید کوڈ میں کبھی نہیں دکھائی جاتی اور نہ ہی کبھی پڑھنے کے قابل شکل میں محفوظ کی جاتی ہے۔ نیا کوڈ تیار کرنے سے پچھلا کوڈ تبدیل ہو جاتا ہے۔",
+  "pair_mobile.needs_production": "جوڑنے کے لیے پروڈکشن ورژن درکار ہے۔ موبائل کمپینین استعمال کرنے کے لیے پروڈکشن لائسنس فعال کریں۔",
+  "pair_mobile.needs_key": "موبائل کمپینین کو جوڑنے کے لیے سیٹنگز میں پروڈکشن EasyPost API کلید شامل کریں۔",
+  "pair_mobile.error_no_production_key": "موبائل کمپینین کو جوڑنے کے لیے سیٹنگز میں پروڈکشن EasyPost API کلید شامل کریں۔",
+  "pair_mobile.error_no_license": "جوڑنے سے پہلے پروڈکشن لائسنس درکار ہے۔ لائسنس فعال کریں، پھر دوبارہ کوشش کریں۔",
+  "pair_mobile.error_invalid_license": "لائسنس کی تصدیق نہیں ہو سکی۔ سیٹنگز میں لائسنس چیک کریں، پھر دوبارہ کوشش کریں۔",
+  "pair_mobile.error_network": "جوڑنے کی سروس تک رسائی حاصل نہیں ہو سکی۔ کنکشن چیک کریں، پھر دوبارہ کوشش کریں۔",
+  "pair_mobile.error_server": "جوڑنے کی سروس نے خرابی کا پیغام بھیجا۔ براہ کرم تھوڑی دیر بعد دوبارہ کوشش کریں۔"
 }

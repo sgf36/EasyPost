@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "בדקו את הקוד ונסו שוב. אם הבעיה נמשכת, פנו לתמיכה.",
   "update_banner.available": "גרסה {version} זמינה.",
   "update_banner.download": "הורדה",
-  "update_banner.dismiss": "סגירה"
+  "update_banner.dismiss": "סגירה",
+  "main_window.nav_pair_mobile": "צימוד אפליקציית הנייד",
+  "pair_mobile.title": "צימוד אפליקציית הנייד",
+  "pair_mobile.intro": "התחבר אל Easy-Post Mobile Companion כדי לעקוב אחר משלוחים ולנהל אותם מהטלפון. אפליקציות הנייד יגיעו בקרוב אל App Store ואל Google Play; קוד שנוצר כאן יבוצע צימוד עמו ברגע שיהיו זמינות.",
+  "pair_mobile.qr_group": "סרוק לצימוד",
+  "pair_mobile.generate_button": "צור קוד צימוד",
+  "pair_mobile.generating_button": "יוצר…",
+  "pair_mobile.regenerate_button": "צור קוד חדש",
+  "pair_mobile.expiry_note": "קוד זה תקף לעשר דקות וניתן להשתמש בו פעם אחת בלבד.",
+  "pair_mobile.steps": "1. התקן את Easy-Post Mobile Companion בטלפון.\n2. פתח את האפליקציה ובחר בצימוד.\n3. סרוק את הקוד שלמעלה.",
+  "pair_mobile.security_note": "מפתח ה-API של הייצור לעולם אינו מוצג בקוד ולעולם אינו נשמר בצורה קריאה. יצירת קוד חדש מחליפה את הקודם.",
+  "pair_mobile.needs_production": "הצימוד מחייב את גרסת הייצור. הפעל רישיון ייצור כדי להשתמש בבן הלוויה לנייד.",
+  "pair_mobile.needs_key": "הוסף מפתח API של EasyPost לייצור תחת ההגדרות כדי לצמד את בן הלוויה לנייד.",
+  "pair_mobile.error_no_production_key": "הוסף מפתח API של EasyPost לייצור תחת ההגדרות כדי לצמד את בן הלוויה לנייד.",
+  "pair_mobile.error_no_license": "נדרש רישיון ייצור לפני הצימוד. הפעל רישיון ונסה שוב.",
+  "pair_mobile.error_invalid_license": "לא ניתן היה לאמת את הרישיון. בדוק את הרישיון תחת ההגדרות ונסה שוב.",
+  "pair_mobile.error_network": "לא ניתן היה להגיע אל שירות הצימוד. בדוק את החיבור ונסה שוב.",
+  "pair_mobile.error_server": "שירות הצימוד החזיר שגיאה. נסה שוב בעוד זמן קצר."
 }

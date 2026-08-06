@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "ኮዱን አረጋግጠው እንደገና ይሞክሩ። ችግሩ ከቀጠለ ድጋፍን ያግኙ።",
   "update_banner.available": "ስሪት {version} ይገኛል።",
   "update_banner.download": "አውርድ",
-  "update_banner.dismiss": "አሰናብት"
+  "update_banner.dismiss": "አሰናብት",
+  "main_window.nav_pair_mobile": "የሞባይል መተግበሪያ ማጣመር",
+  "pair_mobile.title": "የሞባይል መተግበሪያ ማጣመር",
+  "pair_mobile.intro": "ከስልክ ላይ ጭነቶችን ለመከታተል እና ለማስተዳደር Easy-Post Mobile Companion ያገናኙ። የሞባይል መተግበሪያዎቹ በቅርቡ በ App Store እና Google Play ላይ ይመጣሉ፤ እዚህ የተፈጠረ ኮድ እነሱ እንደተገኙ ወዲያውኑ ይጣመራል።",
+  "pair_mobile.qr_group": "ለማጣመር ይቃኙ",
+  "pair_mobile.generate_button": "የማጣመሪያ ኮድ ይፍጠሩ",
+  "pair_mobile.generating_button": "በመፍጠር ላይ…",
+  "pair_mobile.regenerate_button": "አዲስ ኮድ ይፍጠሩ",
+  "pair_mobile.expiry_note": "ይህ ኮድ ለአስር ደቂቃዎች ትክክለኛ ሲሆን አንድ ጊዜ ብቻ ጥቅም ላይ ሊውል ይችላል።",
+  "pair_mobile.steps": "1. Easy-Post Mobile Companion ን በስልኩ ላይ ይጫኑ።\n2. መተግበሪያውን ይክፈቱ እና ማጣመር ን ይምረጡ።\n3. ከላይ ያለውን ኮድ ይቃኙ።",
+  "pair_mobile.security_note": "የምርት ኤፒአይ ቁልፍ በኮዱ ውስጥ በጭራሽ አይታይም እንዲሁም በሚነበብ መልኩ በጭራሽ አይቀመጥም። አዲስ ኮድ መፍጠር ቀዳሚውን ይተካል።",
+  "pair_mobile.needs_production": "ማጣመር የምርት ስሪት ይፈልጋል። የሞባይል ተባባሪውን ለመጠቀም የምርት ፈቃድ ያንቁ።",
+  "pair_mobile.needs_key": "የሞባይል ተባባሪውን ለማጣመር በቅንብሮች ስር የምርት EasyPost ኤፒአይ ቁልፍ ያክሉ።",
+  "pair_mobile.error_no_production_key": "የሞባይል ተባባሪውን ለማጣመር በቅንብሮች ስር የምርት EasyPost ኤፒአይ ቁልፍ ያክሉ።",
+  "pair_mobile.error_no_license": "ከማጣመር በፊት የምርት ፈቃድ ያስፈልጋል። ፈቃድ ያንቁ፣ ከዚያም እንደገና ይሞክሩ።",
+  "pair_mobile.error_invalid_license": "ፈቃዱን ማረጋገጥ አልተቻለም። ፈቃዱን በቅንብሮች ስር ያረጋግጡ፣ ከዚያም እንደገና ይሞክሩ።",
+  "pair_mobile.error_network": "የማጣመሪያ አገልግሎቱን ማግኘት አልተቻለም። ግንኙነቱን ያረጋግጡ፣ ከዚያም እንደገና ይሞክሩ።",
+  "pair_mobile.error_server": "የማጣመሪያ አገልግሎቱ ስህተት መልሷል። እባክዎ በቅርቡ እንደገና ይሞክሩ።"
 }

@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "කේතය පරීක්ෂා කර නැවත උත්සාහ කරන්න. ගැටලුව දිගටම පවතී නම්, සහාය අමතන්න.",
   "update_banner.available": "{version} අනුවාදය ලබා ගත හැකිය.",
   "update_banner.download": "බාගන්න",
-  "update_banner.dismiss": "වසන්න"
+  "update_banner.dismiss": "වසන්න",
+  "main_window.nav_pair_mobile": "ජංගම යෙදුම යුගල කිරීම",
+  "pair_mobile.title": "ජංගම යෙදුම යුගල කිරීම",
+  "pair_mobile.intro": "දුරකථනයකින් තැපැල් භාණ්ඩ නිරීක්ෂණය කර කළමනාකරණය කිරීමට Easy-Post Mobile Companion සම්බන්ධ කරන්න. ජංගම යෙදුම් ඉක්මනින් App Store සහ Google Play හි ලැබෙනු ඇත; මෙහි ජනනය කරන කේතය ඒවා ලබා ගත හැකි වූ වහාම යුගල වනු ඇත.",
+  "pair_mobile.qr_group": "යුගල කිරීමට ස්කෑන් කරන්න",
+  "pair_mobile.generate_button": "යුගල කේතය ජනනය කරන්න",
+  "pair_mobile.generating_button": "ජනනය කරමින්…",
+  "pair_mobile.regenerate_button": "නව කේතයක් ජනනය කරන්න",
+  "pair_mobile.expiry_note": "මෙම කේතය මිනිත්තු දහයක් සඳහා වලංගු වන අතර එය එක් වරක් පමණක් භාවිත කළ හැක.",
+  "pair_mobile.steps": "1. දුරකථනයේ Easy-Post Mobile Companion ස්ථාපනය කරන්න.\n2. යෙදුම විවෘත කර යුගල කරන්න තෝරන්න.\n3. ඉහත කේතය ස්කෑන් කරන්න.",
+  "pair_mobile.security_note": "නිෂ්පාදන API යතුර කිසි විටෙකත් කේතයේ නොපෙන්වන අතර කියවිය හැකි ආකාරයෙන් කිසි විටෙකත් ගබඩා නොකෙරේ. නව කේතයක් ජනනය කිරීමෙන් පෙර පැවති කේතය ප්‍රතිස්ථාපනය වේ.",
+  "pair_mobile.needs_production": "යුගල කිරීම සඳහා නිෂ්පාදන අනුවාදය අවශ්‍ය වේ. ජංගම සහායක යෙදුම භාවිත කිරීමට නිෂ්පාදන බලපත්‍රයක් සක්‍රිය කරන්න.",
+  "pair_mobile.needs_key": "ජංගම සහායක යෙදුම යුගල කිරීමට සැකසීම් යටතේ නිෂ්පාදන EasyPost API යතුරක් එක් කරන්න.",
+  "pair_mobile.error_no_production_key": "ජංගම සහායක යෙදුම යුගල කිරීමට සැකසීම් යටතේ නිෂ්පාදන EasyPost API යතුරක් එක් කරන්න.",
+  "pair_mobile.error_no_license": "යුගල කිරීමට පෙර නිෂ්පාදන බලපත්‍රයක් අවශ්‍ය වේ. බලපත්‍රයක් සක්‍රිය කර, නැවත උත්සාහ කරන්න.",
+  "pair_mobile.error_invalid_license": "බලපත්‍රය සත්‍යාපනය කළ නොහැකි විය. සැකසීම් යටතේ බලපත්‍රය පරීක්ෂා කර, නැවත උත්සාහ කරන්න.",
+  "pair_mobile.error_network": "යුගල කිරීමේ සේවාව වෙත ළඟා විය නොහැකි විය. සම්බන්ධතාවය පරීක්ෂා කර, නැවත උත්සාහ කරන්න.",
+  "pair_mobile.error_server": "යුගල කිරීමේ සේවාව දෝෂයක් ලබා දුන්නේය. කරුණාකර ටික වේලාවකින් නැවත උත්සාහ කරන්න."
 }

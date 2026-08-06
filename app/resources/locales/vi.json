@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "Hãy kiểm tra mã và thử lại. Nếu sự cố vẫn tiếp diễn, hãy liên hệ bộ phận hỗ trợ.",
   "update_banner.available": "Đã có phiên bản {version}.",
   "update_banner.download": "Tải xuống",
-  "update_banner.dismiss": "Bỏ qua"
+  "update_banner.dismiss": "Bỏ qua",
+  "main_window.nav_pair_mobile": "Ghép nối ứng dụng di động",
+  "pair_mobile.title": "Ghép nối ứng dụng di động",
+  "pair_mobile.intro": "Kết nối Easy-Post Mobile Companion để theo dõi và quản lý các lô hàng từ điện thoại. Các ứng dụng di động sắp ra mắt trên App Store và Google Play; mã được tạo tại đây sẽ ghép nối ngay khi ứng dụng khả dụng.",
+  "pair_mobile.qr_group": "Quét để ghép nối",
+  "pair_mobile.generate_button": "Tạo mã ghép nối",
+  "pair_mobile.generating_button": "Đang tạo…",
+  "pair_mobile.regenerate_button": "Tạo mã mới",
+  "pair_mobile.expiry_note": "Mã này có hiệu lực trong mười phút và chỉ có thể sử dụng một lần.",
+  "pair_mobile.steps": "1. Cài đặt Easy-Post Mobile Companion trên điện thoại.\n2. Mở ứng dụng và chọn Ghép nối.\n3. Quét mã ở trên.",
+  "pair_mobile.security_note": "Khóa API bản chính thức không bao giờ được hiển thị trong mã và không bao giờ được lưu trữ ở dạng có thể đọc được. Việc tạo mã mới sẽ thay thế mã trước đó.",
+  "pair_mobile.needs_production": "Việc ghép nối yêu cầu phiên bản chính thức. Kích hoạt giấy phép bản chính thức để sử dụng ứng dụng đồng hành trên di động.",
+  "pair_mobile.needs_key": "Thêm khóa API EasyPost bản chính thức trong mục Cài đặt để ghép nối ứng dụng đồng hành trên di động.",
+  "pair_mobile.error_no_production_key": "Thêm khóa API EasyPost bản chính thức trong mục Cài đặt để ghép nối ứng dụng đồng hành trên di động.",
+  "pair_mobile.error_no_license": "Cần có giấy phép bản chính thức trước khi ghép nối. Kích hoạt giấy phép, sau đó thử lại.",
+  "pair_mobile.error_invalid_license": "Không thể xác minh giấy phép. Kiểm tra giấy phép trong mục Cài đặt, sau đó thử lại.",
+  "pair_mobile.error_network": "Không thể kết nối đến dịch vụ ghép nối. Kiểm tra kết nối mạng, sau đó thử lại.",
+  "pair_mobile.error_server": "Dịch vụ ghép nối đã trả về lỗi. Vui lòng thử lại sau ít phút."
 }

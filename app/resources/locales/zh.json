@@ -502,5 +502,22 @@
   "store_unlock.enter_code_invalid_body": "请检查解锁码后重试。如果问题仍然存在，请联系支持团队。",
   "update_banner.available": "版本 {version} 现已可用。",
   "update_banner.download": "下载",
-  "update_banner.dismiss": "忽略"
+  "update_banner.dismiss": "忽略",
+  "main_window.nav_pair_mobile": "配对移动应用",
+  "pair_mobile.title": "配对移动应用",
+  "pair_mobile.intro": "连接 Easy-Post Mobile Companion，以便通过手机跟踪和管理货运。移动应用即将在 App Store 和 Google Play 上线；在此生成的配对码将在应用可用后立即生效。",
+  "pair_mobile.qr_group": "扫描以配对",
+  "pair_mobile.generate_button": "生成配对码",
+  "pair_mobile.generating_button": "正在生成…",
+  "pair_mobile.regenerate_button": "生成新配对码",
+  "pair_mobile.expiry_note": "此配对码有效期为十分钟，且仅可使用一次。",
+  "pair_mobile.steps": "1. 在手机上安装 Easy-Post Mobile Companion。\n2. 打开应用并选择配对。\n3. 扫描上方的配对码。",
+  "pair_mobile.security_note": "生产环境 API 密钥永远不会显示在配对码中，也不会以可读形式存储。生成新配对码将替换先前的配对码。",
+  "pair_mobile.needs_production": "配对需要生产版本。请激活生产许可证以使用移动伴侣应用。",
+  "pair_mobile.needs_key": "请在设置中添加生产环境 EasyPost API 密钥，以配对移动伴侣应用。",
+  "pair_mobile.error_no_production_key": "请在设置中添加生产环境 EasyPost API 密钥，以配对移动伴侣应用。",
+  "pair_mobile.error_no_license": "配对前需要生产许可证。请先激活许可证，然后重试。",
+  "pair_mobile.error_invalid_license": "无法验证许可证。请在设置中检查许可证，然后重试。",
+  "pair_mobile.error_network": "无法连接到配对服务。请检查网络连接，然后重试。",
+  "pair_mobile.error_server": "配对服务返回了错误。请稍后重试。"
 }
