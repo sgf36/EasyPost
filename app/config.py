@@ -12,7 +12,7 @@ KEYRING_SERVICE_NAME = "EasyPostDesktop"
 # (app/core/update_check.py) compares this against the latest GitHub release
 # tag to decide whether to prompt the user to update. Keep it in step with the
 # release tag and packaging/msix/AppxManifest.xml on every release.
-APP_VERSION = "1.0.9"
+APP_VERSION = "1.0.10"
 
 ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
 
