@@ -1,0 +1,29 @@
+name = "easypost-mobile-proxy"
+main = "src/worker.js"
+compatibility_date = "2025-06-01"
+
+# The proxy stores only ciphertext of each user's EasyPost key; the decryption
+# key (KEK) lives on the paired phone and is presented per request. There is no
+# server-held master secret to leak — a stolen D1 is undecryptable ciphertext.
+[[d1_databases]]
+binding = "PAIRING"
+database_name = "easypost-mobile"
+database_id = "66db03fe-79a8-4950-8afd-9d4feb8aa08a"
+
+[vars]
+# Upstream EasyPost REST base. Overridable for tests.
+EASYPOST_API_BASE = "https://api.easypost.com/v2"
+# Public half of the licence signing key (same key the desktop app embeds). Safe
+# to publish — it only verifies signatures, it cannot mint licences.
+LICENSE_PUBLIC_KEY_B64 = "344VCmZ52xHf0sTVsAidKz0Dsn0/QfZ+kwcKRGj+GDc="
+LICENSE_PRODUCT_ID = "easypost-desktop"
+LICENSE_FORMAT_TAG = "EPD1"
+# How long a pairing token is claimable before it expires (seconds).
+PAIR_TTL_SECONDS = "600"
+
+# Pairing + proxy need no secrets. Two optional secrets enable app-store
+# reviewer access (a working app on demo TEST-mode data, no QR pairing needed):
+#   wrangler secret put REVIEW_CODE              # the code reviewers type
+#   wrangler secret put DEMO_EASYPOST_TEST_KEY   # a demo EasyPost TEST key
+# Push credentials (APNs/FCM) get added as secrets in the push phase:
+#   wrangler secret put APNS_KEY   /   FCM_SERVICE_ACCOUNT
