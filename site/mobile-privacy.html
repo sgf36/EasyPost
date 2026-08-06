@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile privacy policy — Easy-Post Mobile Companion</title>
+<meta name="description" content="What the Easy-Post Mobile Companion app stores, what it transmits and to whom. The production key is never shown on the phone and is never stored anywhere in readable form. No analytics, no advertising, no tracking.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html">Easy-Post Desktop</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="mobile.html">Mobile</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="download.html">Download</a>
+      <a href="faq.html">FAQ</a>
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="index.html#support">Support</a>
+    </nav>
+  </div>
+</header>
+
+<section class="legal">
+  <div class="wrap prose">
+    <h1>Mobile privacy policy</h1>
+    <p class="updated">Last updated 6 August 2026</p>
+
+    <p>This policy covers the <strong>Easy-Post Mobile Companion</strong> apps for iOS and Android. It sits alongside the <a href="privacy.html">Easy-Post Desktop privacy policy</a>. The data controller is <strong>Spencer Fields</strong>, a sole trader established in London, United Kingdom, contactable at <a href="mailto:Apps@spencerfields.com">Apps@spencerfields.com</a>.</p>
+
+    <h2>The short version</h2>
+    <p>The app is a companion to Easy-Post Desktop and shows tracking information from the EasyPost account it is paired with. The production API key is never displayed in the app and is never stored anywhere in readable form. The app contains no analytics, no telemetry, no advertising identifiers and no crash reporting.</p>
+
+    <h2>Pairing and the production key</h2>
+    <p>Pairing is started by scanning a code shown in Easy-Post Desktop, or by entering a review code. The production EasyPost key is registered once with a backend proxy operated by the Supplier. That proxy stores only an <strong>encrypted copy</strong> of the key that it cannot read on its own: the decryption key is delivered to the phone during pairing and held in the operating system secure store (the iOS Keychain or the Android Keystore). A copy of the encrypted database on its own therefore reveals nothing. Removing the pairing, or pairing again, replaces or clears these values.</p>
+
+    <h2>What is transmitted, and to whom</h2>
+    <ul>
+      <li><strong>EasyPost</strong> — to show tracking and to perform the actions offered in the app, requests are sent through the Supplier's proxy to EasyPost, using the paired account's own key. This is the same account the desktop application already uses.</li>
+      <li><strong>Map locations</strong> — to place approximate pins on the journey map, the city and region names contained in a shipment's scan history are sent to OpenStreetMap's public geocoding service. No account identifier, no key and no personal contact detail is included.</li>
+      <li><strong>Push notifications (when offered)</strong> — a device notification token may be registered with the Supplier's backend and with Apple Push Notification service or Firebase Cloud Messaging, solely to deliver tracking updates. This is used for no other purpose.</li>
+    </ul>
+
+    <h2>What is not collected</h2>
+    <p>No advertising identifiers, no location tracking of the device, no analytics of how the app is used, no contact-list access and no sale of data to anyone. The app requests camera access for one purpose only: to scan the pairing code. Camera images are processed on the device and are never stored or transmitted.</p>
+
+    <h2>App stores</h2>
+    <p>The apps are distributed through the Apple App Store and Google Play. Those stores process their own account and download information under their own privacy policies, which are outside the Supplier's control.</p>
+
+    <h2>Retention and deletion</h2>
+    <p>To remove all data held for a device, unpair it from within the app; this deletes the device credentials on the phone and the associated encrypted record. A lapsed or revoked desktop licence also disables the paired app. Questions and deletion requests can be sent to <a href="mailto:Apps@spencerfields.com">Apps@spencerfields.com</a>.</p>
+
+    <h2>Changes</h2>
+    <p>Material changes to this policy will be reflected here with an updated date above.</p>
+  </div>
+</section>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-cols">
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="mobile.html">Mobile app</a></li>
+          <li><a href="download.html">Download</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="terms.html">Terms of service</a></li>
+          <li><a href="privacy.html">Privacy policy</a></li>
+          <li><a href="refunds.html">Refund policy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="index.html#support">Contact form</a></li>
+          <li><a href="index.html#support">Email and telephone</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="legal-line">
+      Easy-Post Desktop is a product of Spencer Fields, a sole trader established in London, United Kingdom.
+      Orders are processed by our authorised reseller and Merchant of Record, Paddle.com Market Ltd, who handle
+      billing, invoicing and any applicable sales tax or VAT.
+    </p>
+    <p class="copyright">&copy; 2026 Spencer Fields.</p>
+  </div>
+</footer>
+
+<script src="analytics.js" defer></script>
+</body>
+</html>
