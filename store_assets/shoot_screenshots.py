@@ -75,6 +75,11 @@ def main():
 
     win = MainWindow()
     win.resize(*SIZE)
+    # Render with the real platform plugin (correct fonts) but keep the window
+    # off-screen: WA_DontShowOnScreen lays out and paints the widget without it
+    # ever appearing on the display. Do NOT run this under QT_QPA_PLATFORM=
+    # offscreen — that plugin renders every glyph as a tofu box on Windows.
+    win.setAttribute(Qt.WidgetAttribute.WA_DontShowOnScreen, True)
     win.show()
     # Skip the gates: we want the shell, not the setup wizard.
     win._show_app_shell()
@@ -92,7 +97,18 @@ def main():
         # Drive the sidebar rather than the stack, so the highlighted nav row
         # matches the page on screen. Setting the stack directly leaves the
         # selection stranded on whatever was chosen last.
+        # Each view is wrapped in a QScrollArea before being added to the stack
+        # (see MainWindow._build_nav), so the view is not a direct stack child
+        # and indexOf(view) returns -1. Find the scroller that holds it.
         stack_index = win._view_stack.indexOf(view)
+        if stack_index == -1:
+            from PySide6.QtWidgets import QScrollArea
+
+            for i in range(win._view_stack.count()):
+                w = win._view_stack.widget(i)
+                if isinstance(w, QScrollArea) and w.widget() is view:
+                    stack_index = i
+                    break
         row = next(
             (r for r in range(win._nav.count())
              if win._nav.item(r).data(Qt.ItemDataRole.UserRole) == stack_index),
@@ -129,6 +145,22 @@ def main():
                     print(f"    rates rows: {view._rates_table.rowCount()}")
             except Exception as exc:
                 print(f"    note rates: {str(exc)[:80]}")
+            settle(app, 600)
+
+        # HTS Lookup is a reference tool, so an empty results grid says nothing.
+        # Run a real search (live USITC data) so the screenshot shows codes and
+        # duty rates. Nothing is purchased or changed.
+        if label.startswith("08"):
+            try:
+                view._search_input.setText("copper")
+                view._on_search_clicked()
+                for _ in range(40):
+                    settle(app, 500)
+                    if view._table.rowCount() > 0:
+                        break
+                print(f"    hts rows: {view._table.rowCount()}")
+            except Exception as exc:
+                print(f"    note hts: {str(exc)[:80]}")
             settle(app, 600)
 
         path = lang_dir / f"{label}.png"
