@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Umvumo wokusebenza ngempela uyadingeka ngaphambi kokubhangqa. Yenza umvumo usebenze, bese uzama futhi.",
   "pair_mobile.error_invalid_license": "Umvumo awukwazanga ukuqinisekiswa. Hlola umvumo ngaphansi kwezinga elithi Izilungiselelo, bese uzama futhi.",
   "pair_mobile.error_network": "Isevisi yokubhangqa ayifinyelelekanga. Hlola uxhumano, bese uzama futhi.",
-  "pair_mobile.error_server": "Isevisi yokubhangqa ibuyise iphutha. Sicela uzame futhi maduzane."
+  "pair_mobile.error_server": "Isevisi yokubhangqa ibuyise iphutha. Sicela uzame futhi maduzane.",
+  "main_window.nav_android_app": "Uhlelo lokusebenza lwe-Android",
+  "android_app.title": "Uhlelo lokusebenza lwe-Android",
+  "android_app.intro": "Landa i-Easy-Post Mobile Companion ye-Android ngokuqondile, bese uyibhangqa nale khompyutha ukuze ulandelele futhi uphathe izithuthwa usebenzisa ifoni.",
+  "android_app.play_soon": "Izofika maduze ku-Google Play. Lokhu kulanda okuqondile kuyinguqulo yokufinyelela kwakuqala kwabaphethe ilayisensi yokukhiqiza ngesikhathi uhlu lwe-Play Store lusaqedelwa.",
+  "android_app.download_button": "Landa uhlelo lokusebenza lwe-Android (APK)",
+  "android_app.steps_group": "Indlela yokufaka",
+  "android_app.steps": "1. Landa i-APK efonini ye-Android, noma uyidlulisele kuyo.\n2. Vula ifayela, bese uvumela ukufakwa kusuka kulo mthombo uma ucelwa.\n3. Vula i-Easy-Post Mobile Companion bese ukhetha Bhangqa.\n4. Khiqiza ikhodi yokubhangqa ngaphansi kwe-Amathuluzi bese uthi Bhangqa uhlelo lokusebenza lweselula, bese uyiskena.",
+  "android_app.checksum_group": "Qinisekisa okulandiwe",
+  "android_app.checksum_note": "Qhathanisa ifayela olilandile ne-checksum ye-SHA-256 ngaphambi kokufaka.",
+  "android_app.copy_checksum": "Kopisha i-checksum",
+  "android_app.copied": "Kukopishiwe",
+  "android_app.reinstall_note": "Le nguqulo yokufinyelela kwakuqala isayinwe ngokuzimela kokukhishwa kwe-Google Play. Kungadingeka ukufaka kabusha kusuka ku-Google Play uma uhlu selusebenza; ukubhangqa kuyaqhubeka, ngakho akukho lutho olulahlekayo.",
+  "android_app.needs_production": "Uhlelo lokusebenza lwe-Android lubhangqa nenguqulo yokusebenza ngempela. Yenza ilayisensi yokukhiqiza isebenze ukuze uyilande futhi uyibhangqe."
 }

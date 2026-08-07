@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Une licence de production est requise avant le jumelage. Activez une licence, puis réessayez.",
   "pair_mobile.error_invalid_license": "La licence n'a pas pu être vérifiée. Vérifiez la licence sous Paramètres, puis réessayez.",
   "pair_mobile.error_network": "Le service de jumelage n'a pas pu être contacté. Vérifiez la connexion, puis réessayez.",
-  "pair_mobile.error_server": "Le service de jumelage a renvoyé une erreur. Veuillez réessayer sous peu."
+  "pair_mobile.error_server": "Le service de jumelage a renvoyé une erreur. Veuillez réessayer sous peu.",
+  "main_window.nav_android_app": "Application Android",
+  "android_app.title": "Application Android",
+  "android_app.intro": "Téléchargez directement Easy-Post Mobile Companion pour Android, puis jumelez-le avec ce poste pour suivre et gérer les expéditions depuis un téléphone.",
+  "android_app.play_soon": "Bientôt disponible sur Google Play. Ce téléchargement direct est une version en accès anticipé destinée aux titulaires d'une licence de production, le temps que la fiche du Play Store soit finalisée.",
+  "android_app.download_button": "Télécharger l'application Android (APK)",
+  "android_app.steps_group": "Comment installer",
+  "android_app.steps": "1. Téléchargez l'APK sur le téléphone Android, ou transférez-le.\n2. Ouvrez le fichier, puis autorisez l'installation depuis cette source si vous y êtes invité.\n3. Ouvrez Easy-Post Mobile Companion et choisissez Jumeler.\n4. Générez un code de jumelage sous Outils puis Jumeler l'application mobile, et scannez-le.",
+  "android_app.checksum_group": "Vérifier le téléchargement",
+  "android_app.checksum_note": "Vérifiez le fichier téléchargé à l'aide de cette somme de contrôle SHA-256 avant l'installation.",
+  "android_app.copy_checksum": "Copier la somme de contrôle",
+  "android_app.copied": "Copié",
+  "android_app.reinstall_note": "Cette version en accès anticipé est signée indépendamment de la version Google Play. Une réinstallation depuis Google Play pourra être nécessaire une fois la fiche en ligne ; le jumelage est conservé, rien n'est donc perdu.",
+  "android_app.needs_production": "L'application Android se jumelle avec la version de production. Activez une licence de production pour la télécharger et la jumeler."
 }

@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "È necessaria una licenza di produzione prima dell'associazione. Attiva una licenza, quindi riprova.",
   "pair_mobile.error_invalid_license": "Non è stato possibile verificare la licenza. Controlla la licenza in Impostazioni, quindi riprova.",
   "pair_mobile.error_network": "Non è stato possibile raggiungere il servizio di associazione. Controlla la connessione, quindi riprova.",
-  "pair_mobile.error_server": "Il servizio di associazione ha restituito un errore. Riprova tra poco."
+  "pair_mobile.error_server": "Il servizio di associazione ha restituito un errore. Riprova tra poco.",
+  "main_window.nav_android_app": "App Android",
+  "android_app.title": "App Android",
+  "android_app.intro": "Scarica direttamente Easy-Post Mobile Companion per Android, quindi associalo a questo desktop per tracciare e gestire le spedizioni da un telefono.",
+  "android_app.play_soon": "Presto disponibile su Google Play. Questo download diretto è una build ad accesso anticipato per i titolari di licenza di produzione mentre la scheda del Play Store viene finalizzata.",
+  "android_app.download_button": "Scarica l'app Android (APK)",
+  "android_app.steps_group": "Come installare",
+  "android_app.steps": "1. Scarica l'APK sul telefono Android oppure trasferiscilo.\n2. Apri il file, quindi consenti l'installazione da questa fonte se richiesto.\n3. Apri Easy-Post Mobile Companion e scegli Associa.\n4. Genera un codice di associazione in Strumenti quindi Associa app mobile, e scansionalo.",
+  "android_app.checksum_group": "Verifica il download",
+  "android_app.checksum_note": "Controlla il file scaricato con questo checksum SHA-256 prima di installarlo.",
+  "android_app.copy_checksum": "Copia checksum",
+  "android_app.copied": "Copiato",
+  "android_app.reinstall_note": "Questa build ad accesso anticipato è firmata in modo indipendente dalla versione di Google Play. Potrebbe essere necessario reinstallare da Google Play una volta che la scheda sarà attiva; l'associazione viene mantenuta, quindi non si perde nulla.",
+  "android_app.needs_production": "L'app Android si associa alla versione di produzione. Attiva una licenza di produzione per scaricarla e associarla."
 }

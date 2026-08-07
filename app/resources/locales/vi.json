@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Cần có giấy phép bản chính thức trước khi ghép nối. Kích hoạt giấy phép, sau đó thử lại.",
   "pair_mobile.error_invalid_license": "Không thể xác minh giấy phép. Kiểm tra giấy phép trong mục Cài đặt, sau đó thử lại.",
   "pair_mobile.error_network": "Không thể kết nối đến dịch vụ ghép nối. Kiểm tra kết nối mạng, sau đó thử lại.",
-  "pair_mobile.error_server": "Dịch vụ ghép nối đã trả về lỗi. Vui lòng thử lại sau ít phút."
+  "pair_mobile.error_server": "Dịch vụ ghép nối đã trả về lỗi. Vui lòng thử lại sau ít phút.",
+  "main_window.nav_android_app": "Ứng dụng Android",
+  "android_app.title": "Ứng dụng Android",
+  "android_app.intro": "Tải Easy-Post Mobile Companion cho Android trực tiếp, sau đó ghép nối với máy tính này để theo dõi và quản lý lô hàng từ điện thoại.",
+  "android_app.play_soon": "Sắp có trên Google Play. Bản tải trực tiếp này là bản truy cập sớm dành cho người giữ giấy phép bản chính thức trong khi trang niêm yết trên Play Store đang được hoàn thiện.",
+  "android_app.download_button": "Tải ứng dụng Android (APK)",
+  "android_app.steps_group": "Cách cài đặt",
+  "android_app.steps": "1. Tải APK về điện thoại Android, hoặc chuyển nó sang.\n2. Mở tệp, sau đó cho phép cài đặt từ nguồn này nếu được nhắc.\n3. Mở Easy-Post Mobile Companion và chọn Ghép nối.\n4. Tạo mã ghép nối trong mục Công cụ rồi Ghép nối ứng dụng di động, và quét mã đó.",
+  "android_app.checksum_group": "Xác minh bản tải",
+  "android_app.checksum_note": "Đối chiếu tệp đã tải với giá trị checksum SHA-256 này trước khi cài đặt.",
+  "android_app.copy_checksum": "Sao chép checksum",
+  "android_app.copied": "Đã sao chép",
+  "android_app.reinstall_note": "Bản truy cập sớm này được ký độc lập với bản phát hành trên Google Play. Có thể cần cài đặt lại từ Google Play khi trang niêm yết hoạt động; việc ghép nối vẫn được giữ lại, nên không mất gì cả.",
+  "android_app.needs_production": "Ứng dụng Android ghép nối với phiên bản chính thức. Kích hoạt giấy phép bản chính thức để tải và ghép nối."
 }

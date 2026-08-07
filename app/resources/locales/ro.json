@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Este necesară o licență de producție înainte de asociere. Activați o licență, apoi încercați din nou.",
   "pair_mobile.error_invalid_license": "Licența nu a putut fi verificată. Verificați licența în Setări, apoi încercați din nou.",
   "pair_mobile.error_network": "Serviciul de asociere nu a putut fi contactat. Verificați conexiunea, apoi încercați din nou.",
-  "pair_mobile.error_server": "Serviciul de asociere a returnat o eroare. Vă rugăm să încercați din nou în scurt timp."
+  "pair_mobile.error_server": "Serviciul de asociere a returnat o eroare. Vă rugăm să încercați din nou în scurt timp.",
+  "main_window.nav_android_app": "Aplicație Android",
+  "android_app.title": "Aplicație Android",
+  "android_app.intro": "Descarcă Easy-Post Mobile Companion pentru Android direct, apoi asociază-l cu acest computer pentru a urmări și gestiona expedierile de pe telefon.",
+  "android_app.play_soon": "În curând pe Google Play. Această descărcare directă este o versiune cu acces timpuriu pentru deținătorii de licență de producție, până când listarea în Play Store este finalizată.",
+  "android_app.download_button": "Descarcă aplicația Android (APK)",
+  "android_app.steps_group": "Cum se instalează",
+  "android_app.steps": "1. Descarcă fișierul APK pe telefonul Android sau transferă-l pe acesta.\n2. Deschide fișierul, apoi permite instalarea din această sursă dacă ți se solicită.\n3. Deschide Easy-Post Mobile Companion și alege Asociere.\n4. Generează un cod de asociere din Instrumente, apoi Asociere aplicație mobilă, și scanează-l.",
+  "android_app.checksum_group": "Verifică descărcarea",
+  "android_app.checksum_note": "Verifică fișierul descărcat față de această sumă de control SHA-256 înainte de instalare.",
+  "android_app.copy_checksum": "Copiază suma de control",
+  "android_app.copied": "Copiat",
+  "android_app.reinstall_note": "Această versiune cu acces timpuriu este semnată independent de versiunea din Google Play. Poate fi necesară reinstalarea din Google Play după publicarea listării; asocierea se păstrează, așa că nu se pierde nimic.",
+  "android_app.needs_production": "Aplicația Android se asociază cu versiunea de producție. Activează o licență de producție pentru a o descărca și asocia."
 }

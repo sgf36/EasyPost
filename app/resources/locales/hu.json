@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "A párosítás előtt éles licenc szükséges. Aktiváljon licencet, majd próbálja újra.",
   "pair_mobile.error_invalid_license": "A licencet nem sikerült ellenőrizni. Ellenőrizze a licencet a Beállítások alatt, majd próbálja újra.",
   "pair_mobile.error_network": "A párosítási szolgáltatás nem érhető el. Ellenőrizze a kapcsolatot, majd próbálja újra.",
-  "pair_mobile.error_server": "A párosítási szolgáltatás hibát adott vissza. Kérjük, próbálja újra röviddel később."
+  "pair_mobile.error_server": "A párosítási szolgáltatás hibát adott vissza. Kérjük, próbálja újra röviddel később.",
+  "main_window.nav_android_app": "Android alkalmazás",
+  "android_app.title": "Android alkalmazás",
+  "android_app.intro": "Töltse le közvetlenül az Android rendszerre készült Easy-Post Mobile Companion alkalmazást, majd párosítsa ezzel az asztali alkalmazással, hogy telefonról követhesse és kezelhesse a küldeményeket.",
+  "android_app.play_soon": "Hamarosan elérhető a Google Play áruházban. Ez a közvetlen letöltés korai hozzáférésű build az éles licenc tulajdonosai számára, amíg a Play Store-oldal véglegesítése folyamatban van.",
+  "android_app.download_button": "Az Android alkalmazás letöltése (APK)",
+  "android_app.steps_group": "Telepítés",
+  "android_app.steps": "1. Töltse le az APK-t az Android telefonra, vagy másolja át.\n2. Nyissa meg a fájlt, majd engedélyezze a telepítést ebből a forrásból, ha a rendszer kéri.\n3. Nyissa meg az Easy-Post Mobile Companion alkalmazást, és válassza a Párosítás lehetőséget.\n4. Hozzon létre egy párosítási kódot az Eszközök, majd a Mobilalkalmazás párosítása menüpontban, és olvassa be.",
+  "android_app.checksum_group": "A letöltés ellenőrzése",
+  "android_app.checksum_note": "Telepítés előtt vesse össze a letöltött fájlt ezzel a SHA-256 ellenőrzőösszeggel.",
+  "android_app.copy_checksum": "Ellenőrzőösszeg másolása",
+  "android_app.copied": "Másolva",
+  "android_app.reinstall_note": "Ez a korai hozzáférésű build a Google Play-kiadástól függetlenül van aláírva. A Google Play áruházból való újratelepítésre lehet szükség, amint az oldal elérhetővé válik; a párosítás megmarad, így semmi sem vész el.",
+  "android_app.needs_production": "Az Android alkalmazás az éles verzióval párosítható. Aktiváljon egy éles licencet a letöltéséhez és párosításához."
 }

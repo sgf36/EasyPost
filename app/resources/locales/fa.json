@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "پیش از جفت‌سازی، به یک مجوز تولید نیاز است. مجوزی را فعال کرده و دوباره تلاش کنید.",
   "pair_mobile.error_invalid_license": "مجوز قابل تأیید نبود. مجوز را در بخش تنظیمات بررسی کرده و دوباره تلاش کنید.",
   "pair_mobile.error_network": "امکان دسترسی به سرویس جفت‌سازی وجود نداشت. اتصال را بررسی کرده و دوباره تلاش کنید.",
-  "pair_mobile.error_server": "سرویس جفت‌سازی خطایی بازگرداند. لطفاً کمی بعد دوباره تلاش کنید."
+  "pair_mobile.error_server": "سرویس جفت‌سازی خطایی بازگرداند. لطفاً کمی بعد دوباره تلاش کنید.",
+  "main_window.nav_android_app": "برنامه Android",
+  "android_app.title": "برنامه Android",
+  "android_app.intro": "Easy-Post Mobile Companion را برای Android مستقیماً دانلود کنید، سپس آن را با این رایانه جفت کنید تا مرسوله‌ها را از طریق تلفن ردیابی و مدیریت کنید.",
+  "android_app.play_soon": "به‌زودی در Google Play. این دانلود مستقیم یک نسخه دسترسی زودهنگام برای دارندگان مجوز تولید است تا زمانی که فهرست Play Store نهایی شود.",
+  "android_app.download_button": "دانلود برنامه Android (APK)",
+  "android_app.steps_group": "نحوه نصب",
+  "android_app.steps": "1. فایل APK را روی تلفن Android دانلود کنید یا آن را منتقل کنید.\n2. فایل را باز کنید، سپس در صورت درخواست، نصب از این منبع را مجاز کنید.\n3. Easy-Post Mobile Companion را باز کرده و جفت‌سازی را انتخاب کنید.\n4. یک کد جفت‌سازی را از بخش ابزارها سپس جفت‌سازی برنامه موبایل ایجاد کنید و آن را اسکن کنید.",
+  "android_app.checksum_group": "تأیید دانلود",
+  "android_app.checksum_note": "پیش از نصب، فایل دانلودشده را با این جمع کنترلی SHA-256 بررسی کنید.",
+  "android_app.copy_checksum": "کپی جمع کنترلی",
+  "android_app.copied": "کپی شد",
+  "android_app.reinstall_note": "این نسخه دسترسی زودهنگام مستقل از نسخه Google Play امضا شده است. پس از آنکه فهرست فعال شد، ممکن است نصب مجدد از Google Play لازم باشد؛ جفت‌سازی حفظ می‌شود، بنابراین چیزی از دست نمی‌رود.",
+  "android_app.needs_production": "برنامه Android با نسخه تولید جفت می‌شود. برای دانلود و جفت‌سازی آن، یک مجوز تولید را فعال کنید."
 }

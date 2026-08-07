@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "En produktionslicens krävs innan parkoppling. Aktivera en licens och försök igen.",
   "pair_mobile.error_invalid_license": "Licensen kunde inte verifieras. Kontrollera licensen under Inställningar och försök igen.",
   "pair_mobile.error_network": "Parkopplingstjänsten kunde inte nås. Kontrollera anslutningen och försök igen.",
-  "pair_mobile.error_server": "Parkopplingstjänsten returnerade ett fel. Försök igen om en liten stund."
+  "pair_mobile.error_server": "Parkopplingstjänsten returnerade ett fel. Försök igen om en liten stund.",
+  "main_window.nav_android_app": "Android-app",
+  "android_app.title": "Android-app",
+  "android_app.intro": "Ladda ner Easy-Post Mobile Companion för Android direkt och parkoppla den sedan med den här datorn för att spåra och hantera försändelser från en telefon.",
+  "android_app.play_soon": "Kommer snart till Google Play. Den här direkta nedladdningen är en tidig version för innehavare av produktionslicens medan listningen i Play Store färdigställs.",
+  "android_app.download_button": "Ladda ner Android-appen (APK)",
+  "android_app.steps_group": "Så här installerar du",
+  "android_app.steps": "1. Ladda ner APK-filen till Android-telefonen, eller överför den dit.\n2. Öppna filen och tillåt sedan installation från den här källan om du uppmanas.\n3. Öppna Easy-Post Mobile Companion och välj Parkoppla.\n4. Skapa en parkopplingskod under Verktyg och sedan Parkoppla mobilapp, och skanna den.",
+  "android_app.checksum_group": "Verifiera nedladdningen",
+  "android_app.checksum_note": "Kontrollera den nedladdade filen mot den här SHA-256-kontrollsumman innan du installerar.",
+  "android_app.copy_checksum": "Kopiera kontrollsumma",
+  "android_app.copied": "Kopierad",
+  "android_app.reinstall_note": "Den här tidiga versionen är signerad oberoende av Google Play-utgåvan. Ominstallation från Google Play kan krävas när listningen är aktiv; parkopplingen följer med, så inget går förlorat.",
+  "android_app.needs_production": "Android-appen parkopplas med produktionsversionen. Aktivera en produktionslicens för att ladda ner och parkoppla den."
 }

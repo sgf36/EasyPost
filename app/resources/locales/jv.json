@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Lisensi produksi dibutuhake sadurunge masang. Aktifake lisensi, banjur coba maneh.",
   "pair_mobile.error_invalid_license": "Lisensi ora bisa divalidasi. Priksa lisensi ing Setelan, banjur coba maneh.",
   "pair_mobile.error_network": "Layanan pemasangan ora bisa dijangkau. Priksa sambungan, banjur coba maneh.",
-  "pair_mobile.error_server": "Layanan pemasangan mbalekake kesalahan. Mangga coba maneh sedhela maneh."
+  "pair_mobile.error_server": "Layanan pemasangan mbalekake kesalahan. Mangga coba maneh sedhela maneh.",
+  "main_window.nav_android_app": "Aplikasi Android",
+  "android_app.title": "Aplikasi Android",
+  "android_app.intro": "Undhuh Easy-Post Mobile Companion kanggo Android kanthi langsung, banjur pasangake karo desktop iki kanggo nglacak lan ngatur pengiriman saka telpon.",
+  "android_app.play_soon": "Bakal enggal rawuh ing Google Play. Undhuhan langsung iki minangka versi akses awal kanggo sing duwe lisensi produksi nalika daftar Play Store lagi difinalake.",
+  "android_app.download_button": "Undhuh aplikasi Android (APK)",
+  "android_app.steps_group": "Cara masang",
+  "android_app.steps": "1. Undhuh APK menyang telpon Android, utawa transfer.\n2. Bukak file kasebut, banjur idini pemasangan saka sumber iki yen dijaluk.\n3. Bukak Easy-Post Mobile Companion banjur pilih Pasang.\n4. Gawe kode pemasangan ing Piranti banjur Pasangake aplikasi seluler, lan pindai kode kasebut.",
+  "android_app.checksum_group": "Verifikasi undhuhan",
+  "android_app.checksum_note": "Priksa file sing diundhuh karo checksum SHA-256 iki sadurunge masang.",
+  "android_app.copy_checksum": "Salin checksum",
+  "android_app.copied": "Disalin",
+  "android_app.reinstall_note": "Versi akses awal iki ditandatangani kanthi kapisah saka rilis Google Play. Pemasangan ulang saka Google Play bisa uga dibutuhake yen daftar wis aktif; pemasangan tetep kagawa, dadi ora ana sing ilang.",
+  "android_app.needs_production": "Aplikasi Android dipasangake karo versi produksi. Aktifake lisensi produksi kanggo ngundhuh lan masangake."
 }

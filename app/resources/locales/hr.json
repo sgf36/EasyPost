@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Prije uparivanja potrebna je proizvodna licenca. Aktivirajte licencu, a zatim pokušajte ponovno.",
   "pair_mobile.error_invalid_license": "Licencu nije bilo moguće provjeriti. Provjerite licencu u Postavkama, a zatim pokušajte ponovno.",
   "pair_mobile.error_network": "Uslugu uparivanja nije bilo moguće dosegnuti. Provjerite vezu, a zatim pokušajte ponovno.",
-  "pair_mobile.error_server": "Usluga uparivanja vratila je pogrešku. Pokušajte ponovno uskoro."
+  "pair_mobile.error_server": "Usluga uparivanja vratila je pogrešku. Pokušajte ponovno uskoro.",
+  "main_window.nav_android_app": "Android aplikacija",
+  "android_app.title": "Android aplikacija",
+  "android_app.intro": "Preuzmite Easy-Post Mobile Companion za Android izravno, a zatim ga uparite s ovim računalom za praćenje i upravljanje pošiljkama s telefona.",
+  "android_app.play_soon": "Uskoro na Google Play. Ovo izravno preuzimanje je verzija ranog pristupa za nositelje produkcijske licence dok se ne dovrši unos na Play Store.",
+  "android_app.download_button": "Preuzmi Android aplikaciju (APK)",
+  "android_app.steps_group": "Kako instalirati",
+  "android_app.steps": "1. Preuzmite APK na Android telefon ili ga prenesite.\n2. Otvorite datoteku, a zatim dopustite instalaciju iz ovog izvora ako se to zatraži.\n3. Otvorite Easy-Post Mobile Companion i odaberite Upari.\n4. Generirajte kôd za uparivanje pod Alati pa Uparivanje mobilne aplikacije i skenirajte ga.",
+  "android_app.checksum_group": "Provjerite preuzimanje",
+  "android_app.checksum_note": "Prije instalacije provjerite preuzetu datoteku u odnosu na ovaj SHA-256 kontrolni zbroj.",
+  "android_app.copy_checksum": "Kopiraj kontrolni zbroj",
+  "android_app.copied": "Kopirano",
+  "android_app.reinstall_note": "Ova verzija ranog pristupa potpisana je neovisno o Google Play izdanju. Nakon što unos postane aktivan, možda će biti potrebna ponovna instalacija s Google Playa; uparivanje se prenosi, pa se ništa ne gubi.",
+  "android_app.needs_production": "Android aplikacija uparuje se s produkcijskom verzijom. Aktivirajte produkcijsku licencu da biste je preuzeli i uparili."
 }

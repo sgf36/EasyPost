@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Ana buƙatar lasisin production kafin haɗawa. A kunna lasisi, sannan a sake gwadawa.",
   "pair_mobile.error_invalid_license": "Ba a iya tabbatar da lasisin ba. A duba lasisin a ƙarƙashin Saitunan, sannan a sake gwadawa.",
   "pair_mobile.error_network": "Ba a iya isa ga sabis na haɗawa ba. A duba haɗin intanet, sannan a sake gwadawa.",
-  "pair_mobile.error_server": "Sabis na haɗawa ya mayar da kuskure. Don Allah a sake gwadawa nan da ɗan lokaci."
+  "pair_mobile.error_server": "Sabis na haɗawa ya mayar da kuskure. Don Allah a sake gwadawa nan da ɗan lokaci.",
+  "main_window.nav_android_app": "Manhajar Android",
+  "android_app.title": "Manhajar Android",
+  "android_app.intro": "Sauke Easy-Post Mobile Companion na Android kai tsaye, sannan ka haɗa shi da wannan kwamfutar don bin diddigi da sarrafa jigilai daga waya.",
+  "android_app.play_soon": "Ana zuwa nan ba da jimawa ba a Google Play. Wannan saukewa kai tsaye gini ne na samun dama da wuri ga masu lasisin samarwa yayin da ake kammala jerin Play Store.",
+  "android_app.download_button": "Sauke manhajar Android (APK)",
+  "android_app.steps_group": "Yadda ake shigarwa",
+  "android_app.steps": "1. Sauke APK a wayar Android, ko ka canja shi.\n2. Buɗe fayil ɗin, sannan ka ba da izinin shigarwa daga wannan tushe idan aka nema.\n3. Buɗe Easy-Post Mobile Companion sannan ka zaɓi Haɗa.\n4. Ƙirƙira lambar haɗi ƙarƙashin Kayan aiki sannan Haɗa manhajar wayar hannu, sannan ka yi scan ɗinta.",
+  "android_app.checksum_group": "Tabbatar da saukewa",
+  "android_app.checksum_note": "Duba fayil ɗin da aka sauke da wannan checksum na SHA-256 kafin shigarwa.",
+  "android_app.copy_checksum": "Kwafi checksum",
+  "android_app.copied": "An kwafa",
+  "android_app.reinstall_note": "An sanya hannu kan wannan ginin samun dama da wuri daban da fitowar Google Play. Ana iya buƙatar sāke shigarwa daga Google Play da zarar jerin ya kunna; haɗin yana ci gaba, don haka babu abin da ake rasa.",
+  "android_app.needs_production": "Manhajar Android tana haɗuwa da sigar samarwa. Kunna lasisin samarwa don sauke shi da haɗa shi."
 }

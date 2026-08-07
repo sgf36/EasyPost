@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Przed sparowaniem wymagana jest licencja produkcyjna. Aktywuj licencję, a następnie spróbuj ponownie.",
   "pair_mobile.error_invalid_license": "Nie udało się zweryfikować licencji. Sprawdź licencję w Ustawieniach, a następnie spróbuj ponownie.",
   "pair_mobile.error_network": "Nie udało się połączyć z usługą parowania. Sprawdź połączenie, a następnie spróbuj ponownie.",
-  "pair_mobile.error_server": "Usługa parowania zwróciła błąd. Spróbuj ponownie za chwilę."
+  "pair_mobile.error_server": "Usługa parowania zwróciła błąd. Spróbuj ponownie za chwilę.",
+  "main_window.nav_android_app": "Aplikacja Android",
+  "android_app.title": "Aplikacja Android",
+  "android_app.intro": "Pobierz Easy-Post Mobile Companion na Android bezpośrednio, a następnie sparuj go z tym komputerem, aby śledzić przesyłki i zarządzać nimi z telefonu.",
+  "android_app.play_soon": "Wkrótce w Google Play. To bezpośrednie pobieranie to wersja we wczesnym dostępie dla posiadaczy licencji produkcyjnej, dopóki wpis w Play Store nie zostanie ukończony.",
+  "android_app.download_button": "Pobierz aplikację Android (APK)",
+  "android_app.steps_group": "Jak zainstalować",
+  "android_app.steps": "1. Pobierz plik APK na telefon z systemem Android lub przenieś go na urządzenie.\n2. Otwórz plik, a następnie zezwól na instalację z tego źródła, jeśli pojawi się monit.\n3. Otwórz Easy-Post Mobile Companion i wybierz Sparuj.\n4. Wygeneruj kod parowania w sekcji Narzędzia, a następnie Sparuj aplikację mobilną, i zeskanuj go.",
+  "android_app.checksum_group": "Zweryfikuj pobrany plik",
+  "android_app.checksum_note": "Sprawdź pobrany plik względem tej sumy kontrolnej SHA-256 przed instalacją.",
+  "android_app.copy_checksum": "Kopiuj sumę kontrolną",
+  "android_app.copied": "Skopiowano",
+  "android_app.reinstall_note": "Ta wersja we wczesnym dostępie jest podpisana niezależnie od wydania w Google Play. Po udostępnieniu wpisu może być konieczna ponowna instalacja z Google Play; parowanie zostaje zachowane, więc nic nie zostanie utracone.",
+  "android_app.needs_production": "Aplikacja Android paruje się z wersją produkcyjną. Aktywuj licencję produkcyjną, aby ją pobrać i sparować."
 }
