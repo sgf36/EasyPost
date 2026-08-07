@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "נדרש רישיון ייצור לפני הצימוד. הפעל רישיון ונסה שוב.",
   "pair_mobile.error_invalid_license": "לא ניתן היה לאמת את הרישיון. בדוק את הרישיון תחת ההגדרות ונסה שוב.",
   "pair_mobile.error_network": "לא ניתן היה להגיע אל שירות הצימוד. בדוק את החיבור ונסה שוב.",
-  "pair_mobile.error_server": "שירות הצימוד החזיר שגיאה. נסה שוב בעוד זמן קצר."
+  "pair_mobile.error_server": "שירות הצימוד החזיר שגיאה. נסה שוב בעוד זמן קצר.",
+  "main_window.nav_android_app": "אפליקציית Android",
+  "android_app.title": "אפליקציית Android",
+  "android_app.intro": "הורד את Easy-Post Mobile Companion עבור Android ישירות, ולאחר מכן צמד אותו למחשב זה כדי לעקוב אחר משלוחים ולנהל אותם מהטלפון.",
+  "android_app.play_soon": "בקרוב ב-Google Play. הורדה ישירה זו היא גרסת גישה מוקדמת עבור בעלי רישיון הפקה, עד להשלמת הרישום ב-Play Store.",
+  "android_app.download_button": "הורד את אפליקציית Android (APK)",
+  "android_app.steps_group": "כיצד להתקין",
+  "android_app.steps": "1. הורד את קובץ ה-APK לטלפון ה-Android, או העבר אותו אליו.\n2. פתח את הקובץ, ולאחר מכן אשר התקנה ממקור זה אם תתבקש.\n3. פתח את Easy-Post Mobile Companion ובחר בצימוד.\n4. צור קוד צימוד תחת כלים ואז צימוד אפליקציית הנייד, וסרוק אותו.",
+  "android_app.checksum_group": "אימות ההורדה",
+  "android_app.checksum_note": "בדוק את הקובץ שהורד מול סכום ביקורת SHA-256 זה לפני ההתקנה.",
+  "android_app.copy_checksum": "העתק סכום ביקורת",
+  "android_app.copied": "הועתק",
+  "android_app.reinstall_note": "גרסת גישה מוקדמת זו חתומה באופן עצמאי מגרסת Google Play. ייתכן שיידרש להתקין מחדש מ-Google Play לאחר שהרישום יעלה לאוויר; הצימוד נשמר, כך שדבר לא יאבד.",
+  "android_app.needs_production": "אפליקציית Android מצטמדת לגרסת ההפקה. הפעל רישיון הפקה כדי להוריד ולצמד אותה."
 }

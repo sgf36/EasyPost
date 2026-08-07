@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Ulashdan oldin ishlab chiqarish litsenziyasi talab qilinadi. Litsenziyani faollashtiring, so'ngra qayta urinib ko'ring.",
   "pair_mobile.error_invalid_license": "Litsenziyani tekshirib bo'lmadi. Sozlamalar bo'limida litsenziyani tekshiring, so'ngra qayta urinib ko'ring.",
   "pair_mobile.error_network": "Ulash xizmatiga ulanib bo'lmadi. Ulanishni tekshiring, so'ngra qayta urinib ko'ring.",
-  "pair_mobile.error_server": "Ulash xizmati xatolik qaytardi. Iltimos, birozdan so'ng qayta urinib ko'ring."
+  "pair_mobile.error_server": "Ulash xizmati xatolik qaytardi. Iltimos, birozdan so'ng qayta urinib ko'ring.",
+  "main_window.nav_android_app": "Android ilovasi",
+  "android_app.title": "Android ilovasi",
+  "android_app.intro": "Android uchun Easy-Post Mobile Companion ilovasini to'g'ridan-to'g'ri yuklab oling, so'ng uni telefondan jo'natmalarni kuzatish va boshqarish uchun ushbu kompyuterga ulang.",
+  "android_app.play_soon": "Tez orada Google Play'da. Ushbu to'g'ridan-to'g'ri yuklab olish — Play Store ro'yxati yakunlanayotgan vaqtda ishlab chiqarish litsenziyasi egalari uchun erta kirish versiyasidir.",
+  "android_app.download_button": "Android ilovasini (APK) yuklab olish",
+  "android_app.steps_group": "O'rnatish tartibi",
+  "android_app.steps": "1. APK faylini Android telefoniga yuklab oling yoki uni ko'chirib o'tkazing.\n2. Faylni oching, so'ng so'ralsa, ushbu manbadan o'rnatishga ruxsat bering.\n3. Easy-Post Mobile Companion ilovasini oching va Ulash tugmasini tanlang.\n4. Vositalar bo'limida, so'ng Mobil ilovani ulash orqali ulash kodini yarating va uni skanerlang.",
+  "android_app.checksum_group": "Yuklamani tekshiring",
+  "android_app.checksum_note": "O'rnatishdan oldin yuklab olingan faylni ushbu SHA-256 nazorat summasi bilan solishtiring.",
+  "android_app.copy_checksum": "Nazorat summasini nusxalash",
+  "android_app.copied": "Nusxalandi",
+  "android_app.reinstall_note": "Ushbu erta kirish versiyasi Google Play relizidan alohida imzolangan. Ro'yxat faollashgach, Google Play'dan qayta o'rnatish talab qilinishi mumkin; ulanish saqlanib qoladi, shuning uchun hech narsa yo'qolmaydi.",
+  "android_app.needs_production": "Android ilovasi ishlab chiqarish versiyasi bilan ulanadi. Uni yuklab olish va ulash uchun ishlab chiqarish litsenziyasini faollashtiring."
 }

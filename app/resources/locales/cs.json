@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Před párováním je vyžadována produkční licence. Aktivujte licenci a zkuste to znovu.",
   "pair_mobile.error_invalid_license": "Licenci se nepodařilo ověřit. Zkontrolujte licenci v Nastavení a zkuste to znovu.",
   "pair_mobile.error_network": "Párovací službu se nepodařilo kontaktovat. Zkontrolujte připojení a zkuste to znovu.",
-  "pair_mobile.error_server": "Párovací služba vrátila chybu. Zkuste to prosím za chvíli znovu."
+  "pair_mobile.error_server": "Párovací služba vrátila chybu. Zkuste to prosím za chvíli znovu.",
+  "main_window.nav_android_app": "Aplikace Android",
+  "android_app.title": "Aplikace Android",
+  "android_app.intro": "Stáhněte si Easy-Post Mobile Companion pro Android přímo a poté jej spárujte s tímto počítačem, abyste mohli sledovat a spravovat zásilky z telefonu.",
+  "android_app.play_soon": "Již brzy na Google Play. Toto přímé stažení je sestavení s předběžným přístupem pro držitele produkční licence, než bude dokončen záznam v Play Store.",
+  "android_app.download_button": "Stáhnout aplikaci Android (APK)",
+  "android_app.steps_group": "Jak nainstalovat",
+  "android_app.steps": "1. Stáhněte APK do telefonu Android nebo jej do něj přeneste.\n2. Otevřete soubor a poté povolte instalaci z tohoto zdroje, pokud k tomu budete vyzváni.\n3. Otevřete Easy-Post Mobile Companion a zvolte Spárovat.\n4. V nabídce Nástroje a poté Spárovat mobilní aplikaci vygenerujte párovací kód a naskenujte jej.",
+  "android_app.checksum_group": "Ověřit stažený soubor",
+  "android_app.checksum_note": "Před instalací zkontrolujte stažený soubor pomocí tohoto kontrolního součtu SHA-256.",
+  "android_app.copy_checksum": "Kopírovat kontrolní součet",
+  "android_app.copied": "Zkopírováno",
+  "android_app.reinstall_note": "Toto sestavení s předběžným přístupem je podepsáno nezávisle na vydání na Google Play. Po zveřejnění záznamu může být nutné přeinstalovat aplikaci z Google Play; spárování zůstane zachováno, takže o nic nepřijdete.",
+  "android_app.needs_production": "Aplikace Android se páruje s produkční verzí. Aktivujte produkční licenci, abyste ji mohli stáhnout a spárovat."
 }

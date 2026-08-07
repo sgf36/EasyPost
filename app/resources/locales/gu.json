@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "જોડાણ કરતાં પહેલાં પ્રોડક્શન લાયસન્સ જરૂરી છે. લાયસન્સ સક્રિય કરો, પછી ફરી પ્રયાસ કરો.",
   "pair_mobile.error_invalid_license": "લાયસન્સ ચકાસી શકાયું નથી. સેટિંગ્સ હેઠળ લાયસન્સ તપાસો, પછી ફરી પ્રયાસ કરો.",
   "pair_mobile.error_network": "જોડાણ સેવા સુધી પહોંચી શકાયું નથી. કનેક્શન તપાસો, પછી ફરી પ્રયાસ કરો.",
-  "pair_mobile.error_server": "જોડાણ સેવાએ ભૂલ પરત આપી. કૃપા કરીને થોડી વારમાં ફરી પ્રયાસ કરો."
+  "pair_mobile.error_server": "જોડાણ સેવાએ ભૂલ પરત આપી. કૃપા કરીને થોડી વારમાં ફરી પ્રયાસ કરો.",
+  "main_window.nav_android_app": "Android એપ",
+  "android_app.title": "Android એપ",
+  "android_app.intro": "Android માટે Easy-Post Mobile Companion સીધું ડાઉનલોડ કરો, પછી ફોનથી શિપમેન્ટ ટ્રૅક અને મેનેજ કરવા માટે તેને આ ડેસ્કટૉપ સાથે જોડો.",
+  "android_app.play_soon": "Google Play પર ટૂંક સમયમાં આવી રહ્યું છે. Play Store લિસ્ટિંગ આખરી થાય ત્યાં સુધી આ સીધું ડાઉનલોડ પ્રોડક્શન લાઇસન્સ ધારકો માટે અર્લી-ઍક્સેસ બિલ્ડ છે.",
+  "android_app.download_button": "Android એપ (APK) ડાઉનલોડ કરો",
+  "android_app.steps_group": "કેવી રીતે ઇન્સ્ટોલ કરવું",
+  "android_app.steps": "1. Android ફોન પર APK ડાઉનલોડ કરો, અથવા તેને ટ્રાન્સફર કરો.\n2. ફાઇલ ખોલો, પછી પૂછવામાં આવે તો આ સ્રોતથી ઇન્સ્ટોલેશનની મંજૂરી આપો.\n3. Easy-Post Mobile Companion ખોલો અને જોડો પસંદ કરો.\n4. સાધનો પછી મોબાઇલ એપ જોડો હેઠળ એક જોડાણ કોડ જનરેટ કરો, અને તેને સ્કૅન કરો.",
+  "android_app.checksum_group": "ડાઉનલોડ ચકાસો",
+  "android_app.checksum_note": "ઇન્સ્ટોલ કરતાં પહેલાં ડાઉનલોડ કરેલી ફાઇલને આ SHA-256 ચેકસમ સામે ચકાસો.",
+  "android_app.copy_checksum": "ચેકસમ કૉપિ કરો",
+  "android_app.copied": "કૉપિ થયું",
+  "android_app.reinstall_note": "આ અર્લી-ઍક્સેસ બિલ્ડ Google Play રિલીઝથી સ્વતંત્ર રીતે સહી કરેલી છે. લિસ્ટિંગ લાઇવ થાય પછી Google Play પરથી ફરી ઇન્સ્ટોલ કરવું જરૂરી બની શકે છે; જોડાણ જળવાઈ રહે છે, તેથી કંઈ ગુમાવાતું નથી.",
+  "android_app.needs_production": "Android એપ પ્રોડક્શન સંસ્કરણ સાથે જોડાય છે. તેને ડાઉનલોડ અને જોડવા માટે પ્રોડક્શન લાઇસન્સ સક્રિય કરો."
 }

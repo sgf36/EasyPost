@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Leseni ya uzalishaji inahitajika kabla ya kuoanisha. Amilisha leseni, kisha jaribu tena.",
   "pair_mobile.error_invalid_license": "Leseni haikuweza kuthibitishwa. Angalia leseni chini ya Mipangilio, kisha ujaribu tena.",
   "pair_mobile.error_network": "Huduma ya kuoanisha haikuweza kufikiwa. Angalia muunganisho, kisha ujaribu tena.",
-  "pair_mobile.error_server": "Huduma ya kuoanisha ilirudisha hitilafu. Tafadhali jaribu tena baada ya muda mfupi."
+  "pair_mobile.error_server": "Huduma ya kuoanisha ilirudisha hitilafu. Tafadhali jaribu tena baada ya muda mfupi.",
+  "main_window.nav_android_app": "Programu ya Android",
+  "android_app.title": "Programu ya Android",
+  "android_app.intro": "Pakua Easy-Post Mobile Companion kwa Android moja kwa moja, kisha uioanishe na kompyuta hii ili kufuatilia na kudhibiti usafirishaji kutoka kwa simu.",
+  "android_app.play_soon": "Inakuja hivi karibuni kwenye Google Play. Upakuaji huu wa moja kwa moja ni toleo la awali kwa wenye leseni ya uzalishaji wakati orodha ya Play Store inakamilishwa.",
+  "android_app.download_button": "Pakua programu ya Android (APK)",
+  "android_app.steps_group": "Jinsi ya kusakinisha",
+  "android_app.steps": "1. Pakua APK kwenye simu ya Android, au uihamishe hadi humo.\n2. Fungua faili, kisha uruhusu usakinishaji kutoka chanzo hiki ukiombwa.\n3. Fungua Easy-Post Mobile Companion na uchague Oanisha.\n4. Tengeneza msimbo wa kuoanisha chini ya Zana kisha Oanisha programu ya simu, na uuchanganue.",
+  "android_app.checksum_group": "Thibitisha upakuaji",
+  "android_app.checksum_note": "Linganisha faili iliyopakuliwa na hundisumu hii ya SHA-256 kabla ya kusakinisha.",
+  "android_app.copy_checksum": "Nakili hundisumu",
+  "android_app.copied": "Imenakiliwa",
+  "android_app.reinstall_note": "Toleo hili la awali limetiwa saini kwa kujitegemea na toleo la Google Play. Huenda ukahitaji kusakinisha upya kutoka Google Play mara orodha itakapokuwa hai; uoanishaji hubaki, kwa hivyo hakuna kinachopotea.",
+  "android_app.needs_production": "Programu ya Android huoanishwa na toleo la uzalishaji. Amilisha leseni ya uzalishaji ili kuipakua na kuioanisha."
 }

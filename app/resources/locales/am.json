@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "ከማጣመር በፊት የምርት ፈቃድ ያስፈልጋል። ፈቃድ ያንቁ፣ ከዚያም እንደገና ይሞክሩ።",
   "pair_mobile.error_invalid_license": "ፈቃዱን ማረጋገጥ አልተቻለም። ፈቃዱን በቅንብሮች ስር ያረጋግጡ፣ ከዚያም እንደገና ይሞክሩ።",
   "pair_mobile.error_network": "የማጣመሪያ አገልግሎቱን ማግኘት አልተቻለም። ግንኙነቱን ያረጋግጡ፣ ከዚያም እንደገና ይሞክሩ።",
-  "pair_mobile.error_server": "የማጣመሪያ አገልግሎቱ ስህተት መልሷል። እባክዎ በቅርቡ እንደገና ይሞክሩ።"
+  "pair_mobile.error_server": "የማጣመሪያ አገልግሎቱ ስህተት መልሷል። እባክዎ በቅርቡ እንደገና ይሞክሩ።",
+  "main_window.nav_android_app": "የAndroid መተግበሪያ",
+  "android_app.title": "የAndroid መተግበሪያ",
+  "android_app.intro": "Easy-Post Mobile Companion ለAndroid በቀጥታ ያውርዱ፣ ከዚያም ከስልክ ላይ ጭነቶችን ለመከታተልና ለማስተዳደር ከዚህ ዴስክቶፕ ጋር ያጣምሩት።",
+  "android_app.play_soon": "በቅርቡ ወደ Google Play ይመጣል። ይህ ቀጥተኛ ማውረድ የPlay Store ዝርዝር በሚጠናቀቅበት ጊዜ ለምርት ፈቃድ ባለቤቶች የቀደመ መዳረሻ ግንባታ ነው።",
+  "android_app.download_button": "የAndroid መተግበሪያን ያውርዱ (APK)",
+  "android_app.steps_group": "እንዴት እንደሚጫን",
+  "android_app.steps": "1. APK ን ወደ Android ስልኩ ያውርዱ፣ ወይም ወደ እሱ ያስተላልፉት።\n2. ፋይሉን ይክፈቱ፣ ከዚያም ከተጠየቁ ከዚህ ምንጭ መጫንን ይፍቀዱ።\n3. Easy-Post Mobile Companion ን ይክፈቱ እና ማጣመር ን ይምረጡ።\n4. በመሣሪያዎች ከዚያም የሞባይል መተግበሪያ ማጣመር ስር የማጣመሪያ ኮድ ይፍጠሩ እና ይቃኙት።",
+  "android_app.checksum_group": "ማውረዱን ያረጋግጡ",
+  "android_app.checksum_note": "ከመጫንዎ በፊት የወረደውን ፋይል ከዚህ SHA-256 ቼክሰም ጋር ያረጋግጡ።",
+  "android_app.copy_checksum": "ቼክሰም ይቅዱ",
+  "android_app.copied": "ተቀድቷል",
+  "android_app.reinstall_note": "ይህ የቀደመ መዳረሻ ግንባታ ከGoogle Play ልቀት ተለይቶ ተፈርሟል። ዝርዝሩ ንቁ ከሆነ በኋላ ከGoogle Play እንደገና መጫን ሊያስፈልግ ይችላል፤ ማጣመሩ ስለሚቀጥል ምንም አይጠፋም።",
+  "android_app.needs_production": "የAndroid መተግበሪያ ከምርት ስሪት ጋር ይጣመራል። እሱን ለማውረድና ለማጣመር የምርት ፈቃድ ያንቁ።"
 }

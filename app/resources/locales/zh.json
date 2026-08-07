@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "配对前需要生产许可证。请先激活许可证，然后重试。",
   "pair_mobile.error_invalid_license": "无法验证许可证。请在设置中检查许可证，然后重试。",
   "pair_mobile.error_network": "无法连接到配对服务。请检查网络连接，然后重试。",
-  "pair_mobile.error_server": "配对服务返回了错误。请稍后重试。"
+  "pair_mobile.error_server": "配对服务返回了错误。请稍后重试。",
+  "main_window.nav_android_app": "Android 应用",
+  "android_app.title": "Android 应用",
+  "android_app.intro": "直接下载适用于 Android 的 Easy-Post Mobile Companion，然后将其与此桌面版配对，即可通过手机跟踪和管理货件。",
+  "android_app.play_soon": "即将在 Google Play 上线。此直接下载是面向生产许可证持有者的抢先体验版本，Play Store 上架页面正在最终完善中。",
+  "android_app.download_button": "下载 Android 应用（APK）",
+  "android_app.steps_group": "安装方法",
+  "android_app.steps": "1. 将 APK 下载到 Android 手机上，或将其传输过去。\n2. 打开该文件，如果出现提示，请允许从此来源安装。\n3. 打开 Easy-Post Mobile Companion 并选择配对。\n4. 在工具下依次选择配对移动应用，生成配对码并扫描。",
+  "android_app.checksum_group": "验证下载",
+  "android_app.checksum_note": "安装前，请将下载的文件与此 SHA-256 校验和进行核对。",
+  "android_app.copy_checksum": "复制校验和",
+  "android_app.copied": "已复制",
+  "android_app.reinstall_note": "此抢先体验版本的签名独立于 Google Play 发布版本。上架页面上线后，可能需要从 Google Play 重新安装；配对信息会保留，因此不会丢失任何内容。",
+  "android_app.needs_production": "Android 应用与生产版本配对。请激活生产许可证以下载并配对。"
 }

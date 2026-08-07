@@ -519,5 +519,18 @@
   "pair_mobile.error_no_license": "Lesen pengeluaran diperlukan sebelum penggandingan. Aktifkan lesen, kemudian cuba lagi.",
   "pair_mobile.error_invalid_license": "Lesen tidak dapat disahkan. Semak lesen di bawah Tetapan, kemudian cuba lagi.",
   "pair_mobile.error_network": "Perkhidmatan penggandingan tidak dapat dihubungi. Semak sambungan, kemudian cuba lagi.",
-  "pair_mobile.error_server": "Perkhidmatan penggandingan mengembalikan ralat. Sila cuba lagi sebentar lagi."
+  "pair_mobile.error_server": "Perkhidmatan penggandingan mengembalikan ralat. Sila cuba lagi sebentar lagi.",
+  "main_window.nav_android_app": "Aplikasi Android",
+  "android_app.title": "Aplikasi Android",
+  "android_app.intro": "Muat turun Easy-Post Mobile Companion untuk Android secara terus, kemudian gandingkannya dengan desktop ini untuk menjejak dan mengurus penghantaran daripada telefon.",
+  "android_app.play_soon": "Akan datang di Google Play. Muat turun terus ini ialah binaan akses awal untuk pemegang lesen pengeluaran sementara penyenaraian Play Store dimuktamadkan.",
+  "android_app.download_button": "Muat turun aplikasi Android (APK)",
+  "android_app.steps_group": "Cara memasang",
+  "android_app.steps": "1. Muat turun APK ke telefon Android, atau pindahkannya.\n2. Buka fail tersebut, kemudian benarkan pemasangan daripada sumber ini jika diminta.\n3. Buka Easy-Post Mobile Companion dan pilih Gandingkan.\n4. Jana kod gandingan di bawah Alat kemudian Gandingkan aplikasi mudah alih, dan imbasnya.",
+  "android_app.checksum_group": "Sahkan muat turun",
+  "android_app.checksum_note": "Semak fail yang dimuat turun terhadap hasil semak SHA-256 ini sebelum memasang.",
+  "android_app.copy_checksum": "Salin hasil semak",
+  "android_app.copied": "Disalin",
+  "android_app.reinstall_note": "Binaan akses awal ini ditandatangani secara berasingan daripada keluaran Google Play. Pemasangan semula daripada Google Play mungkin diperlukan setelah penyenaraian tersebut disiarkan; gandingan kekal, jadi tiada apa-apa yang hilang.",
+  "android_app.needs_production": "Aplikasi Android bergandingan dengan versi pengeluaran. Aktifkan lesen pengeluaran untuk memuat turun dan menggandingkannya."
 }
