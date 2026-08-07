@@ -174,6 +174,12 @@ class CreateShipmentView(QWidget):
         content_layout.addWidget(QLabel(f"<h2>{tr('create_shipment.title')}</h2>"))
         content_layout.addWidget(self._build_form_group())
         content_layout.addWidget(self._build_customs_group())
+        # Get Rates sits below the Customs section. On an international shipment
+        # the customs form is visible, so this reads top-to-bottom: package →
+        # customs → Get Rates. On a domestic shipment the customs group is
+        # hidden and collapses to nothing, so the button simply follows the
+        # package form as before.
+        content_layout.addWidget(self._get_rates_btn)
 
         # Rates sit beside the purchased label rather than above it, so the
         # label you just bought is visible without leaving the page — and the
@@ -270,7 +276,11 @@ class CreateShipmentView(QWidget):
 
         group_layout = QVBoxLayout()
         group_layout.addLayout(form)
-        group_layout.addWidget(self._get_rates_btn)
+        # The Get Rates button is intentionally NOT added here. It is placed at
+        # page level, after the Customs section (see the content assembly in
+        # __init__), so an international shipment prompts for customs details
+        # above the button rather than below it. The button is created here so
+        # the reference to it exists before that assembly runs.
         group.setLayout(group_layout)
         return group
 
