@@ -200,8 +200,8 @@
   "create_shipment.from_label": "De la:",
   "create_shipment.get_rates_button": "Obține tarife",
   "create_shipment.get_rates_error_body": "Tarifele nu au putut fi obținute:\n{error}",
-  "create_shipment.height_label": "Înălțime (in):",
-  "create_shipment.length_label": "Lungime (in):",
+  "create_shipment.height_label": "Î ({unit}):",
+  "create_shipment.length_label": "L ({unit}):",
   "create_shipment.missing_addresses_body": "Verifică mai întâi cel puțin două adrese în Agenda de adrese.",
   "create_shipment.missing_addresses_title": "Adrese lipsă",
   "create_shipment.missing_name_body": "Această expediere traversează o graniță internațională. Curierii solicită un nume sau o companie atât la adresa de origine, cât și la cea de destinație pentru declarația vamală — adaugă unul la fiecare în Agenda de adrese mai întâi.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Salvat",
   "create_shipment.title": "Creează expediere & compară tarife",
   "create_shipment.to_label": "Către:",
-  "create_shipment.weight_label": "Greutate (oz):",
-  "create_shipment.width_label": "Lățime (in):",
+  "create_shipment.weight_label": "Greutate:",
+  "create_shipment.width_label": "l ({unit}):",
   "create_shipment.zip_mode_note": "Doar verificare preț. Cumpărarea unei etichete necesită adrese complete la ambele capete, așa că treceți la „Adrese complete” pentru a cumpăra.",
   "create_shipment.zip_placeholder": "Cod poștal",
   "dashboard.placeholder_text": "Vizualizările pentru expedieri, urmărire, agendă de adrese și rapoarte vor fi adăugate în etapele ulterioare de dezvoltare. Utilizează Setări pentru a gestiona cheile API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Copiază suma de control",
   "android_app.copied": "Copiat",
   "android_app.reinstall_note": "Această versiune cu acces timpuriu este semnată independent de versiunea din Google Play. Poate fi necesară reinstalarea din Google Play după publicarea listării; asocierea se păstrează, așa că nu se pierde nimic.",
-  "android_app.needs_production": "Aplicația Android se asociază cu versiunea de producție. Activează o licență de producție pentru a o descărca și asocia."
+  "android_app.needs_production": "Aplicația Android se asociază cu versiunea de producție. Activează o licență de producție pentru a o descărca și asocia.",
+  "create_shipment.units_label": "Unități:",
+  "create_shipment.units_metric": "Metric",
+  "create_shipment.units_imperial": "Imperial"
 }

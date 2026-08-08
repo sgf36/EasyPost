@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Daga:",
   "create_shipment.get_rates_button": "Samo Farashi",
   "create_shipment.get_rates_error_body": "Ba a iya samo farashi ba:\n{error}",
-  "create_shipment.height_label": "Tsayi (in):",
-  "create_shipment.length_label": "Tsawo (in):",
+  "create_shipment.height_label": "T ({unit}):",
+  "create_shipment.length_label": "T ({unit}):",
   "create_shipment.missing_addresses_body": "Fara tabbatar da aƙalla adireshi biyu a Littafin Adireshi.",
   "create_shipment.missing_addresses_title": "Adireshin da suka ɓace",
   "create_shipment.missing_name_body": "Wannan kunshin yana ƙetare iyakar kasa da kasa. Kamfanonin jigilar kaya suna bukatar suna ko kamfani a kan adireshin farawa da na isarwa duka biyu don sanarwar kwastam — fara ƙara suna ko kamfani ga kowannensu a Littafin Adireshi.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "An Ajiye",
   "create_shipment.title": "Kirkiri Kunshi & Kwatanta Farashi",
   "create_shipment.to_label": "Zuwa:",
-  "create_shipment.weight_label": "Nauyi (oz):",
-  "create_shipment.width_label": "Fadi (in):",
+  "create_shipment.weight_label": "Nauyi:",
+  "create_shipment.width_label": "F ({unit}):",
   "create_shipment.zip_mode_note": "Duba farashi kawai. Sayen lamba yana buƙatar cikakkun adireshi a bangarorin biyu, don haka koma zuwa “Cikakkun adireshi” don siya.",
   "create_shipment.zip_placeholder": "Lambar gidan waya",
   "dashboard.placeholder_text": "Ana ƙara kayan aikawa, bibiya, littafin adireshi, da ra'ayoyin rahoto a matakan ginawa na gaba. Yi amfani da Saitunan don sarrafa maɓallan API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Kwafi checksum",
   "android_app.copied": "An kwafa",
   "android_app.reinstall_note": "An sanya hannu kan wannan ginin samun dama da wuri daban da fitowar Google Play. Ana iya buƙatar sāke shigarwa daga Google Play da zarar jerin ya kunna; haɗin yana ci gaba, don haka babu abin da ake rasa.",
-  "android_app.needs_production": "Manhajar Android tana haɗuwa da sigar samarwa. Kunna lasisin samarwa don sauke shi da haɗa shi."
+  "android_app.needs_production": "Manhajar Android tana haɗuwa da sigar samarwa. Kunna lasisin samarwa don sauke shi da haɗa shi.",
+  "create_shipment.units_label": "Ma'auni:",
+  "create_shipment.units_metric": "Awo na Mita",
+  "create_shipment.units_imperial": "Awo na Imfa"
 }

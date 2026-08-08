@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Ka:",
   "create_shipment.get_rates_button": "Hel Qiimaha",
   "create_shipment.get_rates_error_body": "Qiimaha lama helin karin:\n{error}",
-  "create_shipment.height_label": "Sarajoogga (in):",
-  "create_shipment.length_label": "Dhererka (in):",
+  "create_shipment.height_label": "J ({unit}):",
+  "create_shipment.length_label": "D ({unit}):",
   "create_shipment.missing_addresses_body": "Marka hore xaqiiji ugu yaraan laba cinwaan oo ku yaal Buugga Cinwaannada.",
   "create_shipment.missing_addresses_title": "Cinwaanno Maqan",
   "create_shipment.missing_name_body": "Shixnadkani wuxuu tallaabsadaa xudduud caalami ah. Baaninta caadiyada dartay, shirkadaha gaadiidku waxay u baahan yihiin magac ama shirkad ku yaal labada cinwaan, kan laga soo diray iyo kan loo diray — marka hore mid uga dar mid kasta Buugga Cinwaannada.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "La Kaydiyay",
   "create_shipment.title": "Samee Shixnad oo Baadh Qiimayaal",
   "create_shipment.to_label": "Loo Diray:",
-  "create_shipment.weight_label": "Miisaanka (oz):",
-  "create_shipment.width_label": "Ballaca (in):",
+  "create_shipment.weight_label": "Miisaan:",
+  "create_shipment.width_label": "B ({unit}):",
   "create_shipment.zip_mode_note": "Hubinta qiimaha kaliya. Iibsashada sumad waxay u baahan tahay cinwaanno buuxa labada dhinacba, sidaas darteed u bedel “Cinwaanno buuxa” si aad u iibsato.",
   "create_shipment.zip_placeholder": "Lambarka boostada",
   "dashboard.placeholder_text": "Shixnadaha, raadraaca, buugga cinwaannada, iyo aragtiyaha warbixinta waxaa lagu daraa marxalado dambe oo dhismaha ah. Isticmaal Dejinta si aad u maamusho furayaasha API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Koobi checksum",
   "android_app.copied": "La koobiyay",
   "android_app.reinstall_note": "Noocan helitaanka hore waxaa si madax-bannaan loogu saxeexay marka loo eego siideynta Google Play. Dib-u-rakibaad ka timid Google Play ayaa laga yaabaa in loo baahdo marka liiska uu noolaado; isku xirku wuu socon doonaa, sidaas darteed waxba lama lumin.",
-  "android_app.needs_production": "Appka Android wuxuu la xiriiraa nooca wax-soo-saarka. Kici shatiga wax-soo-saarka si aad u soo dejiso oo u xirto."
+  "android_app.needs_production": "Appka Android wuxuu la xiriiraa nooca wax-soo-saarka. Kici shatiga wax-soo-saarka si aad u soo dejiso oo u xirto.",
+  "create_shipment.units_label": "Halbeegyo:",
+  "create_shipment.units_metric": "Metrik",
+  "create_shipment.units_imperial": "Imperial"
 }

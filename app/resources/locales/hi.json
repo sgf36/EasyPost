@@ -200,8 +200,8 @@
   "create_shipment.from_label": "प्रेषक:",
   "create_shipment.get_rates_button": "दरें प्राप्त करें",
   "create_shipment.get_rates_error_body": "दरें प्राप्त नहीं की जा सकीं:\n{error}",
-  "create_shipment.height_label": "ऊंचाई (इंच):",
-  "create_shipment.length_label": "लंबाई (इंच):",
+  "create_shipment.height_label": "ऊं ({unit}):",
+  "create_shipment.length_label": "लं ({unit}):",
   "create_shipment.missing_addresses_body": "पहले पता पुस्तिका में कम से कम दो पते सत्यापित करें।",
   "create_shipment.missing_addresses_title": "पते अनुपलब्ध",
   "create_shipment.missing_name_body": "यह शिपमेंट अंतरराष्ट्रीय सीमा पार करती है। सीमा शुल्क घोषणा के लिए कैरियर को प्रारंभिक और गंतव्य दोनों पतों पर नाम या कंपनी की आवश्यकता होती है — पहले पता पुस्तिका में प्रत्येक में एक जोड़ें।",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "सहेजा गया",
   "create_shipment.title": "शिपमेंट बनाएं और दरें देखें",
   "create_shipment.to_label": "प्राप्तकर्ता:",
-  "create_shipment.weight_label": "वज़न (औंस):",
-  "create_shipment.width_label": "चौड़ाई (इंच):",
+  "create_shipment.weight_label": "वजन:",
+  "create_shipment.width_label": "चौ ({unit}):",
   "create_shipment.zip_mode_note": "केवल मूल्य जाँच। लेबल खरीदने के लिए दोनों ओर पूरे पते आवश्यक हैं, इसलिए खरीदने के लिए «पूरे पते» पर जाएँ।",
   "create_shipment.zip_placeholder": "पिन कोड",
   "dashboard.placeholder_text": "शिपमेंट, ट्रैकिंग, पता पुस्तिका और रिपोर्टिंग व्यू बाद के बिल्ड चरणों में जोड़े जाएंगे। API कुंजियों को प्रबंधित करने के लिए सेटिंग्स का उपयोग करें।",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "चेकसम कॉपी करें",
   "android_app.copied": "कॉपी किया गया",
   "android_app.reinstall_note": "यह अर्ली-एक्सेस बिल्ड Google Play रिलीज़ से स्वतंत्र रूप से हस्ताक्षरित है। लिस्टिंग लाइव होने पर Google Play से पुनः इंस्टॉल करना आवश्यक हो सकता है; पेयरिंग बनी रहती है, इसलिए कुछ भी नहीं खोता।",
-  "android_app.needs_production": "Android ऐप प्रोडक्शन संस्करण के साथ जुड़ता है। इसे डाउनलोड करने और जोड़ने के लिए प्रोडक्शन लाइसेंस सक्रिय करें।"
+  "android_app.needs_production": "Android ऐप प्रोडक्शन संस्करण के साथ जुड़ता है। इसे डाउनलोड करने और जोड़ने के लिए प्रोडक्शन लाइसेंस सक्रिय करें।",
+  "create_shipment.units_label": "इकाइयाँ:",
+  "create_shipment.units_metric": "मीट्रिक",
+  "create_shipment.units_imperial": "इंपीरियल"
 }

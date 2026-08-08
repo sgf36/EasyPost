@@ -60,6 +60,12 @@ class AppSettings:
     # the MAS build the relay is the only transport and tracks mcp_enabled instead,
     # so this flag is not consulted there (see mcp_relay_client.relay_should_run).
     mcp_relay_enabled: bool = False
+    # Create Shipment measurement system and weight unit. Defaults keep the
+    # original behaviour (inches + ounces, EasyPost-native) so nothing changes
+    # for existing users; the last choice made on the form is remembered here.
+    # Values are normalised to in/oz before any API call (see app/core/units.py).
+    unit_system: str = "imperial"  # "imperial" (in) | "metric" (cm)
+    weight_unit: str = "oz"  # imperial: oz|lb ; metric: kg|g
 
 
 def load_settings() -> AppSettings:

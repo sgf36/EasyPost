@@ -200,8 +200,8 @@
   "create_shipment.from_label": "അയക്കുന്നത്:",
   "create_shipment.get_rates_button": "നിരക്കുകൾ നേടുക",
   "create_shipment.get_rates_error_body": "നിരക്കുകൾ ലഭിക്കാൻ കഴിഞ്ഞില്ല:\n{error}",
-  "create_shipment.height_label": "ഉയരം (ഇഞ്ച്):",
-  "create_shipment.length_label": "നീളം (ഇഞ്ച്):",
+  "create_shipment.height_label": "ഉയരം ({unit}):",
+  "create_shipment.length_label": "നീളം ({unit}):",
   "create_shipment.missing_addresses_body": "ആദ്യം വിലാസപുസ്തകത്തിൽ കുറഞ്ഞത് രണ്ട് വിലാസങ്ങളെങ്കിലും സ്ഥിരീകരിക്കുക.",
   "create_shipment.missing_addresses_title": "വിലാസങ്ങൾ ലഭ്യമല്ല",
   "create_shipment.missing_name_body": "ഈ ഷിപ്മെന്റ് അന്താരാഷ്ട്ര അതിർത്തി കടക്കുന്നു. കസ്റ്റംസ് പ്രഖ്യാപനത്തിനായി ഉത്ഭവ, ലക്ഷ്യസ്ഥാന വിലാസങ്ങളിൽ രണ്ടിലും ഒരു പേര് അല്ലെങ്കിൽ കമ്പനി കാരിയർമാർ ആവശ്യപ്പെടുന്നു — ആദ്യം വിലാസപുസ്തകത്തിൽ ഓരോന്നിലും ഒന്ന് ചേർക്കുക.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "സംരക്ഷിച്ചു",
   "create_shipment.title": "ഷിപ്മെന്റ് സൃഷ്ടിച്ച് നിരക്കുകൾ താരതമ്യം ചെയ്യുക",
   "create_shipment.to_label": "സ്വീകർത്താവ്:",
-  "create_shipment.weight_label": "ഭാരം (ഔൺസ്):",
-  "create_shipment.width_label": "വീതി (ഇഞ്ച്):",
+  "create_shipment.weight_label": "ഭാരം:",
+  "create_shipment.width_label": "വീതി ({unit}):",
   "create_shipment.zip_mode_note": "വില പരിശോധന മാത്രം. ലേബൽ വാങ്ങാൻ ഇരു വശത്തും പൂർണ്ണ വിലാസം ആവശ്യമാണ്, അതിനാൽ വാങ്ങാൻ «പൂർണ്ണ വിലാസങ്ങൾ» എന്നതിലേക്ക് മാറുക.",
   "create_shipment.zip_placeholder": "പിൻ കോഡ്",
   "dashboard.placeholder_text": "ഷിപ്മെന്റുകൾ, ട്രാക്കിംഗ്, വിലാസപുസ്തകം, റിപ്പോർട്ടിംഗ് കാഴ്ചകൾ പിന്നീടുള്ള നിർമ്മാണ ഘട്ടങ്ങളിൽ ചേർക്കും. API കീകൾ കൈകാര്യം ചെയ്യാൻ ക്രമീകരണങ്ങൾ ഉപയോഗിക്കുക.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "ചെക്ക്‌സം പകർത്തുക",
   "android_app.copied": "പകർത്തി",
   "android_app.reinstall_note": "ഈ ആദ്യകാല-ആക്‌സസ് ബിൽഡ് Google Play റിലീസിൽ നിന്ന് സ്വതന്ത്രമായി ഒപ്പിട്ടിരിക്കുന്നു. ലിസ്റ്റിംഗ് സജീവമായാൽ Google Play-യിൽ നിന്ന് വീണ്ടും ഇൻസ്റ്റാൾ ചെയ്യേണ്ടി വന്നേക്കാം; ജോടിയാക്കൽ നിലനിൽക്കുന്നതിനാൽ ഒന്നും നഷ്ടപ്പെടില്ല.",
-  "android_app.needs_production": "Android ആപ്പ് ഉൽപ്പാദന പതിപ്പുമായി ജോടിയാക്കുന്നു. ഇത് ഡൗൺലോഡ് ചെയ്ത് ജോടിയാക്കാൻ ഒരു ഉൽപ്പാദന ലൈസൻസ് സജീവമാക്കുക."
+  "android_app.needs_production": "Android ആപ്പ് ഉൽപ്പാദന പതിപ്പുമായി ജോടിയാക്കുന്നു. ഇത് ഡൗൺലോഡ് ചെയ്ത് ജോടിയാക്കാൻ ഒരു ഉൽപ്പാദന ലൈസൻസ് സജീവമാക്കുക.",
+  "create_shipment.units_label": "യൂണിറ്റുകൾ:",
+  "create_shipment.units_metric": "മെട്രിക്",
+  "create_shipment.units_imperial": "ഇംപീരിയൽ"
 }

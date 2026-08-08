@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Od:",
   "create_shipment.get_rates_button": "Získat sazby",
   "create_shipment.get_rates_error_body": "Sazby se nepodařilo získat:\n{error}",
-  "create_shipment.height_label": "V (palce):",
-  "create_shipment.length_label": "D (palce):",
+  "create_shipment.height_label": "V ({unit}):",
+  "create_shipment.length_label": "D ({unit}):",
   "create_shipment.missing_addresses_body": "Nejprve ověřte alespoň dvě adresy v adresáři.",
   "create_shipment.missing_addresses_title": "Chybějící adresy",
   "create_shipment.missing_name_body": "Tato zásilka překračuje mezinárodní hranici. Dopravci vyžadují jméno nebo společnost na adrese odesílatele i příjemce pro celní prohlášení — nejprve je doplňte v adresáři.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Uloženo",
   "create_shipment.title": "Vytvořit zásilku a porovnat sazby",
   "create_shipment.to_label": "Komu:",
-  "create_shipment.weight_label": "Hmotnost (oz):",
-  "create_shipment.width_label": "Š (palce):",
+  "create_shipment.weight_label": "Hmotnost:",
+  "create_shipment.width_label": "Š ({unit}):",
   "create_shipment.zip_mode_note": "Pouze orientační cena. Koupě štítku vyžaduje úplné adresy na obou stranách, proto pro nákup přepněte na „Úplné adresy“.",
   "create_shipment.zip_placeholder": "PSČ",
   "dashboard.placeholder_text": "Zobrazení zásilek, sledování, adresáře a přehledů budou přidána v pozdějších fázích vývoje. Pro správu API klíčů použijte Nastavení.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Kopírovat kontrolní součet",
   "android_app.copied": "Zkopírováno",
   "android_app.reinstall_note": "Toto sestavení s předběžným přístupem je podepsáno nezávisle na vydání na Google Play. Po zveřejnění záznamu může být nutné přeinstalovat aplikaci z Google Play; spárování zůstane zachováno, takže o nic nepřijdete.",
-  "android_app.needs_production": "Aplikace Android se páruje s produkční verzí. Aktivujte produkční licenci, abyste ji mohli stáhnout a spárovat."
+  "android_app.needs_production": "Aplikace Android se páruje s produkční verzí. Aktivujte produkční licenci, abyste ji mohli stáhnout a spárovat.",
+  "create_shipment.units_label": "Jednotky:",
+  "create_shipment.units_metric": "Metrické",
+  "create_shipment.units_imperial": "Imperiální"
 }

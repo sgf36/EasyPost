@@ -200,8 +200,8 @@
   "create_shipment.from_label": "מאת:",
   "create_shipment.get_rates_button": "קבל תעריפים",
   "create_shipment.get_rates_error_body": "לא ניתן היה לקבל תעריפים:\n{error}",
-  "create_shipment.height_label": "גובה (אינץ'):",
-  "create_shipment.length_label": "אורך (אינץ'):",
+  "create_shipment.height_label": "ג ({unit}):",
+  "create_shipment.length_label": "א ({unit}):",
   "create_shipment.missing_addresses_body": "יש לאמת תחילה לפחות שתי כתובות בפנקס הכתובות.",
   "create_shipment.missing_addresses_title": "כתובות חסרות",
   "create_shipment.missing_name_body": "משלוח זה חוצה גבול בינלאומי. חברות השילוח דורשות שם או חברה הן בכתובת המוצא והן בכתובת היעד עבור הצהרת המכס — יש להוסיף שם או חברה לכל אחת מהן בפנקס הכתובות תחילה.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "נשמר",
   "create_shipment.title": "יצירת משלוח והשוואת תעריפים",
   "create_shipment.to_label": "אל:",
-  "create_shipment.weight_label": "משקל (אונקיות):",
-  "create_shipment.width_label": "רוחב (אינץ'):",
+  "create_shipment.weight_label": "משקל:",
+  "create_shipment.width_label": "ר ({unit}):",
   "create_shipment.zip_mode_note": "בדיקת מחיר בלבד. רכישת תווית מחייבת כתובות מלאות בשני הקצוות, לכן עבור אל \"כתובות מלאות\" כדי לרכוש.",
   "create_shipment.zip_placeholder": "מיקוד",
   "dashboard.placeholder_text": "תצוגות משלוחים, מעקב, פנקס כתובות ודוחות יתווספו בשלבי פיתוח מאוחרים יותר. יש להשתמש בהגדרות כדי לנהל את מפתחות ה-API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "העתק סכום ביקורת",
   "android_app.copied": "הועתק",
   "android_app.reinstall_note": "גרסת גישה מוקדמת זו חתומה באופן עצמאי מגרסת Google Play. ייתכן שיידרש להתקין מחדש מ-Google Play לאחר שהרישום יעלה לאוויר; הצימוד נשמר, כך שדבר לא יאבד.",
-  "android_app.needs_production": "אפליקציית Android מצטמדת לגרסת ההפקה. הפעל רישיון הפקה כדי להוריד ולצמד אותה."
+  "android_app.needs_production": "אפליקציית Android מצטמדת לגרסת ההפקה. הפעל רישיון הפקה כדי להוריד ולצמד אותה.",
+  "create_shipment.units_label": "יחידות:",
+  "create_shipment.units_metric": "מטרי",
+  "create_shipment.units_imperial": "אימפריאלי"
 }

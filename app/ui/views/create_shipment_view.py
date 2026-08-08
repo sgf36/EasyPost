@@ -30,8 +30,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core import units
 from app.core.countries import COUNTRIES
 from app.core.errors import format_api_error
+from app.core.settings import load_settings, save_settings
 from app.i18n import tr
 from app.services.addresses import list_addresses
 from app.services.packages import (
@@ -230,15 +232,33 @@ class CreateShipmentView(QWidget):
         self._zip_widget = self._build_zip_row()
         self._zip_widget.setVisible(False)
 
+        # Measurement system, remembered across sessions. Everything is
+        # normalised to inches/ounces for EasyPost via app/core/units.py.
+        _saved = load_settings()
+        self._unit_system = _saved.unit_system if _saved.unit_system in units.DIM_UNIT else "imperial"
+        _wu = units.WEIGHT_UNITS[self._unit_system]
+        self._weight_unit = _saved.weight_unit if _saved.weight_unit in _wu else _wu[0]
+
         # Minimum 0, not 1: a document/letter is under 1 inch (or cm) thick, and
         # forcing every dimension to >= 1 made the parcel read as a box — which
         # stopped carriers without a predefined letter package from quoting
         # letter/document services. The carrier still validates the final values.
+        # Ranges, decimals and the unit shown are set per unit by _apply_units().
         self._length_input = self._spin(0, 1000, 6)
         self._width_input = self._spin(0, 1000, 6)
         self._height_input = self._spin(0, 1000, 6)
         self._weight_input = self._spin(0.1, 5000, 16)
         self._reference_input = QLineEdit()
+
+        # Metric/Imperial toggle (dimensions: cm|in) and the weight-unit
+        # selector (kg|g in metric, oz|lb in imperial).
+        self._system_combo = QComboBox()
+        self._system_combo.addItem(tr("create_shipment.units_metric"), "metric")
+        self._system_combo.addItem(tr("create_shipment.units_imperial"), "imperial")
+        self._system_combo.setCurrentIndex(self._system_combo.findData(self._unit_system))
+        self._system_combo.currentIndexChanged.connect(self._on_system_changed)
+        self._weight_unit_combo = QComboBox()
+        self._weight_unit_combo.currentIndexChanged.connect(self._on_weight_unit_changed)
 
         self._package_combo = QComboBox()
         self._package_combo.currentIndexChanged.connect(self._on_package_selected)
@@ -253,21 +273,38 @@ class CreateShipmentView(QWidget):
         package_row.addWidget(self._save_package_btn)
         package_row.addWidget(self._delete_package_btn)
 
+        # Labels carry the active dimension unit (e.g. "L (cm)"); _apply_units
+        # sets their text. The weight unit is shown by the combo beside it.
+        self._length_label = QLabel()
+        self._width_label = QLabel()
+        self._height_label = QLabel()
+        self._weight_label = QLabel(tr("create_shipment.weight_label"))
+
+        units_row = QHBoxLayout()
+        units_row.addWidget(QLabel(tr("create_shipment.units_label")))
+        units_row.addWidget(self._system_combo)
+        units_row.addStretch(1)
+
         dims_row = QHBoxLayout()
-        dims_row.addWidget(QLabel(tr("create_shipment.length_label")))
+        dims_row.addWidget(self._length_label)
         dims_row.addWidget(self._length_input)
-        dims_row.addWidget(QLabel(tr("create_shipment.width_label")))
+        dims_row.addWidget(self._width_label)
         dims_row.addWidget(self._width_input)
-        dims_row.addWidget(QLabel(tr("create_shipment.height_label")))
+        dims_row.addWidget(self._height_label)
         dims_row.addWidget(self._height_input)
-        dims_row.addWidget(QLabel(tr("create_shipment.weight_label")))
+        dims_row.addWidget(self._weight_label)
         dims_row.addWidget(self._weight_input)
+        dims_row.addWidget(self._weight_unit_combo)
 
         form.addRow(mode_row)
         form.addRow(self._full_address_widget)
         form.addRow(self._zip_widget)
         form.addRow(tr("create_shipment.package_label"), package_row)
+        form.addRow(units_row)
         form.addRow(dims_row)
+        # Set unit labels, spin ranges/decimals, the weight-unit combo and the
+        # starting values to match the loaded measurement system.
+        self._apply_units(initial=True)
         self._reference_row_label = QLabel(tr("create_shipment.reference_field"))
         form.addRow(self._reference_row_label, self._reference_input)
 
@@ -348,6 +385,103 @@ class CreateShipmentView(QWidget):
         spin.setValue(default)
         return spin
 
+    # --- Measurement units -------------------------------------------------
+    # EasyPost is always given inches/ounces; the widgets hold whatever the user
+    # picked and these helpers convert. See app/core/units.py.
+
+    def _dim_unit(self) -> str:
+        return units.DIM_UNIT[self._unit_system]
+
+    def _apply_units(self, initial: bool = False) -> None:
+        """Point the labels, spin ranges/decimals and the weight-unit combo at
+        the active system. With initial=True, also seed default values."""
+        dim_unit = self._dim_unit()
+        self._length_label.setText(tr("create_shipment.length_label", unit=dim_unit))
+        self._width_label.setText(tr("create_shipment.width_label", unit=dim_unit))
+        self._height_label.setText(tr("create_shipment.height_label", unit=dim_unit))
+        lo, hi, dec, step = units.DIM_SPIN[dim_unit]
+        for spin in (self._length_input, self._width_input, self._height_input):
+            spin.setDecimals(dec)
+            spin.setRange(lo, hi)
+            spin.setSingleStep(step)
+            if initial:
+                spin.setValue(units.DIM_DEFAULT[dim_unit])
+        self._rebuild_weight_unit_combo()
+        wlo, whi, wdec, wstep = units.WEIGHT_SPIN[self._weight_unit]
+        self._weight_input.setDecimals(wdec)
+        self._weight_input.setRange(wlo, whi)
+        self._weight_input.setSingleStep(wstep)
+        if initial:
+            self._weight_input.setValue(units.WEIGHT_DEFAULT[self._weight_unit])
+
+    def _rebuild_weight_unit_combo(self) -> None:
+        combo = self._weight_unit_combo
+        combo.blockSignals(True)
+        combo.clear()
+        for unit_code in units.WEIGHT_UNITS[self._unit_system]:
+            combo.addItem(unit_code, unit_code)
+        idx = combo.findData(self._weight_unit)
+        if idx < 0:
+            idx = 0
+            self._weight_unit = combo.itemData(0)
+        combo.setCurrentIndex(idx)
+        combo.blockSignals(False)
+
+    def _on_system_changed(self, *_args) -> None:
+        new_system = self._system_combo.currentData()
+        if not new_system or new_system == self._unit_system:
+            return
+        old_dim = units.DIM_UNIT[self._unit_system]
+        old_weight_unit = self._weight_unit
+        # Preserve the physical parcel across the switch: read canonical in/oz,
+        # then re-display in the new units.
+        dim_canon = [
+            units.to_inches(s.value(), old_dim)
+            for s in (self._length_input, self._width_input, self._height_input)
+        ]
+        weight_canon = units.to_ounces(self._weight_input.value(), old_weight_unit)
+        self._unit_system = new_system
+        self._weight_unit = units.WEIGHT_UNITS[new_system][0]
+        self._apply_units(initial=False)
+        new_dim = self._dim_unit()
+        for spin, canon in zip(
+            (self._length_input, self._width_input, self._height_input), dim_canon
+        ):
+            spin.setValue(units.from_inches(canon, new_dim))
+        self._weight_input.setValue(units.from_ounces(weight_canon, self._weight_unit))
+        self._persist_units()
+
+    def _on_weight_unit_changed(self, *_args) -> None:
+        new_unit = self._weight_unit_combo.currentData()
+        if not new_unit or new_unit == self._weight_unit:
+            return
+        canon = units.to_ounces(self._weight_input.value(), self._weight_unit)
+        self._weight_unit = new_unit
+        wlo, whi, wdec, wstep = units.WEIGHT_SPIN[new_unit]
+        self._weight_input.setDecimals(wdec)
+        self._weight_input.setRange(wlo, whi)
+        self._weight_input.setSingleStep(wstep)
+        self._weight_input.setValue(units.from_ounces(canon, new_unit))
+        self._persist_units()
+
+    def _persist_units(self) -> None:
+        settings = load_settings()
+        settings.unit_system = self._unit_system
+        settings.weight_unit = self._weight_unit
+        save_settings(settings)
+
+    def _length_in(self) -> float:
+        return round(units.to_inches(self._length_input.value(), self._dim_unit()), 3)
+
+    def _width_in(self) -> float:
+        return round(units.to_inches(self._width_input.value(), self._dim_unit()), 3)
+
+    def _height_in(self) -> float:
+        return round(units.to_inches(self._height_input.value(), self._dim_unit()), 3)
+
+    def _weight_oz(self) -> float:
+        return round(units.to_ounces(self._weight_input.value(), self._weight_unit), 3)
+
     def _refresh_saved_packages(self) -> None:
         self._saved_packages = list_saved_packages()
         self._populate_package_combo()
@@ -425,12 +559,14 @@ class CreateShipmentView(QWidget):
 
         if is_saved:
             pkg = data[1]
-            # `is not None`, not `or`: 0 is a legitimate (thin/letter) dimension
-            # now that the minimum is 0, and `pkg.length or 1` would clobber it.
-            self._length_input.setValue(pkg.length if pkg.length is not None else 1)
-            self._width_input.setValue(pkg.width if pkg.width is not None else 1)
-            self._height_input.setValue(pkg.height if pkg.height is not None else 1)
-            self._weight_input.setValue(pkg.weight)
+            dim_unit = self._dim_unit()
+            # Saved packages are stored canonically (inches/ounces); display them
+            # in the active units. `is not None`, not `or`: 0 is a legitimate
+            # (thin/letter) dimension now that the minimum is 0.
+            self._length_input.setValue(units.from_inches(pkg.length if pkg.length is not None else 1, dim_unit))
+            self._width_input.setValue(units.from_inches(pkg.width if pkg.width is not None else 1, dim_unit))
+            self._height_input.setValue(units.from_inches(pkg.height if pkg.height is not None else 1, dim_unit))
+            self._weight_input.setValue(units.from_ounces(pkg.weight, self._weight_unit))
 
     def _on_save_package_clicked(self) -> None:
         name, ok = QInputDialog.getText(self, tr("create_shipment.save_package_dialog_title"), tr("create_shipment.save_package_dialog_label"))
@@ -439,10 +575,10 @@ class CreateShipmentView(QWidget):
             return
         save_package(
             name,
-            self._length_input.value(),
-            self._width_input.value(),
-            self._height_input.value(),
-            self._weight_input.value(),
+            self._length_in(),
+            self._width_in(),
+            self._height_in(),
+            self._weight_oz(),
         )
         self._refresh_saved_packages()
         # Select the package just saved rather than leaving the combo on
@@ -958,16 +1094,16 @@ class CreateShipmentView(QWidget):
         params = dict(
             to_address_id=to_id,
             from_address_id=from_id,
-            weight=self._weight_input.value(),
+            weight=self._weight_oz(),
             reference=self._reference_input.text().strip(),
             customs_info=customs_info,
         )
         if isinstance(package_data, tuple) and package_data[0] == "predefined":
             params["predefined_package"] = package_data[1].name
         else:
-            params["length"] = self._length_input.value()
-            params["width"] = self._width_input.value()
-            params["height"] = self._height_input.value()
+            params["length"] = self._length_in()
+            params["width"] = self._width_in()
+            params["height"] = self._height_in()
         self._quote_only = False
         self._pending_task = run_async(lambda: create_shipment(**params), self)
         self._pending_task.succeeded.connect(self._on_rates_received)
@@ -992,15 +1128,15 @@ class CreateShipmentView(QWidget):
             to_postal_code=to_zip,
             from_country=self._from_country_combo.currentData(),
             to_country=self._to_country_combo.currentData(),
-            weight=self._weight_input.value(),
+            weight=self._weight_oz(),
         )
         package_data = self._package_combo.currentData()
         if isinstance(package_data, tuple) and package_data[0] == "predefined":
             params["predefined_package"] = package_data[1].name
         else:
-            params["length"] = self._length_input.value()
-            params["width"] = self._width_input.value()
-            params["height"] = self._height_input.value()
+            params["length"] = self._length_in()
+            params["width"] = self._width_in()
+            params["height"] = self._height_in()
 
         self._quote_only = True
         self._pending_task = run_async(lambda: create_rate_quote(**params), self)

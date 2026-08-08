@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Від:",
   "create_shipment.get_rates_button": "Отримати тарифи",
   "create_shipment.get_rates_error_body": "Не вдалося отримати тарифи:\n{error}",
-  "create_shipment.height_label": "В (дюйми):",
-  "create_shipment.length_label": "Д (дюйми):",
+  "create_shipment.height_label": "В ({unit}):",
+  "create_shipment.length_label": "Д ({unit}):",
   "create_shipment.missing_addresses_body": "Спочатку перевірте принаймні дві адреси в Книзі адрес.",
   "create_shipment.missing_addresses_title": "Відсутні адреси",
   "create_shipment.missing_name_body": "Це відправлення перетинає міжнародний кордон. Для митної декларації перевізники вимагають ім'я або назву компанії як для адреси відправника, так і для адреси одержувача — спочатку додайте його для кожної з них у Книзі адрес.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Збережено",
   "create_shipment.title": "Створення відправлення та порівняння тарифів",
   "create_shipment.to_label": "Кому:",
-  "create_shipment.weight_label": "Вага (унції):",
-  "create_shipment.width_label": "Ш (дюйми):",
+  "create_shipment.weight_label": "Вага:",
+  "create_shipment.width_label": "Ш ({unit}):",
   "create_shipment.zip_mode_note": "Лише перевірка ціни. Для купівлі етикетки потрібні повні адреси з обох боків, тож перемкніться на «Повні адреси».",
   "create_shipment.zip_placeholder": "Поштовий індекс",
   "dashboard.placeholder_text": "Розділи відправлень, відстеження, книги адрес і звітів будуть додані на пізніших етапах розробки. Використовуйте Налаштування для керування ключами API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Копіювати контрольну суму",
   "android_app.copied": "Скопійовано",
   "android_app.reinstall_note": "Ця версія раннього доступу підписана окремо від випуску в Google Play. Після появи сторінки може знадобитися перевстановлення з Google Play; прив'язка зберігається, тож нічого не втрачається.",
-  "android_app.needs_production": "Додаток Android прив'язується до виробничої версії. Активуйте виробничу ліцензію, щоб завантажити та прив'язати його."
+  "android_app.needs_production": "Додаток Android прив'язується до виробничої версії. Активуйте виробничу ліцензію, щоб завантажити та прив'язати його.",
+  "create_shipment.units_label": "Одиниці:",
+  "create_shipment.units_metric": "Метрична",
+  "create_shipment.units_imperial": "Імперська"
 }

@@ -214,8 +214,8 @@
   "create_shipment.from_label": "From:",
   "create_shipment.get_rates_button": "Get Rates",
   "create_shipment.get_rates_error_body": "Could not get rates:\n{error}",
-  "create_shipment.height_label": "H (in):",
-  "create_shipment.length_label": "L (in):",
+  "create_shipment.height_label": "H ({unit}):",
+  "create_shipment.length_label": "L ({unit}):",
   "create_shipment.missing_addresses_body": "Verify at least two addresses in the Address Book first.",
   "create_shipment.missing_addresses_title": "Missing addresses",
   "create_shipment.missing_name_body": "This shipment crosses an international border. Carriers require a name or company on both the origin and destination address for the customs declaration — add one to each in the Address Book first.",
@@ -265,8 +265,8 @@
   "create_shipment.saved_title": "Saved",
   "create_shipment.title": "Create Shipment & Shop Rates",
   "create_shipment.to_label": "To:",
-  "create_shipment.weight_label": "Weight (oz):",
-  "create_shipment.width_label": "W (in):",
+  "create_shipment.weight_label": "Weight:",
+  "create_shipment.width_label": "W ({unit}):",
   "create_shipment.zip_mode_note": "Price check only. Buying a label needs full addresses at both ends, so switch to \"Full addresses\" to purchase.",
   "create_shipment.zip_placeholder": "Postal code",
   "dashboard.placeholder_text": "Shipments, tracking, address book, and reporting views are added in later build stages. Use Settings to manage API keys.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Copy checksum",
   "android_app.copied": "Copied",
   "android_app.reinstall_note": "This early-access build is signed independently of the Google Play release. Reinstalling from Google Play may be required once the listing is live; pairing carries across, so nothing is lost.",
-  "android_app.needs_production": "The Android app pairs with the production version. Activate a production licence to download and pair it."
+  "android_app.needs_production": "The Android app pairs with the production version. Activate a production licence to download and pair it.",
+  "create_shipment.units_label": "Units:",
+  "create_shipment.units_metric": "Metric",
+  "create_shipment.units_imperial": "Imperial"
 }

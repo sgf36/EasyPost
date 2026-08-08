@@ -200,8 +200,8 @@
   "create_shipment.from_label": "నుండి:",
   "create_shipment.get_rates_button": "రేట్లు పొందండి",
   "create_shipment.get_rates_error_body": "రేట్లను పొందలేకపోయాము:\n{error}",
-  "create_shipment.height_label": "ఎత్తు (అం):",
-  "create_shipment.length_label": "పొడవు (అం):",
+  "create_shipment.height_label": "ఎ ({unit}):",
+  "create_shipment.length_label": "పొ ({unit}):",
   "create_shipment.missing_addresses_body": "ముందుగా చిరునామాల పుస్తకంలో కనీసం రెండు చిరునామాలను ధృవీకరించండి.",
   "create_shipment.missing_addresses_title": "చిరునామాలు లేవు",
   "create_shipment.missing_name_body": "ఈ షిప్‌మెంట్ అంతర్జాతీయ సరిహద్దును దాటుతుంది. కస్టమ్స్ డిక్లరేషన్ కోసం మూలం మరియు గమ్యం చిరునామా రెండింటిలోనూ క్యారియర్‌లకు పేరు లేదా సంస్థ అవసరం — ముందుగా చిరునామాల పుస్తకంలో ప్రతి దానికి ఒకటి జోడించండి.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "సేవ్ చేయబడింది",
   "create_shipment.title": "షిప్‌మెంట్ సృష్టించి రేట్లు పోల్చండి",
   "create_shipment.to_label": "గమ్యం:",
-  "create_shipment.weight_label": "బరువు (ఔన్స్):",
-  "create_shipment.width_label": "వెడల్పు (అం):",
+  "create_shipment.weight_label": "బరువు:",
+  "create_shipment.width_label": "వె ({unit}):",
   "create_shipment.zip_mode_note": "ధర తనిఖీ మాత్రమే. లేబుల్ కొనుగోలుకు రెండు వైపులా పూర్తి చిరునామాలు అవసరం, కాబట్టి కొనడానికి «పూర్తి చిరునామాలు»కి మారండి.",
   "create_shipment.zip_placeholder": "పోస్టల్ కోడ్",
   "dashboard.placeholder_text": "షిప్‌మెంట్‌లు, ట్రాకింగ్, చిరునామాల పుస్తకం మరియు నివేదిక వీక్షణలు తర్వాతి బిల్డ్ దశల్లో జోడించబడతాయి. API కీలను నిర్వహించడానికి సెట్టింగ్‌లను ఉపయోగించండి.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "చెక్‌సమ్‌ను కాపీ చేయండి",
   "android_app.copied": "కాపీ చేయబడింది",
   "android_app.reinstall_note": "ఈ ముందస్తు యాక్సెస్ బిల్డ్ Google Play విడుదల నుండి స్వతంత్రంగా సంతకం చేయబడింది. జాబితా ప్రత్యక్షమైన తర్వాత Google Play నుండి మళ్లీ ఇన్‌స్టాల్ చేయాల్సి రావచ్చు; జత కొనసాగుతుంది, కాబట్టి ఏదీ కోల్పోదు.",
-  "android_app.needs_production": "Android యాప్ ఉత్పత్తి వెర్షన్‌తో జత అవుతుంది. దాన్ని డౌన్‌లోడ్ చేసి జత చేయడానికి ఉత్పత్తి లైసెన్స్‌ను యాక్టివేట్ చేయండి."
+  "android_app.needs_production": "Android యాప్ ఉత్పత్తి వెర్షన్‌తో జత అవుతుంది. దాన్ని డౌన్‌లోడ్ చేసి జత చేయడానికి ఉత్పత్తి లైసెన్స్‌ను యాక్టివేట్ చేయండి.",
+  "create_shipment.units_label": "యూనిట్లు:",
+  "create_shipment.units_metric": "మెట్రిక్",
+  "create_shipment.units_imperial": "ఇంపీరియల్"
 }

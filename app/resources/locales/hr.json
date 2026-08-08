@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Od:",
   "create_shipment.get_rates_button": "Dohvati cijene",
   "create_shipment.get_rates_error_body": "Cijene nije moguće dohvatiti:\n{error}",
-  "create_shipment.height_label": "V (in):",
-  "create_shipment.length_label": "D (in):",
+  "create_shipment.height_label": "V ({unit}):",
+  "create_shipment.length_label": "D ({unit}):",
   "create_shipment.missing_addresses_body": "Prvo provjerite najmanje dvije adrese u Adresaru.",
   "create_shipment.missing_addresses_title": "Adrese nedostaju",
   "create_shipment.missing_name_body": "Ova pošiljka prelazi međunarodnu granicu. Za carinsku deklaraciju dostavljači zahtijevaju ime ili tvrtku i na adresi polazišta i na adresi odredišta — prvo dodajte ime ili tvrtku za svaku adresu u Adresaru.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Spremljeno",
   "create_shipment.title": "Izradi pošiljku i usporedi cijene",
   "create_shipment.to_label": "Za:",
-  "create_shipment.weight_label": "Težina (oz):",
-  "create_shipment.width_label": "Š (in):",
+  "create_shipment.weight_label": "Težina:",
+  "create_shipment.width_label": "Š ({unit}):",
   "create_shipment.zip_mode_note": "Samo provjera cijene. Kupnja naljepnice zahtijeva potpune adrese na obje strane, pa za kupnju prijeđite na „Potpune adrese”.",
   "create_shipment.zip_placeholder": "Poštanski broj",
   "dashboard.placeholder_text": "Prikazi za pošiljke, praćenje, adresar i izvještaje dodaju se u kasnijim fazama razvoja. Koristite Postavke za upravljanje API ključevima.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Kopiraj kontrolni zbroj",
   "android_app.copied": "Kopirano",
   "android_app.reinstall_note": "Ova verzija ranog pristupa potpisana je neovisno o Google Play izdanju. Nakon što unos postane aktivan, možda će biti potrebna ponovna instalacija s Google Playa; uparivanje se prenosi, pa se ništa ne gubi.",
-  "android_app.needs_production": "Android aplikacija uparuje se s produkcijskom verzijom. Aktivirajte produkcijsku licencu da biste je preuzeli i uparili."
+  "android_app.needs_production": "Android aplikacija uparuje se s produkcijskom verzijom. Aktivirajte produkcijsku licencu da biste je preuzeli i uparili.",
+  "create_shipment.units_label": "Jedinice:",
+  "create_shipment.units_metric": "Metričke",
+  "create_shipment.units_imperial": "Imperijalne"
 }

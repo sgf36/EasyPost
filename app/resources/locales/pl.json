@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Od:",
   "create_shipment.get_rates_button": "Pobierz stawki",
   "create_shipment.get_rates_error_body": "Nie można pobrać stawek:\n{error}",
-  "create_shipment.height_label": "Wys. (cale):",
-  "create_shipment.length_label": "Dł. (cale):",
+  "create_shipment.height_label": "W ({unit}):",
+  "create_shipment.length_label": "D ({unit}):",
   "create_shipment.missing_addresses_body": "Najpierw zweryfikuj co najmniej dwa adresy w Książce adresowej.",
   "create_shipment.missing_addresses_title": "Brak adresów",
   "create_shipment.missing_name_body": "Ta przesyłka przekracza granicę międzynarodową. Do zgłoszenia celnego przewoźnicy wymagają podania imienia i nazwiska lub nazwy firmy zarówno w adresie nadawcy, jak i odbiorcy — dodaj je do obu w Książce adresowej.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Zapisano",
   "create_shipment.title": "Utwórz przesyłkę i porównaj stawki",
   "create_shipment.to_label": "Do:",
-  "create_shipment.weight_label": "Waga (uncje):",
-  "create_shipment.width_label": "Szer. (cale):",
+  "create_shipment.weight_label": "Waga:",
+  "create_shipment.width_label": "S ({unit}):",
   "create_shipment.zip_mode_note": "Tylko sprawdzenie ceny. Zakup etykiety wymaga pełnych adresów po obu stronach, dlatego przełącz na „Pełne adresy”, aby kupić.",
   "create_shipment.zip_placeholder": "Kod pocztowy",
   "dashboard.placeholder_text": "Widoki przesyłek, śledzenia, książki adresowej i raportów zostaną dodane w kolejnych etapach budowy. Użyj Ustawień, aby zarządzać kluczami API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Kopiuj sumę kontrolną",
   "android_app.copied": "Skopiowano",
   "android_app.reinstall_note": "Ta wersja we wczesnym dostępie jest podpisana niezależnie od wydania w Google Play. Po udostępnieniu wpisu może być konieczna ponowna instalacja z Google Play; parowanie zostaje zachowane, więc nic nie zostanie utracone.",
-  "android_app.needs_production": "Aplikacja Android paruje się z wersją produkcyjną. Aktywuj licencję produkcyjną, aby ją pobrać i sparować."
+  "android_app.needs_production": "Aplikacja Android paruje się z wersją produkcyjną. Aktywuj licencję produkcyjną, aby ją pobrać i sparować.",
+  "create_shipment.units_label": "Jednostki:",
+  "create_shipment.units_metric": "Metryczne",
+  "create_shipment.units_imperial": "Imperialne"
 }

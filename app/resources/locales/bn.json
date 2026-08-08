@@ -200,8 +200,8 @@
   "create_shipment.from_label": "প্রেরক:",
   "create_shipment.get_rates_button": "রেট পান",
   "create_shipment.get_rates_error_body": "রেট পাওয়া যায়নি:\n{error}",
-  "create_shipment.height_label": "উচ্চতা (ইঞ্চি):",
-  "create_shipment.length_label": "দৈর্ঘ্য (ইঞ্চি):",
+  "create_shipment.height_label": "উচ্চতা ({unit}):",
+  "create_shipment.length_label": "দৈর্ঘ্য ({unit}):",
   "create_shipment.missing_addresses_body": "প্রথমে ঠিকানা বইয়ে অন্তত দুটি ঠিকানা যাচাই করুন।",
   "create_shipment.missing_addresses_title": "ঠিকানা অনুপস্থিত",
   "create_shipment.missing_name_body": "এই শিপমেন্ট একটি আন্তর্জাতিক সীমান্ত অতিক্রম করে। কাস্টমস ঘোষণার জন্য ক্যারিয়াররা প্রেরক ও প্রাপক উভয় ঠিকানায় একটি নাম বা কোম্পানি দাবি করে — প্রথমে ঠিকানা বইয়ে প্রতিটিতে একটি করে যোগ করুন।",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "সংরক্ষিত",
   "create_shipment.title": "শিপমেন্ট তৈরি করুন এবং রেট দেখুন",
   "create_shipment.to_label": "প্রাপক:",
-  "create_shipment.weight_label": "ওজন (আউন্স):",
-  "create_shipment.width_label": "প্রস্থ (ইঞ্চি):",
+  "create_shipment.weight_label": "ওজন:",
+  "create_shipment.width_label": "প্রস্থ ({unit}):",
   "create_shipment.zip_mode_note": "শুধু দাম যাচাই। লেবেল কিনতে উভয় প্রান্তে সম্পূর্ণ ঠিকানা প্রয়োজন, তাই কিনতে «সম্পূর্ণ ঠিকানা»-এ যান।",
   "create_shipment.zip_placeholder": "পোস্টাল কোড",
   "dashboard.placeholder_text": "শিপমেন্ট, ট্র্যাকিং, ঠিকানা বই এবং রিপোর্টিং ভিউ পরবর্তী নির্মাণ পর্যায়ে যোগ করা হবে। API কী পরিচালনা করতে সেটিংস ব্যবহার করুন।",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "চেকসাম কপি করুন",
   "android_app.copied": "কপি করা হয়েছে",
   "android_app.reinstall_note": "এই আর্লি-অ্যাক্সেস বিল্ডটি Google Play রিলিজ থেকে স্বতন্ত্রভাবে স্বাক্ষরিত। তালিকা সক্রিয় হয়ে গেলে Google Play থেকে পুনরায় ইনস্টল করার প্রয়োজন হতে পারে; পেয়ারিং বজায় থাকে, তাই কিছুই হারায় না।",
-  "android_app.needs_production": "Android অ্যাপ প্রোডাকশন সংস্করণের সাথে পেয়ার হয়। এটি ডাউনলোড ও পেয়ার করতে একটি প্রোডাকশন লাইসেন্স সক্রিয় করুন।"
+  "android_app.needs_production": "Android অ্যাপ প্রোডাকশন সংস্করণের সাথে পেয়ার হয়। এটি ডাউনলোড ও পেয়ার করতে একটি প্রোডাকশন লাইসেন্স সক্রিয় করুন।",
+  "create_shipment.units_label": "একক:",
+  "create_shipment.units_metric": "মেট্রিক",
+  "create_shipment.units_imperial": "ইম্পেরিয়াল"
 }

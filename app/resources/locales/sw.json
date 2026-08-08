@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Kutoka:",
   "create_shipment.get_rates_button": "Pata Viwango vya Bei",
   "create_shipment.get_rates_error_body": "Imeshindwa kupata viwango vya bei:\n{error}",
-  "create_shipment.height_label": "Urefu wa juu (in):",
-  "create_shipment.length_label": "Urefu (in):",
+  "create_shipment.height_label": "K ({unit}):",
+  "create_shipment.length_label": "U ({unit}):",
   "create_shipment.missing_addresses_body": "Kwanza thibitisha angalau anwani mbili kwenye Kitabu cha Anwani.",
   "create_shipment.missing_addresses_title": "Anwani hazipo",
   "create_shipment.missing_name_body": "Kifurushi hiki kinavuka mpaka wa kimataifa. Kwa tamko la forodha, makampuni ya usafirishaji yanahitaji jina au kampuni kwenye anwani ya mwanzo na ile ya mwisho — kwanza ongeza moja kwa kila moja kwenye Kitabu cha Anwani.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Imehifadhiwa",
   "create_shipment.title": "Unda Kifurushi na Linganisha Viwango vya Bei",
   "create_shipment.to_label": "Kwa:",
-  "create_shipment.weight_label": "Uzito (oz):",
-  "create_shipment.width_label": "Upana (in):",
+  "create_shipment.weight_label": "Uzito:",
+  "create_shipment.width_label": "P ({unit}):",
   "create_shipment.zip_mode_note": "Kuangalia bei pekee. Kununua lebo kunahitaji anwani kamili pande zote mbili, kwa hivyo badilisha hadi “Anwani kamili” ili kununua.",
   "create_shipment.zip_placeholder": "Msimbo wa posta",
   "dashboard.placeholder_text": "Vifurushi, ufuatiliaji, kitabu cha anwani, na taarifa za ripoti vitaongezwa katika hatua za baadaye za ujenzi. Tumia Mipangilio kusimamia funguo za API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Nakili hundisumu",
   "android_app.copied": "Imenakiliwa",
   "android_app.reinstall_note": "Toleo hili la awali limetiwa saini kwa kujitegemea na toleo la Google Play. Huenda ukahitaji kusakinisha upya kutoka Google Play mara orodha itakapokuwa hai; uoanishaji hubaki, kwa hivyo hakuna kinachopotea.",
-  "android_app.needs_production": "Programu ya Android huoanishwa na toleo la uzalishaji. Amilisha leseni ya uzalishaji ili kuipakua na kuioanisha."
+  "android_app.needs_production": "Programu ya Android huoanishwa na toleo la uzalishaji. Amilisha leseni ya uzalishaji ili kuipakua na kuioanisha.",
+  "create_shipment.units_label": "Vizio:",
+  "create_shipment.units_metric": "Metriki",
+  "create_shipment.units_imperial": "Imperial"
 }

@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Kimdan:",
   "create_shipment.get_rates_button": "Tariflarni olish",
   "create_shipment.get_rates_error_body": "Tariflarni olib bo'lmadi:\n{error}",
-  "create_shipment.height_label": "Balandligi (dyuym):",
-  "create_shipment.length_label": "Uzunligi (dyuym):",
+  "create_shipment.height_label": "B ({unit}):",
+  "create_shipment.length_label": "U ({unit}):",
   "create_shipment.missing_addresses_body": "Avval Manzillar kitobida kamida ikkita manzilni tekshiring.",
   "create_shipment.missing_addresses_title": "Manzillar yo'q",
   "create_shipment.missing_name_body": "Ushbu jo'natma xalqaro chegaradan o'tadi. Tashuvchilar bojxona deklaratsiyasi uchun manba va manzil manzillarining ikkalasida ham ism yoki kompaniya nomini talab qiladi — avval Manzillar kitobida har biriga qo'shing.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Saqlandi",
   "create_shipment.title": "Jo'natma yaratish va tariflarni solishtirish",
   "create_shipment.to_label": "Kimga:",
-  "create_shipment.weight_label": "Og'irligi (untsiya):",
-  "create_shipment.width_label": "Eni (dyuym):",
+  "create_shipment.weight_label": "Og'irlik:",
+  "create_shipment.width_label": "K ({unit}):",
   "create_shipment.zip_mode_note": "Faqat narx tekshiruvi. Yorliq sotib olish uchun har ikki tomonda to‘liq manzil kerak, shuning uchun sotib olish uchun «To‘liq manzillar»ga o‘ting.",
   "create_shipment.zip_placeholder": "Pochta indeksi",
   "dashboard.placeholder_text": "Jo'natmalar, kuzatuv, manzillar kitobi va hisobot ko'rinishlari keyingi qurilish bosqichlarida qo'shiladi. API kalitlarini boshqarish uchun Sozlamalardan foydalaning.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Nazorat summasini nusxalash",
   "android_app.copied": "Nusxalandi",
   "android_app.reinstall_note": "Ushbu erta kirish versiyasi Google Play relizidan alohida imzolangan. Ro'yxat faollashgach, Google Play'dan qayta o'rnatish talab qilinishi mumkin; ulanish saqlanib qoladi, shuning uchun hech narsa yo'qolmaydi.",
-  "android_app.needs_production": "Android ilovasi ishlab chiqarish versiyasi bilan ulanadi. Uni yuklab olish va ulash uchun ishlab chiqarish litsenziyasini faollashtiring."
+  "android_app.needs_production": "Android ilovasi ishlab chiqarish versiyasi bilan ulanadi. Uni yuklab olish va ulash uchun ishlab chiqarish litsenziyasini faollashtiring.",
+  "create_shipment.units_label": "Birliklar:",
+  "create_shipment.units_metric": "Metrik",
+  "create_shipment.units_imperial": "Imperial"
 }

@@ -200,8 +200,8 @@
   "create_shipment.from_label": "از:",
   "create_shipment.get_rates_button": "دریافت نرخ‌ها",
   "create_shipment.get_rates_error_body": "دریافت نرخ‌ها ممکن نشد:\n{error}",
-  "create_shipment.height_label": "ارتفاع (اینچ):",
-  "create_shipment.length_label": "طول (اینچ):",
+  "create_shipment.height_label": "ارتفاع ({unit}):",
+  "create_shipment.length_label": "طول ({unit}):",
   "create_shipment.missing_addresses_body": "ابتدا حداقل دو آدرس را در دفترچه آدرس تأیید کنید.",
   "create_shipment.missing_addresses_title": "آدرس‌ها مشخص نشده",
   "create_shipment.missing_name_body": "این مرسوله از یک مرز بین‌المللی عبور می‌کند. شرکت‌های حمل‌ونقل برای اظهارنامه گمرکی به نام یا نام شرکت هم در آدرس مبدأ و هم در آدرس مقصد نیاز دارند — ابتدا یکی به هر کدام در دفترچه آدرس اضافه کنید.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "ذخیره شد",
   "create_shipment.title": "ایجاد مرسوله و مقایسه نرخ‌ها",
   "create_shipment.to_label": "به:",
-  "create_shipment.weight_label": "وزن (اونس):",
-  "create_shipment.width_label": "عرض (اینچ):",
+  "create_shipment.weight_label": "وزن:",
+  "create_shipment.width_label": "عرض ({unit}):",
   "create_shipment.zip_mode_note": "فقط بررسی قیمت. خرید برچسب به نشانی کامل در هر دو سو نیاز دارد، بنابراین برای خرید به «نشانی‌های کامل» بروید.",
   "create_shipment.zip_placeholder": "کد پستی",
   "dashboard.placeholder_text": "بخش‌های مرسولات، رهگیری، دفترچه آدرس و گزارش‌ها در مراحل بعدی توسعه اضافه می‌شوند. برای مدیریت کلیدهای API از بخش تنظیمات استفاده کنید.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "کپی جمع کنترلی",
   "android_app.copied": "کپی شد",
   "android_app.reinstall_note": "این نسخه دسترسی زودهنگام مستقل از نسخه Google Play امضا شده است. پس از آنکه فهرست فعال شد، ممکن است نصب مجدد از Google Play لازم باشد؛ جفت‌سازی حفظ می‌شود، بنابراین چیزی از دست نمی‌رود.",
-  "android_app.needs_production": "برنامه Android با نسخه تولید جفت می‌شود. برای دانلود و جفت‌سازی آن، یک مجوز تولید را فعال کنید."
+  "android_app.needs_production": "برنامه Android با نسخه تولید جفت می‌شود. برای دانلود و جفت‌سازی آن، یک مجوز تولید را فعال کنید.",
+  "create_shipment.units_label": "واحدها:",
+  "create_shipment.units_metric": "متریک",
+  "create_shipment.units_imperial": "امپریال"
 }

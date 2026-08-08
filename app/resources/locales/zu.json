@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Kusuka:",
   "create_shipment.get_rates_button": "Thola amanani",
   "create_shipment.get_rates_error_body": "Ayikwazanga ukuthola amanani:\n{error}",
-  "create_shipment.height_label": "Ukuphakama (in):",
-  "create_shipment.length_label": "Ubude (in):",
+  "create_shipment.height_label": "P ({unit}):",
+  "create_shipment.length_label": "U ({unit}):",
   "create_shipment.missing_addresses_body": "Qinisekisa okungenani amakheli amabili ebhukwini lamakheli kuqala.",
   "create_shipment.missing_addresses_title": "Amakheli alahlekile",
   "create_shipment.missing_name_body": "Le mpahla ethunyelwe idlula umngcele wamazwe ngamazwe. Izinkampani ezithuthayo zidinga igama noma inkampani kokubili ekhelini lomsuka nasekhelini elizoyiswa kulo ukuze kwenziwe isimemezelo se-Customs — engeza eyodwa kwelinye nelinye ebhukwini lamakheli kuqala.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Kugciniwe",
   "create_shipment.title": "Dala impahla ethunyelwe & amanani okuthenga",
   "create_shipment.to_label": "Kuya:",
-  "create_shipment.weight_label": "Isisindo (oz):",
-  "create_shipment.width_label": "Ububanzi (in):",
+  "create_shipment.weight_label": "Isisindo:",
+  "create_shipment.width_label": "B ({unit}):",
   "create_shipment.zip_mode_note": "Ukuhlola intengo kuphela. Ukuthenga ilebula kudinga amakheli aphelele emaceleni omabili, ngakho shintshela ku-“Amakheli aphelele” ukuze uthenge.",
   "create_shipment.zip_placeholder": "Ikhodi yeposi",
   "dashboard.placeholder_text": "Izimpahla ezithunyelwe, ukulandelela, ibhuku lamakheli, nemibono yemibiko kuyongezwa ezigabeni zokwakhiwa ezizayo. Sebenzisa Izilungiselelo ukuphatha amakhiya e-API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Kopisha i-checksum",
   "android_app.copied": "Kukopishiwe",
   "android_app.reinstall_note": "Le nguqulo yokufinyelela kwakuqala isayinwe ngokuzimela kokukhishwa kwe-Google Play. Kungadingeka ukufaka kabusha kusuka ku-Google Play uma uhlu selusebenza; ukubhangqa kuyaqhubeka, ngakho akukho lutho olulahlekayo.",
-  "android_app.needs_production": "Uhlelo lokusebenza lwe-Android lubhangqa nenguqulo yokusebenza ngempela. Yenza ilayisensi yokukhiqiza isebenze ukuze uyilande futhi uyibhangqe."
+  "android_app.needs_production": "Uhlelo lokusebenza lwe-Android lubhangqa nenguqulo yokusebenza ngempela. Yenza ilayisensi yokukhiqiza isebenze ukuze uyilande futhi uyibhangqe.",
+  "create_shipment.units_label": "Amayunithi:",
+  "create_shipment.units_metric": "Imethrikhi",
+  "create_shipment.units_imperial": "Impheriyali"
 }

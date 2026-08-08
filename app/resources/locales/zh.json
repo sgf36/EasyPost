@@ -200,8 +200,8 @@
   "create_shipment.from_label": "寄件人：",
   "create_shipment.get_rates_button": "获取运费",
   "create_shipment.get_rates_error_body": "无法获取运费：\n{error}",
-  "create_shipment.height_label": "高（英寸）：",
-  "create_shipment.length_label": "长（英寸）：",
+  "create_shipment.height_label": "高 ({unit}):",
+  "create_shipment.length_label": "长 ({unit}):",
   "create_shipment.missing_addresses_body": "请先在地址簿中验证至少两个地址。",
   "create_shipment.missing_addresses_title": "缺少地址",
   "create_shipment.missing_name_body": "此运单跨越国际边境。承运商要求寄件地址和收件地址均填写姓名或公司名称以用于海关申报——请先在地址簿中为两者分别添加。",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "已保存",
   "create_shipment.title": "创建运单并比较运费",
   "create_shipment.to_label": "收件人：",
-  "create_shipment.weight_label": "重量（盎司）：",
-  "create_shipment.width_label": "宽（英寸）：",
+  "create_shipment.weight_label": "重量:",
+  "create_shipment.width_label": "宽 ({unit}):",
   "create_shipment.zip_mode_note": "仅供价格查询。购买标签需要两端的完整地址，请切换到“完整地址”后购买。",
   "create_shipment.zip_placeholder": "邮政编码",
   "dashboard.placeholder_text": "运单、追踪、地址簿和报表视图将在后续构建阶段添加。请在“设置”中管理 API 密钥。",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "复制校验和",
   "android_app.copied": "已复制",
   "android_app.reinstall_note": "此抢先体验版本的签名独立于 Google Play 发布版本。上架页面上线后，可能需要从 Google Play 重新安装；配对信息会保留，因此不会丢失任何内容。",
-  "android_app.needs_production": "Android 应用与生产版本配对。请激活生产许可证以下载并配对。"
+  "android_app.needs_production": "Android 应用与生产版本配对。请激活生产许可证以下载并配对。",
+  "create_shipment.units_label": "单位:",
+  "create_shipment.units_metric": "公制",
+  "create_shipment.units_imperial": "英制"
 }

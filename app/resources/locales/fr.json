@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Expéditeur :",
   "create_shipment.get_rates_button": "Obtenir les tarifs",
   "create_shipment.get_rates_error_body": "Impossible d'obtenir les tarifs :\n{error}",
-  "create_shipment.height_label": "H (po) :",
-  "create_shipment.length_label": "Long. (po) :",
+  "create_shipment.height_label": "H ({unit}) :",
+  "create_shipment.length_label": "L ({unit}) :",
   "create_shipment.missing_addresses_body": "Vérifiez d'abord au moins deux adresses dans le carnet d'adresses.",
   "create_shipment.missing_addresses_title": "Adresses manquantes",
   "create_shipment.missing_name_body": "Cette expédition traverse une frontière internationale. Les transporteurs exigent un nom ou une société à la fois pour l'adresse d'origine et pour l'adresse de destination pour la déclaration en douane — ajoutez-en d'abord un à chacune dans le carnet d'adresses.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Enregistré",
   "create_shipment.title": "Créer une expédition et comparer les tarifs",
   "create_shipment.to_label": "Destinataire :",
-  "create_shipment.weight_label": "Poids (oz) :",
-  "create_shipment.width_label": "Larg. (po) :",
+  "create_shipment.weight_label": "Poids :",
+  "create_shipment.width_label": "l ({unit}) :",
   "create_shipment.zip_mode_note": "Estimation uniquement. L'achat d'une étiquette exige des adresses complètes aux deux extrémités : passez à « Adresses complètes » pour acheter.",
   "create_shipment.zip_placeholder": "Code postal",
   "dashboard.placeholder_text": "Les vues Expéditions, Suivi, Carnet d'adresses et Rapports seront ajoutées lors de prochaines étapes de développement. Utilisez les Paramètres pour gérer les clés API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Copier la somme de contrôle",
   "android_app.copied": "Copié",
   "android_app.reinstall_note": "Cette version en accès anticipé est signée indépendamment de la version Google Play. Une réinstallation depuis Google Play pourra être nécessaire une fois la fiche en ligne ; le jumelage est conservé, rien n'est donc perdu.",
-  "android_app.needs_production": "L'application Android se jumelle avec la version de production. Activez une licence de production pour la télécharger et la jumeler."
+  "android_app.needs_production": "L'application Android se jumelle avec la version de production. Activez une licence de production pour la télécharger et la jumeler.",
+  "create_shipment.units_label": "Unités :",
+  "create_shipment.units_metric": "Métrique",
+  "create_shipment.units_imperial": "Impérial"
 }

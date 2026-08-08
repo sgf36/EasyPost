@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Si na:",
   "create_shipment.get_rates_button": "Nweta Ọnụahịa",
   "create_shipment.get_rates_error_body": "Enweghị ike nweta ọnụahịa:\n{error}",
-  "create_shipment.height_label": "Ịdị elu (in):",
-  "create_shipment.length_label": "Ogologo (in):",
+  "create_shipment.height_label": "Ịdị elu ({unit}):",
+  "create_shipment.length_label": "Ogologo ({unit}):",
   "create_shipment.missing_addresses_body": "Kwado opekata mpe adreesị abụọ na Akwụkwọ Adreesị mbụ.",
   "create_shipment.missing_addresses_title": "Adreesị na-efu",
   "create_shipment.missing_name_body": "Ngwongwo a na-agafe oke mba. Ndị kompanị mbunye achọrọ aha ma ọ bụ ụlọ ọrụ na adreesị mmalite na nke a na-eziga ya maka nkwupụta customs — tinye otu na nke ọ bụla na Akwụkwọ Adreesị mbụ.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Echekwara",
   "create_shipment.title": "Mepụta Ngwongwo & Chọọ Ọnụahịa",
   "create_shipment.to_label": "Nye:",
-  "create_shipment.weight_label": "Ibu (oz):",
-  "create_shipment.width_label": "Obosara (in):",
+  "create_shipment.weight_label": "Arọ:",
+  "create_shipment.width_label": "Obosara ({unit}):",
   "create_shipment.zip_mode_note": "Naanị nyocha ọnụahịa. Ịzụta akara chọrọ adreesị zuru ezu n'akụkụ abụọ, yabụ gaa na “Adreesị zuru ezu” iji zụta.",
   "create_shipment.zip_placeholder": "Koodu nzipu ozi",
   "dashboard.placeholder_text": "A ga-agbakwunye ngwongwo, nchọpụta, akwụkwọ adreesị, na ndeputa akụkọ n'oge a ga-akọwapụta ọzọ. Jiri Ntọala jikwaa igodo API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Depụta checksum",
   "android_app.copied": "Edepụtala",
   "android_app.reinstall_note": "A bịanyere aka na ụdị ohere mbụ a n'adabereghị na mwepụta Google Play. Enwere ike ịchọ ka i wụnyeghachi site na Google Play ozugbo ndepụta ahụ dịrị; njikọ na-agafe, ya mere ọ dịghị ihe furu efu.",
-  "android_app.needs_production": "Ngwa Android na-ejikọ na ụdị prọdọkshọn. Mee ka laịsens prọdọkshọn rụọ ọrụ iji budata ma jikọọ ya."
+  "android_app.needs_production": "Ngwa Android na-ejikọ na ụdị prọdọkshọn. Mee ka laịsens prọdọkshọn rụọ ọrụ iji budata ma jikọọ ya.",
+  "create_shipment.units_label": "Nha:",
+  "create_shipment.units_metric": "Metric",
+  "create_shipment.units_imperial": "Imperial"
 }

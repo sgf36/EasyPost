@@ -200,8 +200,8 @@
   "create_shipment.from_label": "મોકલનાર:",
   "create_shipment.get_rates_button": "દરો મેળવો",
   "create_shipment.get_rates_error_body": "દરો મેળવી શકાયા નહીં:\n{error}",
-  "create_shipment.height_label": "ઊંચાઈ (ઇંચ):",
-  "create_shipment.length_label": "લંબાઈ (ઇંચ):",
+  "create_shipment.height_label": "ઊ ({unit}):",
+  "create_shipment.length_label": "લં ({unit}):",
   "create_shipment.missing_addresses_body": "પહેલા સરનામા પુસ્તિકામાં ઓછામાં ઓછા બે સરનામા ચકાસો.",
   "create_shipment.missing_addresses_title": "સરનામા ખૂટે છે",
   "create_shipment.missing_name_body": "આ શિપમેન્ટ આંતરરાષ્ટ્રીય સરહદ ઓળંગે છે. કસ્ટમ ઘોષણા માટે કેરિયરને મૂળ અને ગંતવ્ય બંને સરનામા પર નામ અથવા કંપનીની જરૂર છે — પહેલા સરનામા પુસ્તિકામાં દરેકમાં એક ઉમેરો.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "સાચવાયું",
   "create_shipment.title": "શિપમેન્ટ બનાવો અને દરો જુઓ",
   "create_shipment.to_label": "પ્રતિ:",
-  "create_shipment.weight_label": "વજન (ઔંસ):",
-  "create_shipment.width_label": "પહોળાઈ (ઇંચ):",
+  "create_shipment.weight_label": "વજન:",
+  "create_shipment.width_label": "પ ({unit}):",
   "create_shipment.zip_mode_note": "ફક્ત કિંમત તપાસ. લેબલ ખરીદવા બંને છેડે પૂર્ણ સરનામાં જરૂરી છે, તેથી ખરીદવા «પૂર્ણ સરનામાં» પર જાઓ.",
   "create_shipment.zip_placeholder": "પિન કોડ",
   "dashboard.placeholder_text": "શિપમેન્ટ, ટ્રેકિંગ, સરનામા પુસ્તિકા અને રિપોર્ટિંગ દૃશ્યો પછીના બિલ્ડ તબક્કામાં ઉમેરવામાં આવશે. API કી મેનેજ કરવા માટે સેટિંગ્સનો ઉપયોગ કરો.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "ચેકસમ કૉપિ કરો",
   "android_app.copied": "કૉપિ થયું",
   "android_app.reinstall_note": "આ અર્લી-ઍક્સેસ બિલ્ડ Google Play રિલીઝથી સ્વતંત્ર રીતે સહી કરેલી છે. લિસ્ટિંગ લાઇવ થાય પછી Google Play પરથી ફરી ઇન્સ્ટોલ કરવું જરૂરી બની શકે છે; જોડાણ જળવાઈ રહે છે, તેથી કંઈ ગુમાવાતું નથી.",
-  "android_app.needs_production": "Android એપ પ્રોડક્શન સંસ્કરણ સાથે જોડાય છે. તેને ડાઉનલોડ અને જોડવા માટે પ્રોડક્શન લાઇસન્સ સક્રિય કરો."
+  "android_app.needs_production": "Android એપ પ્રોડક્શન સંસ્કરણ સાથે જોડાય છે. તેને ડાઉનલોડ અને જોડવા માટે પ્રોડક્શન લાઇસન્સ સક્રિય કરો.",
+  "create_shipment.units_label": "એકમો:",
+  "create_shipment.units_metric": "મેટ્રિક",
+  "create_shipment.units_imperial": "ઇમ્પિરિયલ"
 }
