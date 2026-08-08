@@ -200,8 +200,8 @@
   "create_shipment.from_label": "روانگی:",
   "create_shipment.get_rates_button": "نرخ حاصل کریں",
   "create_shipment.get_rates_error_body": "نرخ حاصل نہیں کیے جا سکے:\n{error}",
-  "create_shipment.height_label": "اونچائی (انچ):",
-  "create_shipment.length_label": "لمبائی (انچ):",
+  "create_shipment.height_label": "ا ({unit}):",
+  "create_shipment.length_label": "ل ({unit}):",
   "create_shipment.missing_addresses_body": "پہلے ایڈریس بک میں کم از کم دو پتوں کی تصدیق کریں۔",
   "create_shipment.missing_addresses_title": "پتے ناپید",
   "create_shipment.missing_name_body": "یہ شپمنٹ ایک بین الاقوامی سرحد عبور کرتی ہے۔ کسٹمز ڈیکلریشن کے لیے کیریئرز کو روانگی اور منزل دونوں پتوں پر نام یا کمپنی درکار ہوتی ہے — پہلے ایڈریس بک میں ہر ایک میں ایک اندراج شامل کریں۔",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "محفوظ شدہ",
   "create_shipment.title": "شپمنٹ بنائیں اور نرخ دیکھیں",
   "create_shipment.to_label": "بنام:",
-  "create_shipment.weight_label": "وزن (اونس):",
-  "create_shipment.width_label": "چوڑائی (انچ):",
+  "create_shipment.weight_label": "وزن:",
+  "create_shipment.width_label": "چ ({unit}):",
   "create_shipment.zip_mode_note": "صرف قیمت کی جانچ۔ لیبل خریدنے کے لیے دونوں طرف مکمل پتے درکار ہیں، اس لیے خریدنے کے لیے «مکمل پتے» پر جائیں۔",
   "create_shipment.zip_placeholder": "پوسٹل کوڈ",
   "dashboard.placeholder_text": "شپمنٹس، ٹریکنگ، ایڈریس بک، اور رپورٹنگ ویوز بعد کے تعمیراتی مراحل میں شامل کی جائیں گی۔ API کیز کے انتظام کے لیے ترتیبات استعمال کریں۔",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "چیک سم کاپی کریں",
   "android_app.copied": "کاپی ہو گیا",
   "android_app.reinstall_note": "یہ ابتدائی رسائی بلڈ Google Play کے ریلیز سے آزادانہ طور پر دستخط شدہ ہے۔ فہرست لائیو ہونے پر Google Play سے دوبارہ انسٹال کرنے کی ضرورت پڑ سکتی ہے؛ جوڑ برقرار رہتی ہے، اس لیے کچھ ضائع نہیں ہوتا۔",
-  "android_app.needs_production": "Android ایپ پروڈکشن ورژن کے ساتھ جوڑی جاتی ہے۔ اسے ڈاؤن لوڈ اور جوڑنے کے لیے پروڈکشن لائسنس فعال کریں۔"
+  "android_app.needs_production": "Android ایپ پروڈکشن ورژن کے ساتھ جوڑی جاتی ہے۔ اسے ڈاؤن لوڈ اور جوڑنے کے لیے پروڈکشن لائسنس فعال کریں۔",
+  "create_shipment.units_label": "اکائیاں:",
+  "create_shipment.units_metric": "میٹرک",
+  "create_shipment.units_imperial": "امپیریل"
 }

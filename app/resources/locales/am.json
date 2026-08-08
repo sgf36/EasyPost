@@ -200,8 +200,8 @@
   "create_shipment.from_label": "ላኪ:",
   "create_shipment.get_rates_button": "ዋጋዎችን አግኝ",
   "create_shipment.get_rates_error_body": "ዋጋዎችን ማግኘት አልተቻለም:\n{error}",
-  "create_shipment.height_label": "ቁመት (ኢንች):",
-  "create_shipment.length_label": "ርዝመት (ኢንች):",
+  "create_shipment.height_label": "ቁመት ({unit}):",
+  "create_shipment.length_label": "ርዝመት ({unit}):",
   "create_shipment.missing_addresses_body": "መጀመሪያ ቢያንስ ሁለት አድራሻዎችን በአድራሻ ደብተር ውስጥ ያረጋግጡ።",
   "create_shipment.missing_addresses_title": "የጎደሉ አድራሻዎች",
   "create_shipment.missing_name_body": "ይህ መላኪያ ዓለም አቀፍ ድንበር ያቋርጣል። አጓጓዦች ለጉምሩክ ማስታወቂያ በላኪውም ሆነ በተቀባዩ አድራሻ ላይ ስም ወይም ኩባንያ ይፈልጋሉ — መጀመሪያ በአድራሻ ደብተር ውስጥ ለእያንዳንዱ ያክሉ።",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "ተቀምጧል",
   "create_shipment.title": "መላኪያ ፍጠር እና ዋጋዎችን አነጻጽር",
   "create_shipment.to_label": "ተቀባይ:",
-  "create_shipment.weight_label": "ክብደት (አውንስ):",
-  "create_shipment.width_label": "ስፋት (ኢንች):",
+  "create_shipment.weight_label": "ክብደት:",
+  "create_shipment.width_label": "ስፋት ({unit}):",
   "create_shipment.zip_mode_note": "የዋጋ ማረጋገጫ ብቻ። መለያ ለመግዛት በሁለቱም በኩል ሙሉ አድራሻ ያስፈልጋል፣ ስለዚህ ለመግዛት ወደ «ሙሉ አድራሻዎች» ይቀይሩ።",
   "create_shipment.zip_placeholder": "የፖስታ ኮድ",
   "dashboard.placeholder_text": "መላኪያዎች፣ ክትትል፣ አድራሻ ደብተር እና የሪፖርት ማሳያዎች በኋላ በሚመጡ የግንባታ ደረጃዎች ይታከላሉ። የAPI ቁልፎችን ለማስተዳደር ቅንብሮችን ይጠቀሙ።",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "ቼክሰም ይቅዱ",
   "android_app.copied": "ተቀድቷል",
   "android_app.reinstall_note": "ይህ የቀደመ መዳረሻ ግንባታ ከGoogle Play ልቀት ተለይቶ ተፈርሟል። ዝርዝሩ ንቁ ከሆነ በኋላ ከGoogle Play እንደገና መጫን ሊያስፈልግ ይችላል፤ ማጣመሩ ስለሚቀጥል ምንም አይጠፋም።",
-  "android_app.needs_production": "የAndroid መተግበሪያ ከምርት ስሪት ጋር ይጣመራል። እሱን ለማውረድና ለማጣመር የምርት ፈቃድ ያንቁ።"
+  "android_app.needs_production": "የAndroid መተግበሪያ ከምርት ስሪት ጋር ይጣመራል። እሱን ለማውረድና ለማጣመር የምርት ፈቃድ ያንቁ።",
+  "create_shipment.units_label": "አሓዶች:",
+  "create_shipment.units_metric": "ሜትሪክ",
+  "create_shipment.units_imperial": "ኢምፔሪያል"
 }

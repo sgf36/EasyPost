@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Dari:",
   "create_shipment.get_rates_button": "Dapatkan Kadar",
   "create_shipment.get_rates_error_body": "Tidak dapat mendapatkan kadar:\n{error}",
-  "create_shipment.height_label": "T (in):",
-  "create_shipment.length_label": "P (in):",
+  "create_shipment.height_label": "T ({unit}):",
+  "create_shipment.length_label": "P ({unit}):",
   "create_shipment.missing_addresses_body": "Sahkan sekurang-kurangnya dua alamat dalam Buku Alamat terlebih dahulu.",
   "create_shipment.missing_addresses_title": "Alamat tiada",
   "create_shipment.missing_name_body": "Penghantaran ini melintasi sempadan antarabangsa. Untuk pengisytiharan kastam, syarikat penghantaran memerlukan nama atau syarikat pada kedua-dua alamat asal dan destinasi — tambah satu pada setiap satu dalam Buku Alamat terlebih dahulu.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Disimpan",
   "create_shipment.title": "Cipta Penghantaran & Bandingkan Kadar",
   "create_shipment.to_label": "Kepada:",
-  "create_shipment.weight_label": "Berat (oz):",
-  "create_shipment.width_label": "L (in):",
+  "create_shipment.weight_label": "Berat:",
+  "create_shipment.width_label": "L ({unit}):",
   "create_shipment.zip_mode_note": "Semakan harga sahaja. Pembelian label memerlukan alamat penuh di kedua-dua hujung, jadi tukar kepada “Alamat penuh” untuk membeli.",
   "create_shipment.zip_placeholder": "Poskod",
   "dashboard.placeholder_text": "Paparan penghantaran, penjejakan, buku alamat dan laporan akan ditambah pada peringkat pembangunan seterusnya. Gunakan Tetapan untuk menguruskan kunci API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Salin hasil semak",
   "android_app.copied": "Disalin",
   "android_app.reinstall_note": "Binaan akses awal ini ditandatangani secara berasingan daripada keluaran Google Play. Pemasangan semula daripada Google Play mungkin diperlukan setelah penyenaraian tersebut disiarkan; gandingan kekal, jadi tiada apa-apa yang hilang.",
-  "android_app.needs_production": "Aplikasi Android bergandingan dengan versi pengeluaran. Aktifkan lesen pengeluaran untuk memuat turun dan menggandingkannya."
+  "android_app.needs_production": "Aplikasi Android bergandingan dengan versi pengeluaran. Aktifkan lesen pengeluaran untuk memuat turun dan menggandingkannya.",
+  "create_shipment.units_label": "Unit:",
+  "create_shipment.units_metric": "Metrik",
+  "create_shipment.units_imperial": "Imperial"
 }

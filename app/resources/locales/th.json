@@ -200,8 +200,8 @@
   "create_shipment.from_label": "จาก:",
   "create_shipment.get_rates_button": "ดูอัตราค่าส่ง",
   "create_shipment.get_rates_error_body": "ไม่สามารถดูอัตราค่าส่งได้:\n{error}",
-  "create_shipment.height_label": "สูง (นิ้ว):",
-  "create_shipment.length_label": "ยาว (นิ้ว):",
+  "create_shipment.height_label": "ส ({unit}):",
+  "create_shipment.length_label": "ย ({unit}):",
   "create_shipment.missing_addresses_body": "กรุณาตรวจสอบที่อยู่อย่างน้อยสองรายการในสมุดที่อยู่ก่อน",
   "create_shipment.missing_addresses_title": "ไม่มีที่อยู่",
   "create_shipment.missing_name_body": "พัสดุนี้ข้ามพรมแดนระหว่างประเทศ สำหรับการสำแดงศุลกากร ผู้ให้บริการขนส่งกำหนดให้ต้องมีชื่อหรือบริษัททั้งในที่อยู่ต้นทางและปลายทาง — กรุณาเพิ่มชื่อในสมุดที่อยู่ให้ทั้งสองที่ก่อน",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "บันทึกแล้ว",
   "create_shipment.title": "สร้างพัสดุและเปรียบเทียบอัตราค่าส่ง",
   "create_shipment.to_label": "ถึง:",
-  "create_shipment.weight_label": "น้ำหนัก (ออนซ์):",
-  "create_shipment.width_label": "กว้าง (นิ้ว):",
+  "create_shipment.weight_label": "น้ำหนัก:",
+  "create_shipment.width_label": "ก ({unit}):",
   "create_shipment.zip_mode_note": "ตรวจสอบราคาเท่านั้น การซื้อฉลากต้องใช้ที่อยู่แบบเต็มทั้งสองฝั่ง จึงต้องสลับไปที่ “ที่อยู่แบบเต็ม” เพื่อซื้อ",
   "create_shipment.zip_placeholder": "รหัสไปรษณีย์",
   "dashboard.placeholder_text": "หน้าจัดส่งพัสดุ ติดตามพัสดุ สมุดที่อยู่ และรายงาน จะถูกเพิ่มในขั้นตอนการพัฒนาถัดไป ใช้เมนูการตั้งค่าเพื่อจัดการคีย์ API",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "คัดลอกเช็กซัม",
   "android_app.copied": "คัดลอกแล้ว",
   "android_app.reinstall_note": "รุ่นเข้าถึงก่อนใครนี้ลงนามแยกต่างหากจากรุ่นที่วางจำหน่ายบน Google Play อาจต้องติดตั้งใหม่จาก Google Play เมื่อรายการเผยแพร่แล้ว การจับคู่จะยังคงอยู่ จึงไม่มีอะไรสูญหาย",
-  "android_app.needs_production": "แอป Android จับคู่กับเวอร์ชันการใช้งานจริง เปิดใช้งานใบอนุญาตการใช้งานจริงเพื่อดาวน์โหลดและจับคู่"
+  "android_app.needs_production": "แอป Android จับคู่กับเวอร์ชันการใช้งานจริง เปิดใช้งานใบอนุญาตการใช้งานจริงเพื่อดาวน์โหลดและจับคู่",
+  "create_shipment.units_label": "หน่วย:",
+  "create_shipment.units_metric": "เมตริก",
+  "create_shipment.units_imperial": "อิมพีเรียล"
 }

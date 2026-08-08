@@ -200,8 +200,8 @@
   "create_shipment.from_label": "बाट:",
   "create_shipment.get_rates_button": "दरहरू प्राप्त गर्नुहोस्",
   "create_shipment.get_rates_error_body": "दरहरू प्राप्त गर्न सकिएन:\n{error}",
-  "create_shipment.height_label": "उचाइ (इन):",
-  "create_shipment.length_label": "लम्बाइ (इन):",
+  "create_shipment.height_label": "उ ({unit}):",
+  "create_shipment.length_label": "ल ({unit}):",
   "create_shipment.missing_addresses_body": "पहिले ठेगाना पुस्तिकामा कम्तीमा दुई ठेगाना प्रमाणित गर्नुहोस्।",
   "create_shipment.missing_addresses_title": "ठेगानाहरू छुटेका",
   "create_shipment.missing_name_body": "यो ढुवानीले अन्तर्राष्ट्रिय सीमा पार गर्छ। भन्सार घोषणाका लागि ढुवानी कम्पनीहरूलाई मूल र गन्तव्य दुवै ठेगानामा नाम वा कम्पनी चाहिन्छ — पहिले ठेगाना पुस्तिकामा प्रत्येकमा एउटा थप्नुहोस्।",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "सुरक्षित गरियो",
   "create_shipment.title": "ढुवानी सिर्जना गर्नुहोस् & दर खोज्नुहोस्",
   "create_shipment.to_label": "प्रति:",
-  "create_shipment.weight_label": "तौल (औंस):",
-  "create_shipment.width_label": "चौडाइ (इन):",
+  "create_shipment.weight_label": "तौल:",
+  "create_shipment.width_label": "च ({unit}):",
   "create_shipment.zip_mode_note": "मूल्य जाँच मात्र। लेबल किन्न दुवैतर्फ पूरा ठेगाना चाहिन्छ, त्यसैले किन्न «पूरा ठेगाना» मा जानुहोस्।",
   "create_shipment.zip_placeholder": "पोस्टल कोड",
   "dashboard.placeholder_text": "ढुवानी, ट्र्याकिङ, ठेगाना पुस्तिका, र रिपोर्टिङ दृश्यहरू पछिका निर्माण चरणहरूमा थपिनेछन्। API कुञ्जीहरू व्यवस्थापन गर्न सेटिङ प्रयोग गर्नुहोस्।",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "चेकसम प्रतिलिपि गर्नुहोस्",
   "android_app.copied": "प्रतिलिपि गरियो",
   "android_app.reinstall_note": "यो प्रारम्भिक-पहुँच बिल्ड Google Play रिलिजबाट स्वतन्त्र रूपमा हस्ताक्षर गरिएको छ। सूची लाइभ भएपछि Google Play बाट पुन: स्थापना गर्न आवश्यक पर्न सक्छ; जोडा कायमै रहन्छ, त्यसैले केही पनि हराउँदैन।",
-  "android_app.needs_production": "Android एप उत्पादन संस्करणसँग जोडिन्छ। यसलाई डाउनलोड र जोड्न उत्पादन इजाजतपत्र सक्रिय गर्नुहोस्।"
+  "android_app.needs_production": "Android एप उत्पादन संस्करणसँग जोडिन्छ। यसलाई डाउनलोड र जोड्न उत्पादन इजाजतपत्र सक्रिय गर्नुहोस्।",
+  "create_shipment.units_label": "एकाइ:",
+  "create_shipment.units_metric": "मेट्रिक",
+  "create_shipment.units_imperial": "इम्पेरियल"
 }

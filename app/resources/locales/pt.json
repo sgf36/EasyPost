@@ -200,8 +200,8 @@
   "create_shipment.from_label": "De:",
   "create_shipment.get_rates_button": "Obter Tarifas",
   "create_shipment.get_rates_error_body": "Não foi possível obter as tarifas:\n{error}",
-  "create_shipment.height_label": "A (pol):",
-  "create_shipment.length_label": "C (pol):",
+  "create_shipment.height_label": "A ({unit}):",
+  "create_shipment.length_label": "C ({unit}):",
   "create_shipment.missing_addresses_body": "Verifique pelo menos dois endereços no Catálogo de Endereços primeiro.",
   "create_shipment.missing_addresses_title": "Endereços ausentes",
   "create_shipment.missing_name_body": "Este envio cruza uma fronteira internacional. Para a declaração alfandegária, as transportadoras exigem nome ou empresa no endereço de origem e no de destino — adicione um a cada um deles no Catálogo de Endereços primeiro.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Salvo",
   "create_shipment.title": "Criar Envio e Comparar Tarifas",
   "create_shipment.to_label": "Para:",
-  "create_shipment.weight_label": "Peso (oz):",
-  "create_shipment.width_label": "L (pol):",
+  "create_shipment.weight_label": "Peso:",
+  "create_shipment.width_label": "L ({unit}):",
   "create_shipment.zip_mode_note": "Apenas consulta de preço. A compra de uma etiqueta exige moradas completas em ambos os lados, por isso mude para «Moradas completas» para comprar.",
   "create_shipment.zip_placeholder": "Código postal",
   "dashboard.placeholder_text": "As telas de envios, rastreamento, catálogo de endereços e relatórios serão adicionadas em etapas posteriores. Use Configurações para gerenciar as chaves de API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Copiar soma de verificação",
   "android_app.copied": "Copiado",
   "android_app.reinstall_note": "Esta versão de acesso antecipado é assinada de forma independente do lançamento na Google Play. Pode ser necessário reinstalar pela Google Play quando a listagem estiver disponível; o pareamento é mantido, então nada é perdido.",
-  "android_app.needs_production": "O aplicativo Android pareia com a versão de produção. Ative uma licença de produção para baixá-lo e pareá-lo."
+  "android_app.needs_production": "O aplicativo Android pareia com a versão de produção. Ative uma licença de produção para baixá-lo e pareá-lo.",
+  "create_shipment.units_label": "Unidades:",
+  "create_shipment.units_metric": "Métrico",
+  "create_shipment.units_imperial": "Imperial"
 }

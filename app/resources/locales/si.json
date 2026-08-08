@@ -200,8 +200,8 @@
   "create_shipment.from_label": "සිට:",
   "create_shipment.get_rates_button": "ගාස්තු ලබාගන්න",
   "create_shipment.get_rates_error_body": "ගාස්තු ලබාගත නොහැකි විය:\n{error}",
-  "create_shipment.height_label": "උස (අඟල්):",
-  "create_shipment.length_label": "දිග (අඟල්):",
+  "create_shipment.height_label": "උ ({unit}):",
+  "create_shipment.length_label": "ද ({unit}):",
   "create_shipment.missing_addresses_body": "පළමුව ලිපින පොතේ අවම වශයෙන් ලිපින දෙකක් තහවුරු කරන්න.",
   "create_shipment.missing_addresses_title": "ලිපින අස්ථානගතයි",
   "create_shipment.missing_name_body": "මෙම එවුම ජාත්‍යන්තර මායිමක් තරණය කරයි. රේගු ප්‍රකාශනය සඳහා භාරදෙන සමාගම් මූලාශ්‍ර සහ ගමනාන්ත ලිපින දෙකෙහිම නමක් හෝ සමාගමක් අවශ්‍ය කරයි — පළමුව ලිපින පොතේ එක් එක් සඳහා එකක් එකතු කරන්න.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "සුරකින ලදී",
   "create_shipment.title": "එවුමක් සාදන්න & ගාස්තු සොයන්න",
   "create_shipment.to_label": "වෙත:",
-  "create_shipment.weight_label": "බර (අවුන්ස්):",
-  "create_shipment.width_label": "පළල (අඟල්):",
+  "create_shipment.weight_label": "බර:",
+  "create_shipment.width_label": "ප ({unit}):",
   "create_shipment.zip_mode_note": "මිල පරීක්ෂාව පමණි. ලේබලයක් මිලදී ගැනීමට දෙපැත්තේම සම්පූර්ණ ලිපින අවශ්‍ය වේ, එබැවින් මිලදී ගැනීමට «සම්පූර්ණ ලිපින» වෙත මාරු වන්න.",
   "create_shipment.zip_placeholder": "තැපැල් කේතය",
   "dashboard.placeholder_text": "එවුම්, ලුහුබැඳීම, ලිපින පොත සහ වාර්තා දර්ශන පසුව එකතු කෙරේ. API යතුරු කළමනාකරණය කිරීමට සැකසීම් භාවිත කරන්න.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "චෙක්සම් පිටපත් කරන්න",
   "android_app.copied": "පිටපත් කළා",
   "android_app.reinstall_note": "මෙම මුල් ප්‍රවේශ නිකුතුව Google Play නිකුතුවෙන් ස්වාධීනව අත්සන් කර ඇත. ලැයිස්තුගත කිරීම සක්‍රිය වූ පසු Google Play වෙතින් නැවත ස්ථාපනය කිරීමට අවශ්‍ය විය හැක; යුගල කිරීම පවතින බැවින්, කිසිවක් නැති නොවේ.",
-  "android_app.needs_production": "Android යෙදුම නිෂ්පාදන අනුවාදය සමඟ යුගල වේ. එය බාගෙන යුගල කිරීමට නිෂ්පාදන බලපත්‍රයක් සක්‍රිය කරන්න."
+  "android_app.needs_production": "Android යෙදුම නිෂ්පාදන අනුවාදය සමඟ යුගල වේ. එය බාගෙන යුගල කිරීමට නිෂ්පාදන බලපත්‍රයක් සක්‍රිය කරන්න.",
+  "create_shipment.units_label": "ඒකක:",
+  "create_shipment.units_metric": "මෙට්‍රික්",
+  "create_shipment.units_imperial": "ඉම්පීරියල්"
 }

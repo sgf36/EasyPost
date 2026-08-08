@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Gönderen:",
   "create_shipment.get_rates_button": "Ücretleri Al",
   "create_shipment.get_rates_error_body": "Ücretler alınamadı:\n{error}",
-  "create_shipment.height_label": "Y (inç):",
-  "create_shipment.length_label": "U (inç):",
+  "create_shipment.height_label": "Y ({unit}):",
+  "create_shipment.length_label": "U ({unit}):",
   "create_shipment.missing_addresses_body": "Önce Adres Defteri'nde en az iki adresi doğrulayın.",
   "create_shipment.missing_addresses_title": "Eksik adresler",
   "create_shipment.missing_name_body": "Bu gönderi uluslararası bir sınırı geçiyor. Gümrük beyannamesi için kargo şirketleri hem gönderen hem de alıcı adresinde ad veya şirket bilgisi talep eder — önce Adres Defteri'nde her ikisine de birer bilgi ekleyin.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Kaydedildi",
   "create_shipment.title": "Gönderi Oluştur ve Ücretleri Karşılaştır",
   "create_shipment.to_label": "Alıcı:",
-  "create_shipment.weight_label": "Ağırlık (oz):",
-  "create_shipment.width_label": "G (inç):",
+  "create_shipment.weight_label": "Ağırlık:",
+  "create_shipment.width_label": "G ({unit}):",
   "create_shipment.zip_mode_note": "Yalnızca fiyat kontrolü. Etiket satın almak için her iki tarafta da tam adres gerekir; satın almak için “Tam adresler” seçeneğine geçin.",
   "create_shipment.zip_placeholder": "Posta kodu",
   "dashboard.placeholder_text": "Gönderiler, takip, adres defteri ve raporlama görünümleri sonraki sürüm aşamalarında eklenecektir. API anahtarlarını yönetmek için Ayarlar'ı kullanın.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Sağlama toplamını kopyala",
   "android_app.copied": "Kopyalandı",
   "android_app.reinstall_note": "Bu erken erişim sürümü, Google Play sürümünden bağımsız olarak imzalanmıştır. Giriş yayına alındığında Google Play'den yeniden kurulum gerekebilir; eşleştirme korunur, dolayısıyla hiçbir şey kaybolmaz.",
-  "android_app.needs_production": "Android uygulaması üretim sürümüyle eşleşir. İndirmek ve eşleştirmek için bir üretim lisansı etkinleştirin."
+  "android_app.needs_production": "Android uygulaması üretim sürümüyle eşleşir. İndirmek ve eşleştirmek için bir üretim lisansı etkinleştirin.",
+  "create_shipment.units_label": "Birimler:",
+  "create_shipment.units_metric": "Metrik",
+  "create_shipment.units_imperial": "Emperyal"
 }

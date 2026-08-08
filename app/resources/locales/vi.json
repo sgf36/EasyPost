@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Từ:",
   "create_shipment.get_rates_button": "Lấy Cước Phí",
   "create_shipment.get_rates_error_body": "Không thể lấy cước phí:\n{error}",
-  "create_shipment.height_label": "Cao (in):",
-  "create_shipment.length_label": "Dài (in):",
+  "create_shipment.height_label": "C ({unit}):",
+  "create_shipment.length_label": "D ({unit}):",
   "create_shipment.missing_addresses_body": "Trước tiên, hãy xác minh ít nhất hai địa chỉ trong Sổ địa chỉ.",
   "create_shipment.missing_addresses_title": "Thiếu địa chỉ",
   "create_shipment.missing_name_body": "Lô hàng này vượt biên giới quốc tế. Đơn vị vận chuyển yêu cầu tên hoặc công ty tại cả địa chỉ gửi và địa chỉ nhận để khai báo hải quan — hãy thêm thông tin đó cho mỗi địa chỉ trong Sổ địa chỉ trước.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Đã lưu",
   "create_shipment.title": "Tạo Lô Hàng và So Sánh Cước Phí",
   "create_shipment.to_label": "Đến:",
-  "create_shipment.weight_label": "Trọng lượng (oz):",
-  "create_shipment.width_label": "Rộng (in):",
+  "create_shipment.weight_label": "Trọng lượng:",
+  "create_shipment.width_label": "R ({unit}):",
   "create_shipment.zip_mode_note": "Chỉ kiểm tra giá. Việc mua nhãn cần địa chỉ đầy đủ ở cả hai đầu, vì vậy hãy chuyển sang “Địa chỉ đầy đủ” để mua.",
   "create_shipment.zip_placeholder": "Mã bưu chính",
   "dashboard.placeholder_text": "Các màn hình lô hàng, theo dõi, sổ địa chỉ và báo cáo sẽ được bổ sung ở các giai đoạn phát triển sau. Sử dụng Cài đặt để quản lý khóa API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Sao chép checksum",
   "android_app.copied": "Đã sao chép",
   "android_app.reinstall_note": "Bản truy cập sớm này được ký độc lập với bản phát hành trên Google Play. Có thể cần cài đặt lại từ Google Play khi trang niêm yết hoạt động; việc ghép nối vẫn được giữ lại, nên không mất gì cả.",
-  "android_app.needs_production": "Ứng dụng Android ghép nối với phiên bản chính thức. Kích hoạt giấy phép bản chính thức để tải và ghép nối."
+  "android_app.needs_production": "Ứng dụng Android ghép nối với phiên bản chính thức. Kích hoạt giấy phép bản chính thức để tải và ghép nối.",
+  "create_shipment.units_label": "Đơn vị:",
+  "create_shipment.units_metric": "Hệ mét",
+  "create_shipment.units_imperial": "Hệ Anh"
 }

@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Van:",
   "create_shipment.get_rates_button": "Tarieven ophalen",
   "create_shipment.get_rates_error_body": "Kan tarieven niet ophalen:\n{error}",
-  "create_shipment.height_label": "H (in):",
-  "create_shipment.length_label": "L (in):",
+  "create_shipment.height_label": "H ({unit}):",
+  "create_shipment.length_label": "L ({unit}):",
   "create_shipment.missing_addresses_body": "Verifieer eerst ten minste twee adressen in het adresboek.",
   "create_shipment.missing_addresses_title": "Ontbrekende adressen",
   "create_shipment.missing_name_body": "Deze zending overschrijdt een internationale grens. Vervoerders vereisen een naam of bedrijf bij zowel het afzend- als het bestemmingsadres voor de douaneaangifte — voeg er eerst een toe aan elk in het adresboek.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Opgeslagen",
   "create_shipment.title": "Zending aanmaken & tarieven vergelijken",
   "create_shipment.to_label": "Aan:",
-  "create_shipment.weight_label": "Gewicht (oz):",
-  "create_shipment.width_label": "B (in):",
+  "create_shipment.weight_label": "Gewicht:",
+  "create_shipment.width_label": "B ({unit}):",
   "create_shipment.zip_mode_note": "Alleen prijsindicatie. Voor het kopen van een label zijn volledige adressen aan beide kanten nodig. Schakel over naar “Volledige adressen” om te kopen.",
   "create_shipment.zip_placeholder": "Postcode",
   "dashboard.placeholder_text": "Zendingen, tracking, adresboek en rapportageweergaven worden toegevoegd in latere bouwfasen. Gebruik Instellingen om API-sleutels te beheren.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Controlesom kopiëren",
   "android_app.copied": "Gekopieerd",
   "android_app.reinstall_note": "Deze early-accessversie is onafhankelijk van de Google Play-release ondertekend. Mogelijk moet je opnieuw installeren via Google Play zodra de vermelding live is; de koppeling blijft behouden, dus er gaat niets verloren.",
-  "android_app.needs_production": "De Android-app koppelt met de productieversie. Activeer een productielicentie om deze te downloaden en te koppelen."
+  "android_app.needs_production": "De Android-app koppelt met de productieversie. Activeer een productielicentie om deze te downloaden en te koppelen.",
+  "create_shipment.units_label": "Eenheden:",
+  "create_shipment.units_metric": "Metrisch",
+  "create_shipment.units_imperial": "Imperiaal"
 }

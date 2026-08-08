@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Από:",
   "create_shipment.get_rates_button": "Λήψη Τιμών",
   "create_shipment.get_rates_error_body": "Δεν ήταν δυνατή η λήψη τιμών:\n{error}",
-  "create_shipment.height_label": "Υ (ίντσες):",
-  "create_shipment.length_label": "Μ (ίντσες):",
+  "create_shipment.height_label": "Υ ({unit}):",
+  "create_shipment.length_label": "Μ ({unit}):",
   "create_shipment.missing_addresses_body": "Επαληθεύστε πρώτα τουλάχιστον δύο διευθύνσεις στο Βιβλίο Διευθύνσεων.",
   "create_shipment.missing_addresses_title": "Λείπουν διευθύνσεις",
   "create_shipment.missing_name_body": "Αυτή η αποστολή διασχίζει διεθνή σύνορα. Οι μεταφορείς απαιτούν όνομα ή εταιρεία τόσο στη διεύθυνση προέλευσης όσο και στη διεύθυνση προορισμού για την τελωνειακή δήλωση — προσθέστε ένα σε κάθε μία πρώτα στο Βιβλίο Διευθύνσεων.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Αποθηκεύτηκε",
   "create_shipment.title": "Δημιουργία Αποστολής και Σύγκριση Τιμών",
   "create_shipment.to_label": "Προς:",
-  "create_shipment.weight_label": "Βάρος (ουγγιές):",
-  "create_shipment.width_label": "Π (ίντσες):",
+  "create_shipment.weight_label": "Βάρος:",
+  "create_shipment.width_label": "Π ({unit}):",
   "create_shipment.zip_mode_note": "Μόνο έλεγχος τιμής. Η αγορά ετικέτας απαιτεί πλήρεις διευθύνσεις και στις δύο πλευρές, οπότε μεταβείτε στις «Πλήρεις διευθύνσεις».",
   "create_shipment.zip_placeholder": "Ταχυδρομικός κώδικας",
   "dashboard.placeholder_text": "Οι προβολές αποστολών, παρακολούθησης, βιβλίου διευθύνσεων και αναφορών προστίθενται σε επόμενα στάδια ανάπτυξης. Χρησιμοποιήστε τις Ρυθμίσεις για τη διαχείριση κλειδιών API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Αντιγραφή αθροίσματος ελέγχου",
   "android_app.copied": "Αντιγράφηκε",
   "android_app.reinstall_note": "Αυτή η έκδοση πρώιμης πρόσβασης υπογράφεται ανεξάρτητα από την έκδοση στο Google Play. Μπορεί να χρειαστεί επανεγκατάσταση από το Google Play μόλις η καταχώριση γίνει διαθέσιμη· η σύζευξη διατηρείται, οπότε δεν χάνεται τίποτα.",
-  "android_app.needs_production": "Η εφαρμογή Android συζεύγνυται με την έκδοση παραγωγής. Ενεργοποιήστε μια άδεια παραγωγής για να την κατεβάσετε και να τη συζεύξετε."
+  "android_app.needs_production": "Η εφαρμογή Android συζεύγνυται με την έκδοση παραγωγής. Ενεργοποιήστε μια άδεια παραγωγής για να την κατεβάσετε και να τη συζεύξετε.",
+  "create_shipment.units_label": "Μονάδες:",
+  "create_shipment.units_metric": "Μετρικό",
+  "create_shipment.units_imperial": "Αυτοκρατορικό"
 }

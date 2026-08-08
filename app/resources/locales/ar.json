@@ -200,8 +200,8 @@
   "create_shipment.from_label": "من:",
   "create_shipment.get_rates_button": "الحصول على الأسعار",
   "create_shipment.get_rates_error_body": "تعذر الحصول على الأسعار:\n{error}",
-  "create_shipment.height_label": "الارتفاع (بوصة):",
-  "create_shipment.length_label": "الطول (بوصة):",
+  "create_shipment.height_label": "الارتفاع ({unit}):",
+  "create_shipment.length_label": "الطول ({unit}):",
   "create_shipment.missing_addresses_body": "تحقق من عنوانين على الأقل في دفتر العناوين أولاً.",
   "create_shipment.missing_addresses_title": "عناوين مفقودة",
   "create_shipment.missing_name_body": "هذه الشحنة تعبر حدوداً دولية. تشترط شركات الشحن وجود اسم أو شركة على عنوان المرسل وعنوان المستلم لأغراض الإقرار الجمركي — أضف ذلك إلى كل منهما في دفتر العناوين أولاً.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "تم الحفظ",
   "create_shipment.title": "إنشاء شحنة ومقارنة الأسعار",
   "create_shipment.to_label": "إلى:",
-  "create_shipment.weight_label": "الوزن (أونصة):",
-  "create_shipment.width_label": "العرض (بوصة):",
+  "create_shipment.weight_label": "الوزن:",
+  "create_shipment.width_label": "العرض ({unit}):",
   "create_shipment.zip_mode_note": "فحص السعر فقط. يتطلب شراء الملصق عناوين كاملة على الطرفين، لذا انتقل إلى «عناوين كاملة» للشراء.",
   "create_shipment.zip_placeholder": "الرمز البريدي",
   "dashboard.placeholder_text": "سيتم إضافة عروض الشحنات والتتبع ودفتر العناوين والتقارير في مراحل بناء لاحقة. استخدم الإعدادات لإدارة مفاتيح API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "نسخ مجموع التحقق",
   "android_app.copied": "تم النسخ",
   "android_app.reinstall_note": "تم توقيع إصدار الوصول المبكر هذا بشكل مستقل عن إصدار Google Play. قد تكون إعادة التثبيت من Google Play مطلوبة بمجرد توفر الإدراج؛ ويبقى الإقران قائمًا، لذلك لا يُفقد أي شيء.",
-  "android_app.needs_production": "يقترن تطبيق Android بإصدار الإنتاج. فعّل ترخيص إنتاج لتنزيله وإقرانه."
+  "android_app.needs_production": "يقترن تطبيق Android بإصدار الإنتاج. فعّل ترخيص إنتاج لتنزيله وإقرانه.",
+  "create_shipment.units_label": "الوحدات:",
+  "create_shipment.units_metric": "متري",
+  "create_shipment.units_imperial": "إمبراطوري"
 }

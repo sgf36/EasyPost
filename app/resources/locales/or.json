@@ -200,8 +200,8 @@
   "create_shipment.from_label": "ଠାରୁ:",
   "create_shipment.get_rates_button": "ଦର ପାଆନ୍ତୁ",
   "create_shipment.get_rates_error_body": "ଦର ପାଇପାରିଲା ନାହିଁ:\n{error}",
-  "create_shipment.height_label": "ଉଚ୍ଚତା (ଇଞ୍ଚ):",
-  "create_shipment.length_label": "ଲମ୍ବ (ଇଞ୍ଚ):",
+  "create_shipment.height_label": "ଉ ({unit}):",
+  "create_shipment.length_label": "ଲ ({unit}):",
   "create_shipment.missing_addresses_body": "ପ୍ରଥମେ ଠିକଣା ବହିରେ ଅତିକମରେ ଦୁଇଟି ଠିକଣା ଯାଞ୍ଚ କରନ୍ତୁ।",
   "create_shipment.missing_addresses_title": "ଠିକଣା ନାହିଁ",
   "create_shipment.missing_name_body": "ଏହି ଶିପମେଣ୍ଟ ଆନ୍ତର୍ଜାତୀୟ ସୀମା ପାର କରେ। କଷ୍ଟମ୍ସ ଘୋଷଣା ପାଇଁ କେରିଅର୍‌ମାନଙ୍କୁ ମୂଳ ଏବଂ ଗନ୍ତବ୍ୟ ଠିକଣା ଉଭୟରେ ନାମ କିମ୍ବା କମ୍ପାନୀ ଆବଶ୍ୟକ — ପ୍ରଥମେ ଠିକଣା ବହିରେ ପ୍ରତ୍ୟେକରେ ଗୋଟିଏ ଯୋଡ଼ନ୍ତୁ।",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "ସେଭ୍ ହେଲା",
   "create_shipment.title": "ଶିପମେଣ୍ଟ ତିଆରି କରନ୍ତୁ ଏବଂ ଦର ତୁଳନା କରନ୍ତୁ",
   "create_shipment.to_label": "କୁ:",
-  "create_shipment.weight_label": "ଓଜନ (ଆଉନ୍ସ):",
-  "create_shipment.width_label": "ଓସାର (ଇଞ୍ଚ):",
+  "create_shipment.weight_label": "ଓଜନ:",
+  "create_shipment.width_label": "ଓ ({unit}):",
   "create_shipment.zip_mode_note": "କେବଳ ମୂଲ୍ୟ ଯାଞ୍ଚ। ଲେବଲ୍ କିଣିବା ପାଇଁ ଉଭୟ ପାର୍ଶ୍ୱରେ ସମ୍ପୂର୍ଣ୍ଣ ଠିକଣା ଆବଶ୍ୟକ, ତେଣୁ କିଣିବା ପାଇଁ «ସମ୍ପୂର୍ଣ୍ଣ ଠିକଣା» କୁ ଯାଆନ୍ତୁ।",
   "create_shipment.zip_placeholder": "ପିନ୍ କୋଡ୍",
   "dashboard.placeholder_text": "ଶିପମେଣ୍ଟ, ଟ୍ରାକିଂ, ଠିକଣା ବହି, ଏବଂ ରିପୋର୍ଟିଂ ଭ୍ୟୁ ପରବର୍ତ୍ତୀ ନିର୍ମାଣ ପର୍ଯ୍ୟାୟରେ ଯୋଡ଼ାଯିବ। API କି ପରିଚାଳନା କରିବାକୁ ସେଟିଂସ୍ ବ୍ୟବହାର କରନ୍ତୁ।",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "ଚେକସମ୍ କପି କରନ୍ତୁ",
   "android_app.copied": "କପି ହୋଇଛି",
   "android_app.reinstall_note": "ଏହି ଆର୍ଲି-ଆକ୍ସେସ୍ ବିଲ୍ଡ୍ Google Play ରିଲିଜ୍ ଠାରୁ ସ୍ୱାଧୀନ ଭାବେ ସାଇନ୍ ହୋଇଛି। ତାଲିକା ଲାଇଭ୍ ହେବା ପରେ Google Play ରୁ ପୁନଃସ୍ଥାପନ ଆବଶ୍ୟକ ହୋଇପାରେ; ପେୟାରିଂ ବଜାୟ ରହେ, ତେଣୁ କିଛି ହଜେ ନାହିଁ।",
-  "android_app.needs_production": "Android ଆପ୍ ପ୍ରୋଡକ୍ସନ୍ ସଂସ୍କରଣ ସହିତ ପେୟାର୍ ହୁଏ। ଏହାକୁ ଡାଉନଲୋଡ୍ ଓ ପେୟାର୍ କରିବା ପାଇଁ ଏକ ପ୍ରୋଡକ୍ସନ୍ ଲାଇସେନ୍ସ ସକ୍ରିୟ କରନ୍ତୁ।"
+  "android_app.needs_production": "Android ଆପ୍ ପ୍ରୋଡକ୍ସନ୍ ସଂସ୍କରଣ ସହିତ ପେୟାର୍ ହୁଏ। ଏହାକୁ ଡାଉନଲୋଡ୍ ଓ ପେୟାର୍ କରିବା ପାଇଁ ଏକ ପ୍ରୋଡକ୍ସନ୍ ଲାଇସେନ୍ସ ସକ୍ରିୟ କରନ୍ତୁ।",
+  "create_shipment.units_label": "ଏକକ:",
+  "create_shipment.units_metric": "ମେଟ୍ରିକ୍",
+  "create_shipment.units_imperial": "ଇମ୍ପେରିଆଲ୍"
 }

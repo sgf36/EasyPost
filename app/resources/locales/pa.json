@@ -200,8 +200,8 @@
   "create_shipment.from_label": "ਤੋਂ:",
   "create_shipment.get_rates_button": "ਰੇਟ ਲਵੋ",
   "create_shipment.get_rates_error_body": "ਰੇਟ ਪ੍ਰਾਪਤ ਨਹੀਂ ਹੋ ਸਕੇ:\n{error}",
-  "create_shipment.height_label": "ਉਚਾਈ (in):",
-  "create_shipment.length_label": "ਲੰਬਾਈ (in):",
+  "create_shipment.height_label": "ਉ ({unit}):",
+  "create_shipment.length_label": "ਲ ({unit}):",
   "create_shipment.missing_addresses_body": "ਪਹਿਲਾਂ ਪਤਾ ਕਿਤਾਬ ਵਿੱਚ ਘੱਟੋ-ਘੱਟ ਦੋ ਪਤੇ ਤਸਦੀਕ ਕਰੋ।",
   "create_shipment.missing_addresses_title": "ਪਤੇ ਗੁੰਮ ਹਨ",
   "create_shipment.missing_name_body": "ਇਹ ਸ਼ਿਪਮੈਂਟ ਅੰਤਰਰਾਸ਼ਟਰੀ ਸਰਹੱਦ ਪਾਰ ਕਰਦੀ ਹੈ। ਕਸਟਮ ਘੋਸ਼ਣਾ ਲਈ ਕੈਰੀਅਰਾਂ ਨੂੰ ਮੂਲ ਅਤੇ ਮੰਜ਼ਿਲ ਦੋਵੇਂ ਪਤਿਆਂ 'ਤੇ ਨਾਮ ਜਾਂ ਕੰਪਨੀ ਦੀ ਲੋੜ ਹੁੰਦੀ ਹੈ — ਪਹਿਲਾਂ ਪਤਾ ਕਿਤਾਬ ਵਿੱਚ ਹਰੇਕ ਵਿੱਚ ਇੱਕ ਸ਼ਾਮਲ ਕਰੋ।",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "ਸੰਭਾਲਿਆ ਗਿਆ",
   "create_shipment.title": "ਸ਼ਿਪਮੈਂਟ ਬਣਾਓ ਅਤੇ ਰੇਟ ਦੇਖੋ",
   "create_shipment.to_label": "ਨੂੰ:",
-  "create_shipment.weight_label": "ਭਾਰ (oz):",
-  "create_shipment.width_label": "ਚੌੜਾਈ (in):",
+  "create_shipment.weight_label": "ਭਾਰ:",
+  "create_shipment.width_label": "ਚ ({unit}):",
   "create_shipment.zip_mode_note": "ਸਿਰਫ਼ ਕੀਮਤ ਜਾਂਚ। ਲੇਬਲ ਖਰੀਦਣ ਲਈ ਦੋਹਾਂ ਪਾਸੇ ਪੂਰੇ ਪਤੇ ਲੋੜੀਂਦੇ ਹਨ, ਇਸ ਲਈ ਖਰੀਦਣ ਵਾਸਤੇ «ਪੂਰੇ ਪਤੇ» ਉੱਤੇ ਜਾਓ।",
   "create_shipment.zip_placeholder": "ਪਿੰਨ ਕੋਡ",
   "dashboard.placeholder_text": "ਸ਼ਿਪਮੈਂਟ, ਟਰੈਕਿੰਗ, ਪਤਾ ਕਿਤਾਬ, ਅਤੇ ਰਿਪੋਰਟਿੰਗ ਵਿਊ ਬਾਅਦ ਦੇ ਬਿਲਡ ਪੜਾਵਾਂ ਵਿੱਚ ਸ਼ਾਮਲ ਕੀਤੇ ਜਾਣਗੇ। API ਕੁੰਜੀਆਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰਨ ਲਈ ਸੈਟਿੰਗਜ਼ ਵਰਤੋ।",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "ਚੈਕਸਮ ਕਾਪੀ ਕਰੋ",
   "android_app.copied": "ਕਾਪੀ ਕੀਤਾ",
   "android_app.reinstall_note": "ਇਹ ਅਰਲੀ-ਐਕਸੈਸ ਬਿਲਡ Google Play ਰਿਲੀਜ਼ ਤੋਂ ਸੁਤੰਤਰ ਤੌਰ 'ਤੇ ਸਾਈਨ ਕੀਤਾ ਗਿਆ ਹੈ। ਲਿਸਟਿੰਗ ਲਾਈਵ ਹੋਣ 'ਤੇ Google Play ਤੋਂ ਮੁੜ-ਇੰਸਟਾਲ ਕਰਨ ਦੀ ਲੋੜ ਪੈ ਸਕਦੀ ਹੈ; ਪੇਅਰਿੰਗ ਬਰਕਰਾਰ ਰਹਿੰਦੀ ਹੈ, ਇਸ ਲਈ ਕੁਝ ਵੀ ਨਹੀਂ ਗੁਆਚਦਾ।",
-  "android_app.needs_production": "Android ਐਪ ਪ੍ਰੋਡਕਸ਼ਨ ਵਰਜਨ ਨਾਲ ਪੇਅਰ ਹੁੰਦੀ ਹੈ। ਇਸ ਨੂੰ ਡਾਊਨਲੋਡ ਅਤੇ ਪੇਅਰ ਕਰਨ ਲਈ ਇੱਕ ਪ੍ਰੋਡਕਸ਼ਨ ਲਾਇਸੈਂਸ ਸਰਗਰਮ ਕਰੋ।"
+  "android_app.needs_production": "Android ਐਪ ਪ੍ਰੋਡਕਸ਼ਨ ਵਰਜਨ ਨਾਲ ਪੇਅਰ ਹੁੰਦੀ ਹੈ। ਇਸ ਨੂੰ ਡਾਊਨਲੋਡ ਅਤੇ ਪੇਅਰ ਕਰਨ ਲਈ ਇੱਕ ਪ੍ਰੋਡਕਸ਼ਨ ਲਾਇਸੈਂਸ ਸਰਗਰਮ ਕਰੋ।",
+  "create_shipment.units_label": "ਇਕਾਈ:",
+  "create_shipment.units_metric": "ਮੀਟ੍ਰਿਕ",
+  "create_shipment.units_imperial": "ਇੰਪੀਰੀਅਲ"
 }

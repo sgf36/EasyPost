@@ -200,8 +200,8 @@
   "create_shipment.from_label": "அனுப்புநர்:",
   "create_shipment.get_rates_button": "கட்டணங்களைப் பெறு",
   "create_shipment.get_rates_error_body": "கட்டணங்களைப் பெற முடியவில்லை:\n{error}",
-  "create_shipment.height_label": "உயரம் (in):",
-  "create_shipment.length_label": "நீளம் (in):",
+  "create_shipment.height_label": "உ ({unit}):",
+  "create_shipment.length_label": "நீ ({unit}):",
   "create_shipment.missing_addresses_body": "முதலில் முகவரி புத்தகத்தில் குறைந்தது இரண்டு முகவரிகளையாவது சரிபார்.",
   "create_shipment.missing_addresses_title": "முகவரிகள் இல்லை",
   "create_shipment.missing_name_body": "இந்த அனுப்புகை ஒரு சர்வதேச எல்லையைக் கடக்கிறது. சுங்கப் பிரகடனத்திற்காக கேரியர்களுக்கு அனுப்புநர் மற்றும் பெறுநர் முகவரி இரண்டிலும் பெயர் அல்லது நிறுவனம் தேவை — முதலில் முகவரி புத்தகத்தில் ஒவ்வொன்றிலும் ஒன்றைச் சேர்க்கவும்.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "சேமிக்கப்பட்டது",
   "create_shipment.title": "அனுப்புகையை உருவாக்கி கட்டணங்களை ஒப்பிடு",
   "create_shipment.to_label": "பெறுநர்:",
-  "create_shipment.weight_label": "எடை (oz):",
-  "create_shipment.width_label": "அகலம் (in):",
+  "create_shipment.weight_label": "எடை:",
+  "create_shipment.width_label": "அ ({unit}):",
   "create_shipment.zip_mode_note": "விலை சரிபார்ப்பு மட்டுமே. லேபிள் வாங்க இரு முனைகளிலும் முழு முகவரிகள் தேவை, எனவே வாங்க «முழு முகவரிகள்» என்பதற்கு மாறவும்.",
   "create_shipment.zip_placeholder": "அஞ்சல் குறியீடு",
   "dashboard.placeholder_text": "அனுப்புகைகள், டிராக்கிங், முகவரி புத்தகம் மற்றும் அறிக்கை காட்சிகள் பின்னர் வரும் கட்டமைப்பு கட்டங்களில் சேர்க்கப்படும். API கீகளை நிர்வகிக்க அமைப்புகளைப் பயன்படுத்து.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "செக்சம்மை நகலெடு",
   "android_app.copied": "நகலெடுக்கப்பட்டது",
   "android_app.reinstall_note": "இந்த முன்கூட்டிய அணுகல் பதிப்பு, Google Play வெளியீட்டிலிருந்து தனித்தனியாகக் கையொப்பமிடப்பட்டுள்ளது. பட்டியல் செயலுக்கு வந்தவுடன் Google Play இலிருந்து மீண்டும் நிறுவ வேண்டியிருக்கலாம்; இணைப்பு தொடரும், எனவே எதுவும் இழக்கப்படாது.",
-  "android_app.needs_production": "Android ஆப் உற்பத்தி பதிப்புடன் இணைகிறது. அதைப் பதிவிறக்கி இணைக்க, உற்பத்தி உரிமத்தைச் செயல்படுத்தவும்."
+  "android_app.needs_production": "Android ஆப் உற்பத்தி பதிப்புடன் இணைகிறது. அதைப் பதிவிறக்கி இணைக்க, உற்பத்தி உரிமத்தைச் செயல்படுத்தவும்.",
+  "create_shipment.units_label": "அலகுகள்:",
+  "create_shipment.units_metric": "மெட்ரிக்",
+  "create_shipment.units_imperial": "இம்பீரியல்"
 }

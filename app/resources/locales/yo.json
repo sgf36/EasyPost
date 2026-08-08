@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Láti:",
   "create_shipment.get_rates_button": "Gba Owó Ìfìránṣẹ́",
   "create_shipment.get_rates_error_body": "A kò lè gba owó ìfìránṣẹ́:\n{error}",
-  "create_shipment.height_label": "Gíga (ìwọ̀n):",
-  "create_shipment.length_label": "Gígùn (ìwọ̀n):",
+  "create_shipment.height_label": "Gí ({unit}):",
+  "create_shipment.length_label": "G ({unit}):",
   "create_shipment.missing_addresses_body": "Kọ́kọ́ ṣàyẹ̀wò àdírẹ́sì méjì ó kéré jù nínú Ìwé Àdírẹ́sì.",
   "create_shipment.missing_addresses_title": "Àwọn àdírẹ́sì tí ó ṣì kù",
   "create_shipment.missing_name_body": "Ìfìránṣẹ́ yìí ńré ààlà àgbáyé kan kọjá. Àwọn olùgbé nílò orúkọ tàbí ilé-iṣẹ́ ní àdírẹ́sì ìpilẹ̀ṣẹ̀ àti àdírẹ́sì ìdí méjèèjì fún ìkéde kọ́sítọ̀mù — kọ́kọ́ fi kún ọ̀kọ̀ọ̀kan nínú Ìwé Àdírẹ́sì.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "A ti fi pamọ́",
   "create_shipment.title": "Ṣẹ̀dá Ìfìránṣẹ́ àti Ṣàfiwé Owó Ìfìránṣẹ́",
   "create_shipment.to_label": "Sí:",
-  "create_shipment.weight_label": "Ìwúwo (haunsi):",
-  "create_shipment.width_label": "Ìbú (ìwọ̀n):",
+  "create_shipment.weight_label": "Ìwúwo:",
+  "create_shipment.width_label": "Ì ({unit}):",
   "create_shipment.zip_mode_note": "Àyẹ̀wò owó nìkan. Rírà àmì nílò àdírẹ́sì kíkún ní ẹ̀gbẹ́ méjèèjì, nítorí náà yí padà sí “Àdírẹ́sì kíkún” láti rà.",
   "create_shipment.zip_placeholder": "Kóòdù ìfìwéránṣẹ́",
   "dashboard.placeholder_text": "Àwọn ojú ìwòye ìfìránṣẹ́, ìtọpinpin, ìwé àdírẹ́sì, àti ìjábọ̀ ni a óò fi kún un ní àwọn ìpele ìdàgbàsókè tí ó tẹ̀lé. Lo Ètò láti ṣàkóso àwọn kọ́kọ́rọ́ API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Ṣàdàkọ checksum",
   "android_app.copied": "A ti ṣàdàkọ",
   "android_app.reinstall_note": "Ẹ̀yà àǹfààní àkọ́kọ́ yìí ni a fọwọ́sí lọ́tọ̀ọ̀tọ̀ yàtọ̀ sí ìtújáde Google Play. Ó lè yẹ kí a tún fi sórí ẹ̀rọ láti Google Play nígbà tí àkọsílẹ̀ náà bá wà láàyè; ìso-pọ̀ yóò dúró, nítorí náà kò sí ohun tí yóò sọnù.",
-  "android_app.needs_production": "App Android máa so pọ̀ mọ́ ẹ̀yà ìṣàmúlò gidi. Mú ìwé àṣẹ ìṣàmúlò gidi ṣiṣẹ́ láti gbà á sílẹ̀ àti láti so ó pọ̀."
+  "android_app.needs_production": "App Android máa so pọ̀ mọ́ ẹ̀yà ìṣàmúlò gidi. Mú ìwé àṣẹ ìṣàmúlò gidi ṣiṣẹ́ láti gbà á sílẹ̀ àti láti so ó pọ̀.",
+  "create_shipment.units_label": "Ẹ̀ka:",
+  "create_shipment.units_metric": "Mẹ́tíríìkì",
+  "create_shipment.units_imperial": "Ìmpíríà"
 }

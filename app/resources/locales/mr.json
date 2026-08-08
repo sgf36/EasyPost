@@ -200,8 +200,8 @@
   "create_shipment.from_label": "पासून:",
   "create_shipment.get_rates_button": "दर मिळवा",
   "create_shipment.get_rates_error_body": "दर मिळवता आले नाहीत:\n{error}",
-  "create_shipment.height_label": "उंची (इंच):",
-  "create_shipment.length_label": "लांबी (इंच):",
+  "create_shipment.height_label": "उंची ({unit}):",
+  "create_shipment.length_label": "लांबी ({unit}):",
   "create_shipment.missing_addresses_body": "प्रथम अ‍ॅड्रेस बुकमध्ये किमान दोन पत्ते सत्यापित करा.",
   "create_shipment.missing_addresses_title": "पत्ते अनुपलब्ध",
   "create_shipment.missing_name_body": "ही शिपमेंट आंतरराष्ट्रीय सीमा ओलांडते. कस्टम्स घोषणेसाठी मूळ आणि गंतव्य अशा दोन्ही पत्त्यांवर नाव किंवा कंपनी असणे कॅरियरसाठी आवश्यक आहे — प्रथम अ‍ॅड्रेस बुकमध्ये प्रत्येकात एक जोडा.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "जतन केले",
   "create_shipment.title": "शिपमेंट तयार करा आणि दर पहा",
   "create_shipment.to_label": "प्रति:",
-  "create_shipment.weight_label": "वजन (औंस):",
-  "create_shipment.width_label": "रुंदी (इंच):",
+  "create_shipment.weight_label": "वजन:",
+  "create_shipment.width_label": "रुंदी ({unit}):",
   "create_shipment.zip_mode_note": "फक्त किंमत तपासणी. लेबल खरेदीसाठी दोन्ही बाजूंना पूर्ण पत्ते आवश्यक आहेत, म्हणून खरेदीसाठी «पूर्ण पत्ते» वर जा.",
   "create_shipment.zip_placeholder": "पिन कोड",
   "dashboard.placeholder_text": "शिपमेंट्स, ट्रॅकिंग, अ‍ॅड्रेस बुक आणि अहवाल दृश्ये पुढील बिल्ड टप्प्यांमध्ये जोडली जातील. API की व्यवस्थापित करण्यासाठी सेटिंग्ज वापरा.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "चेकसम कॉपी करा",
   "android_app.copied": "कॉपी केले",
   "android_app.reinstall_note": "हे प्रारंभिक-प्रवेश बिल्ड Google Play रिलीझपासून स्वतंत्रपणे स्वाक्षरी केलेले आहे. सूची लाइव्ह झाल्यावर Google Play वरून पुन्हा स्थापित करण्याची आवश्यकता असू शकते; जोडणी कायम राहते, त्यामुळे काहीही गमावले जात नाही.",
-  "android_app.needs_production": "Android अॅप उत्पादन आवृत्तीशी जोडले जाते. ते डाउनलोड आणि जोडण्यासाठी उत्पादन परवाना सक्रिय करा."
+  "android_app.needs_production": "Android अॅप उत्पादन आवृत्तीशी जोडले जाते. ते डाउनलोड आणि जोडण्यासाठी उत्पादन परवाना सक्रिय करा.",
+  "create_shipment.units_label": "एकके:",
+  "create_shipment.units_metric": "मेट्रिक",
+  "create_shipment.units_imperial": "इंपिरियल"
 }

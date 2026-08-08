@@ -200,8 +200,8 @@
   "create_shipment.from_label": "ပေးပို့သူ:",
   "create_shipment.get_rates_button": "နှုန်းထားများ ရယူရန်",
   "create_shipment.get_rates_error_body": "နှုန်းထားများကို ရယူ၍ မရပါ:\n{error}",
-  "create_shipment.height_label": "အမြင့် (လက်မ):",
-  "create_shipment.length_label": "အလျား (လက်မ):",
+  "create_shipment.height_label": "အမြင့် ({unit}):",
+  "create_shipment.length_label": "အလျား ({unit}):",
   "create_shipment.missing_addresses_body": "ပထမဦးစွာ လိပ်စာစာအုပ်တွင် အနည်းဆုံးလိပ်စာနှစ်ခုကို အတည်ပြုပါ။",
   "create_shipment.missing_addresses_title": "လိပ်စာများ မရှိပါ",
   "create_shipment.missing_name_body": "ဤပို့ဆောင်မှုသည် နိုင်ငံတကာ နယ်နိမိတ် ဖြတ်ကျော်သည်။ အကောက်ခွန်ကြေညာလွှာအတွက် သယ်ယူပို့ဆောင်သူများသည် မူလနှင့် ပန်းတိုင် လိပ်စာနှစ်ခုစလုံးတွင် အမည် သို့မဟုတ် ကုမ္ပဏီ ပါရှိရန် လိုအပ်သည် — ပထမဦးစွာ လိပ်စာစာအုပ်တွင် တစ်ခုစီအတွက် ထည့်သွင်းပါ။",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "သိမ်းဆည်းပြီးပါပြီ",
   "create_shipment.title": "ပို့ဆောင်မှုကို ဖန်တီးပြီး နှုန်းထားများကို နှိုင်းယှဉ်ရန်",
   "create_shipment.to_label": "ရရှိသူ:",
-  "create_shipment.weight_label": "အလေးချိန် (အောင်စ):",
-  "create_shipment.width_label": "အနံ (လက်မ):",
+  "create_shipment.weight_label": "အလေးချိန်:",
+  "create_shipment.width_label": "အနံ ({unit}):",
   "create_shipment.zip_mode_note": "စျေးနှုန်းစစ်ဆေးရန်သာ ဖြစ်သည်။ တံဆိပ်ဝယ်ရန် နှစ်ဖက်စလုံးတွင် လိပ်စာအပြည့်အစုံ လိုအပ်သဖြင့် ဝယ်ရန် „လိပ်စာအပြည့်အစုံ“ သို့ ပြောင်းပါ။",
   "create_shipment.zip_placeholder": "စာတိုက်ကုဒ်",
   "dashboard.placeholder_text": "ပို့ဆောင်မှု၊ ခြေရာခံခြင်း၊ လိပ်စာစာအုပ်နှင့် အစီရင်ခံချက်ဆိုင်ရာ မြင်ကွင်းများကို နောက်ပိုင်း တည်ဆောက်မှုအဆင့်များတွင် ထည့်သွင်းပါမည်။ API သော့များကို စီမံခန့်ခွဲရန် ဆက်တင်များကို အသုံးပြုပါ။",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "checksum ကို ကူးယူပါ",
   "android_app.copied": "ကူးယူပြီး",
   "android_app.reinstall_note": "ဤစောစီးစွာအသုံးပြုနိုင်သော တည်ဆောက်မှုကို Google Play ထုတ်ဝေမှုနှင့် သီးခြားလက်မှတ်ရေးထိုးထားသည်။ စာရင်းသွင်းခြင်း အသက်ဝင်ပြီးသည်နှင့် Google Play မှ ပြန်လည်ထည့်သွင်းရန် လိုအပ်နိုင်သည်။ ချိတ်ဆက်မှုသည် ဆက်လက်တည်ရှိသဖြင့် မည်သည့်အရာမျှ ဆုံးရှုံးမည်မဟုတ်ပါ။",
-  "android_app.needs_production": "Android အက်ပ်သည် ထုတ်လုပ်မှုဗားရှင်းနှင့် ချိတ်ဆက်သည်။ ၎င်းကို ဒေါင်းလုဒ်လုပ်ပြီး ချိတ်ဆက်ရန် ထုတ်လုပ်မှုလိုင်စင်ကို အသက်သွင်းပါ။"
+  "android_app.needs_production": "Android အက်ပ်သည် ထုတ်လုပ်မှုဗားရှင်းနှင့် ချိတ်ဆက်သည်။ ၎င်းကို ဒေါင်းလုဒ်လုပ်ပြီး ချိတ်ဆက်ရန် ထုတ်လုပ်မှုလိုင်စင်ကို အသက်သွင်းပါ။",
+  "create_shipment.units_label": "ယူနစ်:",
+  "create_shipment.units_metric": "မက်ထရစ်",
+  "create_shipment.units_imperial": "အင်ပီရီယယ်"
 }

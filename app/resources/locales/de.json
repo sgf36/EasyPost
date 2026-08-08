@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Von:",
   "create_shipment.get_rates_button": "Tarife abrufen",
   "create_shipment.get_rates_error_body": "Tarife konnten nicht abgerufen werden:\n{error}",
-  "create_shipment.height_label": "H (Zoll):",
-  "create_shipment.length_label": "L (Zoll):",
+  "create_shipment.height_label": "H ({unit}):",
+  "create_shipment.length_label": "L ({unit}):",
   "create_shipment.missing_addresses_body": "Prüfen Sie zunächst mindestens zwei Adressen im Adressbuch.",
   "create_shipment.missing_addresses_title": "Adressen fehlen",
   "create_shipment.missing_name_body": "Diese Sendung überschreitet eine internationale Grenze. Versanddienstleister verlangen für die Zollerklärung einen Namen oder eine Firma sowohl für die Absender- als auch die Empfängeradresse — fügen Sie zunächst im Adressbuch bei beiden eine hinzu.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Gespeichert",
   "create_shipment.title": "Sendung erstellen und Tarife vergleichen",
   "create_shipment.to_label": "An:",
-  "create_shipment.weight_label": "Gewicht (oz):",
-  "create_shipment.width_label": "B (Zoll):",
+  "create_shipment.weight_label": "Gewicht:",
+  "create_shipment.width_label": "B ({unit}):",
   "create_shipment.zip_mode_note": "Nur Preisabfrage. Für den Kauf eines Etiketts sind vollständige Adressen auf beiden Seiten erforderlich. Wechseln Sie dazu zu „Vollständige Adressen“.",
   "create_shipment.zip_placeholder": "Postleitzahl",
   "dashboard.placeholder_text": "Sendungen, Sendungsverfolgung, Adressbuch und Berichte werden in späteren Ausbaustufen hinzugefügt. Verwalten Sie API-Schlüssel unter Einstellungen.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Prüfsumme kopieren",
   "android_app.copied": "Kopiert",
   "android_app.reinstall_note": "Dieser Early-Access-Build wird unabhängig von der Google-Play-Veröffentlichung signiert. Eine Neuinstallation über Google Play kann erforderlich sein, sobald der Eintrag verfügbar ist; die Kopplung bleibt erhalten, sodass nichts verloren geht.",
-  "android_app.needs_production": "Die Android-App wird mit der Produktionsversion gekoppelt. Aktivieren Sie eine Produktionslizenz, um sie herunterzuladen und zu koppeln."
+  "android_app.needs_production": "Die Android-App wird mit der Produktionsversion gekoppelt. Aktivieren Sie eine Produktionslizenz, um sie herunterzuladen und zu koppeln.",
+  "create_shipment.units_label": "Einheiten:",
+  "create_shipment.units_metric": "Metrisch",
+  "create_shipment.units_imperial": "Imperial"
 }

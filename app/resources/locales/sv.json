@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Från:",
   "create_shipment.get_rates_button": "Hämta priser",
   "create_shipment.get_rates_error_body": "Kunde inte hämta priser:\n{error}",
-  "create_shipment.height_label": "H (tum):",
-  "create_shipment.length_label": "L (tum):",
+  "create_shipment.height_label": "H ({unit}):",
+  "create_shipment.length_label": "L ({unit}):",
   "create_shipment.missing_addresses_body": "Verifiera minst två adresser i adressboken först.",
   "create_shipment.missing_addresses_title": "Adresser saknas",
   "create_shipment.missing_name_body": "Denna sändning passerar en internationell gräns. Transportörer kräver ett namn eller företag på både avsändar- och mottagaradressen för tulldeklarationen — lägg till ett för var och en i adressboken först.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Sparad",
   "create_shipment.title": "Skapa sändning och jämför priser",
   "create_shipment.to_label": "Till:",
-  "create_shipment.weight_label": "Vikt (oz):",
-  "create_shipment.width_label": "B (tum):",
+  "create_shipment.weight_label": "Vikt:",
+  "create_shipment.width_label": "B ({unit}):",
   "create_shipment.zip_mode_note": "Endast priskontroll. Köp av etikett kräver fullständiga adresser i båda ändar, så växla till ”Fullständiga adresser” för att köpa.",
   "create_shipment.zip_placeholder": "Postnummer",
   "dashboard.placeholder_text": "Sändningar, spårning, adressbok och rapportvyer läggs till i senare byggsteg. Använd Inställningar för att hantera API-nycklar.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Kopiera kontrollsumma",
   "android_app.copied": "Kopierad",
   "android_app.reinstall_note": "Den här tidiga versionen är signerad oberoende av Google Play-utgåvan. Ominstallation från Google Play kan krävas när listningen är aktiv; parkopplingen följer med, så inget går förlorat.",
-  "android_app.needs_production": "Android-appen parkopplas med produktionsversionen. Aktivera en produktionslicens för att ladda ner och parkoppla den."
+  "android_app.needs_production": "Android-appen parkopplas med produktionsversionen. Aktivera en produktionslicens för att ladda ner och parkoppla den.",
+  "create_shipment.units_label": "Enheter:",
+  "create_shipment.units_metric": "Metrisk",
+  "create_shipment.units_imperial": "Imperial"
 }

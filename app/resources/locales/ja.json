@@ -200,8 +200,8 @@
   "create_shipment.from_label": "発送元:",
   "create_shipment.get_rates_button": "料金を取得",
   "create_shipment.get_rates_error_body": "料金を取得できませんでした:\n{error}",
-  "create_shipment.height_label": "高さ (インチ):",
-  "create_shipment.length_label": "長さ (インチ):",
+  "create_shipment.height_label": "高さ ({unit}):",
+  "create_shipment.length_label": "長さ ({unit}):",
   "create_shipment.missing_addresses_body": "先に住所録で2件以上の住所を確認してください。",
   "create_shipment.missing_addresses_title": "住所が不足しています",
   "create_shipment.missing_name_body": "この配送は国際的な国境を越えます。通関申告のため、配送業者は発送元と発送先の両方の住所に名前または会社名を必要とします — 先に住所録でそれぞれに追加してください。",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "保存済み",
   "create_shipment.title": "配送作成 & 料金比較",
   "create_shipment.to_label": "宛先:",
-  "create_shipment.weight_label": "重量 (オンス):",
-  "create_shipment.width_label": "幅 (インチ):",
+  "create_shipment.weight_label": "重量:",
+  "create_shipment.width_label": "幅 ({unit}):",
   "create_shipment.zip_mode_note": "料金確認のみです。ラベルの購入には両側の完全な住所が必要なため、購入するには「完全な住所」に切り替えてください。",
   "create_shipment.zip_placeholder": "郵便番号",
   "dashboard.placeholder_text": "配送、追跡、住所録、レポート機能は今後のビルドで追加されます。APIキーの管理は設定から行ってください。",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "チェックサムをコピー",
   "android_app.copied": "コピーしました",
   "android_app.reinstall_note": "この早期アクセス版は、Google Play版とは独立して署名されています。ストア掲載が公開されたら、Google Playから再インストールが必要になる場合があります。ペアリングは引き継がれるため、何も失われません。",
-  "android_app.needs_production": "Androidアプリは本番バージョンとペアリングします。ダウンロードしてペアリングするには、本番ライセンスを有効化してください。"
+  "android_app.needs_production": "Androidアプリは本番バージョンとペアリングします。ダウンロードしてペアリングするには、本番ライセンスを有効化してください。",
+  "create_shipment.units_label": "単位:",
+  "create_shipment.units_metric": "メートル法",
+  "create_shipment.units_imperial": "ヤードポンド法"
 }

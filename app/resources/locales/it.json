@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Da:",
   "create_shipment.get_rates_button": "Ottieni Tariffe",
   "create_shipment.get_rates_error_body": "Impossibile ottenere le tariffe:\n{error}",
-  "create_shipment.height_label": "Altezza (in):",
-  "create_shipment.length_label": "Lunghezza (in):",
+  "create_shipment.height_label": "Alt. ({unit}):",
+  "create_shipment.length_label": "Lungh. ({unit}):",
   "create_shipment.missing_addresses_body": "Verifica prima almeno due indirizzi nella Rubrica.",
   "create_shipment.missing_addresses_title": "Indirizzi mancanti",
   "create_shipment.missing_name_body": "Questa spedizione attraversa un confine internazionale. I corrieri richiedono un nome o un'azienda sia per l'indirizzo di origine sia per quello di destinazione ai fini della dichiarazione doganale — aggiungine uno a ciascuno nella Rubrica prima.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Salvato",
   "create_shipment.title": "Crea Spedizione e Confronta Tariffe",
   "create_shipment.to_label": "A:",
-  "create_shipment.weight_label": "Peso (oz):",
-  "create_shipment.width_label": "Larghezza (in):",
+  "create_shipment.weight_label": "Peso:",
+  "create_shipment.width_label": "Largh. ({unit}):",
   "create_shipment.zip_mode_note": "Solo verifica prezzo. L'acquisto di un'etichetta richiede indirizzi completi da entrambi i lati: passare a «Indirizzi completi» per acquistare.",
   "create_shipment.zip_placeholder": "Codice postale",
   "dashboard.placeholder_text": "Le visualizzazioni di spedizioni, tracciamento, rubrica e report saranno aggiunte nelle fasi successive di sviluppo. Usa Impostazioni per gestire le chiavi API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Copia checksum",
   "android_app.copied": "Copiato",
   "android_app.reinstall_note": "Questa build ad accesso anticipato è firmata in modo indipendente dalla versione di Google Play. Potrebbe essere necessario reinstallare da Google Play una volta che la scheda sarà attiva; l'associazione viene mantenuta, quindi non si perde nulla.",
-  "android_app.needs_production": "L'app Android si associa alla versione di produzione. Attiva una licenza di produzione per scaricarla e associarla."
+  "android_app.needs_production": "L'app Android si associa alla versione di produzione. Attiva una licenza di produzione per scaricarla e associarla.",
+  "create_shipment.units_label": "Unità:",
+  "create_shipment.units_metric": "Metrico",
+  "create_shipment.units_imperial": "Imperiale"
 }

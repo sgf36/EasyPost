@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Feladó:",
   "create_shipment.get_rates_button": "Díjak lekérése",
   "create_shipment.get_rates_error_body": "Nem sikerült lekérni a díjakat:\n{error}",
-  "create_shipment.height_label": "Magasság (in):",
-  "create_shipment.length_label": "Hosszúság (in):",
+  "create_shipment.height_label": "M ({unit}):",
+  "create_shipment.length_label": "H ({unit}):",
   "create_shipment.missing_addresses_body": "Először ellenőrizzen legalább két címet a Címjegyzékben.",
   "create_shipment.missing_addresses_title": "Hiányzó címek",
   "create_shipment.missing_name_body": "Ez a küldemény nemzetközi határt lép át. A vámnyilatkozathoz a szállítók nevet vagy cégnevet igényelnek mind a feladó, mind a címzett címén — először adjon meg egyet mindkettőhöz a Címjegyzékben.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Mentve",
   "create_shipment.title": "Szállítmány létrehozása és díjak összehasonlítása",
   "create_shipment.to_label": "Címzett:",
-  "create_shipment.weight_label": "Súly (oz):",
-  "create_shipment.width_label": "Szélesség (in):",
+  "create_shipment.weight_label": "Súly:",
+  "create_shipment.width_label": "Sz ({unit}):",
   "create_shipment.zip_mode_note": "Csak árellenőrzés. A címke megvásárlásához mindkét oldalon teljes cím szükséges, ezért váltson a „Teljes címek” lehetőségre.",
   "create_shipment.zip_placeholder": "Irányítószám",
   "dashboard.placeholder_text": "A szállítmányok, a nyomkövetés, a címjegyzék és a jelentések nézetei a későbbi fejlesztési szakaszokban kerülnek hozzáadásra. Az API-kulcsok kezeléséhez használja a Beállításokat.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Ellenőrzőösszeg másolása",
   "android_app.copied": "Másolva",
   "android_app.reinstall_note": "Ez a korai hozzáférésű build a Google Play-kiadástól függetlenül van aláírva. A Google Play áruházból való újratelepítésre lehet szükség, amint az oldal elérhetővé válik; a párosítás megmarad, így semmi sem vész el.",
-  "android_app.needs_production": "Az Android alkalmazás az éles verzióval párosítható. Aktiváljon egy éles licencet a letöltéséhez és párosításához."
+  "android_app.needs_production": "Az Android alkalmazás az éles verzióval párosítható. Aktiváljon egy éles licencet a letöltéséhez és párosításához.",
+  "create_shipment.units_label": "Mértékegységek:",
+  "create_shipment.units_metric": "Metrikus",
+  "create_shipment.units_imperial": "Angolszász"
 }

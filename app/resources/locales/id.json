@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Dari:",
   "create_shipment.get_rates_button": "Dapatkan Tarif",
   "create_shipment.get_rates_error_body": "Tidak dapat mengambil tarif:\n{error}",
-  "create_shipment.height_label": "T (in):",
-  "create_shipment.length_label": "P (in):",
+  "create_shipment.height_label": "T ({unit}):",
+  "create_shipment.length_label": "P ({unit}):",
   "create_shipment.missing_addresses_body": "Verifikasi setidaknya dua alamat di Buku Alamat terlebih dahulu.",
   "create_shipment.missing_addresses_title": "Alamat tidak ada",
   "create_shipment.missing_name_body": "Pengiriman ini melintasi batas internasional. Kurir mewajibkan nama atau perusahaan pada alamat asal dan tujuan untuk deklarasi pabean — tambahkan salah satunya pada masing-masing alamat di Buku Alamat terlebih dahulu.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Tersimpan",
   "create_shipment.title": "Buat Pengiriman & Bandingkan Tarif",
   "create_shipment.to_label": "Kepada:",
-  "create_shipment.weight_label": "Berat (oz):",
-  "create_shipment.width_label": "L (in):",
+  "create_shipment.weight_label": "Berat:",
+  "create_shipment.width_label": "L ({unit}):",
   "create_shipment.zip_mode_note": "Hanya cek harga. Pembelian label memerlukan alamat lengkap di kedua sisi, jadi beralihlah ke “Alamat lengkap” untuk membeli.",
   "create_shipment.zip_placeholder": "Kode pos",
   "dashboard.placeholder_text": "Tampilan pengiriman, pelacakan, buku alamat, dan pelaporan akan ditambahkan pada tahap pengembangan berikutnya. Gunakan Pengaturan untuk mengelola kunci API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Salin checksum",
   "android_app.copied": "Disalin",
   "android_app.reinstall_note": "Versi akses awal ini ditandatangani secara terpisah dari rilis Google Play. Pemasangan ulang dari Google Play mungkin diperlukan setelah daftarnya aktif; pemasangan tetap terbawa, jadi tidak ada yang hilang.",
-  "android_app.needs_production": "Aplikasi Android dipasangkan dengan versi produksi. Aktifkan lisensi produksi untuk mengunduh dan memasangkannya."
+  "android_app.needs_production": "Aplikasi Android dipasangkan dengan versi produksi. Aktifkan lisensi produksi untuk mengunduh dan memasangkannya.",
+  "create_shipment.units_label": "Satuan:",
+  "create_shipment.units_metric": "Metrik",
+  "create_shipment.units_imperial": "Imperial"
 }

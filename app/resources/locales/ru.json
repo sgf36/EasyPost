@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Откуда:",
   "create_shipment.get_rates_button": "Получить тарифы",
   "create_shipment.get_rates_error_body": "Не удалось получить тарифы:\n{error}",
-  "create_shipment.height_label": "В (дюйм.):",
-  "create_shipment.length_label": "Д (дюйм.):",
+  "create_shipment.height_label": "В ({unit}):",
+  "create_shipment.length_label": "Д ({unit}):",
   "create_shipment.missing_addresses_body": "Сначала проверьте не менее двух адресов в адресной книге.",
   "create_shipment.missing_addresses_title": "Адреса не указаны",
   "create_shipment.missing_name_body": "Это отправление пересекает международную границу. Для таможенной декларации перевозчики требуют имя или название компании как для адреса отправителя, так и для адреса получателя — сначала добавьте их для каждого в адресной книге.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Сохранено",
   "create_shipment.title": "Создание отправления и сравнение тарифов",
   "create_shipment.to_label": "Куда:",
-  "create_shipment.weight_label": "Вес (унц.):",
-  "create_shipment.width_label": "Ш (дюйм.):",
+  "create_shipment.weight_label": "Вес:",
+  "create_shipment.width_label": "Ш ({unit}):",
   "create_shipment.zip_mode_note": "Только проверка цены. Для покупки этикетки нужны полные адреса с обеих сторон, поэтому переключитесь на «Полные адреса».",
   "create_shipment.zip_placeholder": "Почтовый индекс",
   "dashboard.placeholder_text": "Разделы отправлений, отслеживания, адресной книги и отчётов будут добавлены на следующих этапах разработки. Используйте раздел «Настройки» для управления ключами API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Копировать контрольную сумму",
   "android_app.copied": "Скопировано",
   "android_app.reinstall_note": "Эта сборка с ранним доступом подписана независимо от выпуска в Google Play. После публикации страницы может потребоваться переустановка из Google Play; сопряжение сохранится, поэтому ничего не будет потеряно.",
-  "android_app.needs_production": "Приложение Android выполняет сопряжение с производственной версией. Активируйте производственную лицензию, чтобы скачать его и выполнить сопряжение."
+  "android_app.needs_production": "Приложение Android выполняет сопряжение с производственной версией. Активируйте производственную лицензию, чтобы скачать его и выполнить сопряжение.",
+  "create_shipment.units_label": "Единицы:",
+  "create_shipment.units_metric": "Метрическая",
+  "create_shipment.units_imperial": "Имперская"
 }

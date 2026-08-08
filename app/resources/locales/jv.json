@@ -200,8 +200,8 @@
   "create_shipment.from_label": "Saka:",
   "create_shipment.get_rates_button": "Jaluk Tarif",
   "create_shipment.get_rates_error_body": "Ora bisa njaluk tarif:\n{error}",
-  "create_shipment.height_label": "T (inci):",
-  "create_shipment.length_label": "P (inci):",
+  "create_shipment.height_label": "Dhuwur ({unit}):",
+  "create_shipment.length_label": "Dawa ({unit}):",
   "create_shipment.missing_addresses_body": "Verifikasi paling sethithik loro alamat ing Buku Alamat dhisik.",
   "create_shipment.missing_addresses_title": "Alamat ora ana",
   "create_shipment.missing_name_body": "Kiriman iki nglintasi wates internasional. Kurir mbutuhake jeneng utawa perusahaan ing alamat asal lan tujuan kanggo deklarasi pabean — tambahake iku ing saben alamat kasebut ing Buku Alamat dhisik.",
@@ -251,8 +251,8 @@
   "create_shipment.saved_title": "Disimpen",
   "create_shipment.title": "Gawe Kiriman & Deleng Tarif",
   "create_shipment.to_label": "Marang:",
-  "create_shipment.weight_label": "Bobot (oz):",
-  "create_shipment.width_label": "L (inci):",
+  "create_shipment.weight_label": "Bobot:",
+  "create_shipment.width_label": "Amba ({unit}):",
   "create_shipment.zip_mode_note": "Mung mriksa rega. Tuku label mbutuhake alamat lengkap ing loro sisih, mula ganti menyang “Alamat lengkap” kanggo tuku.",
   "create_shipment.zip_placeholder": "Kode pos",
   "dashboard.placeholder_text": "Tampilan kiriman, lacak, buku alamat, lan laporan bakal ditambahake ing tahap build sabanjure. Gunakake Setelan kanggo ngatur kunci API.",
@@ -532,5 +532,8 @@
   "android_app.copy_checksum": "Salin checksum",
   "android_app.copied": "Disalin",
   "android_app.reinstall_note": "Versi akses awal iki ditandatangani kanthi kapisah saka rilis Google Play. Pemasangan ulang saka Google Play bisa uga dibutuhake yen daftar wis aktif; pemasangan tetep kagawa, dadi ora ana sing ilang.",
-  "android_app.needs_production": "Aplikasi Android dipasangake karo versi produksi. Aktifake lisensi produksi kanggo ngundhuh lan masangake."
+  "android_app.needs_production": "Aplikasi Android dipasangake karo versi produksi. Aktifake lisensi produksi kanggo ngundhuh lan masangake.",
+  "create_shipment.units_label": "Unit:",
+  "create_shipment.units_metric": "Metrik",
+  "create_shipment.units_imperial": "Imperial"
 }
