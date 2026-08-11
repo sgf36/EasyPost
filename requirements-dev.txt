@@ -2,3 +2,11 @@
 pytest>=8.0.0
 pyinstaller>=6.0.0
 Pillow>=10.0.0
+# Build-only. The PyInstaller spec collects the whole `mcp` package (for the
+# lazily-imported in-process relay), which walks mcp.cli — and mcp.cli.cli
+# calls sys.exit(1) at import time when its optional `typer` dependency is
+# missing (mcp ships the CLI extra separately). collect_submodules imports
+# each submodule during discovery and does not catch SystemExit, so an absent
+# typer aborts the whole build. Declaring it here keeps mcp.cli importable so
+# the build completes. Not a runtime dependency of the app itself.
+typer>=0.12.0
