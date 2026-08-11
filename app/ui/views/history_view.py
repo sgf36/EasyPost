@@ -27,6 +27,7 @@ from app.services.shipments import (
     save_shipment_locally,
 )
 from app.ui.widgets.async_worker import run_async
+from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
 
 _COLUMN_KEYS = [
@@ -46,6 +47,7 @@ class HistoryView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._pending_task = None
+        self._records = []
 
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"<h2>{tr('history.title')}</h2>"))
@@ -60,18 +62,45 @@ class HistoryView(QWidget):
         self._table.setHorizontalHeaderLabels(columns)
         self._table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        # Multi-select purchased shipments to combine their labels onto one sheet.
+        self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QTableWidget.SelectionMode.ExtendedSelection)
 
         reload_btn = QPushButton(tr("history.reload_button"))
         reload_btn.clicked.connect(self.refresh_table)
+        export_btn = QPushButton(tr("history.export_sheet_button"))
+        export_btn.clicked.connect(self._on_export_sheet)
+
+        buttons = QHBoxLayout()
+        buttons.addWidget(reload_btn)
+        buttons.addWidget(export_btn)
+        buttons.addStretch(1)
 
         layout = QVBoxLayout()
         layout.addWidget(self._table)
-        layout.addWidget(reload_btn)
+        layout.addLayout(buttons)
         group.setLayout(layout)
         return group
 
+    def _on_export_sheet(self) -> None:
+        rows = sorted({idx.row() for idx in self._table.selectionModel().selectedRows()})
+        urls = [
+            self._records[r].label_url
+            for r in rows
+            if r < len(self._records) and self._records[r].label_url
+        ]
+        if not urls:
+            QMessageBox.information(
+                self,
+                tr("history.export_sheet_title"),
+                tr("history.export_none_selected"),
+            )
+            return
+        PrintSheetDialog(urls, self).exec()
+
     def refresh_table(self) -> None:
         records = list_shipments()
+        self._records = records
         self._table.setRowCount(len(records))
         for row, rec in enumerate(records):
             values = [
