@@ -24,11 +24,13 @@ from app.services.batches import (
     buy_batch,
     create_batch,
     generate_batch_label,
-    parse_csv,
+    parse_import,
     retrieve_batch,
     save_batch_locally,
     write_csv_template,
+    write_xlsx_template,
 )
+from app.services.packages import predefined_package_names
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
@@ -49,6 +51,22 @@ class BatchView(QWidget):
         layout.addWidget(self._build_batch_group())
 
         self.refresh_address_choices()
+
+    @staticmethod
+    def _save_template_filter() -> str:
+        # Extensions stay literal; only the label words are translated.
+        return (
+            f"{tr('batch_shipments.filter_excel')} (*.xlsx);;"
+            f"{tr('batch_shipments.filter_csv')} (*.csv)"
+        )
+
+    @staticmethod
+    def _import_filter() -> str:
+        return (
+            f"{tr('batch_shipments.filter_spreadsheets')} (*.xlsx *.csv);;"
+            f"{tr('batch_shipments.filter_excel')} (*.xlsx);;"
+            f"{tr('batch_shipments.filter_csv')} (*.csv)"
+        )
 
     def _build_import_group(self) -> QGroupBox:
         group = QGroupBox(tr("batch_shipments.import_group_title"))
@@ -133,26 +151,49 @@ class BatchView(QWidget):
             )
 
     def _on_download_template(self) -> None:
-        path, _ = QFileDialog.getSaveFileName(
+        # Excel default: only a workbook can carry the package dropdown. CSV
+        # stays available for anyone who prefers it (same columns, no dropdown).
+        path, selected = QFileDialog.getSaveFileName(
             self,
             tr("batch_shipments.save_template_dialog_title"),
-            "batch_template.csv",
-            tr("batch_shipments.csv_filter"),
+            "batch_template.xlsx",
+            self._save_template_filter(),
         )
-        if path:
+        if not path:
+            return
+
+        is_xlsx = path.lower().endswith(".xlsx") or "xlsx" in (selected or "").lower()
+        if not is_xlsx:
             write_csv_template(path)
             QMessageBox.information(
                 self, tr("batch_shipments.saved_title"), tr("batch_shipments.saved_body", path=path)
             )
+            return
+
+        # Fetch the carrier package list off the UI thread, then write the
+        # workbook — the fetch may hit the network (falls back to cache).
+        self._pending_task = run_async(
+            lambda: (write_xlsx_template(path, predefined_package_names()), path)[1], self
+        )
+        self._pending_task.succeeded.connect(
+            lambda saved: QMessageBox.information(
+                self, tr("batch_shipments.saved_title"), tr("batch_shipments.saved_body", path=saved)
+            )
+        )
+        self._pending_task.failed.connect(
+            lambda exc: QMessageBox.critical(
+                self, tr("common.error"), tr("batch_shipments.saved_failed_body", error=str(exc))
+            )
+        )
 
     def _on_browse_csv(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
-            self, tr("batch_shipments.choose_csv_dialog_title"), "", tr("batch_shipments.csv_filter")
+            self, tr("batch_shipments.choose_csv_dialog_title"), "", self._import_filter()
         )
         if not path:
             return
         try:
-            self._parsed_rows = parse_csv(path)
+            self._parsed_rows = parse_import(path)
             self._csv_path = path
         except Exception as exc:  # noqa: BLE001
             QMessageBox.critical(self, tr("batch_shipments.invalid_csv_title"), str(exc))
@@ -171,10 +212,14 @@ class BatchView(QWidget):
         self._preview_table.setRowCount(len(self._parsed_rows))
         for row_idx, row in enumerate(self._parsed_rows):
             to_summary = f"{row.fields.get('to_name', '')}, {row.fields.get('to_city', '')}"
-            parcel_summary = (
-                f"{row.fields.get('length','')}x{row.fields.get('width','')}"
-                f"x{row.fields.get('height','')} / {row.fields.get('weight','')}oz"
-            )
+            package = row.fields.get("predefined_package", "")
+            if package:
+                parcel_summary = f"{package} / {row.fields.get('weight','')}oz"
+            else:
+                parcel_summary = (
+                    f"{row.fields.get('length','')}x{row.fields.get('width','')}"
+                    f"x{row.fields.get('height','')} / {row.fields.get('weight','')}oz"
+                )
             self._preview_table.setItem(row_idx, 0, QTableWidgetItem(str(row.line_number)))
             self._preview_table.setItem(row_idx, 1, QTableWidgetItem(to_summary))
             self._preview_table.setItem(row_idx, 2, QTableWidgetItem(parcel_summary))
