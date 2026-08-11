@@ -53,6 +53,42 @@ def settle(app, ms=700):
         time.sleep(0.02)
 
 
+def _sample_label(n):
+    """A representative 4x6 shipping label (PNG bytes) for the print-sheet shot.
+
+    The deterministic harness must not hit the network, so the print-sheet
+    dialog's fetch is stubbed with these — a plain carrier-style label with a
+    barcode and tracking line, so the preview looks real without being any
+    genuine customer's data.
+    """
+    import hashlib
+    import io
+
+    from PIL import Image, ImageDraw
+
+    w, h = 800, 1200
+    im = Image.new("RGB", (w, h), "white")
+    d = ImageDraw.Draw(im)
+    d.rectangle([4, 4, w - 5, h - 5], outline="black", width=4)
+    d.rectangle([0, 0, w, 120], fill="black")
+    d.text((30, 44), f"EASY-POST  ·  {n}", fill="white")
+    d.text((30, 170), "USPS Priority Mail", fill="black")
+    d.text((30, 214), "To: Sample Recipient", fill="black")
+    x = 40
+    seed = hashlib.md5(str(n).encode()).digest()
+    for i in range(120):
+        bw = 3 + (seed[i % len(seed)] % 6)
+        if i % 2 == 0:
+            d.rectangle([x, h - 260, x + bw, h - 80], fill="black")
+        x += bw + 3
+        if x > w - 60:
+            break
+    d.text((40, h - 60), f"9400 1000 0000 000{n}", fill="black")
+    b = io.BytesIO()
+    im.save(b, "PNG")
+    return b.getvalue()
+
+
 def main():
     from app.core.settings import load_settings, save_settings
 
@@ -167,6 +203,39 @@ def main():
         pix = win.grab()
         pix.save(str(path), "PNG")
         written.append(path.name)
+
+    # 10 — Print sheet dialog (new in 1.1.2). Stub the network fetch with sample
+    # labels so the harness stays offline, then composite the dialog onto a
+    # Store-sized canvas (the dialog alone is below the 1366x768 minimum).
+    try:
+        from app.ui.widgets import print_sheet_dialog as psd
+
+        psd.fetch_label_images = lambda urls: ([_sample_label(k) for k in range(1, 5)], [])
+        dlg = psd.PrintSheetDialog(["a", "b", "c", "d"], win)
+        dlg.setAttribute(Qt.WidgetAttribute.WA_DontShowOnScreen, True)
+        dlg.show()
+        for _ in range(40):
+            settle(app, 200)
+            pm = dlg._preview.pixmap()
+            if dlg._save_btn.isEnabled() and pm is not None and not pm.isNull():
+                break
+        settle(app, 400)
+        tmp = lang_dir / "_dlg.png"
+        dlg.grab().save(str(tmp), "PNG")
+        dlg.close()
+
+        from PIL import Image
+
+        bg = Image.new("RGB", SIZE, (245, 246, 248))
+        fg = Image.open(str(tmp)).convert("RGB")
+        bg.paste(fg, ((SIZE[0] - fg.width) // 2, (SIZE[1] - fg.height) // 2))
+        out = lang_dir / "10_print_sheet.png"
+        bg.save(str(out), "PNG")
+        tmp.unlink(missing_ok=True)
+        written.append(out.name)
+        print(f"    print_sheet dialog {fg.width}x{fg.height}")
+    except Exception as exc:
+        print(f"    note print_sheet: {str(exc)[:120]}")
 
     print(f"  {target}: {len(written)} shots -> {lang_dir}")
     win.close()
