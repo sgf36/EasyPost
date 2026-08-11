@@ -265,6 +265,7 @@ export function contactOwnerEmail({
   triageNote,
   message,
   autoReplied,
+  spam = false,
 }) {
   const text =
     "A message was sent from the Easy-Post Desktop contact form.\n\n" +
@@ -284,7 +285,7 @@ export function contactOwnerEmail({
     </tr>`;
   const bodyHtml =
     heading("New support enquiry") +
-    refBox("Case", caseId, autoReplied ? "Customer already received an automated first reply." : "Awaiting your reply.") +
+    refBox("Case", caseId, spam ? "Likely spam — no acknowledgement sent." : autoReplied ? "Customer already received an automated first reply." : "Awaiting your reply.") +
     `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
       ${row("Name", name)}
       ${row("Email", email, true)}
@@ -298,7 +299,7 @@ export function contactOwnerEmail({
     `<div style="color:${B.body};">${paraFromText(message)}</div>`;
   return {
     subject:
-      (autoReplied ? "[auto-replied] " : "[needs reply] ") +
+      (spam ? "[spam?] " : autoReplied ? "[auto-replied] " : "[needs reply] ") +
       `[${caseId}] ${topic} — ${name}`,
     text,
     html: emailShell({

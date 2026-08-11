@@ -262,9 +262,16 @@ async function aiAnswer(env, { topic, message }) {
     "the reply is automated — those are added around your text. If the question cannot be fully and confidently " +
     "answered from these facts, or needs account-specific action (looking up an order, issuing a refund, debugging " +
     "a crash), set confident to false and leave reply empty. Never invent prices, policies or dates. Never promise " +
-    "a refund or make commitments on the business's behalf.\n\nFACTS:\n" +
+    "a refund or make commitments on the business's behalf.\n\n" +
+    "Also judge whether the message is a genuine enquiry from a prospective or existing customer, or unsolicited " +
+    "business outreach — a marketing pitch, SEO or link-building offer, guest-post or backlink request, directory " +
+    "or listing solicitation, agency or freelancer touting services, partnership or investment approach, or any " +
+    "message whose real aim is to sell the reader something or get them to visit or sign up to the sender's own " +
+    "site rather than to buy or use Easy-Post Desktop. If so, set spam to true; otherwise set spam to false. A " +
+    "product-related question dressed up as small talk is NOT spam; be conservative and only flag clear outreach. " +
+    "When spam is true, also set confident to false and leave reply empty.\n\nFACTS:\n" +
     TRIAGE_FACTS +
-    '\n\nRespond with STRICT JSON only — no prose, no code fences: {"confident": true|false, "reply": "..."}';
+    '\n\nRespond with STRICT JSON only — no prose, no code fences: {"confident": true|false, "spam": true|false, "reply": "..."}';
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -288,7 +295,9 @@ async function aiAnswer(env, { topic, message }) {
   } catch {
     return null;
   }
-  return typeof parsed.confident === "boolean" ? parsed : null;
+  if (typeof parsed.confident !== "boolean") return null;
+  parsed.spam = parsed.spam === true;
+  return parsed;
 }
 
 /**
@@ -331,13 +340,22 @@ async function handleContact(request, env) {
   //    present and under the daily cap. Anything unexpected here degrades to
   //    "no auto-reply" — it never blocks the forward to the owner below.
   let aiReply = null;
+  let isSpam = false;
   let triageNote = "Not eligible for auto-reply; routed to you.";
   const eligible = AI_AUTO_TOPICS.has(topic) && env.ANTHROPIC_API_KEY;
   if (eligible && (await underAiCap(env.LICENSES))) {
     try {
       const res = await aiAnswer(env, { topic, message });
       await logAiUse(env.LICENSES);
-      if (res && res.confident && res.reply && res.reply.trim().length > 20) {
+      if (res && res.spam) {
+        // Unsolicited business outreach (directory listing, SEO/link-building,
+        // agency pitch, partnership approach). Flag it for the owner but send
+        // NO acknowledgement to the sender: a reply only confirms a live,
+        // monitored address and invites more of the same.
+        isSpam = true;
+        triageNote =
+          "AI flagged as likely spam / unsolicited business outreach; no acknowledgement sent. Routed to you for review.";
+      } else if (res && res.confident && res.reply && res.reply.trim().length > 20) {
         aiReply = res.reply.trim();
         triageNote = "AUTO-REPLIED to the customer:\n\n" + aiReply;
       } else {
@@ -359,22 +377,26 @@ async function handleContact(request, env) {
 
   // 2) Reply to the customer — the AI answer if we have one, otherwise a plain
   //    acknowledgement. Best-effort: a failure here must not lose the message.
-  const customer = contactCustomerEmail({ name, topic, caseId, aiReply });
-  try {
-    await resendSend(env, {
-      from: "Easy-Post Desktop Support <" + env.LICENSE_FROM_EMAIL + ">",
-      to: email,
-      replyTo: to,
-      subject: customer.subject,
-      text: customer.text,
-      html: customer.html,
-    });
-  } catch {}
+  //    Skipped entirely for spam: acknowledging unsolicited outreach only
+  //    confirms the address and invites more, and the owner still gets it below.
+  if (!isSpam) {
+    const customer = contactCustomerEmail({ name, topic, caseId, aiReply });
+    try {
+      await resendSend(env, {
+        from: "Easy-Post Desktop Support <" + env.LICENSE_FROM_EMAIL + ">",
+        to: email,
+        replyTo: to,
+        subject: customer.subject,
+        text: customer.text,
+        html: customer.html,
+      });
+    } catch {}
+  }
 
   // 3) Forward the original to the owner. This is the safety net, so its success
   //    is what the endpoint reports — the customer reply above is a bonus.
   const owner = contactOwnerEmail({
-    name, email, topic, ip, caseId, triageNote, message, autoReplied,
+    name, email, topic, ip, caseId, triageNote, message, autoReplied, spam: isSpam,
   });
   const r = await resendSend(env, {
     from: "Easy-Post Desktop <" + env.LICENSE_FROM_EMAIL + ">",
