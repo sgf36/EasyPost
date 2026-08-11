@@ -4,14 +4,20 @@ on:
   push:
     branches: [main]
     # The marketing site and prose changes cannot affect the binaries, and a
-    # macOS leg costs ~10 minutes plus a notarization wait. Skip them.
+    # macOS leg costs ~10 minutes plus a notarization wait. store_assets holds
+    # only Partner Center listing artifacts (screenshots, listing CSVs, the
+    # import builder) — the app bundles app/resources, never store_assets — so
+    # editing it must not fire the matrix or, worse, mint another App Store
+    # build off github.run_number. Skip them all.
     paths-ignore:
       - "site/**"
+      - "store_assets/**"
       - "**/*.md"
       - "LICENSE"
   pull_request:
     paths-ignore:
       - "site/**"
+      - "store_assets/**"
       - "**/*.md"
       - "LICENSE"
   workflow_dispatch:
