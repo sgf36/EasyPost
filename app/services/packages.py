@@ -143,3 +143,16 @@ def list_predefined_packages() -> list[PredefinedPackage]:
     if packages:
         _cache_predefined_packages(packages)
     return packages
+
+
+def predefined_package_names() -> list[str]:
+    """The distinct carrier package codes, sorted, for a dropdown of choices.
+
+    EasyPost's ``predefined_package`` parcel field takes the bare package code
+    (e.g. "FlatRateEnvelope"), interpreted per carrier at rating time, so the
+    same name can appear under several carriers — de-duplicated here. Sourced
+    through :func:`list_predefined_packages`, so it inherits its
+    live-first/cache-fallback behaviour and is simply empty when neither has
+    anything (a first run with no network)."""
+    seen = {p.name for p in list_predefined_packages() if p.name}
+    return sorted(seen, key=str.casefold)

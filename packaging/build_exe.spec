@@ -93,6 +93,16 @@ try:
 except Exception as exc:  # never break a build over this
     print(f"[build_exe.spec] MCP collect_all skipped: {exc}")
 
+# openpyxl (batch .xlsx template + import) is imported lazily inside functions
+# and pulls a few submodules dynamically (cell writer/reader). Collect them so
+# the frozen build can still read and write the recipient workbook.
+openpyxl_hiddenimports = []
+try:
+    from PyInstaller.utils.hooks import collect_submodules as _collect_submodules
+    openpyxl_hiddenimports = _collect_submodules("openpyxl")
+except Exception as exc:  # never break a build over this
+    print(f"[build_exe.spec] openpyxl collect_submodules skipped: {exc}")
+
 a = Analysis(
     [str(project_root / "app" / "main.py")],
     pathex=[str(project_root)],
@@ -104,7 +114,7 @@ a = Analysis(
         *winrt_datas,
         *mcp_datas,
     ],
-    hiddenimports=[*winrt_hiddenimports, *storekit_hiddenimports, *mcp_hiddenimports],
+    hiddenimports=[*winrt_hiddenimports, *storekit_hiddenimports, *mcp_hiddenimports, *openpyxl_hiddenimports],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

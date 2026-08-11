@@ -11,6 +11,10 @@ segno>=1.6.0
 # printing onto Avery-style label stock (see app/core/label_sheet.py). Runtime,
 # not just build-time — the label-sheet export runs in the shipped app.
 Pillow>=10.0.0
+# Reads/writes the batch recipient workbook (app/services/batches.py). The .xlsx
+# template carries a data-validation dropdown of carrier package codes, which a
+# flat CSV cannot express; imports still accept either format. Runtime.
+openpyxl>=3.1.0
 # Cap below 2.0: the 2.x SDK renamed/removed mcp.server.fastmcp (which
 # app/mcp_server.py and the relay transport bridge use). Stay on the 1.x API.
 mcp>=1.28.0,<2

@@ -81,8 +81,11 @@ money asks for confirmation while in production mode.
 - **Insurance** — insure a shipment bought outside EasyPost by tracking code.
 - **Pickups** — schedule/buy/cancel carrier pickups for purchased shipments.
 - **Claims** — file and track insurance claims for lost/damaged/stolen packages.
-- **Batch Shipments** — import a CSV of recipients, validate, bulk rate + buy,
-  generate combined labels.
+- **Batch Shipments** — import recipients from an Excel workbook or CSV,
+  validate, bulk rate + buy, generate combined labels. The downloadable
+  template is an `.xlsx` with a dropdown of carrier predefined packages (USPS
+  flat-rate boxes, FedEx envelopes, …); a row that names one needs no
+  dimensions. A plain CSV with the same columns is still accepted.
 - **Reports** — local spend-by-carrier chart, label counts, refund breakdown.
 - **Connect AI agents** — expose the app to Claude, Cursor, VS Code and other
   MCP clients. Reading and rate-shopping run freely; anything that spends
