@@ -66,6 +66,14 @@ class AppSettings:
     # Values are normalised to in/oz before any API call (see app/core/units.py).
     unit_system: str = "imperial"  # "imperial" (in) | "metric" (cm)
     weight_unit: str = "oz"  # imperial: oz|lb ; metric: kg|g
+    # Label print-sheet (see app/core/label_sheet.py). printer_type drives the
+    # printable-area safety check — an inkjet's larger bottom margin means fewer
+    # labels per sheet, but none clipped. The offsets are the one-time
+    # per-printer calibration nudge, in millimetres, applied to every sheet.
+    printer_type: str = "laser"  # "laser" | "inkjet"
+    label_sheet_template: str = "avery_j8169"
+    label_offset_x_mm: float = 0.0
+    label_offset_y_mm: float = 0.0
 
 
 def load_settings() -> AppSettings:

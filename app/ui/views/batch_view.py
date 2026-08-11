@@ -30,6 +30,7 @@ from app.services.batches import (
     write_csv_template,
 )
 from app.ui.widgets.async_worker import run_async
+from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
 
 
@@ -104,6 +105,10 @@ class BatchView(QWidget):
         self._generate_labels_btn.setEnabled(False)
         self._generate_labels_btn.clicked.connect(self._on_generate_labels)
 
+        self._export_sheet_btn = QPushButton(tr("batch_shipments.export_sheet_button"))
+        self._export_sheet_btn.setEnabled(False)
+        self._export_sheet_btn.clicked.connect(self._on_export_sheet)
+
         self._status_label = QLabel(tr("batch_shipments.no_batch_label"))
         self._status_label.setWordWrap(True)
 
@@ -112,6 +117,7 @@ class BatchView(QWidget):
         row.addWidget(self._refresh_status_btn)
         row.addWidget(self._buy_batch_btn)
         row.addWidget(self._generate_labels_btn)
+        row.addWidget(self._export_sheet_btn)
 
         layout = QVBoxLayout()
         layout.addLayout(row)
@@ -236,6 +242,8 @@ class BatchView(QWidget):
 
         self._buy_batch_btn.setEnabled(state in ("created",))
         self._generate_labels_btn.setEnabled(state in ("purchased", "label_generating"))
+        # Once bought, each shipment carries its own label — offer the print sheet.
+        self._export_sheet_btn.setEnabled(bool(self._batch_label_urls(batch)))
 
         label_url = getattr(batch, "label_url", None)
         if label_url:
@@ -275,6 +283,28 @@ class BatchView(QWidget):
         QMessageBox.information(
             self, tr("batch_shipments.purchased_title"), tr("batch_shipments.purchased_body")
         )
+
+    @staticmethod
+    def _batch_label_urls(batch) -> list[str]:
+        """Per-shipment label URLs from a bought batch (for the print sheet)."""
+        urls: list[str] = []
+        for shp in getattr(batch, "shipments", None) or []:
+            label = getattr(shp, "postage_label", None)
+            url = getattr(label, "label_url", None) if label else None
+            if url:
+                urls.append(url)
+        return urls
+
+    def _on_export_sheet(self) -> None:
+        urls = self._batch_label_urls(self._current_batch) if self._current_batch else []
+        if not urls:
+            QMessageBox.information(
+                self,
+                tr("batch_shipments.export_sheet_title"),
+                tr("batch_shipments.export_no_labels"),
+            )
+            return
+        PrintSheetDialog(urls, self).exec()
 
     def _on_generate_labels(self) -> None:
         if not self._current_batch:
