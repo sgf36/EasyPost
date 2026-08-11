@@ -10,6 +10,15 @@ This script does exactly that for the screenshot block: it rewrites
 DesktopScreenshot1-9 and their captions for all 47 listing languages and
 leaves every other row byte-identical to the export.
 
+It also rewrites the **ReleaseNotes** ("What's new in this version") row from
+a per-language JSON catalogue when one is supplied, so the localised release
+notes never have to be pasted into 47 cells by hand — the step that has gone
+wrong before. The notes follow the same localised/fallback split as the
+screenshots: stage 1 sets them for the seven languages it owns and stage 2
+sets them for the remaining forty, so the two halves together cover all 47
+without either clobbering the other. If no catalogue is present the row is
+left byte-identical to the export, exactly as before.
+
 Three rules the importer enforces without saying so:
 
 1. It wants a **folder**, not a zip. The dialog asks for a directory holding
@@ -26,9 +35,16 @@ is all-or-nothing — so a failure leaves the listing untouched.
 
 Usage:
     python store_assets/build_listing_import.py <exported-listingData.csv> [dest]
+        [--stage1 | --stage2] [--notes=<catalogue.json> | --no-notes]
+
+    --stage1 / --stage2  the two halves of the staged import (default: full).
+    --notes=<path>       release-note catalogue to inject (default: the bundled
+                         current-release file); --no-notes leaves ReleaseNotes
+                         byte-identical to the export.
 """
 
 import csv
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -39,6 +55,14 @@ SHOTS = ROOT / "store_assets" / "screenshots"
 PACKAGE = "EasyPost-Store-Listings-IMPORT-v2"
 OUT_DIR = ROOT / "store_assets" / PACKAGE
 CSV_NAME = PACKAGE + ".csv"
+
+# Per-language "What's new in this version" catalogue, keyed by Partner Center
+# listing code (en-us, zh-hans, …) — the same codes the export uses for its
+# language columns. Overridable with --notes=<path>; default is the current
+# release. Absent file → the ReleaseNotes row is passed through untouched.
+RELEASE_NOTES_JSON = ROOT / "store_assets" / "release-notes-1.1.2-translations.json"
+# Partner Center rejects release notes longer than this.
+RELEASE_NOTES_LIMIT = 1500
 
 # Screenshot order as it will appear on the Store page. Rate shopping leads:
 # it is the one image that shows what the product actually does. Settings
@@ -177,7 +201,50 @@ def clear_unused_slots(by_field, width: int) -> None:
                 row[col] = ""
 
 
-def build_folder(export: Path, package: str, only_localised: bool, dest: Path | None):
+def load_release_notes(path: Path | None):
+    """Read the per-language release-note catalogue, or None if none is set.
+
+    A missing file is a hard error only when the caller asked for one by
+    passing --notes; the built-in default silently no-ops so the screenshot
+    refresh still works on a machine that has not staged release notes."""
+    if path is None:
+        return None
+    if not path.exists():
+        raise SystemExit(f"release-notes catalogue not found: {path}")
+    notes = json.loads(path.read_text(encoding="utf-8"))
+    over = {k: len(v) for k, v in notes.items() if len(v) > RELEASE_NOTES_LIMIT}
+    if over:
+        raise SystemExit(f"release notes exceed {RELEASE_NOTES_LIMIT} chars: {over}")
+    return notes
+
+
+def inject_release_notes(by_field, langs, notes, owns) -> int:
+    """Overwrite the ReleaseNotes cell for every language this stage owns.
+
+    `owns(lang) -> bool` picks the columns this half of the staged import is
+    responsible for — the same localised/fallback split the screenshots use —
+    so stage 1 and stage 2 together cover all 47 and neither blanks a cell the
+    other populated. Languages absent from the catalogue keep their export
+    value untouched rather than being blanked."""
+    if not notes:
+        return 0
+    row = by_field.get("ReleaseNotes")
+    if row is None:
+        raise SystemExit("export has no ReleaseNotes row; cannot inject notes")
+    written = 0
+    for col, lang in enumerate(langs, start=4):
+        if not owns(lang):
+            continue
+        text = notes.get(lang)
+        if text is None:
+            continue
+        row[col] = text
+        written += 1
+    return written
+
+
+def build_folder(export: Path, package: str, only_localised: bool, dest: Path | None,
+                 notes=None):
     """A folder package: CSV plus the images it cites, paths prefixed with the
     folder name."""
     rows, header, langs, by_field = read_export(export)
@@ -212,6 +279,13 @@ def build_folder(export: Path, package: str, only_localised: bool, dest: Path | 
             caption_row[col] = CAPTIONS[locale][slot - 1]
             touched += 2
 
+    # Release notes follow the same split: in stage 1 (localised only) this
+    # stage owns the localised languages; in full mode it owns them all.
+    notes_written = inject_release_notes(
+        by_field, langs, notes,
+        owns=(lambda l: l in LOCALISED) if only_localised else (lambda l: True),
+    )
+
     clear_unused_slots(by_field, len(header))
     target = out_dir / f"{package}.csv"
     write_csv(rows, target)
@@ -235,11 +309,12 @@ def build_folder(export: Path, package: str, only_localised: bool, dest: Path | 
     print(f"listings written: {len(LOCALISED) if only_localised else len(langs)}")
     print(f"images copied  : {len(images)}")
     print(f"cells rewritten: {touched}")
+    print(f"release notes  : {notes_written if notes else 'unchanged (no catalogue)'}")
     print(f"folder         : {out_dir}")
     deliver(out_dir, dest, package)
 
 
-def build_fanout(export: Path, dest: Path | None):
+def build_fanout(export: Path, dest: Path | None, notes=None):
     """Stage 2: no upload at all. Copy the English asset URLs that stage 1
     created into the 40 languages that reuse them, and ship a bare CSV.
 
@@ -269,6 +344,12 @@ def build_fanout(export: Path, dest: Path | None):
             caption_row[col] = CAPTIONS[FALLBACK][slot - 1]
             touched += 2
 
+    # Stage 2 owns exactly the languages stage 1 did not: the non-localised
+    # forty. Together the two stages set release notes for all 47.
+    notes_written = inject_release_notes(
+        by_field, langs, notes, owns=lambda l: l not in LOCALISED,
+    )
+
     clear_unused_slots(by_field, len(header))
     target = ROOT / "store_assets" / "EasyPost-Store-Listings-IMPORT-v2-stage2.csv"
     write_csv(rows, target)
@@ -276,6 +357,7 @@ def build_fanout(export: Path, dest: Path | None):
     print("mode           : stage 2 (URL fan-out, nothing uploaded)")
     print(f"listings written: {len(langs) - len(LOCALISED)}")
     print(f"cells rewritten: {touched}")
+    print(f"release notes  : {notes_written if notes else 'unchanged (no catalogue)'}")
     print(f"csv            : {target}")
     if dest:
         shutil.copy2(target, dest / target.name)
@@ -292,18 +374,34 @@ def deliver(out_dir: Path, dest: Path | None, package: str) -> None:
     print(f"copied to      : {target}")
 
 
+def resolve_notes(flags) -> Path | None:
+    """Pick the release-note catalogue from the flags.
+
+    --no-notes   → skip injection, pass ReleaseNotes through untouched.
+    --notes=PATH → use PATH (hard error if it is missing).
+    (neither)    → the built-in default file if it exists, else no-op.
+    """
+    if "--no-notes" in flags:
+        return None
+    for flag in flags:
+        if flag.startswith("--notes="):
+            return Path(flag.split("=", 1)[1])
+    return RELEASE_NOTES_JSON if RELEASE_NOTES_JSON.exists() else None
+
+
 def main() -> None:
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     flags = {a for a in sys.argv[1:] if a.startswith("--")}
     export = Path(args[0])
     dest = Path(args[1]) if len(args) > 1 else None
+    notes = load_release_notes(resolve_notes(flags))
 
     if "--stage2" in flags:
-        build_fanout(export, dest)
+        build_fanout(export, dest, notes)
     elif "--stage1" in flags:
-        build_folder(export, PACKAGE + "-stage1", True, dest)
+        build_folder(export, PACKAGE + "-stage1", True, dest, notes)
     else:
-        build_folder(export, PACKAGE, False, dest)
+        build_folder(export, PACKAGE, False, dest, notes)
 
 
 if __name__ == "__main__":
