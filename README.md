@@ -150,23 +150,45 @@ gate is scoped strictly to builds distributed outside any store.
 ## Publishing the product site
 
 `site/` is served from shared cPanel hosting at
-`/home2/spencgh6/easy-post.spencerfields.com`. There is no deploy script and no
-stored host credential, so publishing is a manual step taken from an
-authenticated browser session.
+`/home2/spencgh6/easy-post.spencerfields.com`. Publishing is fully scripted:
 
-The cPanel **upload widget 404s** on this Bluehost build, so files go through
-cPanel's UAPI instead:
+```bash
+python packaging/deploy_site.py download.html   # one file
+python packaging/deploy_site.py --all           # everything in site/
+```
+
+**No browser and no logged-in session are needed.** A cPanel **API token**
+authenticates the call:
 
 ```
-POST /cpsess<token>/execute/Fileman/save_file_content
+Authorization: cpanel spencgh6:<token>
+POST https://box5192.bluehost.com:2083/execute/Fileman/save_file_content
      dir=/home2/spencgh6/easy-post.spencerfields.com
      file=<name>  content=<utf-8>  from_charset=UTF-8  to_charset=UTF-8
 ```
 
-**Verify by fetching each file over HTTPS afterwards** and comparing byte
-counts against the repository. The File Manager listing shows what is on disk,
-not what the web server actually serves — those can differ, and only the second
-one matters.
+The token is **not in this repository, which is public.** It lives in the OS
+credential store under service `cpanel-easypost-site`, account `spencgh6`, and
+`CPANEL_API_TOKEN` overrides it. Manage tokens in cPanel under Security ->
+Manage API Tokens; a leaked one grants full file-manager access to the hosting
+account and should be revoked there.
+
+Three things that will otherwise cost an hour each:
+
+- **UAPI answers HTTP 200 on failure**, with `status: 0` and the real reason in
+  `errors`. The HTTP code alone proves nothing about whether the write landed.
+- **The host serves `text/html` with no charset**, so `requests` decodes the
+  page as ISO-8859-1 and every non-ASCII character reads back as mojibake. That
+  looks exactly like upload corruption and is not — decode as UTF-8 before
+  comparing. Its mod_security also answers **406** to the default
+  `python-requests` user agent, so the read-back must present a browser one.
+- **`save_file_content` shifts whitespace between tags**, so the served byte
+  count will not match the repository exactly. Compare with whitespace removed.
+
+`deploy_site.py` handles all three and verifies every upload by fetching the
+file back over HTTPS. Do that verification however you publish: the File
+Manager listing shows what is on disk, not what the web server actually serves,
+and only the second one matters.
 
 The pricing page's Buy buttons are **progressive enhancement**: each is an
 `<a>` whose `href` is a mailto, and `site/checkout.js` upgrades the click to a
