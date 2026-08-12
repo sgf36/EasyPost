@@ -125,6 +125,22 @@ German renders at 2075 × 1175 rather than 1924 × 1175 because the labels are
 longer and the window grows to fit. Both sit inside the Store's 1366 × 768 to
 3840 × 2160 range.
 
-Regenerate the images with `store_assets/shoot_screenshots.py <locale>` before
-rebuilding if the interface has changed. That script writes the user's real
-`settings.json`, so set the locale back to `en` when finished.
+Regenerate the images with `packaging/make_screenshots.py` before rebuilding if
+the interface has changed — one run per locale, `--platform store`, and one
+`--window <ViewClass>` per screenshot. It writes to a scratch data directory and
+stubs the credential store, so it touches neither the real `settings.json` nor
+the keyring:
+
+```bash
+python packaging/make_screenshots.py --platform store --locale de \
+    --window CreateShipmentView --window PickupsView --out dist/screenshots
+```
+
+**Run it on a machine with a real window station, never with `--offscreen`.**
+The offscreen Qt plugin ships no font database, so every string renders as an
+empty box. That is how 63 of the 70 committed sources came to be unreadable
+while the run reported success. Open the output.
+
+`store_assets/shoot_screenshots.py` is the superseded version: it covers five
+languages rather than seven, writes the user's real `settings.json`, and is the
+script that produced the missing-glyph set. Prefer the one above.

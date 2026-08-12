@@ -368,6 +368,115 @@ def _capture_window(app, view_class_name: str, path: Path,
     return window
 
 
+# The print sheet is a dialog, not a navigation page, so --window cannot reach
+# it through the nav list like every other capture. It is requested by the same
+# flag and dispatched here instead.
+PRINT_SHEET = "PrintSheetDialog"
+
+
+def _sample_label(n: int) -> bytes:
+    """A representative 4x6 shipping label, as PNG bytes.
+
+    The print sheet fetches its label images over the network, which this
+    harness must never do, so the fetch is stubbed with these. Carrier-style
+    enough that the preview reads as real, and invented so that no genuine
+    customer's label is published.
+    """
+    import hashlib
+    import io
+
+    from PIL import Image, ImageDraw
+
+    w, h = 800, 1200
+    im = Image.new("RGB", (w, h), "white")
+    d = ImageDraw.Draw(im)
+    d.rectangle([4, 4, w - 5, h - 5], outline="black", width=4)
+    d.rectangle([0, 0, w, 120], fill="black")
+    d.text((30, 44), f"EASY-POST  -  {n}", fill="white")
+    d.text((30, 170), "USPS Priority Mail", fill="black")
+    d.text((30, 214), "To: Sample Recipient", fill="black")
+    x = 40
+    seed = hashlib.md5(str(n).encode()).digest()
+    for i in range(120):
+        bar = 3 + (seed[i % len(seed)] % 6)
+        if i % 2 == 0:
+            d.rectangle([x, h - 260, x + bar, h - 80], fill="black")
+        x += bar + 3
+        if x > w - 60:
+            break
+    d.text((40, h - 60), f"9400 1000 0000 000{n}", fill="black")
+    buf = io.BytesIO()
+    im.save(buf, "PNG")
+    return buf.getvalue()
+
+
+def _capture_print_sheet(app, path: Path, width: int, height: int, scale: int):
+    """Paint the Export print sheet dialog onto a Store-sized canvas.
+
+    The dialog is smaller than the minimum listing image, so it is centred on a
+    canvas rather than stretched. It is shown with WA_DontShowOnScreen, which
+    lays it out without ever putting it in front of anyone running this.
+
+    The wait is on the dialog's own readiness — Save enabled and a preview
+    pixmap present — not on a fixed sleep. Grabbing early produced the empty
+    grey preview box, which is indistinguishable from a working screenshot
+    unless you open it.
+    """
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QColor, QPainter, QPixmap
+
+    from app.ui.main_window import MainWindow
+    from app.ui.widgets import print_sheet_dialog as psd
+
+    window = MainWindow()
+    window._show_app_shell()
+
+    psd.fetch_label_images = lambda urls: ([_sample_label(k) for k in range(1, 5)], [])
+    dialog = psd.PrintSheetDialog(["a", "b", "c", "d"], window)
+    dialog.setAttribute(Qt.WidgetAttribute.WA_DontShowOnScreen, True)
+    dialog.show()
+
+    import time
+
+    deadline = time.monotonic() + 20.0
+    while time.monotonic() < deadline:
+        _settle(app, 0.2)
+        preview = dialog._preview.pixmap()
+        if dialog._save_btn.isEnabled() and preview is not None and not preview.isNull():
+            break
+    else:
+        raise RuntimeError(
+            "print sheet preview never rendered; the grab would be an empty box"
+        )
+    _settle(app, 0.4)
+
+    shot = dialog.grab()
+    if shot.width() > width or shot.height() > height:
+        shot = shot.scaled(
+            width, height,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+
+    canvas = QPixmap(width, height)
+    canvas.fill(QColor("#f5f6f8"))
+    painter = QPainter(canvas)
+    painter.drawPixmap((width - shot.width()) // 2, (height - shot.height()) // 2, shot)
+    painter.end()
+
+    if scale != 1:
+        canvas = canvas.scaled(
+            width * scale, height * scale,
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not canvas.save(str(path), "PNG"):
+        raise RuntimeError(f"Could not write {path}")
+    dialog.close()
+    return window
+
+
 def _assert_no_orphan_cell_widgets(window, view_class_name: str) -> None:
     """Fail if a table holds a widget that is no longer one of its cells.
 
@@ -690,9 +799,13 @@ def main() -> int:
             for view_class in args.window:
                 path = out_root / label / f"window-{view_class}.png"
                 try:
-                    alive.append(_capture_window(
-                        app, view_class, path, width, height,
-                        scale * args.scale_factor))
+                    if view_class == PRINT_SHEET:
+                        alive.append(_capture_print_sheet(
+                            app, path, width, height, scale * args.scale_factor))
+                    else:
+                        alive.append(_capture_window(
+                            app, view_class, path, width, height,
+                            scale * args.scale_factor))
                     written += 1
                 except Exception as exc:  # noqa: BLE001 - report, do not abort
                     print(f"  FAILED {path}: {type(exc).__name__}: {exc}")

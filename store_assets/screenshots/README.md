@@ -73,6 +73,23 @@ merely hidden for these captures.
 
 ## Reproducing
 
-`store_assets/shoot_screenshots.py <locale>` drives the real window through Qt — sets the
-locale, builds `MainWindow`, walks the sidebar, and grabs each page. Scripted
-rather than mouse-driven so the five sets are identical but for language.
+`packaging/make_screenshots.py` drives the real window through Qt — sets the
+locale, builds `MainWindow`, selects a page through the actual sidebar, and
+grabs the whole window. Scripted rather than mouse-driven so the seven sets are
+identical but for language.
+
+```bash
+python packaging/make_screenshots.py --platform store --locale de \
+    --window CreateShipmentView --window BatchView --out dist/screenshots
+```
+
+`--window PrintSheetDialog` is dispatched separately, because the print sheet is
+a dialog and has no sidebar entry: it is grabbed with `WA_DontShowOnScreen` and
+centred on a Store-sized canvas.
+
+**Never use `--offscreen`.** That plugin has no font database and renders every
+string as an empty box; 63 of these 70 files were unreadable for exactly that
+reason while the run reported success. Open the PNGs.
+
+`store_assets/shoot_screenshots.py` is the superseded version — five languages,
+and it writes the user's real `settings.json`.
