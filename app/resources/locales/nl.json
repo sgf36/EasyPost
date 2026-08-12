@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Alleen postcodes (prijsindicatie)",
   "create_shipment.badge_cheapest": "Goedkoopst",
   "create_shipment.badge_fastest": "Snelst",
+  "create_shipment.billed_to_account": "Op rekening gefactureerd",
   "create_shipment.buy_button": "Kopen",
   "create_shipment.buy_confirm_description": "Koop {carrier} {service}-label voor {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Schakel over naar “Volledige adressen” om dit tarief te kopen.",

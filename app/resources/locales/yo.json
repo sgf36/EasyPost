@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Kóòdù ìfìwéránṣẹ́ nìkan (àyẹ̀wò owó)",
   "create_shipment.badge_cheapest": "Tí ó rọrùn jùlọ",
   "create_shipment.badge_fastest": "Tí ó yára jùlọ",
+  "create_shipment.billed_to_account": "Fi sí àkàǹtì",
   "create_shipment.buy_button": "Ra",
   "create_shipment.buy_confirm_description": "Ra àmì {carrier} {service} fún {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Yí padà sí “Àdírẹ́sì kíkún” láti ra owó yìí.",

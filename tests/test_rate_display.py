@@ -59,6 +59,17 @@ def test_price_folds_currency_into_one_cell():
     assert _format_price(rate("a", amount="10.97", currency="GBP")) == "10.97 GBP"
 
 
+def test_price_shows_billed_to_account_for_account_billed_rate():
+    # Royal Mail's sub-penny OBA rate isn't the real price — it reads as
+    # "Billed to account" (the default locale is English) rather than "0.01 GBP".
+    from app.i18n import tr
+
+    billed = rate("rm", carrier="RoyalMailV3", amount="0.01", currency="GBP")
+    assert _format_price(billed) == tr("create_shipment.billed_to_account")
+    # A normal rate is unaffected.
+    assert _format_price(rate("a", amount="10.97", currency="GBP")) == "10.97 GBP"
+
+
 def test_delivery_shows_bare_number_under_the_est_days_header():
     # A bare number, not "1 days" — the column header carries the unit, which
     # avoids plural rules across all 50 locales.

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "पोस्टल कोड मात्र (मूल्य जाँच)",
   "create_shipment.badge_cheapest": "सबैभन्दा सस्तो",
   "create_shipment.badge_fastest": "सबैभन्दा छिटो",
+  "create_shipment.billed_to_account": "खातामा बिल",
   "create_shipment.buy_button": "खरिद गर्नुहोस्",
   "create_shipment.buy_confirm_description": "{rate} {currency} मा {carrier} {service} लेबल खरिद गर्नुहोस्।",
   "create_shipment.buy_needs_full_address": "यो दर किन्न «पूरा ठेगाना» मा जानुहोस्।",

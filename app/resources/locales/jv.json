@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Mung kode pos (mriksa rega)",
   "create_shipment.badge_cheapest": "Paling murah",
   "create_shipment.badge_fastest": "Paling cepet",
+  "create_shipment.billed_to_account": "Ditagih menyang akun",
   "create_shipment.buy_button": "Tuku",
   "create_shipment.buy_confirm_description": "Tuku label {carrier} {service} kanggo {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Ganti menyang “Alamat lengkap” kanggo tuku tarif iki.",

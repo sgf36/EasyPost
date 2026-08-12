@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Amakhodi eposi kuphela (ukuhlola intengo)",
   "create_shipment.badge_cheapest": "Okushibhe kakhulu",
   "create_shipment.badge_fastest": "Okusheshayo kakhulu",
+  "create_shipment.billed_to_account": "Ikhokhelwa ku-akhawunti",
   "create_shipment.buy_button": "Thenga",
   "create_shipment.buy_confirm_description": "Thenga ilebula ye-{carrier} {service} nge-{rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Shintshela ku-“Amakheli aphelele” ukuze uthenge le ntengo.",

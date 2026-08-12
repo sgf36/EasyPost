@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "ફક્ત પિન કોડ (કિંમત તપાસ)",
   "create_shipment.badge_cheapest": "સૌથી સસ્તું",
   "create_shipment.badge_fastest": "સૌથી ઝડપી",
+  "create_shipment.billed_to_account": "ખાતામાં બિલ",
   "create_shipment.buy_button": "ખરીદો",
   "create_shipment.buy_confirm_description": "{rate} {currency} માટે {carrier} {service} લેબલ ખરીદો.",
   "create_shipment.buy_needs_full_address": "આ દર ખરીદવા «પૂર્ણ સરનામાં» પર જાઓ.",

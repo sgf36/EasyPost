@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Koodu nzipu ozi naanị (nyocha ọnụahịa)",
   "create_shipment.badge_cheapest": "Kacha dị ọnụ ala",
   "create_shipment.badge_fastest": "Kacha ọsọ",
+  "create_shipment.billed_to_account": "A na-akwụ ụgwọ na akaụntụ",
   "create_shipment.buy_button": "Zụta",
   "create_shipment.buy_confirm_description": "Zụta akara {carrier} {service} maka {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Gaa na “Adreesị zuru ezu” iji zụta ọnụahịa a.",

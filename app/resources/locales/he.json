@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "מיקודים בלבד (בדיקת מחיר)",
   "create_shipment.badge_cheapest": "הזול ביותר",
   "create_shipment.badge_fastest": "המהיר ביותר",
+  "create_shipment.billed_to_account": "מחויב לחשבון",
   "create_shipment.buy_button": "רכישה",
   "create_shipment.buy_confirm_description": "רכישת תווית {carrier} {service} בעלות {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "עבור אל \"כתובות מלאות\" כדי לרכוש תעריף זה.",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "పోస్టల్ కోడ్‌లు మాత్రమే (ధర తనిఖీ)",
   "create_shipment.badge_cheapest": "అత్యంత చౌక",
   "create_shipment.badge_fastest": "అత్యంత వేగవంతం",
+  "create_shipment.billed_to_account": "ఖాతాకు బిల్ చేయబడుతుంది",
   "create_shipment.buy_button": "కొను",
   "create_shipment.buy_confirm_description": "{rate} {currency}కి {carrier} {service} లేబుల్‌ను కొనుగోలు చేయండి.",
   "create_shipment.buy_needs_full_address": "ఈ ధరను కొనడానికి «పూర్తి చిరునామాలు»కి మారండి.",

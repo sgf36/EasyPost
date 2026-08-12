@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "仅邮政编码（价格查询）",
   "create_shipment.badge_cheapest": "最便宜",
   "create_shipment.badge_fastest": "最快",
+  "create_shipment.billed_to_account": "记入账户",
   "create_shipment.buy_button": "购买",
   "create_shipment.buy_confirm_description": "以 {rate} {currency} 购买 {carrier} {service} 面单。",
   "create_shipment.buy_needs_full_address": "请切换到“完整地址”以购买此费率。",

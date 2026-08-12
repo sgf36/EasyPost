@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "فقط کد پستی (بررسی قیمت)",
   "create_shipment.badge_cheapest": "ارزان‌ترین",
   "create_shipment.badge_fastest": "سریع‌ترین",
+  "create_shipment.billed_to_account": "به حساب منظور می‌شود",
   "create_shipment.buy_button": "خرید",
   "create_shipment.buy_confirm_description": "خرید برچسب {carrier} {service} به مبلغ {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "برای خرید این نرخ به «نشانی‌های کامل» بروید.",

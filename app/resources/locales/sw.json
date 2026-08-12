@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Misimbo ya posta pekee (kuangalia bei)",
   "create_shipment.badge_cheapest": "Rahisi zaidi",
   "create_shipment.badge_fastest": "Haraka zaidi",
+  "create_shipment.billed_to_account": "Inatozwa kwa akaunti",
   "create_shipment.buy_button": "Nunua",
   "create_shipment.buy_confirm_description": "Nunua lebo ya {carrier} {service} kwa {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Badilisha hadi “Anwani kamili” ili kununua bei hii.",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Только почтовые индексы (проверка цены)",
   "create_shipment.badge_cheapest": "Дешевле всего",
   "create_shipment.badge_fastest": "Быстрее всего",
+  "create_shipment.billed_to_account": "Выставляется на счёт",
   "create_shipment.buy_button": "Купить",
   "create_shipment.buy_confirm_description": "Купить этикетку {carrier} {service} за {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Переключитесь на «Полные адреса», чтобы купить этот тариф.",

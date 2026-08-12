@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Poskod sahaja (semakan harga)",
   "create_shipment.badge_cheapest": "Termurah",
   "create_shipment.badge_fastest": "Terpantas",
+  "create_shipment.billed_to_account": "Dicaj ke akaun",
   "create_shipment.buy_button": "Beli",
   "create_shipment.buy_confirm_description": "Beli label {carrier} {service} untuk {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Tukar kepada “Alamat penuh” untuk membeli kadar ini.",

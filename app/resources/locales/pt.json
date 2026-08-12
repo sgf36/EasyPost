@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Apenas códigos postais (consulta de preço)",
   "create_shipment.badge_cheapest": "Mais barato",
   "create_shipment.badge_fastest": "Mais rápido",
+  "create_shipment.billed_to_account": "Faturado na conta",
   "create_shipment.buy_button": "Comprar",
   "create_shipment.buy_confirm_description": "Comprar etiqueta {carrier} {service} por {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Mude para «Moradas completas» para comprar esta tarifa.",

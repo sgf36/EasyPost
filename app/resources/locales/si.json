@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "තැපැල් කේත පමණි (මිල පරීක්ෂාව)",
   "create_shipment.badge_cheapest": "අඩුම මිල",
   "create_shipment.badge_fastest": "වේගවත්ම",
+  "create_shipment.billed_to_account": "ගිණුමට බිල් කෙරේ",
   "create_shipment.buy_button": "මිලදී ගන්න",
   "create_shipment.buy_confirm_description": "{rate} {currency} සඳහා {carrier} {service} ලේබලය මිලදී ගන්න.",
   "create_shipment.buy_needs_full_address": "මෙම ගාස්තුව මිලදී ගැනීමට «සම්පූර්ණ ලිපින» වෙත මාරු වන්න.",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "പിൻ കോഡ് മാത്രം (വില പരിശോധന)",
   "create_shipment.badge_cheapest": "ഏറ്റവും വില കുറഞ്ഞത്",
   "create_shipment.badge_fastest": "ഏറ്റവും വേഗമേറിയത്",
+  "create_shipment.billed_to_account": "അക്കൗണ്ടിലേക്ക് ബിൽ",
   "create_shipment.buy_button": "വാങ്ങുക",
   "create_shipment.buy_confirm_description": "{rate} {currency}-ന് {carrier} {service} ലേബൽ വാങ്ങുക.",
   "create_shipment.buy_needs_full_address": "ഈ നിരക്ക് വാങ്ങാൻ «പൂർണ്ണ വിലാസങ്ങൾ» എന്നതിലേക്ക് മാറുക.",

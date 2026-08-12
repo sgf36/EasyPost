@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Endast postnummer (priskontroll)",
   "create_shipment.badge_cheapest": "Billigast",
   "create_shipment.badge_fastest": "Snabbast",
+  "create_shipment.billed_to_account": "Faktureras på konto",
   "create_shipment.buy_button": "Köp",
   "create_shipment.buy_confirm_description": "Köp fraktsedel från {carrier} {service} för {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Växla till ”Fullständiga adresser” för att köpa den här taxan.",

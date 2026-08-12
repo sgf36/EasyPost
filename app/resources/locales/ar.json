@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "الرموز البريدية فقط (فحص السعر)",
   "create_shipment.badge_cheapest": "الأرخص",
   "create_shipment.badge_fastest": "الأسرع",
+  "create_shipment.billed_to_account": "يُفوتر على الحساب",
   "create_shipment.buy_button": "شراء",
   "create_shipment.buy_confirm_description": "شراء ملصق {carrier} {service} مقابل {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "انتقل إلى «عناوين كاملة» لشراء هذا السعر.",

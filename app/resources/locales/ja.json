@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "郵便番号のみ（料金確認）",
   "create_shipment.badge_cheapest": "最安",
   "create_shipment.badge_fastest": "最速",
+  "create_shipment.billed_to_account": "アカウントに請求",
   "create_shipment.buy_button": "購入",
   "create_shipment.buy_confirm_description": "{rate} {currency}で{carrier}の{service}ラベルを購入します。",
   "create_shipment.buy_needs_full_address": "この料金を購入するには「完全な住所」に切り替えてください。",

@@ -25,7 +25,8 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSpinBox,
     QTableWidget,
-    QTableWidgetItem,
+    QTreeWidget,
+    QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
 )
@@ -50,13 +51,13 @@ from app.services.shipments import (
 )
 from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
-from app.ui.widgets.chips import badge, carrier_chip
+from app.ui.widgets.chips import badge
 from app.ui.widgets.purchase_confirm import confirm_if_production
 
-# Carrier & service | Rate | Delivery | Buy. Carrier and service share one
-# cell (chip plus name) rather than taking a column each — the same amount of
-# information in less width, which keeps the table readable now that it sits
-# beside the label preview.
+# Carrier & service | Rate | Delivery | Buy. Rates are shown in a QTreeWidget
+# grouped by carrier: the carrier is a top-level (header) row and each service
+# is a child under it, so column 0 carries the carrier name on a header row and
+# the service name on a child row rather than both sharing one flat cell.
 _RATE_COLUMN_COUNT = 4
 _CUSTOMS_ITEM_COLUMN_COUNT = 7
 
@@ -94,6 +95,11 @@ def _fastest_rate_id(rates) -> str | None:
 
 
 def _format_price(rate) -> str:
+    # Royal Mail and other OBA carriers bill the real postage to the account,
+    # so the sub-penny figure EasyPost hands back is not the price to show —
+    # say it's invoiced rather than a misleading "0.01 GBP".
+    if _is_account_billed(rate):
+        return tr("create_shipment.billed_to_account")
     amount = getattr(rate, "rate", "") or ""
     currency = getattr(rate, "currency", "") or ""
     return f"{amount} {currency}".strip()
@@ -108,7 +114,7 @@ def _format_delivery(rate) -> str:
     return str(days)
 
 
-# Anything at or below this (in the rate's own currency) is treated as a
+# Anything below this (in the rate's own currency) is treated as a
 # non-purchasable placeholder, not a real quote. Some carriers — notably Royal
 # Mail V3 via EasyPost — return their whole service catalogue as rates, including
 # services that don't apply to the route, priced at a nominal 0.01 that cannot be
@@ -116,12 +122,55 @@ def _format_delivery(rate) -> str:
 # genuine quotes exist (see _on_rates_received).
 _MIN_REAL_RATE = 0.02
 
+# Carriers that invoice postage to the account externally (Royal Mail's OBA
+# billing) rather than charging the label price up front. EasyPost's Royal Mail
+# v3 integration returns *purchasable* services at a nominal sub-penny rate
+# precisely because the true cost is billed to the account, not quoted on the
+# rate. So for these carriers a sub-_MIN_REAL_RATE figure means "billed to
+# account" and the label genuinely can be bought — it is NOT the non-purchasable
+# catalogue placeholder that the same low number means for any other carrier.
+_ACCOUNT_BILLED_CARRIERS = {"RoyalMail", "RoyalMailV3"}
 
-def _is_placeholder_rate(rate) -> bool:
+# A carrier group with more than this many services starts collapsed (its count
+# stays visible on the header), so a 70-service Royal Mail catalogue doesn't
+# bury every other carrier; smaller groups — and whichever group holds the
+# cheapest rate — start expanded. See _populate_rates_tree.
+_MAX_AUTO_EXPAND = 8
+
+
+def _is_account_billed(rate) -> bool:
+    """True for an account-billed carrier rate whose sub-penny figure is a
+    "billed to account" marker rather than a real quote (see
+    _ACCOUNT_BILLED_CARRIERS). Such rates ARE purchasable despite the low
+    number, so they must be told apart from ordinary placeholders."""
+    if getattr(rate, "carrier", "") not in _ACCOUNT_BILLED_CARRIERS:
+        return False
     try:
         return float(getattr(rate, "rate", None)) < _MIN_REAL_RATE
     except (TypeError, ValueError):
         return False
+
+
+def _is_placeholder_rate(rate) -> bool:
+    """A non-purchasable catalogue placeholder, priced below _MIN_REAL_RATE.
+    Account-billed carrier rates (Royal Mail via OBA) sit below that threshold
+    too but genuinely can be bought, so they are never hidden as placeholders."""
+    if _is_account_billed(rate):
+        return False
+    try:
+        return float(getattr(rate, "rate", None)) < _MIN_REAL_RATE
+    except (TypeError, ValueError):
+        return False
+
+
+def _cheapest_rate_id(rates) -> str | None:
+    """Id of the cheapest rate, ignoring account-billed rates whose real price
+    is unknown (their sub-penny figure isn't a comparable amount). None when
+    nothing is priced."""
+    priced = [r for r in rates if not _is_account_billed(r)]
+    if not priced:
+        return None
+    return min(priced, key=_rate_sort_key).id
 
 
 def _size_widget_column(table, col: int, *, padding: int = 16) -> None:
@@ -850,31 +899,38 @@ class CreateShipmentView(QWidget):
             tr("create_shipment.col_est_days"),
             "",
         ]
-        self._rates_table = QTableWidget(0, _RATE_COLUMN_COUNT)
-        self._rates_table.setHorizontalHeaderLabels(rate_columns)
-        header = self._rates_table.horizontalHeader()
+        # Rates are grouped by carrier under collapsible header rows rather than
+        # shown flat: Royal Mail v3 alone returns 70+ services, which used to
+        # drown every other carrier in one long list. Each carrier is a
+        # top-level row (name + service count) with its services as children.
+        self._rates_tree = QTreeWidget()
+        self._rates_tree.setColumnCount(_RATE_COLUMN_COUNT)
+        self._rates_tree.setHeaderLabels(rate_columns)
+        header = self._rates_tree.header()
         # Carrier & service (col 0) absorbs the slack; the compact columns —
-        # Rate, Est. days, and the Buy button — size to their own content. The
-        # earlier arrangement (col 0 sized to the widest service name, the rest
-        # stretched) collapsed those three to nothing whenever a carrier returned
-        # very long run-together service names (e.g. Royal Mail v3's
-        # "InternationalBusinessParcelTrackedCountryPriced…"), truncating the
-        # headers and clipping the Buy buttons.
-        header.setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        # Rate and Est. days — size to their own content. The Buy column holds a
+        # widget, which ResizeToContents can't measure — left to itself it
+        # collapses and clips the button, so it's Fixed and sized explicitly in
+        # _resize_rates_tree_to_content instead.
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        # The Buy column holds a widget, which ResizeToContents can't measure —
-        # left to itself it collapses and clips the button. Size it explicitly
-        # in _resize_rates_table_to_content instead.
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(_RATE_COLUMN_COUNT - 1, QHeaderView.ResizeMode.Fixed)
-        self._rates_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        # Don't let Qt stretch the last (Buy) section — it's sized to the button,
+        # and a stretched final column would swallow col 0's slack.
+        header.setStretchLastSection(False)
+        self._rates_tree.setEditTriggers(QTreeWidget.EditTrigger.NoEditTriggers)
         # A long service name clips at the (stretched) column edge rather than
-        # forcing the table wider; the full name is humanised and shown, and the
-        # identity cell carries a tooltip with the untruncated text.
-        self._rates_table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self._rates_table.verticalHeader().setVisible(False)
-        # Sized to fit every row (see _resize_rates_table_to_content) instead
-        # of scrolling internally — the outer QScrollArea handles overflow.
-        self._rates_table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # forcing the tree wider; the full name is humanised and shown, and the
+        # service cell carries a tooltip with the untruncated text.
+        self._rates_tree.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # Sized to fit every visible row (see _resize_rates_tree_to_content)
+        # instead of scrolling internally — the outer QScrollArea handles
+        # overflow. Expanding or collapsing a carrier changes the total height,
+        # so re-measure on those signals.
+        self._rates_tree.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self._rates_tree.itemExpanded.connect(self._resize_rates_tree_to_content)
+        self._rates_tree.itemCollapsed.connect(self._resize_rates_tree_to_content)
 
         self._quote_only_note = QLabel(tr("create_shipment.zip_mode_note"))
         self._quote_only_note.setWordWrap(True)
@@ -882,7 +938,7 @@ class CreateShipmentView(QWidget):
         self._quote_only_note.setVisible(False)
 
         layout = QVBoxLayout()
-        layout.addWidget(self._rates_table)
+        layout.addWidget(self._rates_tree)
         layout.addWidget(self._quote_only_note)
         group.setLayout(layout)
         return group
@@ -899,22 +955,46 @@ class CreateShipmentView(QWidget):
         splitting at camelCase and letter/digit boundaries gives ``International
         Business Parcels Tracked 30kg``, which is far quicker to scan and lets a
         clipped name break at a sensible point. Names that already contain
-        spaces are left untouched."""
+        spaces are left untouched. The same spacing turns a carrier code
+        (``RoyalMailV3``) into a readable group-header name."""
         if not name or " " in name:
             return name
         return cls._CAMEL_SPLIT.sub(" ", name)
 
-    def _build_rate_identity_cell(self, rate, *, cheapest: bool, fastest: bool) -> QWidget:
-        """One cell holding the carrier chip, the service name, and any
-        cheapest/fastest marker — the column that used to be three."""
+    # Carrier codes that camel-splitting mangles ("FedEx" → "Fed Ex",
+    # "RoyalMailV3" → "Royal Mail V 3"). Everything else falls back to
+    # _humanize_service, which reads fine for plain acronyms (USPS, UPS, DHL).
+    _CARRIER_DISPLAY_NAMES = {
+        "RoyalMail": "Royal Mail",
+        "RoyalMailV3": "Royal Mail",
+        "FedEx": "FedEx",
+        "FedExDefault": "FedEx",
+        "UPS": "UPS",
+        "UPSDAP": "UPS",
+        "USPS": "USPS",
+        "DHLExpress": "DHL Express",
+        "DhlExpress": "DHL Express",
+        "DhlEcs": "DHL eCommerce",
+        "Hermes": "Hermes",
+    }
+
+    @classmethod
+    def _carrier_display_name(cls, carrier: str) -> str:
+        if not carrier:
+            return "—"
+        return cls._CARRIER_DISPLAY_NAMES.get(carrier) or cls._humanize_service(carrier)
+
+    def _build_rate_service_cell(self, rate, *, cheapest: bool, fastest: bool) -> QWidget:
+        """The service cell of a child row: the humanised service name plus any
+        cheapest/fastest marker. Unlike the old flat-table identity cell this
+        carries no carrier chip — the carrier is the parent (group) row now."""
         cell = QWidget()
         row = QHBoxLayout(cell)
         row.setContentsMargins(6, 4, 6, 4)
         row.setSpacing(8)
-        row.addWidget(carrier_chip(getattr(rate, "carrier", "")))
         service = self._humanize_service(getattr(rate, "service", "") or "") or "—"
         service_label = QLabel(service)
-        # The column clips very long names rather than widening the table, so
+        # The column clips very long names rather than widening the tree, so
         # carry the full text in a tooltip.
         service_label.setToolTip(service)
         row.addWidget(service_label)
@@ -925,35 +1005,129 @@ class CreateShipmentView(QWidget):
         row.addStretch(1)
         return cell
 
-    def _resize_rates_table_to_content(self) -> None:
-        """Size rows, the identity column, and the table itself around the
-        cell *widgets*.
+    def _populate_rates_tree(self, rates, cheapest_id, fastest_id) -> None:
+        """Build the carrier-grouped tree: one top-level row per carrier with
+        its services as children. Carriers are ordered by their cheapest real
+        rate (account-billed-only carriers last); within a carrier the
+        real-priced services come first, then the account-billed ones."""
+        tree = self._rates_tree
+        tree.clear()
 
-        Qt's resizeRowsToContents/ResizeToContents measure the item delegate,
-        which knows nothing about a cell widget — left to itself the table
-        clips the carrier chip vertically and truncates longer service names
-        horizontally.
+        by_carrier: dict[str, list] = {}
+        for rate in rates:
+            by_carrier.setdefault(getattr(rate, "carrier", "") or "", []).append(rate)
+
+        for carrier in self._order_carriers(by_carrier):
+            carrier_rates = by_carrier[carrier]
+            # Real-priced services first (cheapest first); then the
+            # account-billed services, whose sub-penny figure isn't a comparable
+            # price, ordered by name.
+            real = sorted(
+                (r for r in carrier_rates if not _is_account_billed(r)),
+                key=_rate_sort_key,
+            )
+            billed = sorted(
+                (r for r in carrier_rates if _is_account_billed(r)),
+                key=lambda r: (getattr(r, "service", "") or "").lower(),
+            )
+            group_rates = real + billed
+
+            display = self._carrier_display_name(carrier)
+            # A carrier header carries the name and a count but is not itself a
+            # rate — no price, no est. days, no Buy button.
+            parent = QTreeWidgetItem([f"{display} ({len(group_rates)})", "", "", ""])
+            tree.addTopLevelItem(parent)
+
+            has_cheapest = False
+            for rate in group_rates:
+                is_cheapest = rate.id == cheapest_id
+                has_cheapest = has_cheapest or is_cheapest
+                self._add_rate_child(parent, rate, cheapest=is_cheapest, fastest=rate.id == fastest_id)
+
+            # Expand a group by default when it's small enough to scan at a
+            # glance, or when it holds the overall cheapest rate; otherwise a
+            # big catalogue (e.g. Royal Mail's 70+ services) starts collapsed
+            # behind its count so it doesn't bury the rest.
+            parent.setExpanded(len(group_rates) <= _MAX_AUTO_EXPAND or has_cheapest)
+
+        self._resize_rates_tree_to_content()
+
+    def _order_carriers(self, by_carrier: dict[str, list]) -> list[str]:
+        """Carriers with a real (non-account-billed) rate first, ordered by that
+        carrier's cheapest real rate; carriers offering only account-billed
+        rates (real price unknown) go last, alphabetically."""
+        priced: list[tuple[float, str]] = []
+        billed_only: list[str] = []
+        for carrier, carrier_rates in by_carrier.items():
+            real = [r for r in carrier_rates if not _is_account_billed(r)]
+            if real:
+                priced.append((min(_rate_sort_key(r) for r in real), carrier))
+            else:
+                billed_only.append(carrier)
+        priced.sort(key=lambda pair: (pair[0], pair[1]))
+        billed_only.sort()
+        return [carrier for _key, carrier in priced] + billed_only
+
+    def _add_rate_child(self, parent, rate, *, cheapest: bool, fastest: bool) -> None:
+        tree = self._rates_tree
+        child = QTreeWidgetItem(parent, ["", _format_price(rate), _format_delivery(rate), ""])
+        tree.setItemWidget(
+            child, 0, self._build_rate_service_cell(rate, cheapest=cheapest, fastest=fastest)
+        )
+
+        buy_btn = QPushButton(tr("create_shipment.buy_button"))
+        if self._quote_only:
+            # A postal-code quote has no deliverable address, so EasyPost would
+            # reject the purchase. Disable rather than hide, so the reason is
+            # discoverable instead of the button just vanishing.
+            buy_btn.setEnabled(False)
+            buy_btn.setToolTip(tr("create_shipment.buy_needs_full_address"))
+        else:
+            buy_btn.clicked.connect(partial(self._on_buy_clicked, rate))
+        tree.setItemWidget(child, _RATE_COLUMN_COUNT - 1, buy_btn)
+
+    def _resize_rates_tree_to_content(self, *_args) -> None:
+        """Size the tree to show every currently-visible row in full instead of
+        scrolling internally — the outer QScrollArea handles overflow.
+        Recomputed whenever a carrier group is expanded or collapsed.
+
+        Qt's row-height machinery measures the item delegate, which knows
+        nothing about a cell widget, so a service row is measured from the
+        service cell and Buy button; a carrier header row (no widgets) falls
+        back to the delegate's own text height. The Buy column likewise holds a
+        widget Qt won't measure, so it's sized to the widest button here.
         """
-        table = self._rates_table
-        table.resizeRowsToContents()
+        tree = self._rates_tree
+        total_height = tree.header().height() + 2 * tree.frameWidth()
+        buy_width = 0
 
-        total_height = table.horizontalHeader().height() + 2 * table.frameWidth()
-        for row in range(table.rowCount()):
+        def measure(item) -> None:
+            nonlocal total_height, buy_width
             widget_height = 0
-            for col in range(table.columnCount()):
-                widget = table.cellWidget(row, col)
+            for col in range(tree.columnCount()):
+                widget = tree.itemWidget(item, col)
                 if widget is not None:
                     widget_height = max(widget_height, widget.sizeHint().height())
-            # +6 so the Buy button isn't flush against the row borders.
-            if widget_height + 6 > table.rowHeight(row):
-                table.setRowHeight(row, widget_height + 6)
-            total_height += table.rowHeight(row)
+            buy = tree.itemWidget(item, _RATE_COLUMN_COUNT - 1)
+            if buy is not None:
+                buy_width = max(buy_width, buy.sizeHint().width())
+            if widget_height == 0:
+                # A carrier header has no widgets; size it to its text.
+                widget_height = tree.fontMetrics().height()
+            # +8 so a row's widget isn't flush against its borders, and so the
+            # (slightly generous) total never underestimates and clips a row.
+            total_height += widget_height + 8
 
-        # Col 0 stretches and the two text columns fit their content via the
-        # header resize modes; the Buy column holds a widget Qt won't measure, so
-        # size it to the button here (see _build_rates_group).
-        _size_widget_column(table, _RATE_COLUMN_COUNT - 1)
-        table.setFixedHeight(total_height + 2)
+        for i in range(tree.topLevelItemCount()):
+            top = tree.topLevelItem(i)
+            measure(top)
+            if top.isExpanded():
+                for j in range(top.childCount()):
+                    measure(top.child(j))
+
+        if buy_width:
+            tree.setColumnWidth(_RATE_COLUMN_COUNT - 1, buy_width + 16)
+        tree.setFixedHeight(total_height + 2)
 
     def _build_result_group(self) -> QGroupBox:
         group = QGroupBox(tr("create_shipment.result_group"))
@@ -1150,41 +1324,18 @@ class CreateShipmentView(QWidget):
 
         all_rates = sorted(getattr(shipment, "rates", None) or [], key=_rate_sort_key)
         # Drop non-purchasable placeholder rates (e.g. Royal Mail V3 catalogue
-        # services that don't apply to the route, priced at 0.01). If that would
-        # empty the table, fall back to showing everything so a genuine
-        # all-low-cost result is never hidden.
+        # services that don't apply to the route, priced at 0.01). Account-billed
+        # Royal Mail rates sit below the threshold too but ARE buyable, so
+        # _is_placeholder_rate keeps them. If filtering would empty the list,
+        # fall back to showing everything so a genuine all-low-cost result is
+        # never hidden.
         real_rates = [r for r in all_rates if not _is_placeholder_rate(r)]
         rates = real_rates or all_rates
-        cheapest_id = rates[0].id if rates else None
+        cheapest_id = _cheapest_rate_id(rates)
         fastest_id = _fastest_rate_id(rates)
 
         self._quote_only_note.setVisible(self._quote_only)
-        self._rates_table.setRowCount(len(rates))
-        for row, rate in enumerate(rates):
-            self._rates_table.setCellWidget(
-                row,
-                0,
-                self._build_rate_identity_cell(
-                    rate,
-                    cheapest=rate.id == cheapest_id,
-                    fastest=rate.id == fastest_id,
-                ),
-            )
-            self._rates_table.setItem(row, 1, QTableWidgetItem(_format_price(rate)))
-            self._rates_table.setItem(row, 2, QTableWidgetItem(_format_delivery(rate)))
-
-            buy_btn = QPushButton(tr("create_shipment.buy_button"))
-            if self._quote_only:
-                # A postal-code quote has no deliverable address, so EasyPost
-                # would reject the purchase. Disable rather than hide, so the
-                # reason is discoverable instead of the button just vanishing.
-                buy_btn.setEnabled(False)
-                buy_btn.setToolTip(tr("create_shipment.buy_needs_full_address"))
-            else:
-                buy_btn.clicked.connect(partial(self._on_buy_clicked, rate))
-            self._rates_table.setCellWidget(row, _RATE_COLUMN_COUNT - 1, buy_btn)
-
-        self._resize_rates_table_to_content()
+        self._populate_rates_tree(rates, cheapest_id, fastest_id)
 
         if not rates:
             QMessageBox.information(

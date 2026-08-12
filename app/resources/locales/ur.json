@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "صرف پوسٹل کوڈ (قیمت کی جانچ)",
   "create_shipment.badge_cheapest": "سب سے سستا",
   "create_shipment.badge_fastest": "سب سے تیز",
+  "create_shipment.billed_to_account": "اکاؤنٹ پر بل",
   "create_shipment.buy_button": "خریدیں",
   "create_shipment.buy_confirm_description": "{carrier} {service} لیبل {rate} {currency} میں خریدیں۔",
   "create_shipment.buy_needs_full_address": "یہ نرخ خریدنے کے لیے «مکمل پتے» پر جائیں۔",

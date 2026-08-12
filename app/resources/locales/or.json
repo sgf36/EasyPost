@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "କେବଳ ପିନ୍ କୋଡ୍ (ମୂଲ୍ୟ ଯାଞ୍ଚ)",
   "create_shipment.badge_cheapest": "ସବୁଠାରୁ ଶସ୍ତା",
   "create_shipment.badge_fastest": "ସବୁଠାରୁ ଦ୍ରୁତ",
+  "create_shipment.billed_to_account": "ଆକାଉଣ୍ଟରେ ବିଲ୍",
   "create_shipment.buy_button": "କିଣନ୍ତୁ",
   "create_shipment.buy_confirm_description": "{rate} {currency} ପାଇଁ {carrier} {service} ଲେବଲ୍ କିଣନ୍ତୁ।",
   "create_shipment.buy_needs_full_address": "ଏହି ଦର କିଣିବା ପାଇଁ «ସମ୍ପୂର୍ଣ୍ଣ ଠିକଣା» କୁ ଯାଆନ୍ତୁ।",

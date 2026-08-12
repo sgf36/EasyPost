@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Лише поштові індекси (перевірка ціни)",
   "create_shipment.badge_cheapest": "Найдешевше",
   "create_shipment.badge_fastest": "Найшвидше",
+  "create_shipment.billed_to_account": "Виставляється на рахунок",
   "create_shipment.buy_button": "Купити",
   "create_shipment.buy_confirm_description": "Купити етикетку {carrier} {service} за {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Перемкніться на «Повні адреси», щоб купити цей тариф.",
