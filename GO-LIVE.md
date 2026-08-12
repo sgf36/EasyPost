@@ -70,17 +70,22 @@ Store** build is unaffected — Microsoft signs it on publish.
 `pricing.html`, `checkout.js` and `thank-you.html` are live on
 `easy-post.spencerfields.com`, byte-for-byte identical to the repository.
 
-The cPanel upload widget 404s on this Bluehost build, so publishing goes
-through cPanel's UAPI from an authenticated browser session:
+Publishing is scripted and needs no browser and no logged-in session:
 
-```
-POST /cpsess<token>/execute/Fileman/save_file_content
-     dir=/home2/spencgh6/easy-post.spencerfields.com
-     file=<name>  content=<utf-8>  from_charset=UTF-8  to_charset=UTF-8
+```bash
+python packaging/deploy_site.py download.html
+python packaging/deploy_site.py --all
 ```
 
-Verify afterwards by fetching each file over HTTPS and comparing byte counts —
-the File Manager listing alone does not prove what the web server serves.
+It authenticates with a cPanel **API token** (`Authorization: cpanel
+spencgh6:<token>`) held in the OS credential store under service
+`cpanel-easypost-site`, never in this public repository, and verifies each
+upload by fetching the file back over HTTPS. See the README's "Publishing the
+product site" section for the token setup and for three traps — UAPI returning
+HTTP 200 on failure, the missing charset that makes a correct file read back as
+mojibake, and the whitespace shift that makes byte counts differ.
+
+The File Manager listing alone does not prove what the web server serves.
 
 ## Checkout — working end to end
 
