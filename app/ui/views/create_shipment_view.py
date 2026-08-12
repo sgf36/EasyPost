@@ -54,11 +54,13 @@ from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.chips import badge
 from app.ui.widgets.purchase_confirm import confirm_if_production
 
-# Carrier & service | Rate | Delivery | Buy. Rates are shown in a QTreeWidget
-# grouped by carrier: the carrier is a top-level (header) row and each service
-# is a child under it, so column 0 carries the carrier name on a header row and
-# the service name on a child row rather than both sharing one flat cell.
-_RATE_COLUMN_COUNT = 4
+# Carrier & service | Included | Rate | Delivery | Buy. Rates are shown in a
+# QTreeWidget grouped by carrier: the carrier is a top-level (header) row and
+# each service is a child under it, so column 0 carries the carrier name on a
+# header row and the service name on a child row rather than both sharing one
+# flat cell. The "Included" column sits between the service identity and the
+# rate, carrying the enhancement badges (tracked / signed / guaranteed).
+_RATE_COLUMN_COUNT = 5
 _CUSTOMS_ITEM_COLUMN_COUNT = 7
 
 # Label previews are rendered from the image EasyPost returns. PDFs can't be
@@ -83,6 +85,27 @@ def _delivery_days(rate) -> int | None:
         return int(days)
     except (TypeError, ValueError):
         return None
+
+
+def _service_enhancements(rate) -> list[str]:
+    """Which included features a rate's service advertises, as a subset of
+    ["tracked", "signed", "guaranteed"], in that fixed order.
+
+    Read from the service name (case-insensitive) plus EasyPost's
+    delivery_date_guaranteed flag — "signature" in a name counts as signed
+    because carriers name the age-verified variants "…Signature…" rather than
+    "…SignedFor…". Purely descriptive and never raises: a rate with no service
+    name simply yields an empty list.
+    """
+    name = (getattr(rate, "service", "") or "").lower()
+    enhancements: list[str] = []
+    if "tracked" in name:
+        enhancements.append("tracked")
+    if "signed" in name or "signature" in name:
+        enhancements.append("signed")
+    if getattr(rate, "delivery_date_guaranteed", False) or "guaranteed" in name:
+        enhancements.append("guaranteed")
+    return enhancements
 
 
 def _fastest_rate_id(rates) -> str | None:
@@ -356,6 +379,29 @@ class CreateShipmentView(QWidget):
         self._apply_units(initial=True)
         self._reference_row_label = QLabel(tr("create_shipment.reference_field"))
         form.addRow(self._reference_row_label, self._reference_input)
+
+        # Signature on delivery drives EasyPost's delivery_confirmation option,
+        # which changes the services carriers quote (SIGNATURE → Royal Mail's
+        # SignedFor set, ADULT_SIGNATURE → the age-verification set). It lives
+        # here with the other parcel/options inputs, just above Get Rates, so
+        # it's chosen before rates are fetched. userData is the raw option value
+        # (None means "don't send the option at all").
+        self._signature_combo = QComboBox()
+        self._signature_combo.addItem(tr("create_shipment.signature_none"), None)
+        self._signature_combo.addItem(tr("create_shipment.signature_signature"), "SIGNATURE")
+        self._signature_combo.addItem(tr("create_shipment.signature_adult"), "ADULT_SIGNATURE")
+        self._signature_combo.currentIndexChanged.connect(self._on_signature_changed)
+        form.addRow(tr("create_shipment.signature_label"), self._signature_combo)
+
+        # Optional declared value to insure the parcel for. Unlike signature it
+        # does not change the quoted rates, so it is read at Buy time and passed
+        # to EasyPost's purchase call (see _on_buy_clicked). 0 means no cover.
+        self._insurance_input = QDoubleSpinBox()
+        self._insurance_input.setDecimals(2)
+        self._insurance_input.setMaximum(1_000_000)
+        self._insurance_input.setSpecialValueText(tr("create_shipment.insurance_none"))
+        self._insurance_input.setToolTip(tr("create_shipment.insurance_tooltip"))
+        form.addRow(tr("create_shipment.insurance_label"), self._insurance_input)
 
         self._get_rates_btn = QPushButton(tr("create_shipment.get_rates_button"))
         self._get_rates_btn.clicked.connect(self._on_get_rates_clicked)
@@ -895,6 +941,7 @@ class CreateShipmentView(QWidget):
         group = QGroupBox(tr("create_shipment.rates_group"))
         rate_columns = [
             tr("create_shipment.col_carrier_service"),
+            tr("create_shipment.col_enhancements"),
             tr("create_shipment.col_rate"),
             tr("create_shipment.col_est_days"),
             "",
@@ -908,13 +955,14 @@ class CreateShipmentView(QWidget):
         self._rates_tree.setHeaderLabels(rate_columns)
         header = self._rates_tree.header()
         # Carrier & service (col 0) absorbs the slack; the compact columns —
-        # Rate and Est. days — size to their own content. The Buy column holds a
-        # widget, which ResizeToContents can't measure — left to itself it
-        # collapses and clips the button, so it's Fixed and sized explicitly in
-        # _resize_rates_tree_to_content instead.
+        # Included, Rate and Est. days — size to their own content. The Buy
+        # column holds a widget, which ResizeToContents can't measure — left to
+        # itself it collapses and clips the button, so it's Fixed and sized
+        # explicitly in _resize_rates_tree_to_content instead.
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(_RATE_COLUMN_COUNT - 1, QHeaderView.ResizeMode.Fixed)
         # Don't let Qt stretch the last (Buy) section — it's sized to the button,
         # and a stretched final column would swallow col 0's slack.
@@ -1005,6 +1053,29 @@ class CreateShipmentView(QWidget):
         row.addStretch(1)
         return cell
 
+    def _build_rate_enhancements_cell(self, rate) -> QWidget | None:
+        """The "Included" cell: one muted badge per enhancement the service
+        advertises (tracked / signed / guaranteed), or None when it has none so
+        the caller can leave the cell blank. These describe what the service
+        *includes* and are kept apart from the cheapest/fastest ranking markers,
+        which stay in the service identity cell."""
+        enhancements = _service_enhancements(rate)
+        if not enhancements:
+            return None
+        labels = {
+            "tracked": tr("create_shipment.badge_tracked"),
+            "signed": tr("create_shipment.badge_signed"),
+            "guaranteed": tr("create_shipment.badge_guaranteed"),
+        }
+        cell = QWidget()
+        row = QHBoxLayout(cell)
+        row.setContentsMargins(6, 4, 6, 4)
+        row.setSpacing(4)
+        for key in enhancements:
+            row.addWidget(badge(labels[key], tone="muted"))
+        row.addStretch(1)
+        return cell
+
     def _populate_rates_tree(self, rates, cheapest_id, fastest_id) -> None:
         """Build the carrier-grouped tree: one top-level row per carrier with
         its services as children. Carriers are ordered by their cheapest real
@@ -1034,8 +1105,8 @@ class CreateShipmentView(QWidget):
 
             display = self._carrier_display_name(carrier)
             # A carrier header carries the name and a count but is not itself a
-            # rate — no price, no est. days, no Buy button.
-            parent = QTreeWidgetItem([f"{display} ({len(group_rates)})", "", "", ""])
+            # rate — no enhancements, no price, no est. days, no Buy button.
+            parent = QTreeWidgetItem([f"{display} ({len(group_rates)})", "", "", "", ""])
             tree.addTopLevelItem(parent)
 
             has_cheapest = False
@@ -1070,10 +1141,17 @@ class CreateShipmentView(QWidget):
 
     def _add_rate_child(self, parent, rate, *, cheapest: bool, fastest: bool) -> None:
         tree = self._rates_tree
-        child = QTreeWidgetItem(parent, ["", _format_price(rate), _format_delivery(rate), ""])
+        # Columns: service cell (0), enhancements (1), rate (2), est days (3),
+        # Buy (last). Cols 0/1/last hold widgets, so their text is left blank.
+        child = QTreeWidgetItem(parent, ["", "", _format_price(rate), _format_delivery(rate), ""])
         tree.setItemWidget(
             child, 0, self._build_rate_service_cell(rate, cheapest=cheapest, fastest=fastest)
         )
+        # Enhancement badges (tracked / signed / guaranteed) — only set a widget
+        # when the service has any, so a plain service leaves the cell blank.
+        enhancements_cell = self._build_rate_enhancements_cell(rate)
+        if enhancements_cell is not None:
+            tree.setItemWidget(child, 1, enhancements_cell)
 
         buy_btn = QPushButton(tr("create_shipment.buy_button"))
         if self._quote_only:
@@ -1207,6 +1285,20 @@ class CreateShipmentView(QWidget):
             self._to_combo.addItem(display, rec.id)
         self._update_customs_visibility()
 
+    def _on_signature_changed(self, *_args) -> None:
+        """Signature level changes which services carriers quote, so any rates
+        already on screen are stale the moment it changes. Clear them back to
+        the empty state (dropping the quote-only note and the shipment they
+        could be bought from) rather than showing a list that no longer matches
+        the selected option — the user re-runs Get Rates to requote.
+        """
+        if self._rates_tree.topLevelItemCount() == 0:
+            return
+        self._rates_tree.clear()
+        self._current_shipment = None
+        self._quote_only_note.setVisible(False)
+        self._resize_rates_tree_to_content()
+
     def _on_get_rates_clicked(self) -> None:
         if self._mode_zip_radio.isChecked():
             self._request_zip_quote()
@@ -1271,6 +1363,7 @@ class CreateShipmentView(QWidget):
             weight=self._weight_oz(),
             reference=self._reference_input.text().strip(),
             customs_info=customs_info,
+            delivery_confirmation=self._signature_combo.currentData(),
         )
         if isinstance(package_data, tuple) and package_data[0] == "predefined":
             params["predefined_package"] = package_data[1].name
@@ -1303,6 +1396,7 @@ class CreateShipmentView(QWidget):
             from_country=self._from_country_combo.currentData(),
             to_country=self._to_country_combo.currentData(),
             weight=self._weight_oz(),
+            delivery_confirmation=self._signature_combo.currentData(),
         )
         package_data = self._package_combo.currentData()
         if isinstance(package_data, tuple) and package_data[0] == "predefined":
@@ -1359,12 +1453,18 @@ class CreateShipmentView(QWidget):
             rate=getattr(rate, "rate", ""),
             currency=getattr(rate, "currency", ""),
         )
+        # A declared insurance value is a real added charge, so surface it in
+        # the same confirmation that guards a production purchase.
+        insured_value = self._insurance_input.value()
+        insurance = f"{insured_value:.2f}" if insured_value > 0 else None
+        if insurance:
+            description += "\n" + tr("create_shipment.insured_note", amount=insurance)
         if not confirm_if_production(self, description):
             return
 
         shipment_id = self._current_shipment.id
         rate_id = rate.id
-        self._pending_task = run_async(lambda: buy_shipment(shipment_id, rate_id), self)
+        self._pending_task = run_async(lambda: buy_shipment(shipment_id, rate_id, insurance), self)
         self._pending_task.succeeded.connect(self._on_bought)
         self._pending_task.failed.connect(
             lambda exc: QMessageBox.critical(

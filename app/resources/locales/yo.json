@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Àwọn fáìlì CSV",
   "batch_shipments.filter_excel": "Ìwé-iṣẹ́ Excel",
   "batch_shipments.filter_spreadsheets": "Àwọn ìwé-ìṣirò",
-  "batch_shipments.saved_failed_body": "Kò lè fi àwòṣe pamọ́:\n{error}"
+  "batch_shipments.saved_failed_body": "Kò lè fi àwòṣe pamọ́:\n{error}",
+  "create_shipment.signature_label": "Ìbúwọlú nígbà ìfiránṣẹ́:",
+  "create_shipment.signature_none": "Kò sí",
+  "create_shipment.signature_signature": "Ìbúwọlú pọndandan",
+  "create_shipment.signature_adult": "Ìbúwọlú àgbà (18+)",
+  "create_shipment.col_enhancements": "Kúnná",
+  "create_shipment.badge_tracked": "Àtọpinpin",
+  "create_shipment.badge_signed": "Ìbúwọlú",
+  "create_shipment.badge_guaranteed": "Ìdánilójú",
+  "create_shipment.insurance_label": "Ṣe iṣẹ́ àbò fún iye:",
+  "create_shipment.insurance_none": "Kò sí",
+  "create_shipment.insurance_tooltip": "Àṣàyàn. Sọ iye láti ṣe iṣẹ́ àbò fún àpótí; owó àbò ni a ń gbà nígbà tí o bá ra àmì.",
+  "create_shipment.insured_note": "Iṣẹ́ àbò fún {amount}"
 }

@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV फाइलहरू",
   "batch_shipments.filter_excel": "Excel कार्यपुस्तिका",
   "batch_shipments.filter_spreadsheets": "स्प्रेडसिटहरू",
-  "batch_shipments.saved_failed_body": "टेम्प्लेट सुरक्षित गर्न सकिएन:\n{error}"
+  "batch_shipments.saved_failed_body": "टेम्प्लेट सुरक्षित गर्न सकिएन:\n{error}",
+  "create_shipment.signature_label": "डेलिभरीमा हस्ताक्षर:",
+  "create_shipment.signature_none": "कुनै पनि होइन",
+  "create_shipment.signature_signature": "हस्ताक्षर आवश्यक",
+  "create_shipment.signature_adult": "वयस्क हस्ताक्षर (18+)",
+  "create_shipment.col_enhancements": "समावेश",
+  "create_shipment.badge_tracked": "ट्र्याक गरिएको",
+  "create_shipment.badge_signed": "हस्ताक्षर गरिएको",
+  "create_shipment.badge_guaranteed": "ग्यारेन्टी गरिएको",
+  "create_shipment.insurance_label": "मूल्यको लागि बिमा:",
+  "create_shipment.insurance_none": "कुनै पनि होइन",
+  "create_shipment.insurance_tooltip": "वैकल्पिक। पार्सल बिमा गर्न मूल्य घोषणा गर्नुहोस्; लेबल किन्दा कभरको शुल्क लाग्छ।",
+  "create_shipment.insured_note": "{amount} को लागि बिमा गरिएको"
 }

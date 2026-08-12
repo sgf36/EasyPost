@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV 文件",
   "batch_shipments.filter_excel": "Excel 工作簿",
   "batch_shipments.filter_spreadsheets": "电子表格",
-  "batch_shipments.saved_failed_body": "无法保存模板：\n{error}"
+  "batch_shipments.saved_failed_body": "无法保存模板：\n{error}",
+  "create_shipment.signature_label": "签收时需签名：",
+  "create_shipment.signature_none": "无",
+  "create_shipment.signature_signature": "需要签名",
+  "create_shipment.signature_adult": "成人签名 (18+)",
+  "create_shipment.col_enhancements": "包含",
+  "create_shipment.badge_tracked": "可追踪",
+  "create_shipment.badge_signed": "需签名",
+  "create_shipment.badge_guaranteed": "有保障",
+  "create_shipment.insurance_label": "按价值投保：",
+  "create_shipment.insurance_none": "无",
+  "create_shipment.insurance_tooltip": "可选。申报包裹的投保价值；保费在购买面单时收取。",
+  "create_shipment.insured_note": "已投保 {amount}"
 }

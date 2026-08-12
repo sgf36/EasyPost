@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Fayilolin CSV",
   "batch_shipments.filter_excel": "Littafin aiki na Excel",
   "batch_shipments.filter_spreadsheets": "Maƙunsar bayanai",
-  "batch_shipments.saved_failed_body": "An kasa ajiye samfurin:\n{error}"
+  "batch_shipments.saved_failed_body": "An kasa ajiye samfurin:\n{error}",
+  "create_shipment.signature_label": "Sa hannu lokacin isarwa:",
+  "create_shipment.signature_none": "Babu",
+  "create_shipment.signature_signature": "Ana buƙatar sa hannu",
+  "create_shipment.signature_adult": "Sa hannun manya (18+)",
+  "create_shipment.col_enhancements": "An haɗa",
+  "create_shipment.badge_tracked": "Bibiya",
+  "create_shipment.badge_signed": "An sa hannu",
+  "create_shipment.badge_guaranteed": "An tabbatar",
+  "create_shipment.insurance_label": "Yi inshora don kima:",
+  "create_shipment.insurance_none": "Babu",
+  "create_shipment.insurance_tooltip": "Na zaɓi. Bayyana kima don yin inshorar fakiti; ana cajin kariya lokacin sayan lakabin.",
+  "create_shipment.insured_note": "An yi inshora don {amount}"
 }

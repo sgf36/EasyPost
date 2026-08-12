@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "ملفات CSV",
   "batch_shipments.filter_excel": "مصنّف Excel",
   "batch_shipments.filter_spreadsheets": "جداول البيانات",
-  "batch_shipments.saved_failed_body": "تعذّر حفظ القالب:\n{error}"
+  "batch_shipments.saved_failed_body": "تعذّر حفظ القالب:\n{error}",
+  "create_shipment.signature_label": "التوقيع عند التسليم:",
+  "create_shipment.signature_none": "بدون",
+  "create_shipment.signature_signature": "التوقيع مطلوب",
+  "create_shipment.signature_adult": "توقيع شخص بالغ (18+)",
+  "create_shipment.col_enhancements": "مشمول",
+  "create_shipment.badge_tracked": "متتبَّع",
+  "create_shipment.badge_signed": "موقَّع",
+  "create_shipment.badge_guaranteed": "مضمون",
+  "create_shipment.insurance_label": "التأمين على القيمة:",
+  "create_shipment.insurance_none": "بدون",
+  "create_shipment.insurance_tooltip": "اختياري. يُرجى تحديد قيمة لتأمين الطرد عليها؛ تُحتسب التغطية عند شراء الملصق.",
+  "create_shipment.insured_note": "مؤمَّن بقيمة {amount}"
 }

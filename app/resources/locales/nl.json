@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV-bestanden",
   "batch_shipments.filter_excel": "Excel-werkmap",
   "batch_shipments.filter_spreadsheets": "Spreadsheets",
-  "batch_shipments.saved_failed_body": "Kan het sjabloon niet opslaan:\n{error}"
+  "batch_shipments.saved_failed_body": "Kan het sjabloon niet opslaan:\n{error}",
+  "create_shipment.signature_label": "Handtekening bij levering:",
+  "create_shipment.signature_none": "Geen",
+  "create_shipment.signature_signature": "Handtekening vereist",
+  "create_shipment.signature_adult": "Handtekening volwassene (18+)",
+  "create_shipment.col_enhancements": "Inbegrepen",
+  "create_shipment.badge_tracked": "Gevolgd",
+  "create_shipment.badge_signed": "Ondertekend",
+  "create_shipment.badge_guaranteed": "Gegarandeerd",
+  "create_shipment.insurance_label": "Verzekeren voor waarde:",
+  "create_shipment.insurance_none": "Geen",
+  "create_shipment.insurance_tooltip": "Optioneel. Geef een waarde op om het pakket voor te verzekeren; de dekking wordt in rekening gebracht bij aankoop van het label.",
+  "create_shipment.insured_note": "Verzekerd voor {amount}"
 }

@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ファイル",
   "batch_shipments.filter_excel": "Excel ブック",
   "batch_shipments.filter_spreadsheets": "スプレッドシート",
-  "batch_shipments.saved_failed_body": "テンプレートを保存できませんでした:\n{error}"
+  "batch_shipments.saved_failed_body": "テンプレートを保存できませんでした:\n{error}",
+  "create_shipment.signature_label": "配達時の署名:",
+  "create_shipment.signature_none": "なし",
+  "create_shipment.signature_signature": "署名必須",
+  "create_shipment.signature_adult": "成人の署名（18歳以上）",
+  "create_shipment.col_enhancements": "含む",
+  "create_shipment.badge_tracked": "追跡あり",
+  "create_shipment.badge_signed": "署名あり",
+  "create_shipment.badge_guaranteed": "保証あり",
+  "create_shipment.insurance_label": "補償金額:",
+  "create_shipment.insurance_none": "なし",
+  "create_shipment.insurance_tooltip": "任意。荷物に付ける補償額を申告します。補償料はラベル購入時に請求されます。",
+  "create_shipment.insured_note": "{amount} を補償"
 }

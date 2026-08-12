@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ఫైల్‌లు",
   "batch_shipments.filter_excel": "Excel వర్క్‌బుక్",
   "batch_shipments.filter_spreadsheets": "స్ప్రెడ్‌షీట్‌లు",
-  "batch_shipments.saved_failed_body": "మూసను సేవ్ చేయడం సాధ్యపడలేదు:\n{error}"
+  "batch_shipments.saved_failed_body": "మూసను సేవ్ చేయడం సాధ్యపడలేదు:\n{error}",
+  "create_shipment.signature_label": "డెలివరీ సమయంలో సంతకం:",
+  "create_shipment.signature_none": "ఏదీ లేదు",
+  "create_shipment.signature_signature": "సంతకం అవసరం",
+  "create_shipment.signature_adult": "వయోజన సంతకం (18+)",
+  "create_shipment.col_enhancements": "చేర్చబడింది",
+  "create_shipment.badge_tracked": "ట్రాక్ చేయబడింది",
+  "create_shipment.badge_signed": "సంతకం చేయబడింది",
+  "create_shipment.badge_guaranteed": "హామీ ఇవ్వబడింది",
+  "create_shipment.insurance_label": "విలువకు బీమా:",
+  "create_shipment.insurance_none": "ఏదీ లేదు",
+  "create_shipment.insurance_tooltip": "ఐచ్ఛికం. పార్శిల్‌కు బీమా చేయడానికి విలువను ప్రకటించండి; లేబుల్ కొనుగోలు చేసినప్పుడు కవర్‌కు రుసుము వసూలు చేయబడుతుంది.",
+  "create_shipment.insured_note": "{amount} కోసం బీమా చేయబడింది"
 }

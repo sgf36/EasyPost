@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV-Dateien",
   "batch_shipments.filter_excel": "Excel-Arbeitsmappe",
   "batch_shipments.filter_spreadsheets": "Tabellen",
-  "batch_shipments.saved_failed_body": "Die Vorlage konnte nicht gespeichert werden:\n{error}"
+  "batch_shipments.saved_failed_body": "Die Vorlage konnte nicht gespeichert werden:\n{error}",
+  "create_shipment.signature_label": "Unterschrift bei Zustellung:",
+  "create_shipment.signature_none": "Keine",
+  "create_shipment.signature_signature": "Unterschrift erforderlich",
+  "create_shipment.signature_adult": "Unterschrift eines Erwachsenen (18+)",
+  "create_shipment.col_enhancements": "Enthalten",
+  "create_shipment.badge_tracked": "Verfolgt",
+  "create_shipment.badge_signed": "Unterschrieben",
+  "create_shipment.badge_guaranteed": "Garantiert",
+  "create_shipment.insurance_label": "Wert versichern:",
+  "create_shipment.insurance_none": "Keine",
+  "create_shipment.insurance_tooltip": "Optional. Einen Wert angeben, für den das Paket versichert werden soll; die Deckung wird beim Kauf des Etiketts berechnet.",
+  "create_shipment.insured_note": "Versichert für {amount}"
 }

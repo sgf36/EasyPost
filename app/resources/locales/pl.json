@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Pliki CSV",
   "batch_shipments.filter_excel": "Skoroszyt programu Excel",
   "batch_shipments.filter_spreadsheets": "Arkusze kalkulacyjne",
-  "batch_shipments.saved_failed_body": "Nie można zapisać szablonu:\n{error}"
+  "batch_shipments.saved_failed_body": "Nie można zapisać szablonu:\n{error}",
+  "create_shipment.signature_label": "Podpis przy doręczeniu:",
+  "create_shipment.signature_none": "Brak",
+  "create_shipment.signature_signature": "Wymagany podpis",
+  "create_shipment.signature_adult": "Podpis osoby dorosłej (18+)",
+  "create_shipment.col_enhancements": "W zestawie",
+  "create_shipment.badge_tracked": "Śledzona",
+  "create_shipment.badge_signed": "Podpisana",
+  "create_shipment.badge_guaranteed": "Gwarantowana",
+  "create_shipment.insurance_label": "Ubezpiecz na kwotę:",
+  "create_shipment.insurance_none": "Brak",
+  "create_shipment.insurance_tooltip": "Opcjonalne. Zadeklaruj wartość, na jaką ma być ubezpieczona przesyłka; opłata za ochronę jest naliczana przy zakupie etykiety.",
+  "create_shipment.insured_note": "Ubezpieczono na {amount}"
 }

@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ফাইল",
   "batch_shipments.filter_excel": "Excel ওয়ার্কবুক",
   "batch_shipments.filter_spreadsheets": "স্প্রেডশিট",
-  "batch_shipments.saved_failed_body": "টেমপ্লেট সংরক্ষণ করা যায়নি:\n{error}"
+  "batch_shipments.saved_failed_body": "টেমপ্লেট সংরক্ষণ করা যায়নি:\n{error}",
+  "create_shipment.signature_label": "ডেলিভারিতে স্বাক্ষর:",
+  "create_shipment.signature_none": "কোনওটিই নয়",
+  "create_shipment.signature_signature": "স্বাক্ষর আবশ্যক",
+  "create_shipment.signature_adult": "প্রাপ্তবয়স্ক স্বাক্ষর (18+)",
+  "create_shipment.col_enhancements": "অন্তর্ভুক্ত",
+  "create_shipment.badge_tracked": "ট্র্যাক করা",
+  "create_shipment.badge_signed": "স্বাক্ষরিত",
+  "create_shipment.badge_guaranteed": "নিশ্চিত",
+  "create_shipment.insurance_label": "মূল্যের জন্য বিমা:",
+  "create_shipment.insurance_none": "কোনওটিই নয়",
+  "create_shipment.insurance_tooltip": "ঐচ্ছিক। পার্সেলটি যে মূল্যে বিমা করা হবে তা ঘোষণা করুন; লেবেল কেনার সময় কভারের জন্য চার্জ নেওয়া হয়।",
+  "create_shipment.insured_note": "{amount} মূল্যে বিমাকৃত"
 }

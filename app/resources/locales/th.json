@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "ไฟล์ CSV",
   "batch_shipments.filter_excel": "สมุดงาน Excel",
   "batch_shipments.filter_spreadsheets": "สเปรดชีต",
-  "batch_shipments.saved_failed_body": "ไม่สามารถบันทึกเทมเพลตได้:\n{error}"
+  "batch_shipments.saved_failed_body": "ไม่สามารถบันทึกเทมเพลตได้:\n{error}",
+  "create_shipment.signature_label": "ลายเซ็นเมื่อจัดส่ง:",
+  "create_shipment.signature_none": "ไม่มี",
+  "create_shipment.signature_signature": "ต้องมีลายเซ็น",
+  "create_shipment.signature_adult": "ลายเซ็นผู้ใหญ่ (18+)",
+  "create_shipment.col_enhancements": "รวมอยู่ด้วย",
+  "create_shipment.badge_tracked": "ติดตามได้",
+  "create_shipment.badge_signed": "มีลายเซ็น",
+  "create_shipment.badge_guaranteed": "รับประกัน",
+  "create_shipment.insurance_label": "ประกันตามมูลค่า:",
+  "create_shipment.insurance_none": "ไม่มี",
+  "create_shipment.insurance_tooltip": "ไม่บังคับ ระบุมูลค่าเพื่อทำประกันพัสดุ ค่าคุ้มครองจะถูกเรียกเก็บเมื่อซื้อฉลาก",
+  "create_shipment.insured_note": "ทำประกันไว้ที่ {amount}"
 }

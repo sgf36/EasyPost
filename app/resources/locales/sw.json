@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Faili za CSV",
   "batch_shipments.filter_excel": "Kitabu cha kazi cha Excel",
   "batch_shipments.filter_spreadsheets": "Lahajedwali",
-  "batch_shipments.saved_failed_body": "Imeshindwa kuhifadhi kiolezo:\n{error}"
+  "batch_shipments.saved_failed_body": "Imeshindwa kuhifadhi kiolezo:\n{error}",
+  "create_shipment.signature_label": "Saini wakati wa kuwasilisha:",
+  "create_shipment.signature_none": "Hakuna",
+  "create_shipment.signature_signature": "Saini inahitajika",
+  "create_shipment.signature_adult": "Saini ya mtu mzima (18+)",
+  "create_shipment.col_enhancements": "Imejumuishwa",
+  "create_shipment.badge_tracked": "Inafuatiliwa",
+  "create_shipment.badge_signed": "Imesainiwa",
+  "create_shipment.badge_guaranteed": "Imehakikishwa",
+  "create_shipment.insurance_label": "Bima kwa thamani:",
+  "create_shipment.insurance_none": "Hakuna",
+  "create_shipment.insurance_tooltip": "Si lazima. Tangaza thamani ya kukatia kifurushi bima; gharama hutozwa wakati wa kununua lebo.",
+  "create_shipment.insured_note": "Imekatiwa bima kwa {amount}"
 }

@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "קובצי CSV",
   "batch_shipments.filter_excel": "חוברת עבודה של Excel",
   "batch_shipments.filter_spreadsheets": "גיליונות אלקטרוניים",
-  "batch_shipments.saved_failed_body": "לא ניתן לשמור את התבנית:\n{error}"
+  "batch_shipments.saved_failed_body": "לא ניתן לשמור את התבנית:\n{error}",
+  "create_shipment.signature_label": "חתימה בעת מסירה:",
+  "create_shipment.signature_none": "ללא",
+  "create_shipment.signature_signature": "נדרשת חתימה",
+  "create_shipment.signature_adult": "חתימת מבוגר (18+)",
+  "create_shipment.col_enhancements": "כלול",
+  "create_shipment.badge_tracked": "במעקב",
+  "create_shipment.badge_signed": "חתום",
+  "create_shipment.badge_guaranteed": "מובטח",
+  "create_shipment.insurance_label": "ביטוח לפי ערך:",
+  "create_shipment.insurance_none": "ללא",
+  "create_shipment.insurance_tooltip": "אופציונלי. יש להצהיר על ערך לביטוח החבילה; העלות נגבית בעת רכישת התווית.",
+  "create_shipment.insured_note": "מבוטח עבור {amount}"
 }

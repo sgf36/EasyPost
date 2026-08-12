@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV فائلیں",
   "batch_shipments.filter_excel": "Excel ورک بک",
   "batch_shipments.filter_spreadsheets": "اسپریڈ شیٹس",
-  "batch_shipments.saved_failed_body": "ٹیمپلیٹ محفوظ نہیں ہو سکا:\n{error}"
+  "batch_shipments.saved_failed_body": "ٹیمپلیٹ محفوظ نہیں ہو سکا:\n{error}",
+  "create_shipment.signature_label": "ترسیل پر دستخط:",
+  "create_shipment.signature_none": "کوئی نہیں",
+  "create_shipment.signature_signature": "دستخط ضروری",
+  "create_shipment.signature_adult": "بالغ کے دستخط (18+)",
+  "create_shipment.col_enhancements": "شامل",
+  "create_shipment.badge_tracked": "ٹریک شدہ",
+  "create_shipment.badge_signed": "دستخط شدہ",
+  "create_shipment.badge_guaranteed": "ضمانت شدہ",
+  "create_shipment.insurance_label": "اس مالیت پر بیمہ:",
+  "create_shipment.insurance_none": "کوئی نہیں",
+  "create_shipment.insurance_tooltip": "اختیاری۔ پارسل کے بیمے کے لیے مالیت درج کریں؛ کور کی قیمت لیبل خریدتے وقت وصول کی جاتی ہے۔",
+  "create_shipment.insured_note": "{amount} کا بیمہ شدہ"
 }

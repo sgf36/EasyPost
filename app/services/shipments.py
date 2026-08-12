@@ -30,6 +30,7 @@ def create_shipment(
     predefined_package: Optional[str] = None,
     reference: str = "",
     customs_info: Optional[dict] = None,
+    delivery_confirmation: Optional[str] = None,
 ):
     """Create a shipment and get back live carrier rates. References existing
     verified addresses by EasyPost id rather than re-submitting full address
@@ -43,6 +44,11 @@ def create_shipment(
     `customs_info` must be supplied for international shipments — carriers
     reject the label purchase (a raw 400 from EasyPost) without it, and it
     can only be attached at creation time, not added later before buying.
+
+    `delivery_confirmation` ("SIGNATURE" / "ADULT_SIGNATURE") changes which
+    services carriers quote — SIGNATURE surfaces Royal Mail's SignedFor set,
+    ADULT_SIGNATURE the age-verification set — so it rides in the shipment
+    options alongside the label-format preferences rather than in the parcel.
     """
     parcel = {"weight": weight}
     if predefined_package:
@@ -50,13 +56,20 @@ def create_shipment(
     else:
         parcel.update({"length": length, "width": width, "height": height})
 
+    # Merge the signature option into the user's label-format options rather
+    # than replacing them, and only when one is chosen (an empty value would
+    # otherwise clear whatever carriers default to).
+    options = preferred_label_options()
+    if delivery_confirmation:
+        options["delivery_confirmation"] = delivery_confirmation
+
     client = client_manager.get_client()
     params = dict(
         to_address={"id": to_address_id},
         from_address={"id": from_address_id},
         parcel=parcel,
         reference=reference or None,
-        options=preferred_label_options(),
+        options=options,
     )
     if customs_info:
         params["customs_info"] = customs_info
@@ -74,6 +87,7 @@ def create_rate_quote(
     width: Optional[float] = None,
     height: Optional[float] = None,
     predefined_package: Optional[str] = None,
+    delivery_confirmation: Optional[str] = None,
 ):
     """Price-check a route from postal codes alone, without an address book
     entry at either end.
@@ -83,6 +97,10 @@ def create_rate_quote(
     The resulting shipment is **quote-only**: a label cannot be bought from
     it, because carriers require a complete, verified recipient address to
     generate one. Callers must keep the Buy action disabled for these.
+
+    `delivery_confirmation` is honoured here too so the quote reflects the
+    signature-dependent services (SignedFor / age-verification) the real
+    shipment would be offered.
     """
     parcel = {"weight": weight}
     if predefined_package:
@@ -90,17 +108,31 @@ def create_rate_quote(
     else:
         parcel.update({"length": length, "width": width, "height": height})
 
+    # Same merge as create_shipment: keep the label-format options and only
+    # add the signature option when the caller actually picked one.
+    options = preferred_label_options()
+    if delivery_confirmation:
+        options["delivery_confirmation"] = delivery_confirmation
+
     client = client_manager.get_client()
     return client.shipment.create(
         to_address={"zip": to_postal_code, "country": to_country},
         from_address={"zip": from_postal_code, "country": from_country},
         parcel=parcel,
+        options=options,
     )
 
 
-def buy_shipment(shipment_id: str, rate_id: str):
+def buy_shipment(shipment_id: str, rate_id: str, insurance: Optional[str] = None):
+    """Buy the chosen rate's label. When `insurance` is a positive amount (in
+    the shipment's own currency), EasyPost purchases coverage for that declared
+    value at the same time — loss/damage up to that amount — so it is bought
+    atomically with the label rather than added afterwards."""
     client = client_manager.get_client()
-    return client.shipment.buy(shipment_id, rate={"id": rate_id})
+    params = {"rate": {"id": rate_id}}
+    if insurance:
+        params["insurance"] = insurance
+    return client.shipment.buy(shipment_id, **params)
 
 
 def regenerate_label(shipment_id: str, file_format: str = "PDF"):

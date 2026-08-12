@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Ficheiros CSV",
   "batch_shipments.filter_excel": "Livro do Excel",
   "batch_shipments.filter_spreadsheets": "Folhas de cálculo",
-  "batch_shipments.saved_failed_body": "Não foi possível guardar o modelo:\n{error}"
+  "batch_shipments.saved_failed_body": "Não foi possível guardar o modelo:\n{error}",
+  "create_shipment.signature_label": "Assinatura na entrega:",
+  "create_shipment.signature_none": "Nenhuma",
+  "create_shipment.signature_signature": "Assinatura obrigatória",
+  "create_shipment.signature_adult": "Assinatura de adulto (18+)",
+  "create_shipment.col_enhancements": "Incluído",
+  "create_shipment.badge_tracked": "Rastreada",
+  "create_shipment.badge_signed": "Assinada",
+  "create_shipment.badge_guaranteed": "Garantida",
+  "create_shipment.insurance_label": "Segurar pelo valor:",
+  "create_shipment.insurance_none": "Nenhum",
+  "create_shipment.insurance_tooltip": "Opcional. Declare um valor para segurar a encomenda; a cobertura é cobrada na compra da etiqueta.",
+  "create_shipment.insured_note": "Segurada por {amount}"
 }

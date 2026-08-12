@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV-fájlok",
   "batch_shipments.filter_excel": "Excel-munkafüzet",
   "batch_shipments.filter_spreadsheets": "Táblázatok",
-  "batch_shipments.saved_failed_body": "Nem sikerült menteni a sablont:\n{error}"
+  "batch_shipments.saved_failed_body": "Nem sikerült menteni a sablont:\n{error}",
+  "create_shipment.signature_label": "Aláírás átvételkor:",
+  "create_shipment.signature_none": "Nincs",
+  "create_shipment.signature_signature": "Aláírás szükséges",
+  "create_shipment.signature_adult": "Felnőtt aláírása (18+)",
+  "create_shipment.col_enhancements": "Tartalmazza",
+  "create_shipment.badge_tracked": "Követett",
+  "create_shipment.badge_signed": "Aláírt",
+  "create_shipment.badge_guaranteed": "Garantált",
+  "create_shipment.insurance_label": "Biztosítás értékre:",
+  "create_shipment.insurance_none": "Nincs",
+  "create_shipment.insurance_tooltip": "Választható. Adja meg a csomag biztosítási értékét; a fedezet a címke megvásárlásakor kerül felszámításra.",
+  "create_shipment.insured_note": "Biztosítva {amount} értékben"
 }

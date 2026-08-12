@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Faịlụ CSV",
   "batch_shipments.filter_excel": "Akwụkwọ ọrụ Excel",
   "batch_shipments.filter_spreadsheets": "Mpempe akwụkwọ",
-  "batch_shipments.saved_failed_body": "Enweghị ike ịchekwa ihe nlereanya:\n{error}"
+  "batch_shipments.saved_failed_body": "Enweghị ike ịchekwa ihe nlereanya:\n{error}",
+  "create_shipment.signature_label": "Mbinye aka na nnyefe:",
+  "create_shipment.signature_none": "Ọ dịghị",
+  "create_shipment.signature_signature": "Achọrọ mbinye aka",
+  "create_shipment.signature_adult": "Mbinye aka okenye (18+)",
+  "create_shipment.col_enhancements": "Tinyere",
+  "create_shipment.badge_tracked": "A na-eso",
+  "create_shipment.badge_signed": "Bịanyere aka",
+  "create_shipment.badge_guaranteed": "Ekwenyere",
+  "create_shipment.insurance_label": "Mkpuchi maka uru:",
+  "create_shipment.insurance_none": "Ọ dịghị",
+  "create_shipment.insurance_tooltip": "Nhọrọ. Kwupụta uru iji mkpuchi ngwugwu ahụ; a na-akwụ ụgwọ mkpuchi mgbe ị zụtara akara.",
+  "create_shipment.insured_note": "Echekwara maka {amount}"
 }

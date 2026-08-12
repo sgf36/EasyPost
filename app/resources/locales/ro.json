@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Fișiere CSV",
   "batch_shipments.filter_excel": "Registru de lucru Excel",
   "batch_shipments.filter_spreadsheets": "Foi de calcul",
-  "batch_shipments.saved_failed_body": "Șablonul nu a putut fi salvat:\n{error}"
+  "batch_shipments.saved_failed_body": "Șablonul nu a putut fi salvat:\n{error}",
+  "create_shipment.signature_label": "Semnătură la livrare:",
+  "create_shipment.signature_none": "Niciuna",
+  "create_shipment.signature_signature": "Semnătură obligatorie",
+  "create_shipment.signature_adult": "Semnătură adult (18+)",
+  "create_shipment.col_enhancements": "Inclus",
+  "create_shipment.badge_tracked": "Urmărită",
+  "create_shipment.badge_signed": "Semnată",
+  "create_shipment.badge_guaranteed": "Garantată",
+  "create_shipment.insurance_label": "Asigură pentru valoarea:",
+  "create_shipment.insurance_none": "Niciuna",
+  "create_shipment.insurance_tooltip": "Opțional. Declară o valoare pentru asigurarea coletului; acoperirea se taxează la cumpărarea etichetei.",
+  "create_shipment.insured_note": "Asigurat pentru {amount}"
 }

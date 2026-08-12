@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV 파일",
   "batch_shipments.filter_excel": "Excel 통합 문서",
   "batch_shipments.filter_spreadsheets": "스프레드시트",
-  "batch_shipments.saved_failed_body": "템플릿을 저장할 수 없습니다:\n{error}"
+  "batch_shipments.saved_failed_body": "템플릿을 저장할 수 없습니다:\n{error}",
+  "create_shipment.signature_label": "배송 시 서명:",
+  "create_shipment.signature_none": "없음",
+  "create_shipment.signature_signature": "서명 필요",
+  "create_shipment.signature_adult": "성인 서명 (18+)",
+  "create_shipment.col_enhancements": "포함",
+  "create_shipment.badge_tracked": "추적",
+  "create_shipment.badge_signed": "서명",
+  "create_shipment.badge_guaranteed": "보장",
+  "create_shipment.insurance_label": "보험 가액:",
+  "create_shipment.insurance_none": "없음",
+  "create_shipment.insurance_tooltip": "선택 사항. 소포에 보험을 적용할 가액을 신고하세요. 보상은 라벨 구매 시 청구됩니다.",
+  "create_shipment.insured_note": "{amount} 보험 적용"
 }

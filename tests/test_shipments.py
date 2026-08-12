@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 
-from app.services.shipments import create_shipment
+from app.services.shipments import buy_shipment, create_shipment
 
 SAMPLE_CUSTOMS_INFO = {
     "contents_type": "merchandise",
@@ -46,6 +46,45 @@ def test_domestic_shipment_omits_customs_info():
     _, kwargs = mock_client.shipment.create.call_args
     assert "customs_info" not in kwargs
     assert kwargs["parcel"] == {"weight": 16, "length": 6, "width": 6, "height": 6}
+    # No signature option unless one is requested.
+    assert "delivery_confirmation" not in (kwargs.get("options") or {})
+
+
+def test_delivery_confirmation_added_to_options():
+    mock_manager, mock_client = _mock_client_manager()
+    with patch("app.services.shipments.client_manager", mock_manager):
+        create_shipment(
+            to_address_id="addr_to",
+            from_address_id="addr_from",
+            length=6,
+            width=6,
+            height=6,
+            weight=16,
+            delivery_confirmation="SIGNATURE",
+        )
+
+    _, kwargs = mock_client.shipment.create.call_args
+    assert kwargs["options"]["delivery_confirmation"] == "SIGNATURE"
+
+
+def test_buy_shipment_passes_insurance_when_set():
+    mock_manager, mock_client = _mock_client_manager()
+    with patch("app.services.shipments.client_manager", mock_manager):
+        buy_shipment("shp_1", "rate_1", insurance="50.00")
+
+    args, kwargs = mock_client.shipment.buy.call_args
+    assert args == ("shp_1",)
+    assert kwargs["rate"] == {"id": "rate_1"}
+    assert kwargs["insurance"] == "50.00"
+
+
+def test_buy_shipment_omits_insurance_when_none():
+    mock_manager, mock_client = _mock_client_manager()
+    with patch("app.services.shipments.client_manager", mock_manager):
+        buy_shipment("shp_1", "rate_1")
+
+    _, kwargs = mock_client.shipment.buy.call_args
+    assert "insurance" not in kwargs
 
 
 def test_predefined_package_omits_manual_dimensions():

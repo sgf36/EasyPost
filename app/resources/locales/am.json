@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ፋይሎች",
   "batch_shipments.filter_excel": "Excel ደብተር",
   "batch_shipments.filter_spreadsheets": "ተመን ሉሆች",
-  "batch_shipments.saved_failed_body": "ናሙናውን ማስቀመጥ አልተቻለም:\n{error}"
+  "batch_shipments.saved_failed_body": "ናሙናውን ማስቀመጥ አልተቻለም:\n{error}",
+  "create_shipment.signature_label": "ፊርማ በርክክብ ጊዜ:",
+  "create_shipment.signature_none": "ምንም",
+  "create_shipment.signature_signature": "ፊርማ ያስፈልጋል",
+  "create_shipment.signature_adult": "የአዋቂ ፊርማ (18+)",
+  "create_shipment.col_enhancements": "የተካተተ",
+  "create_shipment.badge_tracked": "ክትትል የሚደረግበት",
+  "create_shipment.badge_signed": "የተፈረመ",
+  "create_shipment.badge_guaranteed": "ዋስትና ያለው",
+  "create_shipment.insurance_label": "ለዋጋ መድን ግባ:",
+  "create_shipment.insurance_none": "ምንም",
+  "create_shipment.insurance_tooltip": "አማራጭ። ጥቅሉን ለመድን የሚያገለግል ዋጋ አስታውቅ፤ መያዣው የሚከፈለው መለያ ፊርማ ሲገዛ ነው።",
+  "create_shipment.insured_note": "ለ{amount} መድን ተደርጓል"
 }

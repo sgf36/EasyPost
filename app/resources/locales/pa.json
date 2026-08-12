@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ਫ਼ਾਈਲਾਂ",
   "batch_shipments.filter_excel": "Excel ਵਰਕਬੁੱਕ",
   "batch_shipments.filter_spreadsheets": "ਸਪ੍ਰੈੱਡਸ਼ੀਟਾਂ",
-  "batch_shipments.saved_failed_body": "ਟੈਂਪਲੇਟ ਸੰਭਾਲੀ ਨਹੀਂ ਜਾ ਸਕੀ:\n{error}"
+  "batch_shipments.saved_failed_body": "ਟੈਂਪਲੇਟ ਸੰਭਾਲੀ ਨਹੀਂ ਜਾ ਸਕੀ:\n{error}",
+  "create_shipment.signature_label": "ਡਿਲੀਵਰੀ 'ਤੇ ਦਸਤਖਤ:",
+  "create_shipment.signature_none": "ਕੋਈ ਨਹੀਂ",
+  "create_shipment.signature_signature": "ਦਸਤਖਤ ਲੋੜੀਂਦੇ",
+  "create_shipment.signature_adult": "ਬਾਲਗ ਦਸਤਖਤ (18+)",
+  "create_shipment.col_enhancements": "ਸ਼ਾਮਲ",
+  "create_shipment.badge_tracked": "ਟਰੈਕ ਕੀਤਾ",
+  "create_shipment.badge_signed": "ਦਸਤਖਤ ਕੀਤਾ",
+  "create_shipment.badge_guaranteed": "ਗਾਰੰਟੀਸ਼ੁਦਾ",
+  "create_shipment.insurance_label": "ਮੁੱਲ ਲਈ ਬੀਮਾ:",
+  "create_shipment.insurance_none": "ਕੋਈ ਨਹੀਂ",
+  "create_shipment.insurance_tooltip": "ਵਿਕਲਪਿਕ। ਪਾਰਸਲ ਦਾ ਬੀਮਾ ਕਰਨ ਲਈ ਇੱਕ ਮੁੱਲ ਐਲਾਨ ਕਰੋ; ਲੇਬਲ ਖਰੀਦਣ ਵੇਲੇ ਕਵਰ ਲਈ ਚਾਰਜ ਲਿਆ ਜਾਂਦਾ ਹੈ।",
+  "create_shipment.insured_note": "{amount} ਲਈ ਬੀਮਾ ਕੀਤਾ"
 }

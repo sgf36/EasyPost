@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ફાઈલો",
   "batch_shipments.filter_excel": "Excel વર્કબુક",
   "batch_shipments.filter_spreadsheets": "સ્પ્રેડશીટ્સ",
-  "batch_shipments.saved_failed_body": "ટેમ્પ્લેટ સાચવી શકાયું નથી:\n{error}"
+  "batch_shipments.saved_failed_body": "ટેમ્પ્લેટ સાચવી શકાયું નથી:\n{error}",
+  "create_shipment.signature_label": "ડિલિવરી પર સહી:",
+  "create_shipment.signature_none": "કોઈ નહીં",
+  "create_shipment.signature_signature": "સહી જરૂરી",
+  "create_shipment.signature_adult": "પુખ્ત સહી (18+)",
+  "create_shipment.col_enhancements": "સમાવિષ્ટ",
+  "create_shipment.badge_tracked": "ટ્રૅક કરેલ",
+  "create_shipment.badge_signed": "સહી કરેલ",
+  "create_shipment.badge_guaranteed": "ગેરંટીકૃત",
+  "create_shipment.insurance_label": "મૂલ્ય માટે વીમો:",
+  "create_shipment.insurance_none": "કોઈ નહીં",
+  "create_shipment.insurance_tooltip": "વૈકલ્પિક. પાર્સલનો વીમો ઉતારવા માટે મૂલ્ય જાહેર કરો; લેબલ ખરીદતી વખતે કવરનો ચાર્જ લેવાય છે.",
+  "create_shipment.insured_note": "{amount} માટે વીમો"
 }

@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV கோப்புகள்",
   "batch_shipments.filter_excel": "Excel பணிப்புத்தகம்",
   "batch_shipments.filter_spreadsheets": "விரிதாள்கள்",
-  "batch_shipments.saved_failed_body": "வார்ப்புருவைச் சேமிக்க முடியவில்லை:\n{error}"
+  "batch_shipments.saved_failed_body": "வார்ப்புருவைச் சேமிக்க முடியவில்லை:\n{error}",
+  "create_shipment.signature_label": "வழங்கும்போது கையொப்பம்:",
+  "create_shipment.signature_none": "இல்லை",
+  "create_shipment.signature_signature": "கையொப்பம் தேவை",
+  "create_shipment.signature_adult": "பெரியவர் கையொப்பம் (18+)",
+  "create_shipment.col_enhancements": "உள்ளடக்கியது",
+  "create_shipment.badge_tracked": "கண்காணிக்கப்படுகிறது",
+  "create_shipment.badge_signed": "கையொப்பமிடப்பட்டது",
+  "create_shipment.badge_guaranteed": "உத்தரவாதம்",
+  "create_shipment.insurance_label": "மதிப்பிற்கு காப்பீடு:",
+  "create_shipment.insurance_none": "இல்லை",
+  "create_shipment.insurance_tooltip": "விருப்பத்தேர்வு. பொதியை காப்பீடு செய்ய மதிப்பை அறிவிக்கவும்; சிட்டையை வாங்கும்போது கட்டணம் விதிக்கப்படும்.",
+  "create_shipment.insured_note": "{amount} மதிப்பிற்கு காப்பீடு செய்யப்பட்டது"
 }

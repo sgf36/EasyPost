@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Faylasha CSV",
   "batch_shipments.filter_excel": "Buugga shaqada Excel",
   "batch_shipments.filter_spreadsheets": "Xaashiyaha xisaabta",
-  "batch_shipments.saved_failed_body": "Lama kaydin karin qaabka:\n{error}"
+  "batch_shipments.saved_failed_body": "Lama kaydin karin qaabka:\n{error}",
+  "create_shipment.signature_label": "Saxeexa marka la keenayo:",
+  "create_shipment.signature_none": "Midna",
+  "create_shipment.signature_signature": "Saxeex ayaa loo baahan yahay",
+  "create_shipment.signature_adult": "Saxeex qof qaangaar ah (18+)",
+  "create_shipment.col_enhancements": "Ku jira",
+  "create_shipment.badge_tracked": "La raacayo",
+  "create_shipment.badge_signed": "La saxeexay",
+  "create_shipment.badge_guaranteed": "La damaanadqaaday",
+  "create_shipment.insurance_label": "Caymis qiimaha:",
+  "create_shipment.insurance_none": "Midna",
+  "create_shipment.insurance_tooltip": "Ikhtiyaari. Caddee qiimaha lagu caymiyo xirmada; kharashka waxaa la qaadaa marka la iibsanayo summada.",
+  "create_shipment.insured_note": "Waxaa la caymiyay {amount}"
 }

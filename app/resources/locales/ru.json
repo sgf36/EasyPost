@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Файлы CSV",
   "batch_shipments.filter_excel": "Книга Excel",
   "batch_shipments.filter_spreadsheets": "Электронные таблицы",
-  "batch_shipments.saved_failed_body": "Не удалось сохранить шаблон:\n{error}"
+  "batch_shipments.saved_failed_body": "Не удалось сохранить шаблон:\n{error}",
+  "create_shipment.signature_label": "Подпись при доставке:",
+  "create_shipment.signature_none": "Нет",
+  "create_shipment.signature_signature": "Требуется подпись",
+  "create_shipment.signature_adult": "Подпись взрослого (18+)",
+  "create_shipment.col_enhancements": "Включено",
+  "create_shipment.badge_tracked": "Отслеживается",
+  "create_shipment.badge_signed": "С подписью",
+  "create_shipment.badge_guaranteed": "Гарантировано",
+  "create_shipment.insurance_label": "Застраховать на сумму:",
+  "create_shipment.insurance_none": "Нет",
+  "create_shipment.insurance_tooltip": "Необязательно. Укажите сумму для страхования посылки; страховка оплачивается при покупке этикетки.",
+  "create_shipment.insured_note": "Застраховано на {amount}"
 }
