@@ -186,12 +186,31 @@ def _stub_credentials() -> None:
 
 
 # Pages that must never appear in a store screenshot, whatever else changes.
-# Settings and the first-run wizard both render API key fields; the AI-agent
-# page renders pairing tokens. Naming them here means adding a page to the
-# screenshot set can never quietly add one of these.
+# The first-run wizard renders API key fields; the AI-agent and pairing pages
+# render pairing tokens. Naming them here means adding a page to the screenshot
+# set can never quietly add one of these.
+#
+# settings_view was on this list until 1.2.1 and is deliberately no longer.
+# It was listed because SettingsView.refresh() loaded the stored keys into its
+# two fields on every visit, so the page genuinely could not be photographed.
+# 1.2.1 removed that: the fields are never populated and a stored key shows
+# only as a fixed-length mask. The page is now safe to capture, and the store
+# listing has carried a Settings screenshot since 1.1.1 regardless — so keeping
+# the ban meant the one image the tool refused to produce was one the listing
+# still needed, and it had to come from somewhere else.
+#
+# This is the ban being retired because the underlying exposure was fixed, not
+# because the screenshot was inconvenient. If SettingsView is ever changed to
+# put a key on screen again, put it back.
+#
+# The names are matched against a view's module, so a name matching no module
+# guards nothing. "pair_screen" was such a name: the mobile pairing page is
+# pair_mobile_view, and it renders a QR carrying a one-time pairing token, so
+# for as long as the entry read "pair_screen" that page was not covered at all.
+# test_screenshot_guard.py now pins every entry to a module that exists.
 FORBIDDEN_PAGES = {
-    "settings_view", "setup_wizard", "connect_agents_view",
-    "license_gate", "store_unlock", "pair_screen",
+    "setup_wizard", "connect_agents_view",
+    "license_gate", "store_unlock", "pair_mobile_view",
 }
 
 
@@ -277,10 +296,22 @@ def _capture_window(app, view_class_name: str, path: Path,
     if target_row is None:
         raise RuntimeError(f"No navigation entry renders {view_class_name}")
 
+    # The forbidden-page check applied only to the hard-coded `pages` list, so
+    # --window walked straight past it and could capture any page in the
+    # navigation. Checked here, against the module of the view actually
+    # selected, it covers both routes.
+    module = type(view).__module__.rsplit(".", 1)[-1]
+    if module in FORBIDDEN_PAGES:
+        raise SystemExit(
+            f"Refusing to screenshot {view_class_name}: {module} renders API "
+            f"keys or pairing tokens, and screenshots are published publicly."
+        )
+
     nav.setCurrentRow(target_row)
     _settle(app)
-    _pin_service_picker(stack.widget(nav.item(target_row)
-                                     .data(Qt.ItemDataRole.UserRole)))
+    holder = stack.widget(nav.item(target_row).data(Qt.ItemDataRole.UserRole))
+    _pin_service_picker(holder, app)
+    _seed_rate_table(holder)
     _settle(app)
 
     # Verified immediately before painting, not assumed. A screenshot run that
@@ -306,7 +337,7 @@ SHOWCASE_CARRIER = "dhlexpress"
 SHOWCASE_SERVICE = "ExpressWorldwide"
 
 
-def _pin_service_picker(holder) -> None:
+def _pin_service_picker(holder, app=None) -> None:
     """Force the batch carrier/service picker to a fixed, recognisable choice.
 
     Left alone, the combo shows whatever wins a race: the seeded cache resolves
@@ -314,28 +345,126 @@ def _pin_service_picker(holder) -> None:
     page screenshotted twice offered "DHL Express" once and "Accurate" the
     other time. Across a localised set that means every language advertising a
     different carrier, which reads as carelessness rather than variety.
+
+    Pinning once after a fixed settle was not enough — it is the same race, just
+    narrower. A seven-language run had the Spanish catalogue still loading when
+    the pin ran, and that language alone published "Accurate / Route" while the
+    other six showed DHL Express. So the list is now waited on, and a carrier
+    that never arrives raises rather than printing a note: an inconsistent set
+    is exactly the failure a note gets skimmed past.
     """
     view = holder.widget() if hasattr(holder, "widget") else holder
     picker = getattr(view, "_service_picker", None)
     if picker is None:
         return
     carriers = picker._carrier_combo
-    for index in range(carriers.count()):
-        if carriers.itemData(index) == SHOWCASE_CARRIER:
-            carriers.setCurrentIndex(index)
-            break
-    else:
-        print(f"  NOTE {SHOWCASE_CARRIER} absent from the carrier list; "
-              f"screenshot shows {carriers.currentText()!r}")
-        return
+
+    def _find(combo, wanted, by_data):
+        for index in range(combo.count()):
+            value = combo.itemData(index) if by_data else combo.itemText(index)
+            if value == wanted:
+                return index
+        return None
+
+    def _wait_for(combo, wanted, by_data, seconds=20.0):
+        import time
+
+        deadline = time.monotonic() + seconds
+        while True:
+            index = _find(combo, wanted, by_data)
+            if index is not None:
+                return index
+            if time.monotonic() >= deadline:
+                return None
+            if app is not None:
+                app.processEvents()
+            time.sleep(0.05)
+
+    index = _wait_for(carriers, SHOWCASE_CARRIER, True)
+    if index is None:
+        raise RuntimeError(
+            f"{SHOWCASE_CARRIER} never appeared in the carrier list; the batch "
+            f"screenshot would show {carriers.currentText()!r} and not match "
+            f"the other languages."
+        )
+    carriers.setCurrentIndex(index)
 
     services = picker._service_combo
-    for index in range(services.count()):
-        if services.itemText(index) == SHOWCASE_SERVICE:
-            services.setCurrentIndex(index)
-            return
-    print(f"  NOTE {SHOWCASE_SERVICE} absent for {SHOWCASE_CARRIER}; "
-          f"screenshot shows {services.currentText()!r}")
+    index = _wait_for(services, SHOWCASE_SERVICE, False)
+    if index is None:
+        raise RuntimeError(
+            f"{SHOWCASE_SERVICE} never appeared for {SHOWCASE_CARRIER}; the "
+            f"batch screenshot would show {services.currentText()!r} and not "
+            f"match the other languages."
+        )
+    services.setCurrentIndex(index)
+
+
+# Rates shown on the Create Shipment screenshot.
+#
+# The rates table is filled by a live EasyPost call and credentials are stubbed
+# (_stub_credentials), so a seeded run paints it empty — a poor primary
+# screenshot, and visibly worse than the one already published. These invented
+# quotes are pushed through the view's own _on_rates_received, so the grouping,
+# the cheapest and fastest badges and the "included" column are all built by
+# exactly the code a real fetch would run, rather than by a second rendering
+# path that could drift from it.
+#
+# Invented, like the rest of the seed: nothing here came from a real account and
+# no network call is made. The route is the seeded London -> Manchester one, so
+# the carriers and prices are the domestic British ones a reader would expect.
+_SHOWCASE_RATES = [
+    ("rate_demo1", "Evri", "Standard", "2.89", 3, False),
+    ("rate_demo2", "Evri", "Next Day", "3.09", 1, False),
+    ("rate_demo3", "RoyalMailV3", "RoyalMail2ndClass", "3.35", 3, False),
+    ("rate_demo4", "RoyalMailV3", "RoyalMail1stClass", "4.45", 1, False),
+    ("rate_demo5", "RoyalMailV3", "RoyalMailTracked24", "5.95", 1, False),
+    ("rate_demo6", "RoyalMailV3", "RoyalMail1stClassSignedFor", "6.85", 1, False),
+    ("rate_demo7", "FedEx", "FEDEX_GROUND", "11.20", 2, False),
+    ("rate_demo8", "DHL Express", "ExpressWorldwide", "24.60", 1, True),
+]
+
+
+class _DemoRate:
+    """Duck-typed stand-in for an EasyPost Rate.
+
+    Every helper in create_shipment_view reads rates through getattr, so a
+    plain attribute holder is enough and pulling in the real SDK object would
+    add nothing.
+    """
+
+    def __init__(self, rate_id, carrier, service, amount, days, guaranteed):
+        self.id = rate_id
+        self.carrier = carrier
+        self.service = service
+        self.rate = amount
+        self.currency = "GBP"
+        self.delivery_days = days
+        self.delivery_date_guaranteed = guaranteed
+
+
+class _DemoShipment:
+    def __init__(self, rates):
+        self.rates = rates
+        self.messages = []
+
+
+def _seed_rate_table(holder) -> None:
+    """Fill the Create Shipment rates table with the invented quotes above."""
+    view = holder.widget() if hasattr(holder, "widget") else holder
+    if not hasattr(view, "_on_rates_received"):
+        return
+
+    # Both address combos default to the first saved address, so the page
+    # screenshots as posting from an office to itself. Point the destination at
+    # the other seeded address to make it the London -> Manchester journey the
+    # rates below are quoted for.
+    to_combo = getattr(view, "_to_combo", None)
+    if to_combo is not None and to_combo.count() > 1:
+        to_combo.setCurrentIndex(1)
+
+    rates = [_DemoRate(*row) for row in _SHOWCASE_RATES]
+    view._on_rates_received(_DemoShipment(rates))
 
 
 def main() -> int:
@@ -476,8 +605,15 @@ def audit_for_secrets(root: Path) -> list[str]:
     """
     problems = []
     for png in sorted(root.rglob("*.png")):
-        stem = png.stem
-        if any(bad in stem for bad in ("settings", "wizard", "agent", "pair")):
+        # Case-folded: --window names files after the view class
+        # ("window-ConnectAgentsView.png"), so a case-sensitive match caught
+        # only the older lowercase "05-setup-wizard.png" scheme and let every
+        # whole-window capture through — the exact route this audit is meant
+        # to backstop.
+        stem = png.stem.lower()
+        # "settings" is absent deliberately — see FORBIDDEN_PAGES, which this
+        # mirrors. The Settings page stopped rendering keys in 1.2.1.
+        if any(bad in stem for bad in ("wizard", "agent", "pair")):
             problems.append(f"{png}: page should never be published")
     return problems
 
