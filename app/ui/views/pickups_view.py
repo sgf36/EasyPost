@@ -1,8 +1,13 @@
-"""Schedule a carrier pickup for one or more purchased shipments."""
+"""Schedule a carrier pickup for a purchased shipment.
+
+EasyPost collects ONE shipment per pickup request — the endpoint takes a
+singular `shipment`, and sending a list is rejected outright. Several parcels
+at once means putting them in a batch first.
+"""
 
 from functools import partial
 
-from PySide6.QtCore import QDateTime
+from PySide6.QtCore import QDateTime, Qt
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
@@ -23,9 +28,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.core.errors import format_api_error
+from app.core.errors import carrier_messages, format_api_error
 from app.i18n import tr
-from app.services.addresses import list_addresses
+from app.services.addresses import address_choice_label, list_addresses
 from app.services.pickups import buy_pickup, cancel_pickup, create_pickup, list_pickups, save_pickup_locally
 from app.services.shipments import list_shipments
 from app.ui.widgets.async_worker import run_async
@@ -57,8 +62,10 @@ class PickupsView(QWidget):
 
         self._address_combo = QComboBox()
         self._shipments_list = QListWidget()
+        # Single selection: a pickup collects exactly one shipment, so offering
+        # multi-select only invited a request EasyPost would refuse.
         self._shipments_list.setSelectionMode(
-            QAbstractItemView.SelectionMode.MultiSelection
+            QAbstractItemView.SelectionMode.SingleSelection
         )
         self._shipments_list.setMaximumHeight(120)
 
@@ -132,7 +139,7 @@ class PickupsView(QWidget):
         self._address_combo.clear()
         for rec in list_addresses():
             self._address_combo.addItem(
-                f"{rec.label or rec.name or rec.id} — {rec.city}, {rec.state}", rec.id
+                address_choice_label(rec), rec.id
             )
 
         self._shipments_list.clear()
@@ -153,11 +160,30 @@ class PickupsView(QWidget):
             return
 
         shipment_ids = [item.data(1000) for item in selected_items]
+        if len(shipment_ids) > 1:
+            QMessageBox.warning(
+                self,
+                tr("pickups.one_shipment_title"),
+                tr("pickups.one_shipment_body"),
+            )
+            return
+
+        if self._max_datetime.dateTime() <= self._min_datetime.dateTime():
+            QMessageBox.warning(
+                self,
+                tr("pickups.invalid_window_title"),
+                tr("pickups.invalid_window_body"),
+            )
+            return
+
         params = dict(
             address_id=address_id,
             shipment_ids=shipment_ids,
-            min_datetime=self._min_datetime.dateTime().toString("yyyy-MM-ddTHH:mm:ss"),
-            max_datetime=self._max_datetime.dateTime().toString("yyyy-MM-ddTHH:mm:ss"),
+            # Qt's ISODate carries the machine's UTC offset, which a collection
+            # window needs — a bare local timestamp leaves the carrier guessing
+            # which timezone "10:00" is in.
+            min_datetime=self._min_datetime.dateTime().toString(Qt.DateFormat.ISODate),
+            max_datetime=self._max_datetime.dateTime().toString(Qt.DateFormat.ISODate),
             instructions=self._instructions_input.text().strip(),
             reference=self._reference_input.text().strip(),
         )
@@ -188,10 +214,13 @@ class PickupsView(QWidget):
             self._rates_table.setCellWidget(row, len(_RATE_COLUMNS) - 1, buy_btn)
 
         if not rates:
-            QMessageBox.information(
-                self, tr("pickups.requested_title"),
-                tr("pickups.no_rates_body"),
-            )
+            # As with shipment rates, the carrier's reason for declining lives
+            # on `messages` and nowhere else.
+            body = tr("pickups.no_rates_body")
+            notes = carrier_messages(pickup)
+            if notes:
+                body += "\n\n" + "\n".join(notes)
+            QMessageBox.information(self, tr("pickups.requested_title"), body)
 
     def _on_request_failed(self, exc: Exception) -> None:
         self._request_btn.setEnabled(True)

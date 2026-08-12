@@ -1,5 +1,7 @@
 """Tracking: add a tracking number, view status, poll for updates."""
 
+from functools import partial
+
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QGroupBox,
@@ -18,6 +20,7 @@ from PySide6.QtWidgets import (
 from app.core.errors import format_api_error
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
+from app.services.carriers import carrier_display_name
 from app.services.tracking import create_tracker, list_trackers, refresh_all_trackers, save_tracker_locally
 from app.ui.widgets.async_worker import run_async
 
@@ -36,15 +39,22 @@ class TrackingView(QWidget):
         super().__init__(parent)
         self._pending_task = None
 
+        # Where a failed background refresh is reported, in place rather than
+        # as a modal over whatever the user is doing elsewhere.
+        self._status_label = QLabel("")
+        self._status_label.setWordWrap(True)
+        self._status_label.setVisible(False)
+
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"<h2>{tr('tracking.title')}</h2>"))
         layout.addWidget(self._build_add_group())
+        layout.addWidget(self._status_label)
         layout.addWidget(self._build_table_group(), stretch=1)
 
         self.refresh_table()
 
         self._poll_timer = QTimer(self)
-        self._poll_timer.timeout.connect(self._refresh_all)
+        self._poll_timer.timeout.connect(self._on_poll_tick)
         self._poll_timer.start(_POLL_INTERVAL_MS)
 
         # Instant refresh when a webhook push update lands (see
@@ -116,33 +126,54 @@ class TrackingView(QWidget):
             self, tr("tracking.error_title"), tr("tracking.create_tracker_failed", error=format_api_error(exc))
         )
 
-    def _refresh_all(self) -> None:
+    def _refresh_all(self, *, user_initiated: bool = True) -> None:
         self._refresh_btn.setEnabled(False)
         self._refresh_btn.setText(tr("tracking.refreshing_button"))
         self._pending_task = run_async(refresh_all_trackers, self)
         self._pending_task.succeeded.connect(self._on_refreshed)
-        self._pending_task.failed.connect(self._on_refresh_failed)
+        self._pending_task.failed.connect(
+            partial(self._on_refresh_failed, user_initiated=user_initiated)
+        )
+
+    def _on_poll_tick(self) -> None:
+        """The five-minute background refresh. Distinguished from the button so
+        a network blip while the user is working in another part of the app does
+        not throw a modal dialog over whatever they are doing."""
+        self._refresh_all(user_initiated=False)
 
     def _on_refreshed(self, _trackers) -> None:
         self._refresh_btn.setEnabled(True)
         self._refresh_btn.setText(tr("tracking.refresh_all_button"))
+        self._status_label.setVisible(False)
         self.refresh_table()
 
-    def _on_refresh_failed(self, exc: Exception) -> None:
+    def _on_refresh_failed(self, exc: Exception, *, user_initiated: bool = True) -> None:
         self._refresh_btn.setEnabled(True)
         self._refresh_btn.setText(tr("tracking.refresh_all_button"))
-        QMessageBox.critical(
-            self, tr("tracking.error_title"), tr("tracking.refresh_trackers_failed", error=format_api_error(exc))
-        )
+        message = tr("tracking.refresh_trackers_failed", error=format_api_error(exc))
+        if user_initiated:
+            QMessageBox.critical(self, tr("tracking.error_title"), message)
+        else:
+            # Reported quietly in place; the next tick simply tries again.
+            self._status_label.setText(message)
+            self._status_label.setVisible(True)
 
     def refresh_table(self) -> None:
         records = list_trackers()
         self._table.setRowCount(len(records))
         for row, rec in enumerate(records):
+            # A bare "failure" says a parcel is stuck without saying why;
+            # status_detail carries the actual reason ("address_incorrect").
+            status = rec.status or ""
+            if rec.status_detail and rec.status_detail != rec.status:
+                status = f"{status} — {rec.status_detail}"
             values = [
                 rec.tracking_code or "",
-                rec.carrier or "",
-                rec.status or "",
+                # Trackers store the carrier as the API returns it
+                # ("RoyalMailV3"); the shared lookup turns that into the name
+                # EasyPost itself publishes.
+                carrier_display_name(rec.carrier or ""),
+                status,
                 rec.est_delivery_date or "",
                 rec.last_checked_at or "",
             ]

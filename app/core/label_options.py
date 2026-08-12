@@ -9,7 +9,7 @@ would be silently ignored.
 
 Each format has a default size that applies when no size is given:
 
-    PDF -> 8.5x11    EPL -> 4x5    ZPL -> 4x5    PNG -> 4x6
+    PDF -> 8.5x11    EPL2 -> 4x5    ZPL -> 4x5    PNG -> 4x6
 
 Which sizes a carrier actually honours varies, and EasyPost does not expose
 this programmatically, so the caveats below are transcribed from the article
@@ -26,8 +26,17 @@ LABEL_FORMATS: dict[str, str] = {
     "PNG": "4x6",
     "PDF": "8.5x11",
     "ZPL": "4x5",
-    "EPL": "4x5",
+    # EPL2 is the real format name. "EPL" is *accepted* by the API — verified
+    # live, it is not rejected — but what comes back is EPL2 either way
+    # (label_file_type "application/x-epl2", a .epl2 file). Offering "EPL"
+    # therefore described the output inaccurately rather than breaking it.
+    "EPL2": "4x5",
 }
+
+# Format names EasyPost tolerates but normalises. Kept so a settings file
+# written by an older build still resolves instead of silently reverting the
+# user to PNG.
+_LEGACY_FORMAT_ALIASES = {"EPL": "EPL2"}
 
 # Every size EasyPost documents. "" means "carrier default for the format".
 LABEL_SIZES: tuple[str, ...] = ("4x6", "4x7", "4x8", "4x5", "8.5x11")
@@ -63,12 +72,12 @@ def default_size_for(label_format: str) -> str:
 def sizes_for_format(label_format: str) -> tuple[str, ...]:
     """Sizes worth offering for a format.
 
-    ZPL/EPL are thermal formats, so the 8.5x11 sheet size is meaningless for
+    ZPL/EPL2 are thermal formats, so the 8.5x11 sheet size is meaningless for
     them; PDF is the only one where a full page makes sense alongside the
     thermal sizes.
     """
     fmt = (label_format or "").upper()
-    if fmt in ("ZPL", "EPL"):
+    if fmt in ("ZPL", "EPL2"):
         return ("4x5", "4x6", "4x8")
     if fmt == "PDF":
         return ("8.5x11", "4x6", "4x7", "4x8")
@@ -82,6 +91,7 @@ def normalise(label_format: str, label_size: str) -> tuple[str, str]:
     naming a size that no longer applies to the chosen format.
     """
     fmt = (label_format or DEFAULT_LABEL_FORMAT).upper()
+    fmt = _LEGACY_FORMAT_ALIASES.get(fmt, fmt)
     if fmt not in LABEL_FORMATS:
         fmt = DEFAULT_LABEL_FORMAT
     size = (label_size or "").strip()

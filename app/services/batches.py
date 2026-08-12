@@ -2,20 +2,25 @@
 
 Recipients are imported from either a plain ``.csv`` or an Excel ``.xlsx``
 workbook. The workbook template additionally carries a real dropdown on the
-``predefined_package`` column — a data-validation list of carrier package
-codes — which a flat CSV cannot express. Either format parses to the same
-:class:`BatchRow` list, so everything downstream is unchanged.
+``predefined_package`` column — a data-validation list of carrier-qualified
+package labels ("Royal Mail — LETTER"), so a code that several carriers share
+still names its carrier — which a flat CSV cannot express. Either format parses
+to the same :class:`BatchRow` list, and the carrier-qualified label is reduced
+back to the bare code EasyPost expects at submission time.
 """
 
 import csv
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
 from app.core.client import client_manager
 from app.core.db import db_cursor
-from app.services.packages import predefined_package_names
+from app.services.packages import package_code_from_choice
 from app.services.shipments import preferred_label_options
+
+logger = logging.getLogger(__name__)
 
 CSV_COLUMNS = [
     "to_name",
@@ -43,7 +48,18 @@ CSV_COLUMNS = [
 # Header-level requirement: these columns must exist. length/width/height are
 # additionally required *per row* only when that row names no predefined
 # package (see _validate_row) — a predefined package supplies its own.
-REQUIRED_COLUMNS = {"to_street1", "to_city", "to_state", "to_zip", "to_country", "weight"}
+#
+# `to_state` is deliberately NOT here. It is required only for the countries
+# that actually use a state/province in their addressing (see
+# STATE_REQUIRED_COUNTRIES). EasyPost's own documented GB example carries no
+# `state` at all, and requiring it rejected valid United Kingdom rows before
+# they ever reached the API.
+REQUIRED_COLUMNS = {"to_street1", "to_city", "to_zip", "to_country", "weight"}
+
+# Countries whose addresses genuinely need a state, province or territory.
+# Everywhere else it is optional, and EasyPost fills in a normalised value of
+# its own where one applies.
+STATE_REQUIRED_COUNTRIES = {"US", "CA", "AU", "IN", "BR", "MX", "MY", "AR"}
 
 DIMENSION_COLUMNS = ("length", "width", "height")
 
@@ -119,6 +135,10 @@ def _validate_row(line_number: int, fields: dict) -> BatchRow:
     fields = {k: (str(v) if v is not None else "").strip() for k, v in fields.items()}
     errors = [col for col in REQUIRED_COLUMNS if not fields.get(col)]
 
+    # State only where the destination country actually uses one.
+    if fields.get("to_country", "").upper() in STATE_REQUIRED_COUNTRIES and not fields.get("to_state"):
+        errors.append("to_state")
+
     # A predefined package brings its own dimensions, so length/width/height
     # are only required when no package is named. When they are supplied either
     # way, they must still be numeric.
@@ -181,28 +201,48 @@ def parse_import(path: str) -> list[BatchRow]:
 parse_csv = parse_import
 
 
-def _row_to_shipment_params(row: BatchRow, from_address_id: str) -> dict:
+def _row_to_shipment_params(
+    row: BatchRow,
+    from_address_id: str,
+    *,
+    carrier: Optional[str] = None,
+    service: Optional[str] = None,
+    carrier_account_id: Optional[str] = None,
+    delivery_confirmation: Optional[str] = None,
+    insurance: Optional[str] = None,
+) -> dict:
     f = row.fields
     # A predefined package carries fixed dimensions, so send its code alone and
     # omit length/width/height — the same rule as a single Create Shipment
     # (app/services/shipments.py). Otherwise send the parcel's own dimensions.
     parcel = {"weight": float(f["weight"])}
     if f.get("predefined_package"):
-        parcel["predefined_package"] = f["predefined_package"]
+        # The .xlsx dropdown offers carrier-qualified labels ("Royal Mail —
+        # LETTER"); EasyPost's predefined_package wants the bare code alone. A
+        # bare code typed straight into a CSV passes through unchanged.
+        parcel["predefined_package"] = package_code_from_choice(f["predefined_package"])
     else:
         parcel.update({
             "length": float(f["length"]),
             "width": float(f["width"]),
             "height": float(f["height"]),
         })
-    return {
+    # Same printed-label format/size as a single shipment — label_size is only
+    # honoured at creation time, so a batch has to carry it too. A signature
+    # request rides along in the same options object.
+    options = dict(preferred_label_options())
+    if delivery_confirmation:
+        options["delivery_confirmation"] = delivery_confirmation
+
+    params = {
         "to_address": {
             "name": f.get("to_name") or None,
             "company": f.get("to_company") or None,
             "street1": f["to_street1"],
             "street2": f.get("to_street2") or None,
             "city": f["to_city"],
-            "state": f["to_state"],
+            # Optional: only some countries use one (STATE_REQUIRED_COUNTRIES).
+            "state": f.get("to_state") or None,
             "zip": f["to_zip"],
             "country": f["to_country"],
             "phone": f.get("to_phone") or None,
@@ -211,18 +251,59 @@ def _row_to_shipment_params(row: BatchRow, from_address_id: str) -> dict:
         "from_address": {"id": from_address_id},
         "parcel": parcel,
         "reference": f.get("reference") or None,
-        # Same printed-label format/size as a single shipment — label_size is
-        # only honoured at creation time, so a batch has to carry it too.
-        "options": preferred_label_options(),
+        "options": options,
     }
 
+    # THE reason a batch can be bought at all. Unlike a single shipment — where
+    # the user picks a rate from the rates table and buys that rate id — a batch
+    # is never rated: `batch.buy` takes no body and EasyPost selects nothing for
+    # you. The carrier and service must be declared here, at creation time, or
+    # every shipment fails at purchase with "A carrier and service must be
+    # provided to purchase through a Batch."
+    if carrier:
+        params["carrier"] = carrier
+    if service:
+        params["service"] = service
+    # Documented alongside carrier/service. EasyPost accepted a batch without it
+    # in testing, but a stale or wrong id is a hard error rather than a silent
+    # skip, so it is sent only when known.
+    if carrier_account_id:
+        params["carrier_accounts"] = [carrier_account_id]
+    if insurance:
+        params["insurance"] = insurance
 
-def create_batch(from_address_id: str, rows: list[BatchRow]):
+    return params
+
+
+def create_batch(
+    from_address_id: str,
+    rows: list[BatchRow],
+    *,
+    carrier: Optional[str] = None,
+    service: Optional[str] = None,
+    carrier_account_id: Optional[str] = None,
+    delivery_confirmation: Optional[str] = None,
+    insurance: Optional[str] = None,
+):
+    """Create a batch. ``carrier`` and ``service`` are required to buy it later
+    (see :func:`_row_to_shipment_params`); a batch created without them can be
+    created but never purchased."""
     valid_rows = [r for r in rows if r.is_valid]
     if not valid_rows:
         raise ValueError("No valid rows to submit.")
     client = client_manager.get_client()
-    shipments = [_row_to_shipment_params(r, from_address_id) for r in valid_rows]
+    shipments = [
+        _row_to_shipment_params(
+            r,
+            from_address_id,
+            carrier=carrier,
+            service=service,
+            carrier_account_id=carrier_account_id,
+            delivery_confirmation=delivery_confirmation,
+            insurance=insurance,
+        )
+        for r in valid_rows
+    ]
     return client.batch.create(shipments=shipments)
 
 
@@ -243,6 +324,116 @@ def generate_batch_label(batch_id: str, file_format: str = "PDF"):
 
 def _batch_state(batch) -> Optional[str]:
     return getattr(batch, "state", None) or getattr(batch, "status", None)
+
+
+def batch_failure_messages(batch) -> list[str]:
+    """Per-shipment failure messages carried inside a batch.
+
+    Batch creation and purchase are asynchronous and never raise for a shipment
+    that failed: the call returns normally and the batch reports the failure in
+    each shipment's ``batch_status``/``batch_message``. A caller that only
+    watches for exceptions therefore sees a batch that bought nothing and says
+    nothing about why. This is where the explanation lives — for example
+    "RoyalMailV3 does not offer service RoyalMail2ndClassSignedFor for this
+    shipment", which is what a missing signature option produces.
+    """
+    messages: list[str] = []
+    for shipment in getattr(batch, "shipments", None) or []:
+        status = shipment.get("batch_status")
+        if status not in ("creation_failed", "postage_purchase_failed"):
+            continue
+        message = shipment.get("batch_message") or status
+        reference = shipment.get("reference") or shipment.get("id") or ""
+        messages.append(f"{reference}: {message}" if reference else str(message))
+    # One repeated cause across 200 shipments should read as one line, not 200.
+    seen: set[str] = set()
+    unique: list[str] = []
+    for message in messages:
+        body = message.split(": ", 1)[-1]
+        if body in seen:
+            continue
+        seen.add(body)
+        unique.append(message)
+    return unique
+
+
+def bought_shipment_ids(batch) -> list[str]:
+    """Ids of the shipments in this batch that actually bought postage."""
+    return [
+        shipment.get("id")
+        for shipment in getattr(batch, "shipments", None) or []
+        if shipment.get("id") and shipment.get("tracking_code")
+    ]
+
+
+def full_shipments(batch) -> list:
+    """Retrieve each bought shipment in full.
+
+    The shipments embedded in a batch are **stubs**. Verified against a real
+    purchased batch, each one carries only ``id``, ``reference``,
+    ``tracking_code``, ``batch_status`` and ``batch_message`` — no
+    ``postage_label``, no ``tracker``, no ``carrier``. Anything that needs a
+    label URL or a tracker has to fetch the shipment itself, which is what this
+    does. One request per shipment, so callers should treat it as a network
+    operation and keep it off the UI thread.
+    """
+    client = client_manager.get_client()
+    shipments = []
+    for shipment_id in bought_shipment_ids(batch):
+        try:
+            shipments.append(client.shipment.retrieve(shipment_id))
+        except Exception:
+            logger.exception("Could not retrieve batch shipment %s", shipment_id)
+    return shipments
+
+
+def batch_label_urls(batch) -> list[str]:
+    """Per-shipment label URLs for a bought batch, for the print sheet.
+
+    Reads them off fully retrieved shipments rather than the batch's own stub
+    entries, which carry no ``postage_label`` at all — checking the stubs
+    returned nothing every time, leaving the print-sheet export permanently
+    disabled after a batch purchase.
+    """
+    urls = []
+    for shipment in full_shipments(batch):
+        label = getattr(shipment, "postage_label", None)
+        url = getattr(label, "label_url", None) if label else None
+        if url:
+            urls.append(url)
+    return urls
+
+
+def track_batch_shipments(batch) -> int:
+    """Record every bought shipment in the local tracking table.
+
+    Buying a label always creates a tracker on EasyPost's side — that is not
+    optional and there is no way to opt out of carrier tracking. What is
+    optional, and what this does, is copying those trackers into the app's own
+    Tracking page so a batch does not vanish the moment it is bought. Returns
+    the number recorded.
+
+    The tracker is taken from the retrieved shipment rather than created afresh
+    from the tracking code. Creating one is both redundant — buying the label
+    already made it — and rejected outright in test mode, where EasyPost accepts
+    only its own EZ-prefixed test tracking numbers.
+
+    Best effort by design: the labels are already paid for, so a local
+    bookkeeping failure must never be reported as a failed purchase.
+    """
+    from app.services.tracking import save_tracker_locally
+
+    recorded = 0
+    for shipment in full_shipments(batch):
+        tracker = getattr(shipment, "tracker", None)
+        if tracker is None:
+            continue
+        try:
+            save_tracker_locally(tracker)
+            recorded += 1
+        except Exception:
+            logger.exception("Could not record tracker for shipment %s", shipment.id)
+    return recorded
 
 
 def save_batch_locally(batch, source_csv: str = "") -> None:

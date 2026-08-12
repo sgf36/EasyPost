@@ -1,7 +1,14 @@
-"""Batch shipments: import a CSV of recipients, validate, then bulk rate/buy."""
+"""Batch shipments: import a CSV of recipients, validate, then bulk buy.
+
+Note "bulk buy", not "bulk rate": EasyPost does not rate a batch. Batch
+shipments come back with ``rates: []`` and ``selected_rate: None``, and
+``batch.buy`` takes no body, so there is nothing to choose at purchase time. The
+carrier and service are declared up front through the ServicePicker instead.
+"""
 
 import webbrowser
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -18,39 +25,70 @@ from PySide6.QtWidgets import (
 )
 
 from app.core.errors import format_api_error
+from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
-from app.services.addresses import list_addresses
+from app.services.addresses import address_choice_label, list_addresses
 from app.services.batches import (
+    batch_failure_messages,
+    batch_label_urls,
+    bought_shipment_ids,
     buy_batch,
     create_batch,
     generate_batch_label,
     parse_import,
     retrieve_batch,
     save_batch_locally,
+    track_batch_shipments,
     write_csv_template,
     write_xlsx_template,
 )
-from app.services.packages import predefined_package_names
+from app.services.packages import predefined_package_choices
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
+from app.ui.widgets.service_picker import ServicePicker
+
+# States EasyPost is still working through. Batch creation and purchase are both
+# asynchronous, so the app polls until the state settles rather than leaving the
+# user to press Refresh and guess.
+TRANSITIONAL_STATES = {"creating", "purchasing", "label_generating"}
+POLL_INTERVAL_MS = 3000
 
 
 class BatchView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._pending_task = None
+        self._poll_task = None
+        self._labels_task = None
+        self._label_urls = []
         self._csv_path = None
         self._parsed_rows = []
         self._current_batch = None
+        # The combined-label prompt must fire once, not on every poll tick.
+        self._label_prompt_shown = False
+
+        self._service_picker = ServicePicker(self)
+        self._service_picker.changed.connect(self._update_create_enabled)
+
+        self._poll_timer = QTimer(self)
+        self._poll_timer.setInterval(POLL_INTERVAL_MS)
+        self._poll_timer.timeout.connect(self._poll_once)
+
+        # Instant refresh when a batch event is pushed, where the user has the
+        # webhook feature enabled. Polling stays on regardless — the tunnel is
+        # optional and can fail — so this only shortens the wait.
+        webhook_manager.batch_updated.connect(self._on_batch_event)
 
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"<h2>{tr('batch_shipments.title')}</h2>"))
         layout.addWidget(self._build_import_group())
         layout.addWidget(self._build_preview_group(), stretch=1)
+        layout.addWidget(self._service_picker)
         layout.addWidget(self._build_batch_group())
 
         self.refresh_address_choices()
+        self._service_picker.load_catalogue()
 
     @staticmethod
     def _save_template_filter() -> str:
@@ -147,7 +185,7 @@ class BatchView(QWidget):
         self._from_combo.clear()
         for rec in list_addresses():
             self._from_combo.addItem(
-                f"{rec.label or rec.name or rec.id} — {rec.city}, {rec.state}", rec.id
+                address_choice_label(rec), rec.id
             )
 
     def _on_download_template(self) -> None:
@@ -173,7 +211,7 @@ class BatchView(QWidget):
         # Fetch the carrier package list off the UI thread, then write the
         # workbook — the fetch may hit the network (falls back to cache).
         self._pending_task = run_async(
-            lambda: (write_xlsx_template(path, predefined_package_names()), path)[1], self
+            lambda: (write_xlsx_template(path, predefined_package_choices()), path)[1], self
         )
         self._pending_task.succeeded.connect(
             lambda saved: QMessageBox.information(
@@ -225,7 +263,16 @@ class BatchView(QWidget):
             self._preview_table.setItem(row_idx, 2, QTableWidgetItem(parcel_summary))
             self._preview_table.setItem(row_idx, 3, QTableWidgetItem("; ".join(row.errors)))
 
-        self._create_batch_btn.setEnabled(valid_count > 0)
+        self._valid_row_count = valid_count
+        self._update_create_enabled()
+
+    def _update_create_enabled(self) -> None:
+        """A batch can only be created once there is something to ship AND a
+        service to ship it by — without the latter the batch is created and then
+        cannot be bought at all, so the button stays disabled rather than
+        producing a dead batch."""
+        rows_ready = getattr(self, "_valid_row_count", 0) > 0
+        self._create_batch_btn.setEnabled(rows_ready and self._service_picker.is_complete())
 
     def _on_create_batch(self) -> None:
         from_id = self._from_combo.currentData()
@@ -235,14 +282,35 @@ class BatchView(QWidget):
             )
             return
 
+        selection = self._service_picker.selection()
+        if selection is None:
+            QMessageBox.warning(
+                self,
+                tr("batch_shipments.missing_service_title"),
+                tr("batch_shipments.missing_service_body"),
+            )
+            return
+
+        self._selection = selection
         self._create_batch_btn.setEnabled(False)
+        self._label_prompt_shown = False
+        self._label_urls = []
+        self._export_sheet_btn.setEnabled(False)
         self._pending_task = run_async(
-            lambda: create_batch(from_id, self._parsed_rows), self
+            lambda: create_batch(
+                from_id,
+                self._parsed_rows,
+                carrier=selection.carrier,
+                service=selection.service,
+                delivery_confirmation=selection.delivery_confirmation,
+                insurance=selection.insurance,
+            ),
+            self,
         )
         self._pending_task.succeeded.connect(self._on_batch_created)
         self._pending_task.failed.connect(
             lambda exc: (
-                self._create_batch_btn.setEnabled(True),
+                self._update_create_enabled(),
                 QMessageBox.critical(
                     self, tr("common.error"), tr("batch_shipments.create_failed_body", error=format_api_error(exc))
                 ),
@@ -250,7 +318,7 @@ class BatchView(QWidget):
         )
 
     def _on_batch_created(self, batch) -> None:
-        self._create_batch_btn.setEnabled(True)
+        self._update_create_enabled()
         self._current_batch = batch
         save_batch_locally(batch, self._csv_path or "")
         self._refresh_status_btn.setEnabled(True)
@@ -273,25 +341,67 @@ class BatchView(QWidget):
         save_batch_locally(batch, self._csv_path or "")
         self._update_status_label(batch)
 
+    # -- polling -------------------------------------------------------------
+
+    def _poll_once(self) -> None:
+        """One background refresh per timer tick. Skipped while a previous poll
+        is still in flight, so a slow response cannot stack up requests."""
+        if not self._current_batch or self._poll_task is not None:
+            return
+        batch_id = self._current_batch.id
+        self._poll_task = run_async(lambda: retrieve_batch(batch_id), self)
+        self._poll_task.succeeded.connect(self._on_poll_result)
+        # A transient network blip should not kill the poll loop or throw a
+        # modal at the user; the next tick simply tries again.
+        self._poll_task.failed.connect(lambda _exc: setattr(self, "_poll_task", None))
+
+    def _on_poll_result(self, batch) -> None:
+        self._poll_task = None
+        self._on_status_refreshed(batch)
+
+    def _on_batch_event(self, batch_id: str) -> None:
+        """A pushed batch event for the batch currently on screen."""
+        if self._current_batch and batch_id == self._current_batch.id:
+            self._poll_once()
+
+    def _sync_polling(self, state) -> None:
+        if state in TRANSITIONAL_STATES:
+            if not self._poll_timer.isActive():
+                self._poll_timer.start()
+        elif self._poll_timer.isActive():
+            self._poll_timer.stop()
+
     def _update_status_label(self, batch) -> None:
         state = getattr(batch, "state", None) or getattr(batch, "status", None)
         num_shipments = getattr(batch, "num_shipments", "?")
-        self._status_label.setText(
-            tr(
-                "batch_shipments.status_label",
-                batch_id=batch.id,
-                state=state,
-                num_shipments=num_shipments,
-            )
+        text = tr(
+            "batch_shipments.status_label",
+            batch_id=batch.id,
+            state=state,
+            num_shipments=num_shipments,
         )
+        # Per-shipment failures are reported inside the batch, never raised, so
+        # without this a failed purchase looks like a state change and nothing
+        # more. This is the message that explains *why* nothing was bought.
+        failures = batch_failure_messages(batch)
+        if failures:
+            text += "\n" + "\n".join(failures)
+        self._status_label.setText(text)
+
+        self._sync_polling(state)
 
         self._buy_batch_btn.setEnabled(state in ("created",))
-        self._generate_labels_btn.setEnabled(state in ("purchased", "label_generating"))
-        # Once bought, each shipment carries its own label — offer the print sheet.
-        self._export_sheet_btn.setEnabled(bool(self._batch_label_urls(batch)))
+        # Enabled on `label_generated`, not `label_generating`: the latter means
+        # EasyPost is still building the combined PDF, and asking for it again
+        # mid-generation just restarts the wait.
+        self._generate_labels_btn.setEnabled(state in ("purchased", "label_generated"))
+        # Once bought, each shipment carries its own label — offer the print
+        # sheet, though the URLs have to be fetched before it can be enabled.
+        self._fetch_label_urls(batch)
 
         label_url = getattr(batch, "label_url", None)
-        if label_url:
+        if label_url and not self._label_prompt_shown:
+            self._label_prompt_shown = True
             self._pending_label_url = label_url
             if (
                 QMessageBox.question(
@@ -325,23 +435,45 @@ class BatchView(QWidget):
         self._current_batch = batch
         save_batch_locally(batch, self._csv_path or "")
         self._update_status_label(batch)
+
+        failures = batch_failure_messages(batch)
+        if failures:
+            # Purchase is asynchronous and reports per-shipment failures in the
+            # batch body rather than raising, so "submitted" alone would be a
+            # misleading thing to tell the user here.
+            QMessageBox.warning(
+                self,
+                tr("batch_shipments.purchase_problems_title"),
+                tr("batch_shipments.purchase_problems_body", details="\n".join(failures)),
+            )
+            return
+
+        if getattr(self, "_selection", None) and self._selection.auto_track:
+            # Best effort: the labels are already bought, so failing to record
+            # them locally must not be reported as a failed purchase.
+            self._pending_task = run_async(lambda: track_batch_shipments(batch), self)
+
         QMessageBox.information(
             self, tr("batch_shipments.purchased_title"), tr("batch_shipments.purchased_body")
         )
 
-    @staticmethod
-    def _batch_label_urls(batch) -> list[str]:
-        """Per-shipment label URLs from a bought batch (for the print sheet)."""
-        urls: list[str] = []
-        for shp in getattr(batch, "shipments", None) or []:
-            label = getattr(shp, "postage_label", None)
-            url = getattr(label, "label_url", None) if label else None
-            if url:
-                urls.append(url)
-        return urls
+    def _fetch_label_urls(self, batch) -> None:
+        """Collect the per-shipment label URLs in the background.
+
+        This is one request per shipment — the batch's own shipment entries are
+        stubs with no postage label on them — so it must not run on the UI
+        thread, and it only runs once the batch reports something bought."""
+        if self._label_urls or not bought_shipment_ids(batch):
+            return
+        self._labels_task = run_async(lambda: batch_label_urls(batch), self)
+        self._labels_task.succeeded.connect(self._on_label_urls)
+
+    def _on_label_urls(self, urls) -> None:
+        self._label_urls = list(urls or [])
+        self._export_sheet_btn.setEnabled(bool(self._label_urls))
 
     def _on_export_sheet(self) -> None:
-        urls = self._batch_label_urls(self._current_batch) if self._current_batch else []
+        urls = self._label_urls
         if not urls:
             QMessageBox.information(
                 self,
