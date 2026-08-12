@@ -60,7 +60,7 @@ CSV_NAME = PACKAGE + ".csv"
 # listing code (en-us, zh-hans, …) — the same codes the export uses for its
 # language columns. Overridable with --notes=<path>; default is the current
 # release. Absent file → the ReleaseNotes row is passed through untouched.
-RELEASE_NOTES_JSON = ROOT / "store_assets" / "release-notes-1.1.2-translations.json"
+RELEASE_NOTES_JSON = ROOT / "store_assets" / "release-notes-1.1.3-translations.json"
 # Partner Center rejects release notes longer than this.
 RELEASE_NOTES_LIMIT = 1500
 
