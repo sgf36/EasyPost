@@ -249,6 +249,15 @@ def _capture_window(app, view_class_name: str, path: Path,
     from PySide6.QtCore import Qt
 
     window = MainWindow()
+
+    # Force the application shell.
+    #
+    # MainWindow routes to the first-run wizard whenever it cannot find usable
+    # credentials, and a CI runner never has any. Without this every capture is
+    # the "Connect your EasyPost account" form — which is what the first macOS
+    # run produced: twenty images, all of them the wizard, reported as success.
+    window._show_app_shell()
+
     nav = window._nav
     stack = window._view_stack
 
@@ -271,6 +280,17 @@ def _capture_window(app, view_class_name: str, path: Path,
     _pin_service_picker(stack.widget(nav.item(target_row)
                                      .data(Qt.ItemDataRole.UserRole)))
     _settle(app)
+
+    # Verified immediately before painting, not assumed. A screenshot run that
+    # quietly captures the wrong screen still reports success, and the only
+    # thing that catches it is someone opening the PNG.
+    showing = window._root_stack.currentWidget()
+    if showing is not window._app_shell:
+        raise RuntimeError(
+            f"Refusing to capture {view_class_name}: the window is showing "
+            f"{type(showing).__name__}, not the application shell."
+        )
+
     _capture(window, path, width, height, scale)
     return window
 
