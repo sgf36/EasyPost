@@ -28,11 +28,25 @@ longer than the English without trouble, but check each one before importing.
 
 • Printer type and label calibration have moved to Settings. The printer on the desk, and the fine adjustment across and down the page, are now set alongside the label format and size instead of only inside the Export print sheet dialog, which could not be reached until a label had been bought.
 
-## Note for whoever imports this
+## Translations
 
-The 1.2.0 stage 2 Partner Center import writes the **1.2.0** ReleaseNotes to the
-forty non-localised languages. If that import has not run yet, it should still
-run as built — it is verified against the 1.2.0 export and rebuilding it against
-a newer export is what caused the caption drift fixed in `c91fff6`. Update the
-release notes to 1.2.1 as a separate pass afterwards, in all forty-seven, once
-these strings have been translated.
+All 47 listing languages are in `release-notes-1.2.1-translations.json`, which is
+the file `build_listing_import.py` reads by default.
+
+Every translation names the Settings page and the Forget-stored-keys button with
+the exact string the app shows in that language, taken from
+`app/resources/locales/`, so the note and the interface agree rather than
+offering the reader two different names for the same button. Checked: 47 of 47
+carry the button label verbatim.
+
+None is near the 1500-character cap — the longest is French at 1254, the
+shortest Chinese at 319, because the languages that pack the most meaning into
+the fewest characters do exactly that.
+
+## Sequencing
+
+These notes describe a version the Store does not serve until the 1.2.1 package
+is submitted. Partner Center ships listing changes and packages in the *same*
+submission, so add `EasyPostDesktop-1.2.1.0.msix` to the submission that carries
+these notes. Publishing 1.2.1 notes against the 1.2.0 package would describe
+features nobody could download yet.
