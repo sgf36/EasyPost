@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Fail CSV",
   "batch_shipments.filter_excel": "Buku Kerja Excel",
   "batch_shipments.filter_spreadsheets": "Hamparan",
-  "batch_shipments.saved_failed_body": "Tidak dapat menyimpan templat:\n{error}"
+  "batch_shipments.saved_failed_body": "Tidak dapat menyimpan templat:\n{error}",
+  "create_shipment.signature_label": "Tandatangan semasa penghantaran:",
+  "create_shipment.signature_none": "Tiada",
+  "create_shipment.signature_signature": "Tandatangan diperlukan",
+  "create_shipment.signature_adult": "Tandatangan dewasa (18+)",
+  "create_shipment.col_enhancements": "Disertakan",
+  "create_shipment.badge_tracked": "Dijejak",
+  "create_shipment.badge_signed": "Ditandatangani",
+  "create_shipment.badge_guaranteed": "Dijamin",
+  "create_shipment.insurance_label": "Insurans untuk nilai:",
+  "create_shipment.insurance_none": "Tiada",
+  "create_shipment.insurance_tooltip": "Pilihan. Isytiharkan nilai untuk menginsuranskan bungkusan; perlindungan dikenakan bayaran semasa membeli label.",
+  "create_shipment.insured_note": "Diinsuranskan untuk {amount}"
 }

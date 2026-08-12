@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "File CSV",
   "batch_shipments.filter_excel": "Cartella di lavoro Excel",
   "batch_shipments.filter_spreadsheets": "Fogli di calcolo",
-  "batch_shipments.saved_failed_body": "Impossibile salvare il modello:\n{error}"
+  "batch_shipments.saved_failed_body": "Impossibile salvare il modello:\n{error}",
+  "create_shipment.signature_label": "Firma alla consegna:",
+  "create_shipment.signature_none": "Nessuna",
+  "create_shipment.signature_signature": "Firma obbligatoria",
+  "create_shipment.signature_adult": "Firma di adulto (18+)",
+  "create_shipment.col_enhancements": "Incluso",
+  "create_shipment.badge_tracked": "Tracciato",
+  "create_shipment.badge_signed": "Firmato",
+  "create_shipment.badge_guaranteed": "Garantito",
+  "create_shipment.insurance_label": "Assicura per valore:",
+  "create_shipment.insurance_none": "Nessuno",
+  "create_shipment.insurance_tooltip": "Facoltativo. Dichiara un valore per assicurare il pacco; la copertura viene addebitata all'acquisto dell'etichetta.",
+  "create_shipment.insured_note": "Assicurato per {amount}"
 }

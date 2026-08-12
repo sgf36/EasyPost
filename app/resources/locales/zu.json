@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Amafayela e-CSV",
   "batch_shipments.filter_excel": "Incwadi yomsebenzi ye-Excel",
   "batch_shipments.filter_spreadsheets": "Amashidi okusabalalisa",
-  "batch_shipments.saved_failed_body": "Ayikwazanga ukulondoloza isifanekiso:\n{error}"
+  "batch_shipments.saved_failed_body": "Ayikwazanga ukulondoloza isifanekiso:\n{error}",
+  "create_shipment.signature_label": "Isignesha ekulethweni:",
+  "create_shipment.signature_none": "Lutho",
+  "create_shipment.signature_signature": "Kudingeka isignesha",
+  "create_shipment.signature_adult": "Isignesha yomdala (18+)",
+  "create_shipment.col_enhancements": "Kufakiwe",
+  "create_shipment.badge_tracked": "Kuyalandelelwa",
+  "create_shipment.badge_signed": "Kusayiniwe",
+  "create_shipment.badge_guaranteed": "Kuqinisekisiwe",
+  "create_shipment.insurance_label": "Umshwalense ngenani:",
+  "create_shipment.insurance_none": "Lutho",
+  "create_shipment.insurance_tooltip": "Okukhethwayo. Bika inani lokushwalensa iphasela; imali yokumboza ikhokhwa lapho uthenga ilebula.",
+  "create_shipment.insured_note": "Kushwalensiwe nge-{amount}"
 }

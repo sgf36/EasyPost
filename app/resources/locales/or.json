@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ଫାଇଲ୍‌ଗୁଡ଼ିକ",
   "batch_shipments.filter_excel": "Excel ୱାର୍କବୁକ୍",
   "batch_shipments.filter_spreadsheets": "ସ୍ପ୍ରେଡ୍‌ସିଟ୍‌ଗୁଡ଼ିକ",
-  "batch_shipments.saved_failed_body": "ଟେମ୍ପଲେଟ୍ ସେଭ୍ କରାଯାଇପାରିଲା ନାହିଁ:\n{error}"
+  "batch_shipments.saved_failed_body": "ଟେମ୍ପଲେଟ୍ ସେଭ୍ କରାଯାଇପାରିଲା ନାହିଁ:\n{error}",
+  "create_shipment.signature_label": "ବିତରଣରେ ସ୍ୱାକ୍ଷର:",
+  "create_shipment.signature_none": "କିଛି ନାହିଁ",
+  "create_shipment.signature_signature": "ସ୍ୱାକ୍ଷର ଆବଶ୍ୟକ",
+  "create_shipment.signature_adult": "ବୟସ୍କ ସ୍ୱାକ୍ଷର (18+)",
+  "create_shipment.col_enhancements": "ଅନ୍ତର୍ଭୁକ୍ତ",
+  "create_shipment.badge_tracked": "ଟ୍ରାକ୍ କରାଯାଇଛି",
+  "create_shipment.badge_signed": "ସ୍ୱାକ୍ଷରିତ",
+  "create_shipment.badge_guaranteed": "ନିଶ୍ଚିତ",
+  "create_shipment.insurance_label": "ମୂଲ୍ୟ ପାଇଁ ବୀମା:",
+  "create_shipment.insurance_none": "କିଛି ନାହିଁ",
+  "create_shipment.insurance_tooltip": "ବୈକଳ୍ପିକ। ପାର୍ସଲ ବୀମା କରିବା ପାଇଁ ଏକ ମୂଲ୍ୟ ଘୋଷଣା କରନ୍ତୁ; ଲେବଲ କିଣିବା ସମୟରେ କଭର ପାଇଁ ଚାର୍ଜ ଲାଗେ।",
+  "create_shipment.insured_note": "{amount} ପାଇଁ ବୀମାକୃତ"
 }

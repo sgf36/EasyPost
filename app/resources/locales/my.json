@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ဖိုင်များ",
   "batch_shipments.filter_excel": "Excel အလုပ်စာအုပ်",
   "batch_shipments.filter_spreadsheets": "စာရင်းဇယားများ",
-  "batch_shipments.saved_failed_body": "တမ်းပလိတ်ကို သိမ်းဆည်း၍ မရပါ:\n{error}"
+  "batch_shipments.saved_failed_body": "တမ်းပလိတ်ကို သိမ်းဆည်း၍ မရပါ:\n{error}",
+  "create_shipment.signature_label": "ပေးပို့ချိန် လက်မှတ်:",
+  "create_shipment.signature_none": "မရှိ",
+  "create_shipment.signature_signature": "လက်မှတ် လိုအပ်သည်",
+  "create_shipment.signature_adult": "အရွယ်ရောက်ပြီးသူ လက်မှတ် (18+)",
+  "create_shipment.col_enhancements": "ပါဝင်သည်",
+  "create_shipment.badge_tracked": "ခြေရာခံ",
+  "create_shipment.badge_signed": "လက်မှတ်ထိုးပြီး",
+  "create_shipment.badge_guaranteed": "အာမခံချက်ရှိ",
+  "create_shipment.insurance_label": "တန်ဖိုးအတွက် အာမခံရန်:",
+  "create_shipment.insurance_none": "မရှိ",
+  "create_shipment.insurance_tooltip": "ရွေးချယ်နိုင်သည်။ ပါဆယ်ကို အာမခံရန် တန်ဖိုးတစ်ခု ကြေညာပါ။ လေဘယ်ဝယ်ယူချိန်တွင် အကာအကွယ်အတွက် ကြေးကောက်ခံပါမည်။",
+  "create_shipment.insured_note": "{amount} အတွက် အာမခံထားသည်"
 }

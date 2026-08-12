@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Tệp CSV",
   "batch_shipments.filter_excel": "Bảng tính Excel",
   "batch_shipments.filter_spreadsheets": "Bảng tính",
-  "batch_shipments.saved_failed_body": "Không thể lưu mẫu:\n{error}"
+  "batch_shipments.saved_failed_body": "Không thể lưu mẫu:\n{error}",
+  "create_shipment.signature_label": "Chữ ký khi giao hàng:",
+  "create_shipment.signature_none": "Không",
+  "create_shipment.signature_signature": "Yêu cầu chữ ký",
+  "create_shipment.signature_adult": "Chữ ký người lớn (18+)",
+  "create_shipment.col_enhancements": "Bao gồm",
+  "create_shipment.badge_tracked": "Theo dõi",
+  "create_shipment.badge_signed": "Có chữ ký",
+  "create_shipment.badge_guaranteed": "Bảo đảm",
+  "create_shipment.insurance_label": "Bảo hiểm theo giá trị:",
+  "create_shipment.insurance_none": "Không",
+  "create_shipment.insurance_tooltip": "Tùy chọn. Khai báo giá trị để bảo hiểm bưu kiện; phí bảo hiểm được tính khi mua nhãn.",
+  "create_shipment.insured_note": "Đã bảo hiểm cho {amount}"
 }

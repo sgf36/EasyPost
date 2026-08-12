@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV fayllar",
   "batch_shipments.filter_excel": "Excel kitobi",
   "batch_shipments.filter_spreadsheets": "Elektron jadvallar",
-  "batch_shipments.saved_failed_body": "Shablonni saqlab bo'lmadi:\n{error}"
+  "batch_shipments.saved_failed_body": "Shablonni saqlab bo'lmadi:\n{error}",
+  "create_shipment.signature_label": "Yetkazishda imzo:",
+  "create_shipment.signature_none": "Yoʻq",
+  "create_shipment.signature_signature": "Imzo talab qilinadi",
+  "create_shipment.signature_adult": "Kattalar imzosi (18+)",
+  "create_shipment.col_enhancements": "Kiritilgan",
+  "create_shipment.badge_tracked": "Kuzatiladi",
+  "create_shipment.badge_signed": "Imzolangan",
+  "create_shipment.badge_guaranteed": "Kafolatlangan",
+  "create_shipment.insurance_label": "Ushbu qiymatga sugʻurta:",
+  "create_shipment.insurance_none": "Yoʻq",
+  "create_shipment.insurance_tooltip": "Ixtiyoriy. Posilkani sugʻurtalash uchun qiymatni koʻrsating; qopqoq haqi yorliq sotib olinganda olinadi.",
+  "create_shipment.insured_note": "{amount} uchun sugʻurtalangan"
 }

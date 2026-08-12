@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV फायली",
   "batch_shipments.filter_excel": "Excel वर्कबुक",
   "batch_shipments.filter_spreadsheets": "स्प्रेडशीट",
-  "batch_shipments.saved_failed_body": "टेम्पलेट जतन करता आले नाही:\n{error}"
+  "batch_shipments.saved_failed_body": "टेम्पलेट जतन करता आले नाही:\n{error}",
+  "create_shipment.signature_label": "वितरणाच्या वेळी स्वाक्षरी:",
+  "create_shipment.signature_none": "काहीही नाही",
+  "create_shipment.signature_signature": "स्वाक्षरी आवश्यक",
+  "create_shipment.signature_adult": "प्रौढ स्वाक्षरी (18+)",
+  "create_shipment.col_enhancements": "समाविष्ट",
+  "create_shipment.badge_tracked": "ट्रॅक केलेले",
+  "create_shipment.badge_signed": "स्वाक्षरी केलेले",
+  "create_shipment.badge_guaranteed": "हमी दिलेले",
+  "create_shipment.insurance_label": "मूल्यासाठी विमा:",
+  "create_shipment.insurance_none": "काहीही नाही",
+  "create_shipment.insurance_tooltip": "पर्यायी. पार्सलचा विमा उतरवण्यासाठी मूल्य जाहीर करा; लेबल खरेदी करताना संरक्षणासाठी शुल्क आकारले जाते.",
+  "create_shipment.insured_note": "{amount} साठी विमा उतरवला"
 }

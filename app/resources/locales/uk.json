@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Файли CSV",
   "batch_shipments.filter_excel": "Книга Excel",
   "batch_shipments.filter_spreadsheets": "Електронні таблиці",
-  "batch_shipments.saved_failed_body": "Не вдалося зберегти шаблон:\n{error}"
+  "batch_shipments.saved_failed_body": "Не вдалося зберегти шаблон:\n{error}",
+  "create_shipment.signature_label": "Підпис під час доставлення:",
+  "create_shipment.signature_none": "Немає",
+  "create_shipment.signature_signature": "Потрібен підпис",
+  "create_shipment.signature_adult": "Підпис дорослого (18+)",
+  "create_shipment.col_enhancements": "Включено",
+  "create_shipment.badge_tracked": "Відстеження",
+  "create_shipment.badge_signed": "Із підписом",
+  "create_shipment.badge_guaranteed": "Гарантовано",
+  "create_shipment.insurance_label": "Застрахувати на суму:",
+  "create_shipment.insurance_none": "Немає",
+  "create_shipment.insurance_tooltip": "Необов'язково. Укажіть вартість для страхування посилки; покриття сплачується під час придбання етикетки.",
+  "create_shipment.insured_note": "Застраховано на {amount}"
 }

@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "Soubory CSV",
   "batch_shipments.filter_excel": "Sešit Excel",
   "batch_shipments.filter_spreadsheets": "Tabulky",
-  "batch_shipments.saved_failed_body": "Šablonu se nepodařilo uložit:\n{error}"
+  "batch_shipments.saved_failed_body": "Šablonu se nepodařilo uložit:\n{error}",
+  "create_shipment.signature_label": "Podpis při doručení:",
+  "create_shipment.signature_none": "Žádný",
+  "create_shipment.signature_signature": "Vyžadován podpis",
+  "create_shipment.signature_adult": "Podpis dospělé osoby (18+)",
+  "create_shipment.col_enhancements": "Zahrnuto",
+  "create_shipment.badge_tracked": "Sledováno",
+  "create_shipment.badge_signed": "Podepsáno",
+  "create_shipment.badge_guaranteed": "Zaručeno",
+  "create_shipment.insurance_label": "Pojistit na hodnotu:",
+  "create_shipment.insurance_none": "Žádná",
+  "create_shipment.insurance_tooltip": "Volitelné. Uveďte hodnotu, na kterou má být zásilka pojištěna; pojištění se účtuje při nákupu štítku.",
+  "create_shipment.insured_note": "Pojištěno na {amount}"
 }

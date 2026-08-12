@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ഫയലുകൾ",
   "batch_shipments.filter_excel": "Excel വർക്ക്ബുക്ക്",
   "batch_shipments.filter_spreadsheets": "സ്പ്രെഡ്ഷീറ്റുകൾ",
-  "batch_shipments.saved_failed_body": "ടെംപ്ലേറ്റ് സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല:\n{error}"
+  "batch_shipments.saved_failed_body": "ടെംപ്ലേറ്റ് സംരക്ഷിക്കാൻ കഴിഞ്ഞില്ല:\n{error}",
+  "create_shipment.signature_label": "ഡെലിവറി സമയത്ത് ഒപ്പ്:",
+  "create_shipment.signature_none": "ഒന്നുമില്ല",
+  "create_shipment.signature_signature": "ഒപ്പ് ആവശ്യമാണ്",
+  "create_shipment.signature_adult": "മുതിർന്നവരുടെ ഒപ്പ് (18+)",
+  "create_shipment.col_enhancements": "ഉൾപ്പെടുത്തിയത്",
+  "create_shipment.badge_tracked": "ട്രാക്ക് ചെയ്തത്",
+  "create_shipment.badge_signed": "ഒപ്പിട്ടത്",
+  "create_shipment.badge_guaranteed": "ഉറപ്പുനൽകിയത്",
+  "create_shipment.insurance_label": "മൂല്യത്തിന് ഇൻഷുർ ചെയ്യുക:",
+  "create_shipment.insurance_none": "ഒന്നുമില്ല",
+  "create_shipment.insurance_tooltip": "ഓപ്ഷണൽ. പാഴ്സൽ ഇൻഷുർ ചെയ്യാൻ ഒരു മൂല്യം പ്രഖ്യാപിക്കുക; ലേബൽ വാങ്ങുമ്പോൾ പരിരക്ഷയ്ക്ക് നിരക്ക് ഈടാക്കും.",
+  "create_shipment.insured_note": "{amount} ന് ഇൻഷുർ ചെയ്തു"
 }

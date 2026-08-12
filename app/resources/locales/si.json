@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ගොනු",
   "batch_shipments.filter_excel": "Excel වැඩපොත",
   "batch_shipments.filter_spreadsheets": "පැතුරුම්පත්",
-  "batch_shipments.saved_failed_body": "අච්චුව සුරැකිය නොහැකි විය:\n{error}"
+  "batch_shipments.saved_failed_body": "අච්චුව සුරැකිය නොහැකි විය:\n{error}",
+  "create_shipment.signature_label": "බෙදාහැරීමේදී අත්සන:",
+  "create_shipment.signature_none": "කිසිවක් නැත",
+  "create_shipment.signature_signature": "අත්සන අවශ්‍යයි",
+  "create_shipment.signature_adult": "වැඩිහිටි අත්සන (18+)",
+  "create_shipment.col_enhancements": "ඇතුළත්",
+  "create_shipment.badge_tracked": "සොයාගත හැකි",
+  "create_shipment.badge_signed": "අත්සන් කළ",
+  "create_shipment.badge_guaranteed": "සහතික කළ",
+  "create_shipment.insurance_label": "වටිනාකමට රක්ෂණය:",
+  "create_shipment.insurance_none": "කිසිවක් නැත",
+  "create_shipment.insurance_tooltip": "විකල්ප. පාර්සලය රක්ෂණය කිරීමට වටිනාකමක් ප්‍රකාශ කරන්න; ලේබලය මිලදී ගැනීමේදී ආවරණය සඳහා ගාස්තු අය කෙරේ.",
+  "create_shipment.insured_note": "{amount} සඳහා රක්ෂණය කර ඇත"
 }

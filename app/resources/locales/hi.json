@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV फ़ाइलें",
   "batch_shipments.filter_excel": "Excel वर्कबुक",
   "batch_shipments.filter_spreadsheets": "स्प्रेडशीट",
-  "batch_shipments.saved_failed_body": "टेम्पलेट सहेजा नहीं जा सका:\n{error}"
+  "batch_shipments.saved_failed_body": "टेम्पलेट सहेजा नहीं जा सका:\n{error}",
+  "create_shipment.signature_label": "डिलीवरी पर हस्ताक्षर:",
+  "create_shipment.signature_none": "कोई नहीं",
+  "create_shipment.signature_signature": "हस्ताक्षर आवश्यक",
+  "create_shipment.signature_adult": "वयस्क हस्ताक्षर (18+)",
+  "create_shipment.col_enhancements": "शामिल",
+  "create_shipment.badge_tracked": "ट्रैक किया गया",
+  "create_shipment.badge_signed": "हस्ताक्षरित",
+  "create_shipment.badge_guaranteed": "गारंटीशुदा",
+  "create_shipment.insurance_label": "मूल्य के लिए बीमा:",
+  "create_shipment.insurance_none": "कोई नहीं",
+  "create_shipment.insurance_tooltip": "वैकल्पिक। पार्सल का बीमा कराने के लिए मूल्य घोषित करें; लेबल खरीदते समय कवर का शुल्क लिया जाता है।",
+  "create_shipment.insured_note": "{amount} के लिए बीमाकृत"
 }

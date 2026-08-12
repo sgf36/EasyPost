@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV ಫೈಲ್‌ಗಳು",
   "batch_shipments.filter_excel": "Excel ವರ್ಕ್‌ಬುಕ್",
   "batch_shipments.filter_spreadsheets": "ಸ್ಪ್ರೆಡ್‌ಶೀಟ್‌ಗಳು",
-  "batch_shipments.saved_failed_body": "ಟೆಂಪ್ಲೇಟ್ ಉಳಿಸಲಾಗಲಿಲ್ಲ:\n{error}"
+  "batch_shipments.saved_failed_body": "ಟೆಂಪ್ಲೇಟ್ ಉಳಿಸಲಾಗಲಿಲ್ಲ:\n{error}",
+  "create_shipment.signature_label": "ವಿತರಣೆ ವೇಳೆ ಸಹಿ:",
+  "create_shipment.signature_none": "ಯಾವುದೂ ಇಲ್ಲ",
+  "create_shipment.signature_signature": "ಸಹಿ ಅಗತ್ಯ",
+  "create_shipment.signature_adult": "ವಯಸ್ಕರ ಸಹಿ (18+)",
+  "create_shipment.col_enhancements": "ಒಳಗೊಂಡಿದೆ",
+  "create_shipment.badge_tracked": "ಜಾಡು ಹಿಡಿಯಲಾಗಿದೆ",
+  "create_shipment.badge_signed": "ಸಹಿ ಮಾಡಲಾಗಿದೆ",
+  "create_shipment.badge_guaranteed": "ಖಾತರಿ",
+  "create_shipment.insurance_label": "ಮೌಲ್ಯಕ್ಕೆ ವಿಮೆ:",
+  "create_shipment.insurance_none": "ಯಾವುದೂ ಇಲ್ಲ",
+  "create_shipment.insurance_tooltip": "ಐಚ್ಛಿಕ. ಪಾರ್ಸೆಲ್‌ಗೆ ವಿಮೆ ಮಾಡಲು ಮೌಲ್ಯ ಘೋಷಿಸಿ; ಲೇಬಲ್ ಖರೀದಿಸುವಾಗ ವಿಮಾ ಶುಲ್ಕ ವಿಧಿಸಲಾಗುತ್ತದೆ.",
+  "create_shipment.insured_note": "{amount} ಗೆ ವಿಮೆ ಮಾಡಲಾಗಿದೆ"
 }

@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "CSV Dosyaları",
   "batch_shipments.filter_excel": "Excel Çalışma Kitabı",
   "batch_shipments.filter_spreadsheets": "Hesap tabloları",
-  "batch_shipments.saved_failed_body": "Şablon kaydedilemedi:\n{error}"
+  "batch_shipments.saved_failed_body": "Şablon kaydedilemedi:\n{error}",
+  "create_shipment.signature_label": "Teslimatta imza:",
+  "create_shipment.signature_none": "Yok",
+  "create_shipment.signature_signature": "İmza gerekli",
+  "create_shipment.signature_adult": "Yetişkin imzası (18+)",
+  "create_shipment.col_enhancements": "Dahil",
+  "create_shipment.badge_tracked": "Takipli",
+  "create_shipment.badge_signed": "İmzalı",
+  "create_shipment.badge_guaranteed": "Garantili",
+  "create_shipment.insurance_label": "Değer için sigorta:",
+  "create_shipment.insurance_none": "Yok",
+  "create_shipment.insurance_tooltip": "İsteğe bağlı. Paketi sigortalamak için bir değer beyan edin; teminat ücreti etiket satın alınırken tahsil edilir.",
+  "create_shipment.insured_note": "{amount} için sigortalı"
 }

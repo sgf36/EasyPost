@@ -566,5 +566,17 @@
   "batch_shipments.filter_csv": "فایل‌های CSV",
   "batch_shipments.filter_excel": "کارپوشه Excel",
   "batch_shipments.filter_spreadsheets": "صفحه‌های گسترده",
-  "batch_shipments.saved_failed_body": "ذخیره قالب ممکن نشد:\n{error}"
+  "batch_shipments.saved_failed_body": "ذخیره قالب ممکن نشد:\n{error}",
+  "create_shipment.signature_label": "امضا هنگام تحویل:",
+  "create_shipment.signature_none": "هیچ‌کدام",
+  "create_shipment.signature_signature": "امضا الزامی است",
+  "create_shipment.signature_adult": "امضای بزرگسال (18+)",
+  "create_shipment.col_enhancements": "شامل",
+  "create_shipment.badge_tracked": "ردیابی‌شده",
+  "create_shipment.badge_signed": "امضاشده",
+  "create_shipment.badge_guaranteed": "تضمین‌شده",
+  "create_shipment.insurance_label": "بیمه برای ارزش:",
+  "create_shipment.insurance_none": "هیچ‌کدام",
+  "create_shipment.insurance_tooltip": "اختیاری. برای بیمه بسته مبلغی را اعلام کنید؛ هزینه پوشش هنگام خرید برچسب دریافت می‌شود.",
+  "create_shipment.insured_note": "بیمه‌شده برای {amount}"
 }
