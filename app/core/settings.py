@@ -5,7 +5,7 @@ and don't need OS keyring protection — a plain JSON file is simpler.
 """
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Optional
 
 from app.config import SETTINGS_PATH, ensure_app_data_dir
@@ -19,6 +19,13 @@ class AppSettings:
     locale: str = DEFAULT_LOCALE
     # Webhook push-update feature (off by default — see app/core/webhook_manager.py).
     webhook_enabled: bool = False
+    # Registered webhook ids, keyed by mode ("test"/"production"). A webhook
+    # belongs to one EasyPost account, so a single shared id was wrong the
+    # moment the user switched modes: the app would try to repoint the other
+    # account's webhook, fail, and quietly create a second one — orphaning the
+    # first, which then stayed registered against a dead tunnel forever.
+    webhook_ids: dict = field(default_factory=dict)
+    # Retained so an install upgrading from a single-id build can migrate.
     webhook_id: Optional[str] = None
     webhook_port: Optional[int] = None
     # Activated offline license key (see app/core/license.py). None until activated.

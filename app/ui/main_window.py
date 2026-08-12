@@ -127,6 +127,7 @@ class MainWindow(QMainWindow):
 
         self._mode_banner = ModeBanner()
         self._mode_banner.production_locked.connect(self._on_production_locked)
+        self._mode_banner.mode_changed.connect(self._on_mode_changed)
         outer.addWidget(self._mode_banner)
 
         body = QWidget()
@@ -273,6 +274,21 @@ class MainWindow(QMainWindow):
             return
         self._view_stack.setCurrentIndex(stack_index)
         on_show = self._nav_actions.get(stack_index)
+        if on_show is not None:
+            on_show()
+
+    def _on_mode_changed(self, _mode: str) -> None:
+        """The mode selector is in the banner, so test/production can be flipped
+        without leaving the current page — and every view loads its mode-scoped
+        data (saved addresses, shipments, claims) in its on-show refresh. Views
+        the user navigates to afterwards are therefore correct, but the one on
+        screen at the moment of the switch would keep the previous mode's rows.
+        That is not merely stale display: a saved address ID belongs to one
+        EasyPost account, so a "Ship from" left over from test mode makes every
+        shipment in a production batch fail at creation. Re-run the visible
+        view's refresh so the switch takes effect where the user is looking.
+        """
+        on_show = self._nav_actions.get(self._view_stack.currentIndex())
         if on_show is not None:
             on_show()
 

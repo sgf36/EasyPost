@@ -15,8 +15,19 @@ from app.core.settings import AppSettings
 
 
 def test_every_format_has_the_default_size_easypost_documents():
-    # Straight from EasyPost's "Shipping Label Sizes" article.
-    assert LABEL_FORMATS == {"PNG": "4x6", "PDF": "8.5x11", "ZPL": "4x5", "EPL": "4x5"}
+    # Straight from EasyPost's "Shipping Label Sizes" article. EPL2 rather than
+    # EPL: verified against the live API, "EPL" is accepted but what comes back
+    # is EPL2 either way — label_file_type "application/x-epl2", a .epl2 file —
+    # so offering "EPL" described the output inaccurately.
+    assert LABEL_FORMATS == {"PNG": "4x6", "PDF": "8.5x11", "ZPL": "4x5", "EPL2": "4x5"}
+
+
+def test_a_settings_file_naming_the_old_epl_still_resolves():
+    """An install upgrading from a build that stored "EPL" must not silently
+    revert to PNG."""
+    from app.core.label_options import normalise
+
+    assert normalise("EPL", "")[0] == "EPL2"
 
 
 def test_default_size_for_is_case_insensitive():

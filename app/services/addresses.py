@@ -70,14 +70,51 @@ def verify_address(
         email=email or None,
     )
 
-    verifications = getattr(address, "verifications", None) or {}
-    delivery = verifications.get("delivery") if isinstance(verifications, dict) else None
-    if delivery and not delivery.get("success", True):
+    delivery = _delivery_verification(address)
+    # `success` is only trustworthy when it is explicitly True. Anything else —
+    # False, or absent — must not be reported to the user as verified.
+    if delivery is not None and delivery.get("success") is not True:
         errors = delivery.get("errors") or []
-        messages = [e.get("message", "Unknown verification error") for e in errors]
+        messages = [_verification_message(e) for e in errors]
         raise AddressVerificationError(messages, address)
 
     return address
+
+
+def _delivery_verification(address):
+    """The `verifications.delivery` sub-object, or None when absent.
+
+    Deliberately NOT guarded with ``isinstance(..., dict)``: the SDK converts
+    every nested response object into an ``EasyPostObject``, which implements
+    ``.get()`` but does **not** subclass ``dict``. An isinstance check against
+    dict is therefore always False, which silently disabled failure detection
+    entirely and marked every address — including undeliverable ones — as
+    verified.
+    """
+    verifications = getattr(address, "verifications", None)
+    if verifications is None:
+        return None
+    return verifications.get("delivery")
+
+
+def _verification_message(error) -> str:
+    """One human-readable line per verification error, with EasyPost's own
+    suggested correction appended when it offers one."""
+    message = error.get("message") or "Unknown verification error"
+    suggestion = error.get("suggestion")
+    return f"{message} ({suggestion})" if suggestion else message
+
+
+def address_is_verified(address) -> bool:
+    """Whether EasyPost positively confirmed this address is deliverable.
+
+    Only an explicit ``success is True`` counts. EasyPost returns no delivery
+    verification at all for countries where address validation does not apply,
+    and "we did not check" is not the same as "this is deliverable" — so the
+    absent case is reported as unverified rather than assumed good.
+    """
+    delivery = _delivery_verification(address)
+    return delivery is not None and delivery.get("success") is True
 
 
 def save_address_locally(
@@ -160,3 +197,15 @@ def set_favorite(address_id: str, favorite: bool) -> None:
             "UPDATE addresses SET is_favorite = ? WHERE id = ?",
             (1 if favorite else 0, address_id),
         )
+
+
+def address_choice_label(rec) -> str:
+    """One line describing a saved address for a dropdown.
+
+    Joins only the parts that exist. The previous f-string always inserted the
+    comma before `state`, so every United Kingdom address — which has no state —
+    read "London," with a stranded trailing comma.
+    """
+    where = ", ".join(part for part in (rec.city, rec.state) if part)
+    name = rec.label or rec.name or rec.id
+    return f"{name} — {where}" if where else str(name)
