@@ -150,6 +150,20 @@ def _seed_database(db_path: Path) -> None:
                 ("evri", "Next Day", "Next Day", "", None),
             ],
         )
+        # Scheduled pickups, so the Pickups page has something in its lower
+        # table. The page took the dashboard's listing slot, and it is the only
+        # screenshot whose bottom half is otherwise two empty grids.
+        cur.executemany(
+            "INSERT OR REPLACE INTO pickups (id, mode, status, address,"
+            " min_datetime, max_datetime, shipment_ids)"
+            " VALUES (?,?,?,?,?,?,?)",
+            [
+                ("pck_demo1", MODE, "scheduled", "Northwind Trading, London",
+                 "2026-08-13 09:00", "2026-08-13 17:00", "shp_demo1"),
+                ("pck_demo2", MODE, "scheduled", "Northwind Logistics, Manchester",
+                 "2026-08-14 09:00", "2026-08-14 12:00", "shp_demo2"),
+            ],
+        )
         cur.executemany(
             "INSERT OR REPLACE INTO trackers (id, mode, tracking_code, carrier, status,"
             " status_detail, est_delivery_date, last_checked_at)"
@@ -220,12 +234,25 @@ def _settle(app, seconds: float = 2.5) -> None:
     Several pages fetch their catalogue on a worker thread. Grabbing straight
     after construction caught the batch picker mid-fetch, so the screenshot read
     "Loading the carrier catalogue..." with an empty carrier list.
+
+    Deferred deletions are flushed too, and that is not a detail. processEvents()
+    does not process DeferredDelete, and this tool never runs a real event loop,
+    so anything discarded via deleteLater simply accumulates. QTableWidget
+    replaces a cell widget that way: every refresh_scheduled() left its previous
+    Cancel buttons parented to the viewport at (0, 0), and grab() painted them —
+    putting a stray Cancel on top of the first address on the Pickups page. The
+    app is not leaking; a running event loop reaps these immediately, so a user
+    never sees them. It is only visible to a grab of a window that was never
+    shown, which is exactly what this tool does.
     """
     import time
+
+    from PySide6.QtCore import QEvent
 
     deadline = time.monotonic() + seconds
     while time.monotonic() < deadline:
         app.processEvents()
+        app.sendPostedEvents(None, QEvent.Type.DeferredDelete)
         time.sleep(0.05)
 
 
@@ -238,6 +265,16 @@ def _capture(widget, path: Path, width: int, height: int, scale: int) -> None:
     # Let the layout settle before painting, or half the page renders unsized.
     widget.adjustSize()
     widget.resize(QSize(width, height))
+
+    # Settle once more at the final size: cell widgets are positioned during
+    # layout, and discarded ones are only reaped when deferred deletes are
+    # flushed (see _settle). Both have to happen before the grab, not before
+    # the resize.
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication.instance()
+    if app is not None:
+        _settle(app, 0.5)
 
     pixmap = widget.grab()
     if scale != 1:
@@ -312,7 +349,10 @@ def _capture_window(app, view_class_name: str, path: Path,
     holder = stack.widget(nav.item(target_row).data(Qt.ItemDataRole.UserRole))
     _pin_service_picker(holder, app)
     _seed_rate_table(holder)
+    _seed_pickup_rates(holder)
     _settle(app)
+
+    _assert_no_orphan_cell_widgets(window, view_class_name)
 
     # Verified immediately before painting, not assumed. A screenshot run that
     # quietly captures the wrong screen still reports success, and the only
@@ -326,6 +366,64 @@ def _capture_window(app, view_class_name: str, path: Path,
 
     _capture(window, path, width, height, scale)
     return window
+
+
+def _assert_no_orphan_cell_widgets(window, view_class_name: str) -> None:
+    """Fail if a table holds a widget that is no longer one of its cells.
+
+    Replacing a cell widget discards the old one with deleteLater, which only
+    runs when deferred deletes are flushed. Unflushed, the discard stays
+    parented to the viewport at (0, 0) and grab() paints it: the address book
+    published three buttons — Favorite, Edit and Delete — stacked on top of the
+    first row's data, in all seven languages, and the run reported success.
+
+    _settle now flushes those, so this is the check that the fix is holding. It
+    is cheap and it is the only thing standing between a stale widget and a
+    published screenshot.
+    """
+    from PySide6.QtCore import QModelIndex
+    from PySide6.QtWidgets import QAbstractItemView, QWidget
+
+    for table in window.findChildren(QAbstractItemView):
+        model = table.model()
+        if model is None:
+            continue
+        registered = set()
+
+        def collect(parent):
+            """Recurse: the rates tree hangs its Buy buttons off child rows, so
+            a top-level-only walk reports every one of them as an orphan."""
+            try:
+                rows = model.rowCount(parent)
+                cols = model.columnCount(parent)
+            except TypeError:
+                # List models take no column argument.
+                try:
+                    rows, cols = model.rowCount(parent), 1
+                except TypeError:
+                    return
+            for r in range(rows):
+                for c in range(cols):
+                    index = model.index(r, c, parent)
+                    w = table.indexWidget(index)
+                    if w is not None:
+                        registered.add(id(w))
+                    # hasChildren is private in PySide6; a child row count of
+                    # zero means a leaf, and table models return zero here, so
+                    # this terminates on both shapes.
+                    if c == 0 and model.rowCount(index) > 0:
+                        collect(index)
+
+        collect(QModelIndex())
+        orphans = [w for w in table.viewport().findChildren(QWidget)
+                   if id(w) not in registered and w.parent() is table.viewport()]
+        if orphans:
+            raise RuntimeError(
+                f"Refusing to capture {view_class_name}: "
+                f"{type(table).__name__} holds {len(orphans)} widget(s) that are "
+                f"no longer cells ({[w.__class__.__name__ for w in orphans][:4]}). "
+                f"They paint over the first row."
+            )
 
 
 # Shown on the batch screenshot. A carrier and service a reader recognises,
@@ -465,6 +563,40 @@ def _seed_rate_table(holder) -> None:
 
     rates = [_DemoRate(*row) for row in _SHOWCASE_RATES]
     view._on_rates_received(_DemoShipment(rates))
+
+
+# Pickup rates, for the same reason as _SHOWCASE_RATES: the table is filled by
+# a live call the screenshot run cannot make. Pushed through the view's own
+# _on_pickup_created so the Buy column and the empty-result path behave exactly
+# as they do for a real request.
+_SHOWCASE_PICKUP_RATES = [
+    ("DHL Express", "ExpressWorldwide", "8.50"),
+    ("Evri", "Next Day", "9.25"),
+    ("FedEx", "FEDEX_GROUND", "12.00"),
+]
+
+
+class _DemoPickupRate:
+    def __init__(self, carrier, service, amount):
+        self.carrier = carrier
+        self.service = service
+        self.rate = amount
+        self.currency = "GBP"
+
+
+class _DemoPickup:
+    def __init__(self, rates):
+        self.pickup_rates = rates
+        self.messages = []
+
+
+def _seed_pickup_rates(holder) -> None:
+    """Fill the Pickups rates table with the invented quotes above."""
+    view = holder.widget() if hasattr(holder, "widget") else holder
+    if not hasattr(view, "_on_pickup_created") or not hasattr(view, "_rates_table"):
+        return
+    rates = [_DemoPickupRate(*row) for row in _SHOWCASE_PICKUP_RATES]
+    view._on_pickup_created(_DemoPickup(rates))
 
 
 def main() -> int:

@@ -91,6 +91,7 @@ ORDER = [
     ("07_reports", "reports"),
     ("08_hts_lookup", "hts_lookup"),
     ("09_settings", "settings"),
+    ("11_pickups", "pickups"),
 ]
 
 # Locales with their own captured screenshots. Every other listing language
@@ -117,6 +118,7 @@ CAPTIONS = {
         "Spend by carrier and label counts at a glance.",
         "Search live Harmonized Tariff Schedule codes for customs paperwork.",
         "Label format, label size and fifty interface languages.",
+        "Request a carrier pickup, compare pickup rates and cancel in a click.",
     ],
     "zh": [
         "并排比较各承运商的实时费率，随即购买并打印面单。",
@@ -127,6 +129,7 @@ CAPTIONS = {
         "一目了然地查看各承运商支出与面单数量。",
         "实时查询协调关税税则（HTS）编码，便于报关。",
         "面单格式、面单尺寸，以及 50 种界面语言。",
+        "申请承运商上门取件，比较取件运费，一键取消。",
     ],
     "hi": [
         "कई कैरियर की लाइव दरें साथ-साथ देखें और तुरंत लेबल खरीदें व प्रिंट करें।",
@@ -137,6 +140,7 @@ CAPTIONS = {
         "कैरियर के अनुसार खर्च और लेबल संख्या एक नज़र में।",
         "सीमा शुल्क दस्तावेज़ों के लिए लाइव HTS टैरिफ़ कोड खोजें।",
         "लेबल फ़ॉर्मैट, लेबल आकार और पचास इंटरफ़ेस भाषाएँ।",
+        "वाहक से पिकअप का अनुरोध करें, पिकअप दरें तुलना करें और एक क्लिक में रद्द करें।",
     ],
     "es": [
         "Compara tarifas reales de transportistas y compra la etiqueta al momento.",
@@ -147,6 +151,7 @@ CAPTIONS = {
         "Gasto por transportista y recuento de etiquetas de un vistazo.",
         "Busca códigos arancelarios armonizados en directo para la documentación aduanera.",
         "Formato de etiqueta, tamaño de etiqueta y cincuenta idiomas de interfaz.",
+        "Solicita una recogida del transportista, compara tarifas y cancela con un clic.",
     ],
     "fr": [
         "Comparez les tarifs réels des transporteurs, puis achetez et imprimez l'étiquette.",
@@ -157,6 +162,7 @@ CAPTIONS = {
         "Dépenses par transporteur et nombre d'étiquettes en un coup d'œil.",
         "Recherchez les codes du tarif douanier harmonisé en direct.",
         "Format d'étiquette, taille d'étiquette et cinquante langues d'interface.",
+        "Demandez un enlèvement, comparez les tarifs et annulez en un clic.",
     ],
     "de": [
         "Tarife mehrerer Dienstleister direkt vergleichen, dann Etikett kaufen und drucken.",
@@ -167,6 +173,7 @@ CAPTIONS = {
         "Ausgaben je Dienstleister und Etikettenanzahl auf einen Blick.",
         "Codes des Harmonisierten Zolltarifs live durchsuchen.",
         "Etikettenformat, Etikettengröße und fünfzig Oberflächensprachen.",
+        "Abholung anfordern, Abholtarife vergleichen und mit einem Klick stornieren.",
     ],
     "ja": [
         "複数の配送業者の実際の料金を並べて比較し、そのままラベルを購入・印刷。",
@@ -177,6 +184,7 @@ CAPTIONS = {
         "配送業者ごとの費用とラベル枚数をひと目で把握。",
         "税関書類向けにHTS（統一関税品目表）コードをリアルタイム検索。",
         "ラベル形式、ラベルサイズ、50言語のインターフェース。",
+        "配送業者の集荷を依頼し、集荷料金を比較して、ワンクリックでキャンセル。",
     ],
 }
 
