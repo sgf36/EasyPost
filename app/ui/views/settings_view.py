@@ -4,6 +4,7 @@
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QDoubleSpinBox,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
@@ -23,6 +24,7 @@ from app.core.label_options import (
     normalise,
     sizes_for_format,
 )
+from app.core.label_sheet import DEFAULT_PRINTER_TYPE
 from app.core.settings import load_settings, save_settings
 from app.core.webhook_manager import (
     STATE_ERROR,
@@ -58,8 +60,14 @@ class SettingsView(QWidget):
         self._save_btn = QPushButton(tr("settings.save_button"))
         self._save_btn.clicked.connect(self._on_save)
 
+        # Blank now means "leave unchanged", so removing a key has to be a
+        # deliberate action rather than the side effect of an empty box.
+        self._forget_btn = QPushButton(tr("settings.forget_keys_button"))
+        self._forget_btn.clicked.connect(self._on_forget_keys)
+
         button_row = QHBoxLayout()
         button_row.addWidget(show_keys_btn)
+        button_row.addWidget(self._forget_btn)
         button_row.addStretch(1)
         button_row.addWidget(self._save_btn)
 
@@ -104,9 +112,31 @@ class SettingsView(QWidget):
         self._label_format_combo.currentIndexChanged.connect(self._on_label_format_changed)
         self._label_size_combo.currentIndexChanged.connect(self._on_label_choice_saved)
 
+        # Printer type and calibration belong here for the same reason the
+        # format and size do: they describe the machine on the desk, not the
+        # parcel. They were previously reachable only from the Export print
+        # sheet dialog, which meant a user had to buy a label before they could
+        # tell the app what printer they own.
+        #
+        # The dialog keeps its own copies, so a one-off sheet can still be
+        # nudged without disturbing the saved default. Both read and write the
+        # same AppSettings fields, so whichever is used last wins.
+        self._printer_combo = QComboBox()
+        self._printer_combo.addItem(tr("print_sheet.printer_laser"), "laser")
+        self._printer_combo.addItem(tr("print_sheet.printer_inkjet"), "inkjet")
+        index = self._printer_combo.findData(settings.printer_type or DEFAULT_PRINTER_TYPE)
+        self._printer_combo.setCurrentIndex(index if index >= 0 else 0)
+        self._printer_combo.currentIndexChanged.connect(self._on_printing_choice_saved)
+
+        self._offset_x_spin = self._make_offset_spin(settings.label_offset_x_mm)
+        self._offset_y_spin = self._make_offset_spin(settings.label_offset_y_mm)
+
         form = QFormLayout()
         form.addRow(tr("settings.label_format_label"), self._label_format_combo)
         form.addRow(tr("settings.label_size_label"), self._label_size_combo)
+        form.addRow(tr("print_sheet.printer_label"), self._printer_combo)
+        form.addRow(tr("print_sheet.offset_x_label"), self._offset_x_spin)
+        form.addRow(tr("print_sheet.offset_y_label"), self._offset_y_spin)
 
         caveats = QLabel(
             tr("settings.label_caveat_ups")
@@ -126,6 +156,30 @@ class SettingsView(QWidget):
         layout.addWidget(caveats)
         group.setLayout(layout)
         return group
+
+    def _make_offset_spin(self, value: float) -> QDoubleSpinBox:
+        """Millimetre nudge, matching the Export print sheet dialog's range."""
+        spin = QDoubleSpinBox()
+        spin.setRange(-25.0, 25.0)
+        spin.setSingleStep(0.5)
+        spin.setDecimals(1)
+        spin.setValue(value or 0.0)
+        spin.setSuffix(" mm")
+        spin.valueChanged.connect(self._on_printing_choice_saved)
+        return spin
+
+    def _on_printing_choice_saved(self) -> None:
+        """Persist the printer profile as soon as it is changed.
+
+        Saved immediately rather than behind the Save button, which belongs to
+        the API keys — pressing it is not something a user should have to do to
+        make a printer choice stick.
+        """
+        settings = load_settings()
+        settings.printer_type = self._printer_combo.currentData()
+        settings.label_offset_x_mm = self._offset_x_spin.value()
+        settings.label_offset_y_mm = self._offset_y_spin.value()
+        save_settings(settings)
 
     def _populate_label_sizes(self, label_format: str, preferred: str) -> None:
         combo = self._label_size_combo
@@ -219,10 +273,29 @@ class SettingsView(QWidget):
             text = tr("settings.webhook_status_stopped")
         self._webhook_status_label.setText(text)
 
+    # Shown in place of a stored key. Not a translated string on purpose: it
+    # carries no language, and it must never be mistaken for the key itself.
+    _STORED_MASK = "•" * 12
+
     def refresh(self) -> None:
+        """Show whether a key is stored, never the key.
+
+        The stored keys are deliberately NOT loaded into these fields. Putting
+        a live API key into a widget means it can be read off the screen by
+        anyone looking, revealed in full by the Show keys toggle, and captured
+        by any screenshot, screen share or recording. A key the user has
+        already saved never needs to be displayed back to them.
+
+        An empty field therefore means "leave this key alone" on save, not
+        "clear it" — see _on_save. Clearing is an explicit action.
+        """
         creds = load_credentials()
-        self._test_key_input.setText(creds.test_key or "")
-        self._prod_key_input.setText(creds.production_key or "")
+        for field, stored in (
+            (self._test_key_input, creds.test_key),
+            (self._prod_key_input, creds.production_key),
+        ):
+            field.clear()
+            field.setPlaceholderText(self._STORED_MASK if stored else "")
 
     def _toggle_visibility(self, checked: bool) -> None:
         mode = QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.Password
@@ -237,8 +310,15 @@ class SettingsView(QWidget):
         # production key cannot be stored in the free test field.
         def save() -> None:
             creds = load_credentials()
-            creds.test_key = test_key or None
-            creds.production_key = prod_key or None
+            # A blank field leaves the stored key untouched. The fields start
+            # empty by design (see refresh), so treating blank as "clear"
+            # would wipe both keys the first time anyone opened Settings and
+            # pressed Save — including someone who came here only to change
+            # the label size.
+            if test_key:
+                creds.test_key = test_key
+            if prod_key:
+                creds.production_key = prod_key
             if not creds.has_mode(creds.active_mode):
                 # Active mode's key was just cleared; fall back to whichever
                 # mode still has a key, if any.
@@ -252,6 +332,20 @@ class SettingsView(QWidget):
             )
 
         verify_key_slots(self, test_key, prod_key, on_ok=save, on_busy=self._set_keys_busy)
+
+    def _on_forget_keys(self) -> None:
+        """Remove both stored keys from this computer's credential store."""
+        if QMessageBox.question(
+            self,
+            tr("settings.forget_keys_confirm_title"),
+            tr("settings.forget_keys_confirm_body"),
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        creds = load_credentials()
+        creds.test_key = None
+        creds.production_key = None
+        save_credentials(creds)
+        self.refresh()
 
     def _set_keys_busy(self, busy: bool) -> None:
         self._save_btn.setEnabled(not busy)
