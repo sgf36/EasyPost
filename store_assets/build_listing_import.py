@@ -392,8 +392,23 @@ def build_fanout(export: Path, dest: Path | None, notes=None):
 
     # Stage 2 owns exactly the languages stage 1 did not: the non-localised
     # forty. Together the two stages set release notes for all 47.
+    # Release notes are written for ALL 47, not just the forty this stage owns
+    # for images.
+    #
+    # The stage split exists because of how image fields behave: a blank one is
+    # a no-op, and an asset URL cannot sit in the same file as a folder path.
+    # Neither applies to text. ReleaseNotes is a plain string that overwrites
+    # cleanly, so there is no reason for it to inherit the split — and every
+    # reason not to, because stage 1 runs against whichever catalogue was
+    # current when the images were shot. Owning notes only here means one file
+    # decides the version, instead of the seven localised languages keeping
+    # whatever stage 1 happened to write.
+    #
+    # That is not hypothetical: stage 1 for 1.2.1 was built before the 1.2.1
+    # catalogue existed, so the listing would have published 1.2.1 notes in
+    # forty languages and 1.2.0 in the seven that matter most, English included.
     notes_written = inject_release_notes(
-        by_field, langs, notes, owns=lambda l: l not in LOCALISED,
+        by_field, langs, notes, owns=lambda l: True,
     )
 
     clear_unused_slots(by_field, len(header))
@@ -401,7 +416,7 @@ def build_fanout(export: Path, dest: Path | None, notes=None):
     write_csv(rows, target)
 
     print("mode           : stage 2 (URL fan-out, nothing uploaded)")
-    print(f"listings written: {len(langs) - len(LOCALISED)}")
+    print(f"listings written: {len(langs) - len(LOCALISED)} (+ release notes for all {len(langs)})")
     print(f"cells rewritten: {touched}")
     print(f"release notes  : {notes_written if notes else 'unchanged (no catalogue)'}")
     print(f"csv            : {target}")
