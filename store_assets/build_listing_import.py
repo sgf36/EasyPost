@@ -67,6 +67,21 @@ RELEASE_NOTES_LIMIT = 1500
 # Screenshot order as it will appear on the Store page. Rate shopping leads:
 # it is the one image that shows what the product actually does. Settings
 # trails, because nobody installs an app for its settings page.
+#
+# The dashboard is deliberately absent. DashboardView is still a placeholder —
+# its entire body is a label reading "Shipments, tracking, address book, and
+# reporting views are added in later build stages" — so the screenshot showed
+# an empty screen saying the product was unfinished. It is the one image that
+# argued against the app. The source capture is kept in screenshots/ so it can
+# be restored in one line once there is a real dashboard to show.
+#
+# Dropping it takes the set from nine images to eight, but note what the import
+# can and cannot do: a blank image cell is a no-op, not a delete — that is the
+# very property stage 1 relies on to leave the forty fallback languages alone.
+# So this removes the dashboard from everything the import WRITES, and slots 1-8
+# are rewritten end to end, but whatever currently sits in slot 9 stays there
+# until it is deleted in the portal. clear_unused_slots keeps slots 10-30 empty;
+# it cannot empty a slot that already holds an asset.
 ORDER = [
     ("02_create_shipment", "rate_shopping"),
     ("04_tracking", "tracking"),
@@ -75,7 +90,6 @@ ORDER = [
     ("05_history", "history"),
     ("07_reports", "reports"),
     ("08_hts_lookup", "hts_lookup"),
-    ("01_dashboard", "dashboard"),
     ("09_settings", "settings"),
 ]
 
@@ -102,7 +116,6 @@ CAPTIONS = {
         "Every purchased label in one place, with refunds a click away.",
         "Spend by carrier and label counts at a glance.",
         "Search live Harmonized Tariff Schedule codes for customs paperwork.",
-        "Shipping activity at a glance the moment the app opens.",
         "Label format, label size and fifty interface languages.",
     ],
     "zh": [
@@ -113,7 +126,6 @@ CAPTIONS = {
         "所有已购面单集中管理，退款只需一次点击。",
         "一目了然地查看各承运商支出与面单数量。",
         "实时查询协调关税税则（HTS）编码，便于报关。",
-        "打开应用即可总览发货动态。",
         "面单格式、面单尺寸，以及 50 种界面语言。",
     ],
     "hi": [
@@ -124,7 +136,6 @@ CAPTIONS = {
         "खरीदे गए सभी लेबल एक जगह, रिफ़ंड बस एक क्लिक दूर।",
         "कैरियर के अनुसार खर्च और लेबल संख्या एक नज़र में।",
         "सीमा शुल्क दस्तावेज़ों के लिए लाइव HTS टैरिफ़ कोड खोजें।",
-        "ऐप खोलते ही शिपिंग गतिविधि एक नज़र में।",
         "लेबल फ़ॉर्मैट, लेबल आकार और पचास इंटरफ़ेस भाषाएँ।",
     ],
     "es": [
@@ -135,7 +146,6 @@ CAPTIONS = {
         "Todas las etiquetas compradas en un solo lugar, con reembolsos a un clic.",
         "Gasto por transportista y recuento de etiquetas de un vistazo.",
         "Busca códigos arancelarios armonizados en directo para la documentación aduanera.",
-        "La actividad de envíos a la vista nada más abrir la aplicación.",
         "Formato de etiqueta, tamaño de etiqueta y cincuenta idiomas de interfaz.",
     ],
     "fr": [
@@ -146,7 +156,6 @@ CAPTIONS = {
         "Toutes les étiquettes achetées au même endroit, remboursement en un clic.",
         "Dépenses par transporteur et nombre d'étiquettes en un coup d'œil.",
         "Recherchez les codes du tarif douanier harmonisé en direct.",
-        "L'activité d'expédition en un coup d'œil dès l'ouverture.",
         "Format d'étiquette, taille d'étiquette et cinquante langues d'interface.",
     ],
     "de": [
@@ -157,7 +166,6 @@ CAPTIONS = {
         "Alle gekauften Etiketten an einem Ort, Erstattung mit einem Klick.",
         "Ausgaben je Dienstleister und Etikettenanzahl auf einen Blick.",
         "Codes des Harmonisierten Zolltarifs live durchsuchen.",
-        "Die Versandaktivität auf einen Blick, direkt nach dem Start.",
         "Etikettenformat, Etikettengröße und fünfzig Oberflächensprachen.",
     ],
     "ja": [
@@ -168,10 +176,22 @@ CAPTIONS = {
         "購入したラベルをすべて一覧表示。返金もワンクリック。",
         "配送業者ごとの費用とラベル枚数をひと目で把握。",
         "税関書類向けにHTS（統一関税品目表）コードをリアルタイム検索。",
-        "起動直後に配送状況をひと目で確認。",
         "ラベル形式、ラベルサイズ、50言語のインターフェース。",
     ],
 }
+
+
+# ORDER and each caption list are parallel: CAPTIONS[locale][slot - 1] captions
+# ORDER[slot - 1]. Dropping or adding a screenshot means editing both, and a
+# list left one entry long would silently shift every caption after it onto the
+# wrong image — the same drift c91fff6 fixed on the stage 2 side, which is not
+# visible in any count the build prints.
+for _locale, _captions in CAPTIONS.items():
+    if len(_captions) != len(ORDER):
+        raise SystemExit(
+            f"{_locale} has {len(_captions)} captions for {len(ORDER)} "
+            f"screenshots. ORDER and CAPTIONS must stay parallel."
+        )
 
 
 def asset_file(locale: str, slot: int, slug: str) -> str:
@@ -192,8 +212,14 @@ def write_csv(rows, target: Path) -> None:
 
 
 def clear_unused_slots(by_field, width: int) -> None:
-    """Slots past the ninth held nothing in the export and must stay that way,
-    otherwise a stale tenth image could survive the import."""
+    """Keep every slot past the last one in ORDER blank in the written CSV.
+
+    This stops a stale image being *cited* by the package. It does not delete
+    anything already live: Partner Center reads a blank image cell as "leave
+    unchanged", which is exactly why stage 1 can blank the forty fallback
+    languages without touching their screenshots. A populated slot beyond ORDER
+    therefore survives until it is removed in the portal.
+    """
     for slot in range(len(ORDER) + 1, 31):
         for row in (by_field[f"DesktopScreenshot{slot}"],
                     by_field[f"DesktopScreenshotCaption{slot}"]):
