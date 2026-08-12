@@ -60,7 +60,7 @@ CSV_NAME = PACKAGE + ".csv"
 # listing code (en-us, zh-hans, …) — the same codes the export uses for its
 # language columns. Overridable with --notes=<path>; default is the current
 # release. Absent file → the ReleaseNotes row is passed through untouched.
-RELEASE_NOTES_JSON = ROOT / "store_assets" / "release-notes-1.1.3-translations.json"
+RELEASE_NOTES_JSON = ROOT / "store_assets" / "release-notes-1.2.0-translations.json"
 # Partner Center rejects release notes longer than this.
 RELEASE_NOTES_LIMIT = 1500
 
@@ -98,7 +98,7 @@ CAPTIONS = {
         "Compare live carrier rates side by side, then buy and print the label.",
         "Track every parcel from a single screen, with automatic refresh.",
         "Save and verify addresses, with country-aware fields for 197 countries.",
-        "Import a CSV of recipients, then rate and buy in bulk.",
+        "Import a CSV of recipients, choose a carrier and service, then buy in bulk.",
         "Every purchased label in one place, with refunds a click away.",
         "Spend by carrier and label counts at a glance.",
         "Search live Harmonized Tariff Schedule codes for customs paperwork.",
@@ -109,7 +109,7 @@ CAPTIONS = {
         "并排比较各承运商的实时费率，随即购买并打印面单。",
         "在一个界面追踪所有包裹，自动刷新。",
         "保存并验证地址，支持 197 个国家的本地化字段。",
-        "导入收件人 CSV 文件，批量询价并购买。",
+        "导入收件人 CSV 文件，选择承运商和服务，然后批量购买。",
         "所有已购面单集中管理，退款只需一次点击。",
         "一目了然地查看各承运商支出与面单数量。",
         "实时查询协调关税税则（HTS）编码，便于报关。",
@@ -120,7 +120,7 @@ CAPTIONS = {
         "कई कैरियर की लाइव दरें साथ-साथ देखें और तुरंत लेबल खरीदें व प्रिंट करें।",
         "सभी पार्सल एक ही स्क्रीन से ट्रैक करें, स्वचालित रिफ़्रेश के साथ।",
         "पते सहेजें और सत्यापित करें, 197 देशों के अनुरूप फ़ील्ड के साथ।",
-        "प्राप्तकर्ताओं की CSV फ़ाइल आयात करें, फिर थोक में दर देखें और खरीदें।",
+        "प्राप्तकर्ताओं की CSV आयात करें, वाहक कंपनी और सेवा चुनें, फिर थोक में खरीदें।",
         "खरीदे गए सभी लेबल एक जगह, रिफ़ंड बस एक क्लिक दूर।",
         "कैरियर के अनुसार खर्च और लेबल संख्या एक नज़र में।",
         "सीमा शुल्क दस्तावेज़ों के लिए लाइव HTS टैरिफ़ कोड खोजें।",
@@ -131,7 +131,7 @@ CAPTIONS = {
         "Compara tarifas reales de transportistas y compra la etiqueta al momento.",
         "Sigue todos los envíos desde una sola pantalla, con actualización automática.",
         "Guarda y verifica direcciones, con campos adaptados a 197 países.",
-        "Importa un CSV de destinatarios y cotiza y compra por lotes.",
+        "Importa un CSV de destinatarios, elige un transportista y un servicio, y compra en lote.",
         "Todas las etiquetas compradas en un solo lugar, con reembolsos a un clic.",
         "Gasto por transportista y recuento de etiquetas de un vistazo.",
         "Busca códigos arancelarios armonizados en directo para la documentación aduanera.",
@@ -142,7 +142,7 @@ CAPTIONS = {
         "Comparez les tarifs réels des transporteurs, puis achetez et imprimez l'étiquette.",
         "Suivez chaque colis depuis un seul écran, avec actualisation automatique.",
         "Enregistrez et vérifiez les adresses, avec des champs adaptés à 197 pays.",
-        "Importez un CSV de destinataires, puis tarifez et achetez en lot.",
+        "Importez un CSV de destinataires, choisissez un transporteur et un service, puis achetez en lot.",
         "Toutes les étiquettes achetées au même endroit, remboursement en un clic.",
         "Dépenses par transporteur et nombre d'étiquettes en un coup d'œil.",
         "Recherchez les codes du tarif douanier harmonisé en direct.",
@@ -153,7 +153,7 @@ CAPTIONS = {
         "Tarife mehrerer Dienstleister direkt vergleichen, dann Etikett kaufen und drucken.",
         "Alle Sendungen auf einem Bildschirm verfolgen, mit automatischer Aktualisierung.",
         "Adressen speichern und prüfen, mit länderspezifischen Feldern für 197 Länder.",
-        "Eine CSV-Datei mit Empfängern importieren, dann Tarife abrufen und im Stapel kaufen.",
+        "CSV mit Empfängern importieren, Versanddienstleister und Service wählen, dann im Stapel kaufen.",
         "Alle gekauften Etiketten an einem Ort, Erstattung mit einem Klick.",
         "Ausgaben je Dienstleister und Etikettenanzahl auf einen Blick.",
         "Codes des Harmonisierten Zolltarifs live durchsuchen.",
@@ -164,7 +164,7 @@ CAPTIONS = {
         "複数の配送業者の実際の料金を並べて比較し、そのままラベルを購入・印刷。",
         "すべての荷物を1つの画面で追跡。自動更新に対応。",
         "住所を保存して検証。197か国に対応した国別入力項目。",
-        "宛先のCSVを取り込み、一括で料金確認と購入。",
+        "受取人のCSVをインポートし、配送業者とサービスを選んで、一括購入。",
         "購入したラベルをすべて一覧表示。返金もワンクリック。",
         "配送業者ごとの費用とラベル枚数をひと目で把握。",
         "税関書類向けにHTS（統一関税品目表）コードをリアルタイム検索。",

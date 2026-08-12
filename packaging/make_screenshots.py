@@ -67,11 +67,13 @@ TARGETS = {
         ("1366x768", 1366, 768, 1),
         ("2160x1440", 1080, 720, 2),
     ],
-    # The size every image already on the Microsoft Store listing was captured
-    # at. A replacement has to match it exactly or it sits visibly different in
-    # the carousel beside the eight it did not replace.
+    # The size the Microsoft Store listing sources in store_assets/screenshots
+    # are captured at. A replacement has to match its siblings exactly or it
+    # sits visibly different in the carousel beside the eight it did not
+    # replace, and build_listing_import.py copies these through without
+    # resizing.
     "store": [
-        ("2000x1250", 2000, 1250, 1),
+        ("1600x1000", 1600, 1000, 1),
     ],
 }
 
