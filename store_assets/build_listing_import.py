@@ -341,7 +341,19 @@ def build_fanout(export: Path, dest: Path | None, notes=None):
             if lang in LOCALISED:
                 continue  # keeps its own imagery, passed through untouched
             shot_row[col] = url
-            caption_row[col] = CAPTIONS[FALLBACK][slot - 1]
+            # Take the caption from the SAME slot of the same export the image
+            # came from, rather than regenerating it from ORDER.
+            #
+            # Partner Center does not keep the order a folder import sends. The
+            # 1.2.0 stage-1 import came back with slots 4-9 permuted, so
+            # ORDER's index no longer described what sits in slot N. Rebuilding
+            # the caption from ORDER while copying the image from the export
+            # paired the Settings screenshot with the batch caption, and
+            # mislabelled every slot from 4 down, in all forty languages.
+            #
+            # Copying both from the same cell cannot drift: whatever English
+            # shows, the other forty show, correctly captioned.
+            caption_row[col] = caption_row[en]
             touched += 2
 
     # Stage 2 owns exactly the languages stage 1 did not: the non-localised
