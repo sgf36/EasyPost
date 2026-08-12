@@ -35,3 +35,7 @@ server/paddle-license-webhook-worker/bundle*.b64
 
 # Internal marketing drafts — not for the public repo
 marketing/
+
+# Listing packages are rebuilt from store_assets/ contents; the zips are
+# duplicates of the folders beside them and only bloat a public repository.
+store_assets/*.zip
