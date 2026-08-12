@@ -91,6 +91,93 @@ def test_predefined_package_param_omits_dimensions():
     assert "length" not in params["parcel"]
 
 
+def _gb_row(**over):
+    from app.services.batches import BatchRow
+
+    fields = {
+        "to_street1": "10 Downing St", "to_city": "London", "to_state": "",
+        "to_zip": "SW1A 2AA", "to_country": "GB", "weight": "3.5",
+        "predefined_package": "LETTER",
+    }
+    fields.update(over)
+    return BatchRow(line_number=2, fields=fields, errors=[])
+
+
+def test_gb_row_without_state_is_valid(tmp_path):
+    """EasyPost's own documented GB example carries no `state`; requiring one
+    rejected valid UK rows outright."""
+    path = tmp_path / "gb.csv"
+    header = ",".join(CSV_COLUMNS)
+    row = "Jane,,10 Downing St,,London,,SW1A 2AA,GB,,,,,,3.5,LETTER,ref-gb"
+    path.write_text(f"{header}\n{row}\n", encoding="utf-8")
+
+    rows = parse_csv(str(path))
+
+    assert len(rows) == 1
+    assert rows[0].is_valid, rows[0].errors
+
+
+def test_us_row_still_requires_state(tmp_path):
+    path = tmp_path / "us.csv"
+    header = ",".join(CSV_COLUMNS)
+    row = "Jane,,123 Main St,,Boston,,02110,US,,,,,,16,,ref-us"
+    path.write_text(f"{header}\n{row}\n", encoding="utf-8")
+
+    rows = parse_csv(str(path))
+
+    assert not rows[0].is_valid
+    assert "to_state" in rows[0].errors
+
+
+def test_carrier_and_service_are_top_level_not_in_options():
+    """Batch buy fails without these: EasyPost never rates batch shipments and
+    `batch.buy` takes no body, so the service must be declared at create time."""
+    params = _row_to_shipment_params(
+        _gb_row(), "adr_uk",
+        carrier="RoyalMailV3", service="RoyalMail2ndClassSignedFor",
+        carrier_account_id="ca_test", delivery_confirmation="SIGNATURE",
+        insurance="20.00",
+    )
+    assert params["carrier"] == "RoyalMailV3"
+    assert params["service"] == "RoyalMail2ndClassSignedFor"
+    assert params["carrier_accounts"] == ["ca_test"]
+    assert params["insurance"] == "20.00"
+    # Signature belongs in options; carrier/service must NOT be nested there.
+    assert params["options"]["delivery_confirmation"] == "SIGNATURE"
+    assert "carrier" not in params["options"]
+    assert "service" not in params["options"]
+
+
+def test_absent_carrier_service_are_omitted_not_null():
+    params = _row_to_shipment_params(_gb_row(), "adr_uk")
+    for key in ("carrier", "service", "carrier_accounts", "insurance"):
+        assert key not in params
+    assert "delivery_confirmation" not in params["options"]
+
+
+def test_blank_state_is_sent_as_none():
+    params = _row_to_shipment_params(_gb_row(), "adr_uk")
+    assert params["to_address"]["state"] is None
+
+
+def test_carrier_qualified_package_reduces_to_bare_code():
+    """A dropdown choice like "Royal Mail — LETTER" is sent to EasyPost as the
+    bare code "LETTER", not the whole carrier-qualified label."""
+    from app.services.batches import BatchRow
+
+    row = BatchRow(
+        line_number=2,
+        fields={
+            "to_street1": "10 Downing St", "to_city": "London", "to_state": "",
+            "to_zip": "SW1A 2AA", "to_country": "GB", "weight": "3.5",
+            "predefined_package": "Royal Mail — LETTER",
+        },
+        errors=[],
+    )
+    params = _row_to_shipment_params(row, "adr_uk")
+    assert params["parcel"]["predefined_package"] == "LETTER"
+
+
 def test_xlsx_template_has_package_dropdown(tmp_path):
     path = tmp_path / "template.xlsx"
     choices = ["FlatRateEnvelope", "Parcel", "SmallFlatRateBox"]

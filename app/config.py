@@ -1,5 +1,6 @@
 """App-wide paths and constants."""
 
+import os
 from pathlib import Path
 
 import platformdirs
@@ -12,7 +13,7 @@ KEYRING_SERVICE_NAME = "EasyPostDesktop"
 # (app/core/update_check.py) compares this against the latest GitHub release
 # tag to decide whether to prompt the user to update. Keep it in step with the
 # release tag and packaging/msix/AppxManifest.xml on every release.
-APP_VERSION = "1.1.3"
+APP_VERSION = "1.2.0"
 
 ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
 
@@ -98,7 +99,14 @@ MCP_SUPPORTED = (
 # token generated in Tools > Connect AI agents.
 MCP_RELAY_URL = "https://easypost-mcp-relay.sgf36.workers.dev"
 
-APP_DATA_DIR = Path(platformdirs.user_data_dir(APP_DIR_NAME, appauthor=False))
+# Normally the per-user application data directory. The environment override
+# exists so a tool can run the real app against a throwaway directory —
+# packaging/make_screenshots.py uses it to render store screenshots from seeded
+# demo data without touching (or publishing) the user's own database.
+APP_DATA_DIR = Path(
+    os.environ.get("EASYPOST_DESKTOP_DATA_DIR")
+    or platformdirs.user_data_dir(APP_DIR_NAME, appauthor=False)
+)
 DATABASE_PATH = APP_DATA_DIR / "easypost_desktop.sqlite3"
 SETTINGS_PATH = APP_DATA_DIR / "settings.json"
 

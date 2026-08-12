@@ -26,6 +26,7 @@ from app.core.errors import format_api_error
 from app.i18n import tr
 from app.services.addresses import (
     AddressVerificationError,
+    address_is_verified,
     delete_address,
     list_addresses,
     save_address_locally,
@@ -284,7 +285,12 @@ class AddressBookView(QWidget):
         )
 
     def _on_verified(self, address, *, label, favorite, replacing_id) -> None:
-        save_address_locally(address, label=label, favorite=favorite, verified=True)
+        # Record what EasyPost actually confirmed, not an assumption. Countries
+        # where address validation does not apply return no delivery
+        # verification at all, and that is not the same as "deliverable".
+        save_address_locally(
+            address, label=label, favorite=favorite, verified=address_is_verified(address)
+        )
         if replacing_id:
             delete_address(replacing_id)
         self._reset_form()

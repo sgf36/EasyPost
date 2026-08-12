@@ -14,10 +14,28 @@ import logging
 from dataclasses import dataclass
 from typing import Optional
 
-from app.core.client import client_manager
 from app.core.db import db_cursor
+from app.services.carriers import (
+    carrier_display_name,
+    coerce_dimensions,
+    retrieve_carrier_metadata,
+)
 
 logger = logging.getLogger(__name__)
+
+__all__ = [
+    "PACKAGE_CHOICE_SEPARATOR",
+    "PredefinedPackage",
+    "SavedPackage",
+    "carrier_display_name",
+    "delete_saved_package",
+    "list_predefined_packages",
+    "list_saved_packages",
+    "package_code_from_choice",
+    "predefined_package_choices",
+    "predefined_package_names",
+    "save_package",
+]
 
 # Predefined packages are fetched for EVERY carrier EasyPost knows about, not a
 # curated subset: the useful set depends on which carriers a given user has
@@ -75,12 +93,6 @@ def delete_saved_package(package_id: int) -> None:
         cur.execute("DELETE FROM saved_packages WHERE id = ?", (package_id,))
 
 
-def _coerce_dimensions(value) -> str:
-    if isinstance(value, list):
-        return ", ".join(str(v) for v in value if v)
-    return str(value) if value else ""
-
-
 def _cache_predefined_packages(packages: list[PredefinedPackage]) -> None:
     """Replace the whole predefined-package cache with a fresh full fetch."""
     with db_cursor() as cur:
@@ -123,19 +135,22 @@ def list_predefined_packages() -> list[PredefinedPackage]:
     successful fetch cached (possibly empty on a first run with no network).
     """
     try:
-        client = client_manager.get_client()
-        result = client.carrier_metadata.retrieve(types=["predefined_packages"])
+        result = retrieve_carrier_metadata(types=["predefined_packages"])
         packages = [
             PredefinedPackage(
-                carrier=pkg["carrier"],
-                name=pkg["name"],
+                # The enclosing entry's `name` is the authoritative carrier code;
+                # the package's own `carrier` field agrees with it, but reading
+                # the parent means one less field to be wrong.
+                carrier=carrier_entry.get("name") or pkg.get("carrier") or "",
+                name=pkg.get("name") or "",
                 description=pkg.get("description"),
-                dimensions=_coerce_dimensions(pkg.get("dimensions")),
+                dimensions=coerce_dimensions(pkg.get("dimensions")),
                 max_weight=pkg.get("max_weight"),
             )
             for carrier_entry in result
             for pkg in (carrier_entry.get("predefined_packages") or [])
         ]
+        packages = [p for p in packages if p.carrier and p.name]
     except Exception:
         logger.exception("Live carrier predefined-package fetch failed; falling back to cache")
         return _cached_predefined_packages()
@@ -153,6 +168,53 @@ def predefined_package_names() -> list[str]:
     same name can appear under several carriers — de-duplicated here. Sourced
     through :func:`list_predefined_packages`, so it inherits its
     live-first/cache-fallback behaviour and is simply empty when neither has
-    anything (a first run with no network)."""
+    anything (a first run with no network).
+
+    Prefer :func:`predefined_package_choices` for anything shown to a user: a
+    bare code is ambiguous when carriers collide (USPS "Letter" vs Royal Mail
+    "LETTER"). This name-only form is kept for callers that only need the codes.
+    """
     seen = {p.name for p in list_predefined_packages() if p.name}
     return sorted(seen, key=str.casefold)
+
+
+# Separator between the carrier label and the package code in a dropdown choice,
+# e.g. "Royal Mail — LETTER". Chosen because neither EasyPost carrier names nor
+# package codes contain " — " (space, em dash, space), so it round-trips: the
+# bare code is recovered unambiguously on import by splitting on it.
+PACKAGE_CHOICE_SEPARATOR = " — "
+
+
+def predefined_package_choices() -> list[str]:
+    """Carrier-qualified package labels for the batch template dropdown.
+
+    Each entry is ``"<carrier> — <code>"`` (e.g. "Royal Mail — LETTER"), so
+    codes that collide across carriers stay distinguishable — the flat Excel
+    data-validation list has no carrier heading of its own the way the Create
+    Shipment combo does. De-duplicated (two Royal Mail carrier codes that both
+    expose "LETTER" collapse to one choice) and sorted by carrier then code.
+    Recover the bare code EasyPost wants with :func:`package_code_from_choice`.
+    """
+    seen: set[str] = set()
+    choices: list[str] = []
+    for p in list_predefined_packages():
+        if not p.name:
+            continue
+        label = f"{carrier_display_name(p.carrier)}{PACKAGE_CHOICE_SEPARATOR}{p.name}"
+        if label not in seen:
+            seen.add(label)
+            choices.append(label)
+    return sorted(choices, key=str.casefold)
+
+
+def package_code_from_choice(choice: str) -> str:
+    """Recover the bare EasyPost package code from a batch dropdown choice.
+
+    Accepts either a carrier-qualified label ("Royal Mail — LETTER") or a bare
+    code typed directly into a CSV ("LETTER"), and returns the code that
+    EasyPost's ``predefined_package`` field expects. Splitting on the *last*
+    separator keeps a carrier label that itself contained one safe.
+    """
+    if PACKAGE_CHOICE_SEPARATOR in choice:
+        return choice.rsplit(PACKAGE_CHOICE_SEPARATOR, 1)[1].strip()
+    return choice.strip()

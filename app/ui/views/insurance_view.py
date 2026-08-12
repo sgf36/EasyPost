@@ -13,7 +13,13 @@ from PySide6.QtWidgets import (
 
 from app.core.errors import format_api_error
 from app.i18n import tr
-from app.services.insurance import create_standalone_insurance
+from app.services.insurance import (
+    InsuranceAmountError,
+    StandaloneInsuranceUnavailable,
+    create_standalone_insurance,
+    is_pending,
+    validate_amount,
+)
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.purchase_confirm import confirm_if_production
 
@@ -65,6 +71,15 @@ class InsuranceView(QWidget):
             )
             return
 
+        # Validated before the purchase confirmation. The amount is always US
+        # dollars and EasyPost caps it at 5,000; rejecting it here saves the
+        # user confirming a spend that the API was never going to accept.
+        try:
+            amount = validate_amount(amount)
+        except InsuranceAmountError as exc:
+            QMessageBox.warning(self, tr("insurance.error_title"), str(exc))
+            return
+
         if not confirm_if_production(
             self, tr("insurance.confirm_purchase", amount=amount, tracking_code=tracking_code)
         ):
@@ -86,14 +101,28 @@ class InsuranceView(QWidget):
     def _on_success(self, insurance) -> None:
         self._submit_btn.setEnabled(True)
         status = getattr(insurance, "status", "unknown")
-        QMessageBox.information(
-            self,
-            tr("insurance.purchased_title"),
-            tr("insurance.purchased_body", status=status, id=insurance.id),
+        # A policy comes back `new` or `pending` and settles to `purchased` or
+        # `failed` later, so this must not be announced as cover in place.
+        title = (
+            tr("insurance.pending_title") if is_pending(insurance)
+            else tr("insurance.purchased_title")
         )
+        body = (
+            tr("insurance.pending_body", status=status, id=insurance.id)
+            if is_pending(insurance)
+            else tr("insurance.purchased_body", status=status, id=insurance.id)
+        )
+        QMessageBox.information(self, title, body)
 
     def _on_failed(self, exc: Exception) -> None:
         self._submit_btn.setEnabled(True)
+        # A permission on the EasyPost account, not a mistake the user made —
+        # so it gets an explanation and a way forward rather than a raw error.
+        if isinstance(exc, StandaloneInsuranceUnavailable):
+            QMessageBox.information(
+                self, tr("insurance.error_title"), tr("insurance.not_enabled_body")
+            )
+            return
         QMessageBox.critical(
             self, tr("insurance.error_title"), tr("insurance.purchase_failed", error=format_api_error(exc))
         )

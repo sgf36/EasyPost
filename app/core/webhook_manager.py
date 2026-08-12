@@ -10,6 +10,7 @@ start or the URL can go stale between launches.
 
 import secrets
 import socket
+from typing import Optional
 
 import keyring
 from PySide6.QtCore import QObject, Signal
@@ -28,6 +29,11 @@ STATE_STARTING = "starting"
 STATE_RUNNING = "running"
 STATE_ERROR = "error"
 
+# Batch lifecycle events. Creation and purchase are asynchronous and can take
+# minutes on a large batch, so these are what let the Batch view react to a
+# finished purchase rather than discovering it on its next poll.
+_BATCH_EVENTS = ("batch.created", "batch.updated")
+
 
 def _get_or_create_webhook_secret() -> str:
     secret = keyring.get_password(KEYRING_SERVICE_NAME, _KEYRING_WEBHOOK_SECRET_USERNAME)
@@ -35,6 +41,20 @@ def _get_or_create_webhook_secret() -> str:
         secret = secrets.token_urlsafe(32)
         keyring.set_password(KEYRING_SERVICE_NAME, _KEYRING_WEBHOOK_SECRET_USERNAME, secret)
     return secret
+
+
+def _webhook_id_for_mode(settings, mode: str) -> Optional[str]:
+    """The webhook registered for this mode, migrating a pre-1.2.0 single id.
+
+    Older builds stored one `webhook_id` with no record of which account it
+    belonged to. It is claimed for the mode that is active the first time this
+    runs, which is the best available guess and beats repointing a webhook on
+    the wrong account.
+    """
+    by_mode = settings.webhook_ids or {}
+    if mode in by_mode:
+        return by_mode[mode]
+    return settings.webhook_id or None
 
 
 def _find_free_port() -> int:
@@ -46,6 +66,7 @@ def _find_free_port() -> int:
 class WebhookManager(QObject):
     state_changed = Signal(str, str)  # (state, detail)
     tracker_updated = Signal(str)  # tracking id, for TrackingView to refresh on
+    batch_updated = Signal(str)  # batch id, so BatchView can stop waiting on its timer
 
     def __init__(self) -> None:
         super().__init__()
@@ -84,17 +105,30 @@ class WebhookManager(QObject):
             webhook_url = f"{public_url}/webhook"
 
             client = client_manager.get_client()
+            mode = client_manager.active_mode
+            existing_id = _webhook_id_for_mode(settings, mode)
+
             webhook = None
-            if settings.webhook_id:
+            if existing_id:
                 try:
-                    webhook = client.webhook.update(settings.webhook_id, url=webhook_url)
+                    # The secret is re-sent on every update, not just at
+                    # creation. Without it EasyPost keeps whatever secret the
+                    # webhook was registered with, so a secret rotated (or a
+                    # webhook created on another machine) leaves every incoming
+                    # event failing signature validation with a 401 — a push
+                    # feature that reports itself as running and silently
+                    # delivers nothing.
+                    webhook = client.webhook.update(
+                        existing_id, url=webhook_url, webhook_secret=secret
+                    )
                 except Exception:
                     webhook = None
             if webhook is None:
                 webhook = client.webhook.create(url=webhook_url, webhook_secret=secret)
 
             settings.webhook_enabled = True
-            settings.webhook_id = webhook.id
+            settings.webhook_ids = {**(settings.webhook_ids or {}), mode: webhook.id}
+            settings.webhook_id = None  # superseded by the per-mode mapping
             settings.webhook_port = actual_port
             save_settings(settings)
 
@@ -111,11 +145,19 @@ class WebhookManager(QObject):
         clean teardown (merely closing the app without disabling leaves it
         registered; see module docstring)."""
         settings = load_settings()
-        if settings.webhook_id:
+        mode = client_manager.active_mode
+        existing_id = _webhook_id_for_mode(settings, mode)
+        if existing_id:
             try:
-                client_manager.get_client().webhook.delete(settings.webhook_id)
+                client_manager.get_client().webhook.delete(existing_id)
             except Exception:
                 pass
+            # Only this mode's registration is forgotten. Clearing the lot would
+            # orphan the other mode's webhook on EasyPost, where it would sit
+            # pointed at a tunnel that no longer exists.
+            settings.webhook_ids = {
+                k: v for k, v in (settings.webhook_ids or {}).items() if k != mode
+            }
             settings.webhook_id = None
         settings.webhook_enabled = False
         save_settings(settings)
@@ -135,14 +177,25 @@ class WebhookManager(QObject):
         """Runs on the HTTP receiver's background thread. Signal emission
         is thread-safe — Qt queues delivery to slots living on the main
         thread automatically."""
-        if event.get("description") != "tracker.updated":
+        description = event.get("description") or ""
+        result = event.get("result") or {}
+
+        if description == "tracker.updated":
+            tracking_id = result.get("id")
+            if not tracking_id:
+                return
+            save_tracker_locally(result)
+            self.tracker_updated.emit(tracking_id)
             return
-        tracker = event.get("result") or {}
-        tracking_id = tracker.get("id")
-        if not tracking_id:
-            return
-        save_tracker_locally(tracker)
-        self.tracker_updated.emit(tracking_id)
+
+        # Batch creation and purchase are asynchronous and can take minutes on a
+        # large batch. Without these the Batch view has nothing to go on but its
+        # own timer, which is why it polls every few seconds; a pushed event
+        # lets it settle immediately instead.
+        if description in _BATCH_EVENTS:
+            batch_id = result.get("id")
+            if batch_id:
+                self.batch_updated.emit(batch_id)
 
 
 webhook_manager = WebhookManager()

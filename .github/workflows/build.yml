@@ -21,6 +21,11 @@ on:
       - "**/*.md"
       - "LICENSE"
   workflow_dispatch:
+    inputs:
+      locale:
+        description: "UI language to render store screenshots in (e.g. en, fr, de, ja)"
+        required: false
+        default: "en"
 
 jobs:
   build:
@@ -365,3 +370,45 @@ jobs:
         with:
           name: EasyPostDesktop-${{ matrix.os }}
           path: dist/*
+
+  # Store screenshots, rendered by CI rather than captured by hand on a rented
+  # Mac. The macOS leg produces genuinely Mac-looking assets — real system
+  # fonts, real control metrics, real window chrome — because it runs on a
+  # macOS runner with the native cocoa platform plugin; the app is simply never
+  # shown, since QWidget.grab() paints an unmapped widget.
+  #
+  # Manual-only: screenshots are a release chore, not something every push needs.
+  screenshots:
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+          - os: windows-latest
+            platform: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      # No credentials are configured on the runner, and the script stubs the
+      # credential store regardless — a published screenshot must never contain
+      # a real API key or data from a real EasyPost account.
+      - name: Render screenshots
+        run: >
+          python packaging/make_screenshots.py
+          --platform ${{ matrix.platform }}
+          --locale ${{ github.event.inputs.locale || 'en' }}
+          --out dist/screenshots
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshots-${{ matrix.platform }}-${{ github.event.inputs.locale || 'en' }}
+          path: dist/screenshots/**

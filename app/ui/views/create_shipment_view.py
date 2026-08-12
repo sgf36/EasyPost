@@ -33,16 +33,19 @@ from PySide6.QtWidgets import (
 
 from app.core import units
 from app.core.countries import COUNTRIES
-from app.core.errors import format_api_error
+from app.core.errors import carrier_messages, format_api_error
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
-from app.services.addresses import list_addresses
+from app.services.addresses import address_choice_label, list_addresses
+from app.services.carriers import carrier_display_name
+from app.services.insurance import INSURANCE_MAX_USD
 from app.services.packages import (
     delete_saved_package,
     list_predefined_packages,
     list_saved_packages,
     save_package,
 )
+from app.services.tracking import track_shipment
 from app.services.shipments import (
     buy_shipment,
     create_rate_quote,
@@ -229,6 +232,23 @@ def _fit_columns_to_widgets(table, *, stretch_col: int = 0, padding: int = 20) -
         table.setColumnWidth(col, width)
 
 
+# Currency for a customs declared value, by origin country. Deliberately small:
+# it covers the countries this app is actually used from, and anything else
+# falls back to USD (EasyPost's own default). A customs form states a value in a
+# currency, and hard-coding USD misstated every non-US sender's declaration.
+_CUSTOMS_CURRENCY_BY_COUNTRY = {
+    "GB": "GBP", "US": "USD", "CA": "CAD", "AU": "AUD", "NZ": "NZD",
+    "CH": "CHF", "JP": "JPY", "CN": "CNY", "IN": "INR", "SG": "SGD",
+    "SE": "SEK", "NO": "NOK", "DK": "DKK", "PL": "PLN", "MX": "MXN",
+    "BR": "BRL", "ZA": "ZAR", "AE": "AED", "HK": "HKD", "KR": "KRW",
+    # The euro area.
+    **{c: "EUR" for c in (
+        "AT", "BE", "CY", "EE", "FI", "FR", "DE", "GR", "IE", "IT", "LV",
+        "LT", "LU", "MT", "NL", "PT", "SK", "SI", "ES", "HR",
+    )},
+}
+
+
 class CreateShipmentView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -242,6 +262,10 @@ class CreateShipmentView(QWidget):
         # True when the current rates came from a postal-code-only quote, in
         # which case no rate on screen can actually be bought.
         self._quote_only = False
+        # Set while the form rewrites its own inputs (a unit conversion) so that
+        # does not read as the user editing the parcel. Must exist before any
+        # widget is built, since building them can emit valueChanged.
+        self._suspend_rate_invalidation = False
 
         content = QWidget()
         content_layout = QVBoxLayout(content)
@@ -263,6 +287,10 @@ class CreateShipmentView(QWidget):
         results_row.addWidget(self._build_result_group(), stretch=2)
         content_layout.addLayout(results_row)
         content_layout.addStretch(1)
+
+        # Connected only once every input exists, and after the initial values
+        # have been set, so start-up does not clear an empty rates table.
+        self._connect_rate_invalidation()
 
         # The Rates table auto-sizes to show every service option in full
         # (see _on_rates_received) rather than scrolling internally, so this
@@ -396,9 +424,15 @@ class CreateShipmentView(QWidget):
         # Optional declared value to insure the parcel for. Unlike signature it
         # does not change the quoted rates, so it is read at Buy time and passed
         # to EasyPost's purchase call (see _on_buy_clicked). 0 means no cover.
+        #
+        # Capped at EasyPost's real ceiling and prefixed in dollars, because the
+        # amount is always USD however the shipment is priced. The old
+        # 1,000,000 maximum let a user enter a figure the API would refuse, and
+        # the refusal arrived only after they had confirmed spending money.
         self._insurance_input = QDoubleSpinBox()
         self._insurance_input.setDecimals(2)
-        self._insurance_input.setMaximum(1_000_000)
+        self._insurance_input.setMaximum(INSURANCE_MAX_USD)
+        self._insurance_input.setPrefix("$ ")
         self._insurance_input.setSpecialValueText(tr("create_shipment.insurance_none"))
         self._insurance_input.setToolTip(tr("create_shipment.insurance_tooltip"))
         form.addRow(tr("create_shipment.insurance_label"), self._insurance_input)
@@ -527,6 +561,10 @@ class CreateShipmentView(QWidget):
         if not new_system or new_system == self._unit_system:
             return
         old_dim = units.DIM_UNIT[self._unit_system]
+        # Re-displaying the same parcel in different units does not change the
+        # parcel, so quoted rates stay valid across the switch even though every
+        # spin box is about to be rewritten.
+        self._suspend_rate_invalidation = True
         old_weight_unit = self._weight_unit
         # Preserve the physical parcel across the switch: read canonical in/oz,
         # then re-display in the new units.
@@ -544,6 +582,7 @@ class CreateShipmentView(QWidget):
         ):
             spin.setValue(units.from_inches(canon, new_dim))
         self._weight_input.setValue(units.from_ounces(weight_canon, self._weight_unit))
+        self._suspend_rate_invalidation = False
         self._persist_units()
 
     def _on_weight_unit_changed(self, *_args) -> None:
@@ -553,10 +592,13 @@ class CreateShipmentView(QWidget):
         canon = units.to_ounces(self._weight_input.value(), self._weight_unit)
         self._weight_unit = new_unit
         wlo, whi, wdec, wstep = units.WEIGHT_SPIN[new_unit]
+        # Same weight, different unit — not a different parcel.
+        self._suspend_rate_invalidation = True
         self._weight_input.setDecimals(wdec)
         self._weight_input.setRange(wlo, whi)
         self._weight_input.setSingleStep(wstep)
         self._weight_input.setValue(units.from_ounces(canon, new_unit))
+        self._suspend_rate_invalidation = False
         self._persist_units()
 
     def _persist_units(self) -> None:
@@ -898,6 +940,17 @@ class CreateShipmentView(QWidget):
         if restriction_type != "none" and not restriction_comments:
             raise ValueError("missing_restriction_comments")
 
+        # The declared value's currency, taken from the origin country rather
+        # than hard-coded to USD. A London sender entering "10" means ten
+        # pounds; declaring that as ten dollars misstates the value on a customs
+        # form. Anything unmapped falls back to USD, which is EasyPost's own
+        # default and a safe assumption for an unknown origin.
+        customs_currency = _CUSTOMS_CURRENCY_BY_COUNTRY.get(
+            (from_rec.country or "").upper() if (from_rec := self._address_by_id.get(
+                self._from_combo.currentData())) else "",
+            "USD",
+        )
+
         items = []
         for row in range(self._customs_items_table.rowCount()):
             description = self._customs_items_table.cellWidget(row, 0).text().strip()
@@ -905,17 +958,30 @@ class CreateShipmentView(QWidget):
             origin_country = origin_combo.currentData()
             if not description or not origin_country:
                 raise ValueError("incomplete_customs_item")
-            items.append(
-                {
-                    "description": description,
-                    "quantity": self._customs_items_table.cellWidget(row, 1).value(),
-                    "value": self._customs_items_table.cellWidget(row, 2).value(),
-                    "weight": self._customs_items_table.cellWidget(row, 3).value(),
-                    "hs_tariff_number": self._customs_items_table.cellWidget(row, 4).text().strip() or None,
-                    "origin_country": origin_country,
-                    "currency": "USD",
-                }
-            )
+            item = {
+                "description": description,
+                "quantity": self._customs_items_table.cellWidget(row, 1).value(),
+                "value": self._customs_items_table.cellWidget(row, 2).value(),
+                # A customs item weight is always OUNCES, whatever unit the
+                # parcel form is currently displaying. Sending the raw spin
+                # value understated a kilogram item by a factor of 28 on the
+                # declaration, which is a customs document rather than an
+                # estimate.
+                "weight": units.to_ounces(
+                    self._customs_items_table.cellWidget(row, 3).value(),
+                    self._weight_unit,
+                ),
+                "origin_country": origin_country,
+                "currency": customs_currency,
+            }
+            # Omitted entirely when blank rather than sent as null. An explicit
+            # null is a stated "no tariff code" where absence simply means the
+            # field was not supplied, and some carriers treat the two
+            # differently.
+            hs_tariff = self._customs_items_table.cellWidget(row, 4).text().strip()
+            if hs_tariff:
+                item["hs_tariff_number"] = hs_tariff
+            items.append(item)
         if not items:
             raise ValueError("no_customs_items")
 
@@ -985,9 +1051,18 @@ class CreateShipmentView(QWidget):
         self._quote_only_note.setStyleSheet(f"color: {TEXT_MUTED};")
         self._quote_only_note.setVisible(False)
 
+        # Why a carrier is absent from the table above. EasyPost reports this on
+        # the shipment's `messages`, which nothing previously read, so a carrier
+        # that declined to quote simply vanished without explanation.
+        self._carrier_notes_label = QLabel("")
+        self._carrier_notes_label.setWordWrap(True)
+        self._carrier_notes_label.setStyleSheet(f"color: {TEXT_MUTED};")
+        self._carrier_notes_label.setVisible(False)
+
         layout = QVBoxLayout()
         layout.addWidget(self._rates_tree)
         layout.addWidget(self._quote_only_note)
+        layout.addWidget(self._carrier_notes_label)
         group.setLayout(layout)
         return group
 
@@ -1009,28 +1084,22 @@ class CreateShipmentView(QWidget):
             return name
         return cls._CAMEL_SPLIT.sub(" ", name)
 
-    # Carrier codes that camel-splitting mangles ("FedEx" → "Fed Ex",
-    # "RoyalMailV3" → "Royal Mail V 3"). Everything else falls back to
-    # _humanize_service, which reads fine for plain acronyms (USPS, UPS, DHL).
-    _CARRIER_DISPLAY_NAMES = {
-        "RoyalMail": "Royal Mail",
-        "RoyalMailV3": "Royal Mail",
-        "FedEx": "FedEx",
-        "FedExDefault": "FedEx",
-        "UPS": "UPS",
-        "UPSDAP": "UPS",
-        "USPS": "USPS",
-        "DHLExpress": "DHL Express",
-        "DhlExpress": "DHL Express",
-        "DhlEcs": "DHL eCommerce",
-        "Hermes": "Hermes",
-    }
-
     @classmethod
     def _carrier_display_name(cls, carrier: str) -> str:
+        """Group-header label for a carrier code off a rate.
+
+        Rates report the carrier CamelCased ("RoyalMailV3"); the shared lookup
+        is case-insensitive and backed by the names EasyPost itself publishes,
+        so it resolves either spelling. Only when the carrier is unknown to that
+        catalogue — an offline first run, say — does this fall back to
+        camel-splitting the code, which reads acceptably for plain acronyms
+        (USPS, UPS, DHL) though it does mangle a few ("FedEx" → "Fed Ex")."""
         if not carrier:
             return "—"
-        return cls._CARRIER_DISPLAY_NAMES.get(carrier) or cls._humanize_service(carrier)
+        resolved = carrier_display_name(carrier)
+        if resolved and resolved != carrier:
+            return resolved
+        return cls._humanize_service(carrier)
 
     def _build_rate_service_cell(self, rate, *, cheapest: bool, fastest: bool) -> QWidget:
         """The service cell of a child row: the humanised service name plus any
@@ -1280,24 +1349,50 @@ class CreateShipmentView(QWidget):
         records = list_addresses()
         self._address_by_id = {rec.id: rec for rec in records}
         for rec in records:
-            display = f"{rec.label or rec.name or rec.id} — {rec.city}, {rec.state}"
+            display = address_choice_label(rec)
             self._from_combo.addItem(display, rec.id)
             self._to_combo.addItem(display, rec.id)
         self._update_customs_visibility()
 
     def _on_signature_changed(self, *_args) -> None:
         """Signature level changes which services carriers quote, so any rates
-        already on screen are stale the moment it changes. Clear them back to
-        the empty state (dropping the quote-only note and the shipment they
-        could be bought from) rather than showing a list that no longer matches
-        the selected option — the user re-runs Get Rates to requote.
+        already on screen are stale the moment it changes."""
+        self._invalidate_rates()
+
+    def _invalidate_rates(self, *_args) -> None:
+        """Discard quoted rates that no longer describe what would be bought.
+
+        A rate belongs to the shipment it was quoted for — a specific parcel,
+        between specific addresses. Change any of those and the prices on screen
+        are for something else, yet each row still carries a live Buy button
+        wired to the old shipment. Leaving them visible invites buying a label
+        for the parcel the user has just finished editing away from.
+
+        Clearing back to the empty state (dropping the quote-only note and the
+        shipment the rates could be bought from) makes the user re-run Get Rates,
+        which is the only way to get prices that match the form.
+
+        Declared insurance is deliberately NOT wired to this: it is applied at
+        purchase time and does not change what carriers quote.
         """
+        if self._suspend_rate_invalidation:
+            return
         if self._rates_tree.topLevelItemCount() == 0:
             return
         self._rates_tree.clear()
         self._current_shipment = None
         self._quote_only_note.setVisible(False)
         self._resize_rates_tree_to_content()
+
+    def _connect_rate_invalidation(self) -> None:
+        """Wire every input that changes what a carrier would quote."""
+        for combo in (self._from_combo, self._to_combo, self._package_combo):
+            combo.currentIndexChanged.connect(self._invalidate_rates)
+        for spin in (
+            self._length_input, self._width_input,
+            self._height_input, self._weight_input,
+        ):
+            spin.valueChanged.connect(self._invalidate_rates)
 
     def _on_get_rates_clicked(self) -> None:
         if self._mode_zip_radio.isChecked():
@@ -1431,9 +1526,19 @@ class CreateShipmentView(QWidget):
         self._quote_only_note.setVisible(self._quote_only)
         self._populate_rates_tree(rates, cheapest_id, fastest_id)
 
+        # Carriers that declined to quote say why here, and nowhere else. The
+        # call succeeded, so this is not an error — but without it a carrier
+        # just goes missing from the table with no explanation at all.
+        notes = carrier_messages(shipment)
+        self._carrier_notes_label.setText("\n".join(notes))
+        self._carrier_notes_label.setVisible(bool(notes))
+
         if not rates:
+            body = tr("create_shipment.no_rates_body")
+            if notes:
+                body += "\n\n" + "\n".join(notes)
             QMessageBox.information(
-                self, tr("create_shipment.no_rates_title"), tr("create_shipment.no_rates_body")
+                self, tr("create_shipment.no_rates_title"), body
             )
 
     def _on_rates_failed(self, exc: Exception) -> None:
@@ -1475,6 +1580,10 @@ class CreateShipmentView(QWidget):
     def _on_bought(self, shipment) -> None:
         self._current_shipment = shipment
         save_shipment_locally(shipment)
+        # Buying a label always creates a tracker; recording it here is what
+        # puts the shipment on the Tracking page, instead of the user having to
+        # paste the tracking number back in by hand.
+        track_shipment(shipment)
 
         postage_label = getattr(shipment, "postage_label", None)
         label_url = getattr(postage_label, "label_url", None) if postage_label else None

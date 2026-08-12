@@ -19,7 +19,12 @@ from PySide6.QtWidgets import (
 
 from app.core.errors import format_api_error
 from app.i18n import tr
-from app.services.insurance import insure_existing_shipment
+from app.services.insurance import (
+    InsuranceAmountError,
+    insure_existing_shipment,
+    is_pending,
+    validate_amount,
+)
 from app.services.shipments import (
     list_shipments,
     refund_shipment,
@@ -150,12 +155,21 @@ class HistoryView(QWidget):
         )
         if not ok or not amount.strip():
             return
+
+        # Checked before the purchase confirmation, not after: EasyPost rejects
+        # anything above its ceiling, and discovering that only once the user
+        # has agreed to spend money is the wrong order.
+        try:
+            amount = validate_amount(amount)
+        except InsuranceAmountError as exc:
+            QMessageBox.warning(self, tr("history.insure_dialog_title"), str(exc))
+            return
+
         if not confirm_if_production(
-            self, tr("history.confirm_insure_purchase", amount=amount.strip())
+            self, tr("history.confirm_insure_purchase", amount=amount)
         ):
             return
 
-        amount = amount.strip()
         self._pending_task = run_async(
             lambda: insure_existing_shipment(shipment_id, amount), self
         )
@@ -169,9 +183,16 @@ class HistoryView(QWidget):
     def _on_insured(self, shipment) -> None:
         save_shipment_locally(shipment)
         self.refresh_table()
-        QMessageBox.information(
-            self, tr("history.insured_title"), tr("history.insured_body")
-        )
+        # Cover is arranged asynchronously, so "insured" would overstate a
+        # policy that is still `pending` — say which of the two happened.
+        if is_pending(shipment):
+            QMessageBox.information(
+                self, tr("history.insured_title"), tr("history.insurance_pending_body")
+            )
+        else:
+            QMessageBox.information(
+                self, tr("history.insured_title"), tr("history.insured_body")
+            )
 
     def _on_refund_clicked(self, shipment_id: str) -> None:
         if not confirm_if_production(
