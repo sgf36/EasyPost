@@ -401,11 +401,21 @@ jobs:
       # No credentials are configured on the runner, and the script stubs the
       # credential store regardless — a published screenshot must never contain
       # a real API key or data from a real EasyPost account.
+      # Whole-window captures, not bare page widgets. Every image already on
+      # the Microsoft Store and App Store listings shows the full application
+      # — mode banner, navigation sidebar and all — so a bare view is
+      # recognisably the same product but visibly not the same screenshot, and
+      # looks wrong sitting beside the ones it did not replace.
       - name: Render screenshots
         run: >
           python packaging/make_screenshots.py
           --platform ${{ matrix.platform }}
           --locale ${{ github.event.inputs.locale || 'en' }}
+          --window CreateShipmentView
+          --window BatchView
+          --window TrackingView
+          --window HistoryView
+          --window HtsLookupView
           --out dist/screenshots
       - name: Upload screenshots
         uses: actions/upload-artifact@v7

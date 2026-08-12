@@ -67,6 +67,12 @@ TARGETS = {
         ("1366x768", 1366, 768, 1),
         ("2160x1440", 1080, 720, 2),
     ],
+    # The size every image already on the Microsoft Store listing was captured
+    # at. A replacement has to match it exactly or it sits visibly different in
+    # the carousel beside the eight it did not replace.
+    "store": [
+        ("2000x1250", 2000, 1250, 1),
+    ],
 }
 
 
@@ -226,6 +232,90 @@ def _capture(widget, path: Path, width: int, height: int, scale: int) -> None:
         raise RuntimeError(f"Could not write {path}")
 
 
+def _capture_window(app, view_class_name: str, path: Path,
+                    width: int, height: int, scale: int) -> None:
+    """Paint the whole application window with one page selected.
+
+    Every image already on the store listings is a full window — mode banner,
+    navigation sidebar and all. Capturing a bare view widget instead produces
+    something that is recognisably the same product but visibly not the same
+    screenshot, which looks wrong sitting beside the ones it did not replace.
+
+    The page is chosen by driving the real navigation list rather than by
+    setting the stack index directly, so whatever a page does when it is shown
+    (`on_show`) runs exactly as it does for a user.
+    """
+    from app.ui.main_window import MainWindow
+    from PySide6.QtCore import Qt
+
+    window = MainWindow()
+    nav = window._nav
+    stack = window._view_stack
+
+    target_row = None
+    for row in range(nav.count()):
+        index = nav.item(row).data(Qt.ItemDataRole.UserRole)
+        if index is None:  # section header
+            continue
+        holder = stack.widget(index)
+        # Each page is wrapped in a QScrollArea, so the view is its child.
+        view = holder.widget() if hasattr(holder, "widget") else holder
+        if type(view).__name__ == view_class_name:
+            target_row = row
+            break
+    if target_row is None:
+        raise RuntimeError(f"No navigation entry renders {view_class_name}")
+
+    nav.setCurrentRow(target_row)
+    _settle(app)
+    _pin_service_picker(stack.widget(nav.item(target_row)
+                                     .data(Qt.ItemDataRole.UserRole)))
+    _settle(app)
+    _capture(window, path, width, height, scale)
+    return window
+
+
+# Shown on the batch screenshot. A carrier and service a reader recognises,
+# rather than whichever name happens to sort first.
+SHOWCASE_CARRIER = "dhlexpress"
+# Without this the service falls to whatever sorts first, which for DHL is
+# "BreakBulkEconomy" — a real service, but freight jargon to a reader deciding
+# whether this app posts their parcels.
+SHOWCASE_SERVICE = "ExpressWorldwide"
+
+
+def _pin_service_picker(holder) -> None:
+    """Force the batch carrier/service picker to a fixed, recognisable choice.
+
+    Left alone, the combo shows whatever wins a race: the seeded cache resolves
+    first on one run and the full built-in catalogue on the next, so the same
+    page screenshotted twice offered "DHL Express" once and "Accurate" the
+    other time. Across a localised set that means every language advertising a
+    different carrier, which reads as carelessness rather than variety.
+    """
+    view = holder.widget() if hasattr(holder, "widget") else holder
+    picker = getattr(view, "_service_picker", None)
+    if picker is None:
+        return
+    carriers = picker._carrier_combo
+    for index in range(carriers.count()):
+        if carriers.itemData(index) == SHOWCASE_CARRIER:
+            carriers.setCurrentIndex(index)
+            break
+    else:
+        print(f"  NOTE {SHOWCASE_CARRIER} absent from the carrier list; "
+              f"screenshot shows {carriers.currentText()!r}")
+        return
+
+    services = picker._service_combo
+    for index in range(services.count()):
+        if services.itemText(index) == SHOWCASE_SERVICE:
+            services.setCurrentIndex(index)
+            return
+    print(f"  NOTE {SHOWCASE_SERVICE} absent for {SHOWCASE_CARRIER}; "
+          f"screenshot shows {services.currentText()!r}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--platform", choices=sorted(TARGETS), default="mac")
@@ -234,6 +324,12 @@ def main() -> int:
     parser.add_argument(
         "--scale-factor", type=int, default=1,
         help="Extra device pixel ratio, for Retina assets",
+    )
+    parser.add_argument(
+        "--window", metavar="VIEWCLASS", action="append", default=[],
+        help="Capture the whole application window with this view selected "
+             "(e.g. BatchView), matching the framing of the published store "
+             "screenshots. Repeatable. Suppresses the bare-view captures.",
     )
     parser.add_argument(
         "--offscreen", action="store_true",
@@ -307,6 +403,18 @@ def main() -> int:
     # object: "RuntimeError: Signal source has been deleted".
     alive = []
     for label, width, height, scale in TARGETS[args.platform]:
+        if args.window:
+            for view_class in args.window:
+                path = out_root / label / f"window-{view_class}.png"
+                try:
+                    alive.append(_capture_window(
+                        app, view_class, path, width, height,
+                        scale * args.scale_factor))
+                    written += 1
+                except Exception as exc:  # noqa: BLE001 - report, do not abort
+                    print(f"  FAILED {path}: {type(exc).__name__}: {exc}")
+            app.processEvents()
+            continue
         for name, factory in pages:
             widget = factory()
             alive.append(widget)
