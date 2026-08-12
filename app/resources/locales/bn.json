@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "শুধু পোস্টাল কোড (দাম যাচাই)",
   "create_shipment.badge_cheapest": "সবচেয়ে সস্তা",
   "create_shipment.badge_fastest": "দ্রুততম",
+  "create_shipment.billed_to_account": "অ্যাকাউন্টে বিল করা হয়",
   "create_shipment.buy_button": "কিনুন",
   "create_shipment.buy_confirm_description": "{rate} {currency}-এ {carrier} {service} লেবেল কিনুন।",
   "create_shipment.buy_needs_full_address": "এই দরে কিনতে «সম্পূর্ণ ঠিকানা»-এ যান।",

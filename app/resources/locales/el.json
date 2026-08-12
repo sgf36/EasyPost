@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Μόνο ταχυδρομικοί κώδικες (έλεγχος τιμής)",
   "create_shipment.badge_cheapest": "Φθηνότερο",
   "create_shipment.badge_fastest": "Ταχύτερο",
+  "create_shipment.billed_to_account": "Χρέωση στον λογαριασμό",
   "create_shipment.buy_button": "Αγορά",
   "create_shipment.buy_confirm_description": "Αγορά ετικέτας {carrier} {service} για {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Μεταβείτε στις «Πλήρεις διευθύνσεις» για να αγοράσετε αυτή την τιμή.",

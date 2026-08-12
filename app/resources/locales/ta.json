@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "அஞ்சல் குறியீடுகள் மட்டும் (விலை சரிபார்ப்பு)",
   "create_shipment.badge_cheapest": "மலிவானது",
   "create_shipment.badge_fastest": "வேகமானது",
+  "create_shipment.billed_to_account": "கணக்கில் வசூலிக்கப்படும்",
   "create_shipment.buy_button": "வாங்கு",
   "create_shipment.buy_confirm_description": "{rate} {currency} க்கு {carrier} {service} லேபிளை வாங்கு.",
   "create_shipment.buy_needs_full_address": "இந்தக் கட்டணத்தை வாங்க «முழு முகவரிகள்» என்பதற்கு மாறவும்.",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "ಪಿನ್ ಕೋಡ್ ಮಾತ್ರ (ಬೆಲೆ ಪರಿಶೀಲನೆ)",
   "create_shipment.badge_cheapest": "ಅತ್ಯಂತ ಅಗ್ಗ",
   "create_shipment.badge_fastest": "ಅತ್ಯಂತ ವೇಗದ",
+  "create_shipment.billed_to_account": "ಖಾತೆಗೆ ಬಿಲ್",
   "create_shipment.buy_button": "ಖರೀದಿಸಿ",
   "create_shipment.buy_confirm_description": "{rate} {currency} ಗೆ {carrier} {service} ಲೇಬಲ್ ಖರೀದಿಸಿ.",
   "create_shipment.buy_needs_full_address": "ಈ ದರವನ್ನು ಖರೀದಿಸಲು «ಪೂರ್ಣ ವಿಳಾಸಗಳು» ಗೆ ಬದಲಾಯಿಸಿ.",

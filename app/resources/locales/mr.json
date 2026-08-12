@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "फक्त पिन कोड (किंमत तपासणी)",
   "create_shipment.badge_cheapest": "सर्वात स्वस्त",
   "create_shipment.badge_fastest": "सर्वात जलद",
+  "create_shipment.billed_to_account": "खात्यावर बिल",
   "create_shipment.buy_button": "खरेदी करा",
   "create_shipment.buy_confirm_description": "{rate} {currency} मध्ये {carrier} {service} लेबल खरेदी करा.",
   "create_shipment.buy_needs_full_address": "हा दर खरेदी करण्यासाठी «पूर्ण पत्ते» वर जा.",

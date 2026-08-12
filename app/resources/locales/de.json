@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Nur Postleitzahlen (Preisabfrage)",
   "create_shipment.badge_cheapest": "Günstigste",
   "create_shipment.badge_fastest": "Schnellste",
+  "create_shipment.billed_to_account": "Über Konto abgerechnet",
   "create_shipment.buy_button": "Kaufen",
   "create_shipment.buy_confirm_description": "{carrier}-{service}-Etikett für {rate} {currency} kaufen.",
   "create_shipment.buy_needs_full_address": "Wechseln Sie zu „Vollständige Adressen“, um diesen Tarif zu kaufen.",

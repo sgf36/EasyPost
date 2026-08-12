@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Csak irányítószámok (árellenőrzés)",
   "create_shipment.badge_cheapest": "Legolcsóbb",
   "create_shipment.badge_fastest": "Leggyorsabb",
+  "create_shipment.billed_to_account": "Számlára terhelve",
   "create_shipment.buy_button": "Vásárlás",
   "create_shipment.buy_confirm_description": "{carrier} {service} címke vásárlása {rate} {currency} áron.",
   "create_shipment.buy_needs_full_address": "A tarifa megvásárlásához váltson a „Teljes címek” lehetőségre.",

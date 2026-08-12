@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "ਸਿਰਫ਼ ਪਿੰਨ ਕੋਡ (ਕੀਮਤ ਜਾਂਚ)",
   "create_shipment.badge_cheapest": "ਸਭ ਤੋਂ ਸਸਤਾ",
   "create_shipment.badge_fastest": "ਸਭ ਤੋਂ ਤੇਜ਼",
+  "create_shipment.billed_to_account": "ਖਾਤੇ ਵਿੱਚ ਬਿੱਲ",
   "create_shipment.buy_button": "ਖਰੀਦੋ",
   "create_shipment.buy_confirm_description": "{rate} {currency} ਵਿੱਚ {carrier} {service} ਲੇਬਲ ਖਰੀਦੋ।",
   "create_shipment.buy_needs_full_address": "ਇਹ ਦਰ ਖਰੀਦਣ ਲਈ «ਪੂਰੇ ਪਤੇ» ਉੱਤੇ ਜਾਓ।",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Solo códigos postales (consulta de precio)",
   "create_shipment.badge_cheapest": "Más barato",
   "create_shipment.badge_fastest": "Más rápido",
+  "create_shipment.billed_to_account": "Facturado a la cuenta",
   "create_shipment.buy_button": "Comprar",
   "create_shipment.buy_confirm_description": "Comprar etiqueta de {carrier} {service} por {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Cambie a «Direcciones completas» para comprar esta tarifa.",

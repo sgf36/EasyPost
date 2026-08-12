@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Chỉ mã bưu chính (kiểm tra giá)",
   "create_shipment.badge_cheapest": "Rẻ nhất",
   "create_shipment.badge_fastest": "Nhanh nhất",
+  "create_shipment.billed_to_account": "Tính vào tài khoản",
   "create_shipment.buy_button": "Mua",
   "create_shipment.buy_confirm_description": "Mua nhãn {carrier} {service} với giá {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Chuyển sang “Địa chỉ đầy đủ” để mua mức giá này.",

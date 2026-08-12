@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "စာတိုက်ကုဒ်သာ (စျေးနှုန်းစစ်ဆေးရန်)",
   "create_shipment.badge_cheapest": "အသက်သာဆုံး",
   "create_shipment.badge_fastest": "အမြန်ဆုံး",
+  "create_shipment.billed_to_account": "အကောင့်သို့ ငွေတောင်းခံသည်",
   "create_shipment.buy_button": "ဝယ်ယူရန်",
   "create_shipment.buy_confirm_description": "{rate} {currency} ဖြင့် {carrier} {service} အညွှန်းကို ဝယ်ယူပါ။",
   "create_shipment.buy_needs_full_address": "ဤနှုန်းကို ဝယ်ရန် „လိပ်စာအပြည့်အစုံ“ သို့ ပြောင်းပါ။",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Pouze PSČ (orientační cena)",
   "create_shipment.badge_cheapest": "Nejlevnější",
   "create_shipment.badge_fastest": "Nejrychlejší",
+  "create_shipment.billed_to_account": "Účtováno na účet",
   "create_shipment.buy_button": "Koupit",
   "create_shipment.buy_confirm_description": "Zakoupit štítek {carrier} {service} za {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Pro koupi této sazby přepněte na „Úplné adresy“.",

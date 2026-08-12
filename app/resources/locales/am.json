@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "የፖስታ ኮድ ብቻ (ዋጋ ማረጋገጫ)",
   "create_shipment.badge_cheapest": "በጣም ርካሽ",
   "create_shipment.badge_fastest": "በጣም ፈጣን",
+  "create_shipment.billed_to_account": "በሂሳብ ይከፈላል",
   "create_shipment.buy_button": "ግዛ",
   "create_shipment.buy_confirm_description": "የ{carrier} {service} ላቤል በ{rate} {currency} ግዛ።",
   "create_shipment.buy_needs_full_address": "ይህን ዋጋ ለመግዛት ወደ «ሙሉ አድራሻዎች» ይቀይሩ።",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Doar coduri poștale (verificare preț)",
   "create_shipment.badge_cheapest": "Cel mai ieftin",
   "create_shipment.badge_fastest": "Cel mai rapid",
+  "create_shipment.billed_to_account": "Facturat în cont",
   "create_shipment.buy_button": "Cumpără",
   "create_shipment.buy_confirm_description": "Cumpără eticheta {carrier} {service} pentru {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Treceți la „Adrese complete” pentru a cumpăra acest tarif.",

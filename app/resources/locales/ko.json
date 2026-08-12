@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "우편번호만 (요금 확인)",
   "create_shipment.badge_cheapest": "최저가",
   "create_shipment.badge_fastest": "최단 기간",
+  "create_shipment.billed_to_account": "계정에 청구",
   "create_shipment.buy_button": "구매",
   "create_shipment.buy_confirm_description": "{rate} {currency}에 {carrier} {service} 운송장을 구매합니다.",
   "create_shipment.buy_needs_full_address": "이 요금을 구매하려면 “전체 주소”로 전환하세요.",

@@ -181,6 +181,7 @@
   "create_shipment.address_mode_zip": "Postal codes only (price check)",
   "create_shipment.badge_cheapest": "Cheapest",
   "create_shipment.badge_fastest": "Fastest",
+  "create_shipment.billed_to_account": "Billed to account",
   "create_shipment.buy_button": "Buy",
   "create_shipment.buy_confirm_description": "Buy {carrier} {service} label for {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Switch to \"Full addresses\" to buy this rate.",

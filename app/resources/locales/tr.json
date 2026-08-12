@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Yalnızca posta kodları (fiyat kontrolü)",
   "create_shipment.badge_cheapest": "En ucuz",
   "create_shipment.badge_fastest": "En hızlı",
+  "create_shipment.billed_to_account": "Hesaba faturalanır",
   "create_shipment.buy_button": "Satın Al",
   "create_shipment.buy_confirm_description": "{rate} {currency} karşılığında {carrier} {service} etiketi satın al.",
   "create_shipment.buy_needs_full_address": "Bu tarifeyi satın almak için “Tam adresler” seçeneğine geçin.",

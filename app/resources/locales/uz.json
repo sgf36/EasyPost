@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Faqat pochta indekslari (narx tekshiruvi)",
   "create_shipment.badge_cheapest": "Eng arzon",
   "create_shipment.badge_fastest": "Eng tez",
+  "create_shipment.billed_to_account": "Hisobga yoziladi",
   "create_shipment.buy_button": "Sotib olish",
   "create_shipment.buy_confirm_description": "{rate} {currency} uchun {carrier} {service} yorlig'ini sotib oling.",
   "create_shipment.buy_needs_full_address": "Bu tarifni sotib olish uchun «To‘liq manzillar»ga o‘ting.",

@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Samo poštanski brojevi (provjera cijene)",
   "create_shipment.badge_cheapest": "Najjeftinije",
   "create_shipment.badge_fastest": "Najbrže",
+  "create_shipment.billed_to_account": "Naplaćuje se na račun",
   "create_shipment.buy_button": "Kupi",
   "create_shipment.buy_confirm_description": "Kupi naljepnicu {carrier} {service} za {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Prijeđite na „Potpune adrese” za kupnju ove cijene.",

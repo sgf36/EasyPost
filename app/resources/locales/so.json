@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Kaliya lambarrada boostada (hubinta qiimaha)",
   "create_shipment.badge_cheapest": "Ugu jaban",
   "create_shipment.badge_fastest": "Ugu dhaqso badan",
+  "create_shipment.billed_to_account": "Xisaabta ayaa lagu qoraa",
   "create_shipment.buy_button": "Iibso",
   "create_shipment.buy_confirm_description": "Iibso summadka {carrier} {service} qiimo {rate} {currency} ah.",
   "create_shipment.buy_needs_full_address": "U bedel “Cinwaanno buuxa” si aad u iibsato qiimahan.",

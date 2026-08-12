@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "รหัสไปรษณีย์เท่านั้น (ตรวจสอบราคา)",
   "create_shipment.badge_cheapest": "ถูกที่สุด",
   "create_shipment.badge_fastest": "เร็วที่สุด",
+  "create_shipment.billed_to_account": "เรียกเก็บเข้าบัญชี",
   "create_shipment.buy_button": "ซื้อ",
   "create_shipment.buy_confirm_description": "ซื้อใบปะหน้า {carrier} {service} ราคา {rate} {currency}",
   "create_shipment.buy_needs_full_address": "สลับไปที่ “ที่อยู่แบบเต็ม” เพื่อซื้ออัตรานี้",

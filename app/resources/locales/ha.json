@@ -163,6 +163,7 @@
   "create_shipment.address_mode_zip": "Lambar gidan waya kawai (duba farashi)",
   "create_shipment.badge_cheapest": "Mafi arha",
   "create_shipment.badge_fastest": "Mafi sauri",
+  "create_shipment.billed_to_account": "Ana biya ta asusu",
   "create_shipment.buy_button": "Saya",
   "create_shipment.buy_confirm_description": "Saya lambar aikawa ta {carrier} {service} akan {rate} {currency}.",
   "create_shipment.buy_needs_full_address": "Koma zuwa “Cikakkun adireshi” don sayen wannan farashi.",
