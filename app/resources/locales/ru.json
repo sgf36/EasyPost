@@ -568,6 +568,7 @@
   "settings.save_button": "Сохранить",
   "settings.saved_body": "Ключи API обновлены.",
   "settings.saved_title": "Сохранено",
+  "settings.sheet_needs_png_note": "Листы этикеток собираются из изображений, поэтому формат изменён с {format} на PNG. Этикетки {format} нельзя разместить на листе.",
   "settings.show_keys_button": "Показать ключи",
   "settings.test_key_label": "Тестовый ключ API:",
   "settings.title": "<h2>Настройки</h2>",

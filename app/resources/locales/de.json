@@ -568,6 +568,7 @@
   "settings.save_button": "Speichern",
   "settings.saved_body": "API-Schlüssel aktualisiert.",
   "settings.saved_title": "Gespeichert",
+  "settings.sheet_needs_png_note": "Etikettenbogen werden aus Etikettenbildern zusammengesetzt, daher wurde das Format von {format} auf PNG umgestellt. {format}-Etiketten lassen sich nicht auf einem Bogen platzieren.",
   "settings.show_keys_button": "Schlüssel anzeigen",
   "settings.test_key_label": "Test-API-Schlüssel:",
   "settings.title": "<h2>Einstellungen</h2>",

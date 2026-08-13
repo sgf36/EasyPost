@@ -568,6 +568,7 @@
   "settings.save_button": "Hifadhi",
   "settings.saved_body": "Funguo za API zimesasishwa.",
   "settings.saved_title": "Imehifadhiwa",
+  "settings.sheet_needs_png_note": "Karatasi za lebo hutengenezwa kutoka picha za lebo, kwa hivyo muundo umebadilishwa kutoka {format} kwenda PNG. Lebo za {format} haziwezi kuwekwa kwenye karatasi.",
   "settings.show_keys_button": "Onyesha funguo",
   "settings.test_key_label": "Funguo ya API ya jaribio:",
   "settings.title": "<h2>Mipangilio</h2>",

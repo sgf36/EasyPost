@@ -568,6 +568,7 @@
   "settings.save_button": "Opslaan",
   "settings.saved_body": "API-sleutels bijgewerkt.",
   "settings.saved_title": "Opgeslagen",
+  "settings.sheet_needs_png_note": "Etikettenvellen worden opgebouwd uit etiketafbeeldingen, dus het formaat is gewijzigd van {format} naar PNG. {format}-etiketten kunnen niet op een vel worden geplaatst.",
   "settings.show_keys_button": "Sleutels tonen",
   "settings.test_key_label": "Test-API-sleutel:",
   "settings.title": "<h2>Instellingen</h2>",

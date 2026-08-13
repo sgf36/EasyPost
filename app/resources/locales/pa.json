@@ -568,6 +568,7 @@
   "settings.save_button": "ਸੰਭਾਲੋ",
   "settings.saved_body": "API ਕੁੰਜੀਆਂ ਅੱਪਡੇਟ ਹੋ ਗਈਆਂ।",
   "settings.saved_title": "ਸੰਭਾਲਿਆ ਗਿਆ",
+  "settings.sheet_needs_png_note": "ਲੇਬਲ ਸ਼ੀਟਾਂ ਲੇਬਲ ਤਸਵੀਰਾਂ ਤੋਂ ਬਣਦੀਆਂ ਹਨ, ਇਸ ਲਈ ਫਾਰਮੈਟ {format} ਤੋਂ ਬਦਲ ਕੇ PNG ਕਰ ਦਿੱਤਾ ਗਿਆ ਹੈ। {format} ਲੇਬਲ ਸ਼ੀਟ ਉੱਤੇ ਨਹੀਂ ਰੱਖੇ ਜਾ ਸਕਦੇ।",
   "settings.show_keys_button": "ਕੁੰਜੀਆਂ ਦਿਖਾਓ",
   "settings.test_key_label": "ਟੈਸਟ API ਕੁੰਜੀ:",
   "settings.title": "<h2>ਸੈਟਿੰਗਜ਼</h2>",

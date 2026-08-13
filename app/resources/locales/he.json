@@ -568,6 +568,7 @@
   "settings.save_button": "שמור",
   "settings.saved_body": "מפתחות ה-API עודכנו.",
   "settings.saved_title": "נשמר",
+  "settings.sheet_needs_png_note": "גיליונות מדבקות מורכבים מתמונות מדבקה, ולכן התבנית שונתה מ-{format} ל-PNG. מדבקות {format} לא ניתן להניח על גיליון.",
   "settings.show_keys_button": "הצג מפתחות",
   "settings.test_key_label": "מפתח API לבדיקה:",
   "settings.title": "<h2>הגדרות</h2>",

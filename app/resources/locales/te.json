@@ -568,6 +568,7 @@
   "settings.save_button": "సేవ్ చేయి",
   "settings.saved_body": "API కీలు నవీకరించబడ్డాయి.",
   "settings.saved_title": "సేవ్ చేయబడింది",
+  "settings.sheet_needs_png_note": "లేబుల్ షీట్లు లేబుల్ చిత్రాల నుండి తయారవుతాయి, కాబట్టి ఫార్మాట్ {format} నుండి PNGకి మార్చబడింది. {format} లేబుళ్లను షీట్‌పై ఉంచలేరు.",
   "settings.show_keys_button": "కీలను చూపించు",
   "settings.test_key_label": "టెస్ట్ API కీ:",
   "settings.title": "<h2>సెట్టింగ్‌లు</h2>",

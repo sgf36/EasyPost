@@ -568,6 +568,7 @@
   "settings.save_button": "Spremi",
   "settings.saved_body": "API ključevi su ažurirani.",
   "settings.saved_title": "Spremljeno",
+  "settings.sheet_needs_png_note": "Arci naljepnica slažu se od slika naljepnica, pa je format promijenjen iz {format} u PNG. Naljepnice {format} ne mogu se postaviti na arak.",
   "settings.show_keys_button": "Prikaži ključeve",
   "settings.test_key_label": "Testni API ključ:",
   "settings.title": "<h2>Postavke</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "Зберегти",
   "settings.saved_body": "Ключі API оновлено.",
   "settings.saved_title": "Збережено",
+  "settings.sheet_needs_png_note": "Аркуші етикеток складаються із зображень, тому формат змінено з {format} на PNG. Етикетки {format} не можна розмістити на аркуші.",
   "settings.show_keys_button": "Показати ключі",
   "settings.test_key_label": "Тестовий ключ API:",
   "settings.title": "<h2>Налаштування</h2>",

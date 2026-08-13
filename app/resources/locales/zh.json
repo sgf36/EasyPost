@@ -568,6 +568,7 @@
   "settings.save_button": "保存",
   "settings.saved_body": "API 密钥已更新。",
   "settings.saved_title": "已保存",
+  "settings.sheet_needs_png_note": "面单拼版由面单图片合成，因此格式已从 {format} 切换为 PNG。{format} 面单无法拼版。",
   "settings.show_keys_button": "显示密钥",
   "settings.test_key_label": "测试环境 API 密钥：",
   "settings.title": "<h2>设置</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "Spara",
   "settings.saved_body": "API-nycklarna har uppdaterats.",
   "settings.saved_title": "Sparad",
+  "settings.sheet_needs_png_note": "Etikettark byggs av etikettbilder, så formatet har ändrats från {format} till PNG. {format}-etiketter kan inte placeras på ett ark.",
   "settings.show_keys_button": "Visa nycklar",
   "settings.test_key_label": "Test-API-nyckel:",
   "settings.title": "<h2>Inställningar</h2>",

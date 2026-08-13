@@ -568,6 +568,7 @@
   "settings.save_button": "Lưu",
   "settings.saved_body": "Đã cập nhật khóa API.",
   "settings.saved_title": "Đã lưu",
+  "settings.sheet_needs_png_note": "Trang nhãn được ghép từ ảnh nhãn, nên định dạng đã chuyển từ {format} sang PNG. Nhãn {format} không thể đặt lên trang.",
   "settings.show_keys_button": "Hiện khóa",
   "settings.test_key_label": "Khóa API thử nghiệm:",
   "settings.title": "<h2>Cài Đặt</h2>",

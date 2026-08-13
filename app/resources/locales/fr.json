@@ -568,6 +568,7 @@
   "settings.save_button": "Enregistrer",
   "settings.saved_body": "Clés API mises à jour.",
   "settings.saved_title": "Enregistré",
+  "settings.sheet_needs_png_note": "Les planches d'étiquettes sont composées d'images, le format est donc passé de {format} à PNG. Les étiquettes {format} ne peuvent pas être placées sur une planche.",
   "settings.show_keys_button": "Afficher les clés",
   "settings.test_key_label": "Clé API de test :",
   "settings.title": "<h2>Paramètres</h2>",

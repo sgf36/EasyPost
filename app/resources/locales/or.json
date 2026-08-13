@@ -568,6 +568,7 @@
   "settings.save_button": "ସେଭ୍ କରନ୍ତୁ",
   "settings.saved_body": "API କି ଅପଡେଟ୍ ହେଲା।",
   "settings.saved_title": "ସେଭ୍ ହେଲା",
+  "settings.sheet_needs_png_note": "ଲେବଲ୍ ସିଟ୍ ଲେବଲ୍ ଛବିରୁ ପ୍ରସ୍ତୁତ ହୁଏ, ତେଣୁ ଫର୍ମାଟ୍ {format} ରୁ PNG କୁ ବଦଳାଯାଇଛି। {format} ଲେବଲ୍ ସିଟ୍ ଉପରେ ରଖାଯାଇପାରିବ ନାହିଁ।",
   "settings.show_keys_button": "କି ଦେଖାନ୍ତୁ",
   "settings.test_key_label": "ଟେଷ୍ଟ API କି:",
   "settings.title": "<h2>ସେଟିଂସ୍</h2>",

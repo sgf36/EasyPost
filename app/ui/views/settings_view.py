@@ -24,7 +24,12 @@ from app.core.label_options import (
     normalise,
     sizes_for_format,
 )
-from app.core.label_sheet import DEFAULT_PRINTER_TYPE
+from app.core.label_sheet import DEFAULT_PRINTER_TYPE, DEFAULT_TEMPLATE, list_templates
+
+# The only label format that can be composed onto a sheet. A sheet is built by
+# pasting label images into cells, and label_sheets._is_raster discards anything
+# Pillow cannot open — which rules out PDF as well as ZPL and EPL2.
+SHEET_LABEL_FORMAT = "PNG"
 from app.core.settings import load_settings, save_settings
 from app.core.webhook_manager import (
     STATE_ERROR,
@@ -128,12 +133,35 @@ class SettingsView(QWidget):
         self._printer_combo.setCurrentIndex(index if index >= 0 else 0)
         self._printer_combo.currentIndexChanged.connect(self._on_printing_choice_saved)
 
+        # The label sheet, for the same reason again: it is the stationery in
+        # the drawer, not a property of the parcel. Until now it could only be
+        # chosen inside the Export print sheet dialog, which cannot be opened
+        # until a label has been bought — so the sheet was picked after the
+        # labels were already the wrong format for it.
+        #
+        # Choosing one also corrects the label format, which is the point.
+        # A sheet is composed by pasting label *images* into cells, so only PNG
+        # can go on one: PDF, ZPL and EPL2 labels are all discarded before they
+        # reach the page (see label_sheets._is_raster). Someone shipping in ZPL
+        # and then exporting a print sheet got an empty one and no explanation.
+        self._sheet_combo = QComboBox()
+        for template in list_templates():
+            self._sheet_combo.addItem(template.name, template.key)
+        index = self._sheet_combo.findData(settings.label_sheet_template or DEFAULT_TEMPLATE)
+        self._sheet_combo.setCurrentIndex(index if index >= 0 else 0)
+        self._sheet_combo.currentIndexChanged.connect(self._on_sheet_template_changed)
+
+        self._sheet_note = QLabel("")
+        self._sheet_note.setWordWrap(True)
+        self._sheet_note.setVisible(False)
+
         self._offset_x_spin = self._make_offset_spin(settings.label_offset_x_mm)
         self._offset_y_spin = self._make_offset_spin(settings.label_offset_y_mm)
 
         form = QFormLayout()
         form.addRow(tr("settings.label_format_label"), self._label_format_combo)
         form.addRow(tr("settings.label_size_label"), self._label_size_combo)
+        form.addRow(tr("print_sheet.template_label"), self._sheet_combo)
         form.addRow(tr("print_sheet.printer_label"), self._printer_combo)
         form.addRow(tr("print_sheet.offset_x_label"), self._offset_x_spin)
         form.addRow(tr("print_sheet.offset_y_label"), self._offset_y_spin)
@@ -152,6 +180,7 @@ class SettingsView(QWidget):
 
         layout = QVBoxLayout()
         layout.addLayout(form)
+        layout.addWidget(self._sheet_note)
         layout.addWidget(note)
         layout.addWidget(caveats)
         group.setLayout(layout)
@@ -168,6 +197,35 @@ class SettingsView(QWidget):
         spin.valueChanged.connect(self._on_printing_choice_saved)
         return spin
 
+    def _on_sheet_template_changed(self) -> None:
+        """Save the chosen sheet, and make the label format one it can use.
+
+        Only PNG survives composition onto a sheet — PDF, ZPL and EPL2 labels
+        are all dropped before they reach the page. Silently leaving an
+        incompatible format selected produces an empty print sheet later, with
+        nothing on screen connecting the two choices, so the format is corrected
+        here and the correction is stated rather than done behind the user's
+        back.
+        """
+        self._on_printing_choice_saved()
+
+        current_format = self._label_format_combo.currentData()
+        if current_format == SHEET_LABEL_FORMAT:
+            self._sheet_note.setVisible(False)
+            return
+
+        index = self._label_format_combo.findData(SHEET_LABEL_FORMAT)
+        if index < 0:
+            return
+        # Setting the combo runs _on_label_format_changed, which repopulates the
+        # sizes and saves — so the size follows the format without being set
+        # twice by two different paths.
+        self._label_format_combo.setCurrentIndex(index)
+        self._sheet_note.setText(
+            tr("settings.sheet_needs_png_note", format=current_format)
+        )
+        self._sheet_note.setVisible(True)
+
     def _on_printing_choice_saved(self) -> None:
         """Persist the printer profile as soon as it is changed.
 
@@ -179,6 +237,7 @@ class SettingsView(QWidget):
         settings.printer_type = self._printer_combo.currentData()
         settings.label_offset_x_mm = self._offset_x_spin.value()
         settings.label_offset_y_mm = self._offset_y_spin.value()
+        settings.label_sheet_template = self._sheet_combo.currentData()
         save_settings(settings)
 
     def _populate_label_sizes(self, label_format: str, preferred: str) -> None:

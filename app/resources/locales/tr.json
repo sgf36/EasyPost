@@ -568,6 +568,7 @@
   "settings.save_button": "Kaydet",
   "settings.saved_body": "API anahtarları güncellendi.",
   "settings.saved_title": "Kaydedildi",
+  "settings.sheet_needs_png_note": "Etiket sayfaları etiket görsellerinden oluşturulur, bu nedenle biçim {format} yerine PNG olarak değiştirildi. {format} etiketleri bir sayfaya yerleştirilemez.",
   "settings.show_keys_button": "Anahtarları göster",
   "settings.test_key_label": "Test API anahtarı:",
   "settings.title": "<h2>Ayarlar</h2>",

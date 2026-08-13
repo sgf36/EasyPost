@@ -568,6 +568,7 @@
   "settings.save_button": "සුරකින්න",
   "settings.saved_body": "API යතුරු යාවත්කාලීන කරන ලදී.",
   "settings.saved_title": "සුරකින ලදී",
+  "settings.sheet_needs_png_note": "ලේබල් පත්‍ර ලේබල් රූපවලින් සැකසේ, එබැවින් ආකෘතිය {format} සිට PNG දක්වා වෙනස් කර ඇත. {format} ලේබල පත්‍රයක තැබිය නොහැක.",
   "settings.show_keys_button": "යතුරු පෙන්වන්න",
   "settings.test_key_label": "පරීක්ෂණ API යතුර:",
   "settings.title": "<h2>සැකසීම්</h2>",

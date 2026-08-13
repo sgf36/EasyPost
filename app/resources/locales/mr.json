@@ -568,6 +568,7 @@
   "settings.save_button": "जतन करा",
   "settings.saved_body": "API की अद्यतनित केल्या.",
   "settings.saved_title": "जतन केले",
+  "settings.sheet_needs_png_note": "लेबल शीट लेबल प्रतिमांपासून तयार होते, म्हणून स्वरूप {format} वरून PNG केले आहे. {format} लेबल शीटवर ठेवता येत नाहीत.",
   "settings.show_keys_button": "की दाखवा",
   "settings.test_key_label": "टेस्ट API की:",
   "settings.title": "<h2>सेटिंग्ज</h2>",

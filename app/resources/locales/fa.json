@@ -568,6 +568,7 @@
   "settings.save_button": "ذخیره",
   "settings.saved_body": "کلیدهای API به‌روزرسانی شد.",
   "settings.saved_title": "ذخیره شد",
+  "settings.sheet_needs_png_note": "برگه‌های برچسب از تصاویر برچسب ساخته می‌شوند، بنابراین قالب از {format} به PNG تغییر کرد. برچسب‌های {format} روی برگه قرار نمی‌گیرند.",
   "settings.show_keys_button": "نمایش کلیدها",
   "settings.test_key_label": "کلید API آزمایشی:",
   "settings.title": "<h2>تنظیمات</h2>",

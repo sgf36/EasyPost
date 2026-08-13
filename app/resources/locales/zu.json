@@ -568,6 +568,7 @@
   "settings.save_button": "Gcina",
   "settings.saved_body": "Amakhiya e-API abuyekeziwe.",
   "settings.saved_title": "Kugciniwe",
+  "settings.sheet_needs_png_note": "Amashidi amalebula akhiwe ngezithombe zamalebula, ngakho ifomethi ishintshwe isuka ku-{format} yaya ku-PNG. Amalebula e-{format} awakwazi ukubekwa eshidini.",
   "settings.show_keys_button": "Bonisa amakhiya",
   "settings.test_key_label": "Ikhiya le-API yokuhlola:",
   "settings.title": "<h2>Izilungiselelo</h2>",
