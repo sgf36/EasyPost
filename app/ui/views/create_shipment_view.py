@@ -37,7 +37,7 @@ from app.core.errors import carrier_messages, format_api_error
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
 from app.services.addresses import address_choice_label, list_addresses
-from app.services.carriers import carrier_display_name
+from app.services.carriers import carrier_display_name, carrier_is_known
 from app.services.insurance import INSURANCE_MAX_USD
 from app.services.packages import (
     delete_saved_package,
@@ -350,6 +350,15 @@ class CreateShipmentView(QWidget):
         self._weight_unit_combo.currentIndexChanged.connect(self._on_weight_unit_changed)
 
         self._package_combo = QComboBox()
+        # Wide enough for its own entries. Left to size itself it settled around
+        # the width of a short label and clipped "Custom dimensions" to
+        # "Custom di" — which is how it reached a published store screenshot.
+        # AdjustToContents keeps it honest as carrier packages are loaded, and
+        # the minimum stops it collapsing before any are.
+        self._package_combo.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToContents
+        )
+        self._package_combo.setMinimumContentsLength(24)
         self._package_combo.currentIndexChanged.connect(self._on_package_selected)
         self._save_package_btn = QPushButton(tr("create_shipment.save_package_button"))
         self._save_package_btn.clicked.connect(self._on_save_package_clicked)
@@ -1026,6 +1035,19 @@ class CreateShipmentView(QWidget):
         r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=[0-9])"
     )
 
+    # Title-casing an all-caps service name gets the brand wrong: FEDEX_GROUND
+    # becomes "Fedex Ground", sitting under a group header that correctly reads
+    # "FedEx". Restore the handful of names whose own capitalisation is not
+    # simple title case.
+    _BRAND_CASE = {
+        "Fedex": "FedEx",
+        "Usps": "USPS",
+        "Ups": "UPS",
+        "Dhl": "DHL",
+        "Ontrac": "OnTrac",
+        "Lasership": "LaserShip",
+    }
+
     @classmethod
     def _humanize_service(cls, name: str) -> str:
         """Space out a run-together carrier service name so it reads as words.
@@ -1035,9 +1057,25 @@ class CreateShipmentView(QWidget):
         Business Parcels Tracked 30kg``, which is far quicker to scan and lets a
         clipped name break at a sensible point. Names that already contain
         spaces are left untouched. The same spacing turns a carrier code
-        (``RoyalMailV3``) into a readable group-header name."""
+        (``RoyalMailV3``) into a readable group-header name.
+
+        Some carriers shout instead of camelCasing — FedEx returns
+        ``FEDEX_GROUND`` — which sat raw and upper-case beside its humanised
+        neighbours in the rates table. Underscores become spaces and an
+        all-caps word is title-cased, so it reads as words like the rest. Real
+        acronyms (USPS, DHL) are single tokens and untouched."""
         if not name or " " in name:
             return name
+        if "_" in name:
+            return " ".join(
+                # Three letters counts: FEDEX_2_DAY was leaving "DAY" shouting.
+                # Genuine three-letter acronyms come back through _BRAND_CASE.
+                cls._BRAND_CASE.get(part.title(), part.title())
+                if part.isupper() and len(part) > 2
+                else part
+                for part in name.split("_")
+                if part
+            )
         return cls._CAMEL_SPLIT.sub(" ", name)
 
     @classmethod
@@ -1049,11 +1087,16 @@ class CreateShipmentView(QWidget):
         so it resolves either spelling. Only when the carrier is unknown to that
         catalogue — an offline first run, say — does this fall back to
         camel-splitting the code, which reads acceptably for plain acronyms
-        (USPS, UPS, DHL) though it does mangle a few ("FedEx" → "Fed Ex")."""
+        (USPS, UPS, DHL).
+
+        Ask the catalogue whether it knows the carrier rather than inferring it
+        from the returned name. Some carriers' display name IS their code, so
+        comparing the two calls them unrecognised and camel-splits them: FedEx
+        reached a published store screenshot as "Fed Ex" that way."""
         if not carrier:
             return "—"
         resolved = carrier_display_name(carrier)
-        if resolved and resolved != carrier:
+        if carrier_is_known(carrier):
             return resolved
         return cls._humanize_service(carrier)
 

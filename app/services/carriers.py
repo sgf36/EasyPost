@@ -100,6 +100,12 @@ class CarrierAccountRef:
 # a real name; everything else is better served by the API's own label, so the
 # map is deliberately kept short instead of restating 96 carriers.
 _CARRIER_DISPLAY_OVERRIDES = {
+    # Carriers whose own capitalisation a camelCase splitter would break, so
+    # they read correctly even before the live catalogue has loaded — on an
+    # offline first run the fallback splitter would otherwise write "Fed Ex".
+    "fedex": "FedEx",
+    "fedexsmartpost": "FedEx SmartPost",
+    "fedexcrossborder": "FedEx Cross Border",
     "royalmailv3": "Royal Mail V3",
     "epostglobalv2": "ePostGlobal V2",
     "ontracv3": "OnTrac V3",
@@ -200,6 +206,26 @@ def carrier_display_name(carrier: str, human_readable: Optional[str] = None) -> 
     # account, then the raw code. The account labels are display-only — see
     # _account_labels — so an account type can never masquerade as a carrier.
     return _carrier_name_map().get(key) or _account_labels.get(key) or carrier
+
+
+def carrier_is_known(carrier: str) -> bool:
+    """Whether the catalogue actually names this carrier.
+
+    :func:`carrier_display_name` returns the raw code as a last resort, so a
+    caller cannot tell "the catalogue calls it this" from "nothing recognised
+    it" by comparing the result with the input — and for carriers whose display
+    name IS their code, the two are identical. FedEx is exactly that case, and
+    treating it as unrecognised sent it through a camelCase splitter that
+    rendered it "Fed Ex" on a store screenshot.
+    """
+    if not carrier:
+        return False
+    key = carrier.casefold()
+    return (
+        key in _CARRIER_DISPLAY_OVERRIDES
+        or key in _carrier_name_map()
+        or key in _account_labels
+    )
 
 
 # ---------------------------------------------------------------------------
