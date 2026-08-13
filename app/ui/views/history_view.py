@@ -26,6 +26,7 @@ from app.services.formatting import (
     format_money,
 )
 from app.services.insurance import (
+    INSURANCE_CURRENCY,
     InsuranceAmountError,
     insure_existing_shipment,
     is_pending,
@@ -145,7 +146,12 @@ class HistoryView(QWidget):
                 display_service(rec.service or ""),
                 format_money(rec.rate_amount, rec.rate_currency) if rec.rate_amount else "",
                 display_status(rec.status),
-                rec.insured_amount or "—",
+                # Insurance is always US dollars whatever the shipment is priced
+                # in (see services/insurance.py), so this column cannot borrow
+                # the rate's currency — and a bare figure beside "3.85 GBP" in
+                # the column before it reads as the same currency.
+                format_money(rec.insured_amount, INSURANCE_CURRENCY)
+                if rec.insured_amount else "—",
                 display_status(rec.refund_status, blank="—"),
             ]
             for col, value in enumerate(values):

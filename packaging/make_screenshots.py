@@ -110,38 +110,43 @@ def _seed_database(db_path: Path) -> None:
         )
         cur.executemany(
             "INSERT OR REPLACE INTO shipments (id, mode, status, to_address, from_address,"
-            " carrier, service, rate_amount, rate_currency, tracking_code)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?)",
+            " carrier, service, rate_amount, rate_currency, tracking_code,"
+            " insured_amount, refund_status)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
             # Two shipments made a thin History table and, once spend stopped
             # being summed across currencies, a one-bar chart. Most of these are
             # GBP so the chart has something to compare; the two USD rows keep
             # the multi-currency total honest and on screen, which is the whole
             # point of reporting per currency.
+            # The last two columns are Insured and Refund status. Left null they
+            # rendered as an em dash on all eight rows, so two of History's nine
+            # columns advertised nothing at all. Three insured parcels and two
+            # refunds in some state is what those columns look like in use.
             [
                 ("shp_demo1", MODE, "purchased", "Alex Morgan, London",
                  "Northwind Trading", "RoyalMailV3", "RoyalMail2ndClassSignedFor",
-                 "3.85", "GBP", "AA000000001GB"),
+                 "3.85", "GBP", "AA000000001GB", "50.00", None),
                 ("shp_demo2", MODE, "purchased", "Sam Rivera, Manchester",
                  "Northwind Trading", "USPS", "Priority", "8.40", "USD",
-                 "EZ1000000001"),
+                 "EZ1000000001", None, None),
                 ("shp_demo3", MODE, "purchased", "Priya Nair, Bristol",
                  "Northwind Trading", "RoyalMailV3", "RoyalMailTracked24",
-                 "5.95", "GBP", "AA000000002GB"),
+                 "5.95", "GBP", "AA000000002GB", "120.00", None),
                 ("shp_demo4", MODE, "purchased", "Jonas Weber, Leeds",
                  "Northwind Trading", "Evri", "Next Day", "3.09", "GBP",
-                 "EZ1000000002"),
+                 "EZ1000000002", None, "submitted"),
                 ("shp_demo5", MODE, "purchased", "Chloe Dupont, Glasgow",
                  "Northwind Trading", "Evri", "Standard", "2.89", "GBP",
-                 "EZ1000000003"),
+                 "EZ1000000003", None, None),
                 ("shp_demo6", MODE, "purchased", "Marco Rossi, Cardiff",
                  "Northwind Trading", "DHLExpress", "ExpressWorldwide", "24.60",
-                 "GBP", "EZ1000000004"),
+                 "GBP", "EZ1000000004", "250.00", None),
                 ("shp_demo7", MODE, "refunded", "Yuki Tanaka, Belfast",
                  "Northwind Trading", "FedEx", "FEDEX_GROUND", "11.20", "USD",
-                 "EZ1000000005"),
+                 "EZ1000000005", None, "refunded"),
                 ("shp_demo8", MODE, "purchased", "Ana Silva, Sheffield",
                  "Northwind Trading", "RoyalMailV3", "RoyalMail1stClass", "4.45",
-                 "GBP", "AA000000003GB"),
+                 "GBP", "AA000000003GB", None, None),
             ],
         )
         # The carrier catalogue, so the batch service picker renders populated.
@@ -204,13 +209,14 @@ def _seed_database(db_path: Path) -> None:
                  "out_for_delivery", None, "2026-08-13"),
                 ("trk_demo4", MODE, "EZ1000000002", "Evri", "pre_transit", None,
                  "2026-08-18"),
+                # Two rows carry a status_detail, which is the line that says
+                # why. These are EasyPost's own vocabulary and are translated
+                # into all fifty languages, so they no longer sit in English in
+                # the middle of an otherwise Japanese table.
                 ("trk_demo5", MODE, "EZ1000000004", "DHLExpress", "in_transit",
-                 None, "2026-08-14"),
-                # No status_detail: a carrier's detail string is carrier text
-                # and is not translated, so "address incorrect" sat in English
-                # in the middle of an otherwise Japanese table.
-                ("trk_demo6", MODE, "EZ1000000005", "FedEx", "failure", None,
-                 "2026-08-16"),
+                 "weather_delay", "2026-08-14"),
+                ("trk_demo6", MODE, "EZ1000000005", "FedEx", "failure",
+                 "damaged", "2026-08-16"),
                 ("trk_demo7", MODE, "AA000000003GB", "RoyalMailV3",
                  "return_to_sender", None, "2026-08-19"),
                 ("trk_demo8", MODE, "EZ1000000003", "Evri",

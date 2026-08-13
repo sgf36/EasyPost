@@ -91,9 +91,16 @@ class TestDisplayStatus:
         assert display_status("delivered", "Delivered") == "Delivered"
 
     def test_keeps_a_detail_that_says_something(self):
-        # A bare "failure" says a parcel is stuck without saying why. The
-        # detail trails after a dash, so it stays lower case.
+        # A bare "failure" says a parcel is stuck without saying why. An
+        # unmapped detail is humanised and trails after a dash in lower case.
         assert display_status("failure", "address_incorrect") == "Failed — address incorrect"
+
+    def test_a_known_carrier_detail_is_translated_not_humanised(self):
+        # These arrive from the carrier, which is not a reason to print them
+        # raw at a user in one of fifty languages.
+        assert display_status("failure", "delivery_exception") == "Failed — Delivery exception"
+        assert display_status("in_transit", "weather_delay") == "In transit — Weather delay"
+        assert display_status("in_transit", "arrived_at_facility") == "In transit — Arrived at facility"
 
     def test_an_unmapped_status_is_humanised_not_printed_raw(self):
         assert display_status("some_new_state") == "Some new state"
