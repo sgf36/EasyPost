@@ -29,11 +29,6 @@ class _WebhookHandler(BaseHTTPRequestHandler):
         pass  # silence default request logging to stderr
 
     def do_POST(self) -> None:
-        if self.path != WEBHOOK_PATH:
-            self.send_response(404)
-            self.end_headers()
-            return
-
         # The tunnel makes this port reachable from the whole internet, so the
         # declared length is an untrusted number from an unauthenticated caller.
         # Reading it unbounded lets anyone who finds the URL allocate arbitrary
@@ -41,15 +36,40 @@ class _WebhookHandler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", 0) or 0)
         except ValueError:
+            # The declared length is unusable, so the body cannot be drained:
+            # there is no way to know where it ends. Close instead of leaving
+            # the connection part-way through a request (see _drain_body).
+            self.close_connection = True
             self.send_response(400)
             self.end_headers()
             return
         if length < 0 or length > MAX_BODY_BYTES:
+            # Deliberately not drained — reading it is the very thing the limit
+            # exists to prevent. Close the connection instead.
+            self.close_connection = True
             self.send_response(413)
             self.end_headers()
             return
 
+        # Read the body before deciding anything else, including the path.
+        #
+        # A response sent while the request body is still unread leaves those
+        # bytes in the socket, and closing a socket in that state sends RST
+        # rather than FIN — so the client sees the connection abort instead of
+        # the status that was just written to it. The 404 path used to return
+        # here without reading, which made a wrong-path POST fail intermittently
+        # for the caller: it depended on whether the body arrived in the same
+        # TCP segment as the headers and got pulled into the buffered reader, so
+        # a small body usually survived and sometimes did not.
+        #
+        # The cost of reading first is bounded by the check above, and the
+        # signature is still verified before the body is trusted for anything.
         body = self.rfile.read(length)
+
+        if self.path != WEBHOOK_PATH:
+            self.send_response(404)
+            self.end_headers()
+            return
         # HTTP header names are case-insensitive (RFC 9110) and proxies do
         # re-case them; Cloudflare's tunnel forwards `x-hmac-signature` in lower
         # case. Passing the raw mapping straight through meant signature
