@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ਬੈਚ ਸਮੱਸਿਆਵਾਂ ਨਾਲ ਖਰੀਦੀ ਗਈ",
   "batch_shipments.purchased_body": "ਬੈਚ ਖਰੀਦ ਜਮ੍ਹਾਂ ਕਰ ਦਿੱਤੀ ਗਈ।",
   "batch_shipments.purchased_title": "ਬੈਚ ਖਰੀਦੀ ਗਈ",
+  "batch_shipments.quoted_only_note": "ਸਿਰਫ਼ ਲਾਈਨ {line} ਲਈ ਮਿਲੀਆਂ ਸੇਵਾਵਾਂ ਦਿਖਾਈਆਂ ਜਾ ਰਹੀਆਂ ਹਨ। ਸਾਰੀਆਂ ਵੇਖਣ ਲਈ “ਸਾਰੇ ਕੈਰੀਅਰ ਦਿਖਾਓ” ਚੁਣੋ।",
   "batch_shipments.refresh_failed_body": "ਬੈਚ ਰਿਫ੍ਰੈਸ਼ ਨਹੀਂ ਹੋ ਸਕੀ:\n{error}",
   "batch_shipments.refresh_status_button": "ਬੈਚ ਸਥਿਤੀ ਰਿਫ੍ਰੈਸ਼ ਕਰੋ",
   "batch_shipments.rows_loaded_summary": "{total} ਕਤਾਰਾਂ ਲੋਡ ਹੋਈਆਂ — {valid} ਵੈਧ, {invalid} ਗਲਤੀਆਂ ਵਾਲੀਆਂ।",

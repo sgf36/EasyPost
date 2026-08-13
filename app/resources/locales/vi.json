@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Đã mua lô nhưng có lỗi",
   "batch_shipments.purchased_body": "Đã gửi yêu cầu mua lô hàng.",
   "batch_shipments.purchased_title": "Đã mua lô hàng",
+  "batch_shipments.quoted_only_note": "Chỉ hiển thị các dịch vụ có báo giá cho dòng {line}. Đánh dấu “Hiện tất cả đơn vị vận chuyển” để xem tất cả.",
   "batch_shipments.refresh_failed_body": "Không thể làm mới lô:\n{error}",
   "batch_shipments.refresh_status_button": "Làm mới trạng thái lô",
   "batch_shipments.rows_loaded_summary": "Đã tải {total} dòng — {valid} hợp lệ, {invalid} có lỗi.",

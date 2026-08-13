@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Dávka zakoupena s problémy",
   "batch_shipments.purchased_body": "Nákup dávky byl odeslán.",
   "batch_shipments.purchased_title": "Dávka zakoupena",
+  "batch_shipments.quoted_only_note": "Zobrazují se pouze služby s nabídkou pro řádek {line}. Zaškrtnutím „Zobrazit všechny dopravce“ zobrazíte všechny.",
   "batch_shipments.refresh_failed_body": "Dávku se nepodařilo obnovit:\n{error}",
   "batch_shipments.refresh_status_button": "Obnovit stav dávky",
   "batch_shipments.rows_loaded_summary": "Načteno řádků: {total} — platných: {valid}, s chybami: {invalid}.",

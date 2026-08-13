@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ব্যাচ কেনা হয়েছে, তবে সমস্যা রয়েছে",
   "batch_shipments.purchased_body": "ব্যাচ ক্রয় জমা দেওয়া হয়েছে।",
   "batch_shipments.purchased_title": "ব্যাচ ক্রয় সম্পন্ন",
+  "batch_shipments.quoted_only_note": "শুধু {line} নম্বর সারির জন্য পাওয়া পরিষেবাগুলি দেখানো হচ্ছে। সব পরিষেবা দেখতে “সব ক্যারিয়ার দেখান” টিক দিন।",
   "batch_shipments.refresh_failed_body": "ব্যাচ রিফ্রেশ করা যায়নি:\n{error}",
   "batch_shipments.refresh_status_button": "ব্যাচের অবস্থা রিফ্রেশ করুন",
   "batch_shipments.rows_loaded_summary": "{total} টি সারি লোড হয়েছে — {valid} টি বৈধ, {invalid} টিতে ত্রুটি।",

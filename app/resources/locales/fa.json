@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "دسته با اشکال خریداری شد",
   "batch_shipments.purchased_body": "خرید دسته‌ای ثبت شد.",
   "batch_shipments.purchased_title": "دسته خریداری شد",
+  "batch_shipments.quoted_only_note": "فقط سرویس‌هایی که برای سطر {line} قیمت داده‌اند نمایش داده می‌شوند. برای دیدن همه، «نمایش همه شرکت‌های حمل‌ونقل» را علامت بزنید.",
   "batch_shipments.refresh_failed_body": "به‌روزرسانی دسته ممکن نشد:\n{error}",
   "batch_shipments.refresh_status_button": "به‌روزرسانی وضعیت دسته",
   "batch_shipments.rows_loaded_summary": "{total} ردیف بارگذاری شد — {valid} معتبر، {invalid} دارای خطا.",

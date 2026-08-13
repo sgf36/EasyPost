@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Batch purchased with problems",
   "batch_shipments.purchased_body": "Batch purchase submitted.",
   "batch_shipments.purchased_title": "Batch purchased",
+  "batch_shipments.quoted_only_note": "Showing only the services quoted for line {line}. Tick “Show all carriers” to see every service.",
   "batch_shipments.refresh_failed_body": "Could not refresh batch:\n{error}",
   "batch_shipments.refresh_status_button": "Refresh batch status",
   "batch_shipments.rows_loaded_summary": "{total} rows loaded — {valid} valid, {invalid} with errors.",

@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ब्याच खरिद भयो, तर समस्यासहित",
   "batch_shipments.purchased_body": "ब्याच खरिद पेश गरियो।",
   "batch_shipments.purchased_title": "ब्याच खरिद गरियो",
+  "batch_shipments.quoted_only_note": "{line} हरफका लागि मूल्य आएका सेवाहरू मात्र देखाइँदैछ। सबै हेर्न “सबै ढुवानी कम्पनी देखाउनुहोस्” छान्नुहोस्।",
   "batch_shipments.refresh_failed_body": "ब्याच रिफ्रेस गर्न सकिएन:\n{error}",
   "batch_shipments.refresh_status_button": "ब्याच स्थिति रिफ्रेस गर्नुहोस्",
   "batch_shipments.rows_loaded_summary": "{total} पङ्क्ति लोड गरियो — {valid} मान्य, {invalid} त्रुटिसहित।",

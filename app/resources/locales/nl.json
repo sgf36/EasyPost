@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Batch gekocht met problemen",
   "batch_shipments.purchased_body": "Batchaankoop ingediend.",
   "batch_shipments.purchased_title": "Batch gekocht",
+  "batch_shipments.quoted_only_note": "Alleen de services met een tarief voor regel {line} worden getoond. Vink “Alle vervoerders tonen” aan om alles te zien.",
   "batch_shipments.refresh_failed_body": "Kan batch niet vernieuwen:\n{error}",
   "batch_shipments.refresh_status_button": "Batchstatus vernieuwen",
   "batch_shipments.rows_loaded_summary": "{total} rijen geladen — {valid} geldig, {invalid} met fouten.",

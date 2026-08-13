@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Batch köpt med problem",
   "batch_shipments.purchased_body": "Batchköpet har skickats.",
   "batch_shipments.purchased_title": "Batch köpt",
+  "batch_shipments.quoted_only_note": "Visar bara de tjänster som offererats för rad {line}. Kryssa i ”Visa alla transportörer” för att se alla.",
   "batch_shipments.refresh_failed_body": "Kunde inte uppdatera batch:\n{error}",
   "batch_shipments.refresh_status_button": "Uppdatera batchstatus",
   "batch_shipments.rows_loaded_summary": "{total} rader laddade — {valid} giltiga, {invalid} med fel.",

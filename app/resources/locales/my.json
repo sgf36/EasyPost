@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "အသုတ်ကို ဝယ်ယူပြီး၊ ပြဿနာအချို့ရှိသည်",
   "batch_shipments.purchased_body": "အသုတ်ဝယ်ယူမှု တင်သွင်းပြီးပါပြီ။",
   "batch_shipments.purchased_title": "အသုတ် ဝယ်ယူပြီး",
+  "batch_shipments.quoted_only_note": "စာကြောင်း {line} အတွက် ဈေးနှုန်းရရှိသော ဝန်ဆောင်မှုများကိုသာ ပြသနေသည်။ အားလုံးကြည့်ရန် “သယ်ယူပို့ဆောင်သူအားလုံးကို ပြရန်” ကို အမှန်ခြစ်ပါ။",
   "batch_shipments.refresh_failed_body": "အသုတ်ကို ပြန်လည်စစ်ဆေး၍ မရပါ:\n{error}",
   "batch_shipments.refresh_status_button": "အသုတ်အခြေအနေကို ပြန်လည်စစ်ဆေးရန်",
   "batch_shipments.rows_loaded_summary": "အတန်း {total} ကို တင်ပြီးပါပြီ — {valid} ခု မှန်ကန်ပြီး၊ {invalid} ခု အမှားရှိသည်။",

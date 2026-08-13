@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "A köteg megvásárlása hibákkal járt",
   "batch_shipments.purchased_body": "A köteg vásárlása elküldve.",
   "batch_shipments.purchased_title": "Köteg megvásárolva",
+  "batch_shipments.quoted_only_note": "Csak a(z) {line}. sorra árajánlatot adó szolgáltatások láthatók. Az összeshez jelölje be a(z) „Összes szállító megjelenítése” lehetőséget.",
   "batch_shipments.refresh_failed_body": "Nem sikerült frissíteni a köteget:\n{error}",
   "batch_shipments.refresh_status_button": "Köteg állapotának frissítése",
   "batch_shipments.rows_loaded_summary": "{total} sor betöltve — {valid} érvényes, {invalid} hibás.",

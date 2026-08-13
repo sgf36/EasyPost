@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ସମସ୍ୟା ସହ ବ୍ୟାଚ୍ କ୍ରୟ ହେଲା",
   "batch_shipments.purchased_body": "ବ୍ୟାଚ୍ କ୍ରୟ ଦାଖଲ ହେଲା।",
   "batch_shipments.purchased_title": "ବ୍ୟାଚ୍ କ୍ରୟ ହେଲା",
+  "batch_shipments.quoted_only_note": "କେବଳ {line} ଧାଡ଼ି ପାଇଁ ମିଳିଥିବା ସେବାଗୁଡ଼ିକ ଦେଖାଯାଉଛି। ସବୁ ଦେଖିବାକୁ “ସମସ୍ତ କେରିଅର୍ ଦେଖାନ୍ତୁ” ଚିହ୍ନଟ କରନ୍ତୁ।",
   "batch_shipments.refresh_failed_body": "ବ୍ୟାଚ୍ ରିଫ୍ରେସ୍ କରିପାରିଲା ନାହିଁ:\n{error}",
   "batch_shipments.refresh_status_button": "ବ୍ୟାଚ୍ ସ୍ଥିତି ରିଫ୍ରେସ୍ କରନ୍ତୁ",
   "batch_shipments.rows_loaded_summary": "{total} ଧାଡ଼ି ଲୋଡ୍ ହେଲା — {valid} ବୈଧ, {invalid} ତ୍ରୁଟିଯୁକ୍ତ।",

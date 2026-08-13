@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Sammelversand mit Problemen gekauft",
   "batch_shipments.purchased_body": "Sammelkauf übermittelt.",
   "batch_shipments.purchased_title": "Sammelversand gekauft",
+  "batch_shipments.quoted_only_note": "Es werden nur die für Zeile {line} angebotenen Services angezeigt. Für alle Services „Alle Versanddienstleister anzeigen“ ankreuzen.",
   "batch_shipments.refresh_failed_body": "Sammelversand konnte nicht aktualisiert werden:\n{error}",
   "batch_shipments.refresh_status_button": "Status des Sammelversands aktualisieren",
   "batch_shipments.rows_loaded_summary": "{total} Zeilen geladen — {valid} gültig, {invalid} mit Fehlern.",

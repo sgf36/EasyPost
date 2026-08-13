@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "بیچ مسائل کے ساتھ خریدا گیا",
   "batch_shipments.purchased_body": "بیچ کی خریداری جمع کرا دی گئی۔",
   "batch_shipments.purchased_title": "بیچ خریدا گیا",
+  "batch_shipments.quoted_only_note": "صرف سطر {line} کے لیے پیش کردہ سروسز دکھائی جا رہی ہیں۔ تمام دیکھنے کے لیے “تمام کیریئرز دکھائیں” پر نشان لگائیں۔",
   "batch_shipments.refresh_failed_body": "بیچ کو تازہ نہیں کیا جا سکا:\n{error}",
   "batch_shipments.refresh_status_button": "بیچ کی صورتحال تازہ کریں",
   "batch_shipments.rows_loaded_summary": "{total} قطاریں لوڈ ہوئیں — {valid} درست، {invalid} خرابیوں کے ساتھ۔",

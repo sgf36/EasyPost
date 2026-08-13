@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ስብስቡ ከችግሮች ጋር ተገዝቷል",
   "batch_shipments.purchased_body": "የስብስብ ግዢ ገብቷል።",
   "batch_shipments.purchased_title": "ስብስብ ተገዝቷል",
+  "batch_shipments.quoted_only_note": "ለመስመር {line} ዋጋ የተሰጣቸው አገልግሎቶች ብቻ ይታያሉ። ሁሉንም ለማየት “ሁሉንም አጓጓዦች አሳይ” ን ምልክት ያድርጉ።",
   "batch_shipments.refresh_failed_body": "ስብስቡን ማደስ አልተቻለም:\n{error}",
   "batch_shipments.refresh_status_button": "የስብስብ ሁኔታ አድስ",
   "batch_shipments.rows_loaded_summary": "{total} ረድፎች ተጭነዋል — {valid} ትክክለኛ፣ {invalid} ከስህተት ጋር።",

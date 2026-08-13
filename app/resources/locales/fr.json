@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Lot acheté avec des problèmes",
   "batch_shipments.purchased_body": "Achat du lot soumis.",
   "batch_shipments.purchased_title": "Lot acheté",
+  "batch_shipments.quoted_only_note": "Seuls les services proposés pour la ligne {line} sont affichés. Cochez « Afficher tous les transporteurs » pour tous les voir.",
   "batch_shipments.refresh_failed_body": "Impossible d'actualiser le lot :\n{error}",
   "batch_shipments.refresh_status_button": "Actualiser le statut du lot",
   "batch_shipments.rows_loaded_summary": "{total} lignes chargées — {valid} valides, {invalid} en erreur.",

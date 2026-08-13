@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ബാച്ച് വാങ്ങി, പക്ഷേ പ്രശ്നങ്ങളുണ്ട്",
   "batch_shipments.purchased_body": "ബാച്ച് വാങ്ങൽ സമർപ്പിച്ചു.",
   "batch_shipments.purchased_title": "ബാച്ച് വാങ്ങി",
+  "batch_shipments.quoted_only_note": "{line} വരിക്ക് ലഭിച്ച സേവനങ്ങൾ മാത്രമാണ് കാണിക്കുന്നത്. എല്ലാം കാണാൻ “എല്ലാ കാരിയറുകളും കാണിക്കുക” തിരഞ്ഞെടുക്കുക.",
   "batch_shipments.refresh_failed_body": "ബാച്ച് പുതുക്കാൻ കഴിഞ്ഞില്ല:\n{error}",
   "batch_shipments.refresh_status_button": "ബാച്ച് നില പുതുക്കുക",
   "batch_shipments.rows_loaded_summary": "{total} വരികൾ ലോഡ് ചെയ്തു — {valid} സാധുവായത്, {invalid} പിശകുകളുള്ളത്.",

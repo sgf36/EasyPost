@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Toplu gönderi sorunlarla satın alındı",
   "batch_shipments.purchased_body": "Toplu satın alma gönderildi.",
   "batch_shipments.purchased_title": "Toplu gönderi satın alındı",
+  "batch_shipments.quoted_only_note": "Yalnızca {line}. satır için fiyat verilen servisler gösteriliyor. Tümünü görmek için “Tüm kargo şirketlerini göster” kutusunu işaretleyin.",
   "batch_shipments.refresh_failed_body": "Toplu gönderi yenilenemedi:\n{error}",
   "batch_shipments.refresh_status_button": "Toplu gönderi durumunu yenile",
   "batch_shipments.rows_loaded_summary": "{total} satır yüklendi — {valid} geçerli, {invalid} hatalı.",

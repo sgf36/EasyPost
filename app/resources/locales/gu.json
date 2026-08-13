@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "બેચ સમસ્યાઓ સાથે ખરીદાયું",
   "batch_shipments.purchased_body": "બેચ ખરીદી સબમિટ થઈ.",
   "batch_shipments.purchased_title": "બેચ ખરીદાયું",
+  "batch_shipments.quoted_only_note": "માત્ર લાઇન {line} માટે મળેલી સેવાઓ બતાવાઈ રહી છે. બધી જોવા માટે “બધા કેરિયર બતાવો” પસંદ કરો.",
   "batch_shipments.refresh_failed_body": "બેચ રિફ્રેશ કરી શકાયું નહીં:\n{error}",
   "batch_shipments.refresh_status_button": "બેચ સ્થિતિ રિફ્રેશ કરો",
   "batch_shipments.rows_loaded_summary": "{total} પંક્તિઓ લોડ થઈ — {valid} માન્ય, {invalid} ભૂલો સાથે.",

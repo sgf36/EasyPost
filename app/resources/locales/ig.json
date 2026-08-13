@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Azụtala ngukọta mana enwere nsogbu",
   "batch_shipments.purchased_body": "Ezitela ịzụta ngukọta.",
   "batch_shipments.purchased_title": "Azụtala ngukọta",
+  "batch_shipments.quoted_only_note": "Naanị ọrụ ndị e nyere ọnụahịa maka ahịrị {line} ka a na-egosi. Mara “Gosi kompanị mbunye niile” ka ị hụ ha niile.",
   "batch_shipments.refresh_failed_body": "Enweghị ike imelite ngukọta:\n{error}",
   "batch_shipments.refresh_status_button": "Melite ọnọdụ ngukọta",
   "batch_shipments.rows_loaded_summary": "{total} ahịrị ebubatala — {valid} ziri ezi, {invalid} nwere njehie.",

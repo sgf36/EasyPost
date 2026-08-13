@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Partia zakupiona z problemami",
   "batch_shipments.purchased_body": "Zakup partii przesłany.",
   "batch_shipments.purchased_title": "Partia zakupiona",
+  "batch_shipments.quoted_only_note": "Pokazywane są tylko usługi wycenione dla wiersza {line}. Zaznacz „Pokaż wszystkich przewoźników”, aby zobaczyć wszystkie.",
   "batch_shipments.refresh_failed_body": "Nie można odświeżyć partii:\n{error}",
   "batch_shipments.refresh_status_button": "Odśwież stan partii",
   "batch_shipments.rows_loaded_summary": "Wczytano {total} wierszy — {valid} poprawnych, {invalid} z błędami.",

@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "தொகுப்பு வாங்கப்பட்டது, சிக்கல்களுடன்",
   "batch_shipments.purchased_body": "தொகுப்பு வாங்குதல் சமர்ப்பிக்கப்பட்டது.",
   "batch_shipments.purchased_title": "தொகுப்பு வாங்கப்பட்டது",
+  "batch_shipments.quoted_only_note": "{line} வரிசைக்கு விலை வழங்கப்பட்ட சேவைகள் மட்டுமே காட்டப்படுகின்றன. அனைத்தையும் காண “அனைத்து கேரியர்களையும் காட்டு” என்பதைத் தேர்வுசெய்க.",
   "batch_shipments.refresh_failed_body": "தொகுப்பைப் புதுப்பிக்க முடியவில்லை:\n{error}",
   "batch_shipments.refresh_status_button": "தொகுப்பு நிலையைப் புதுப்பி",
   "batch_shipments.rows_loaded_summary": "{total} வரிசைகள் ஏற்றப்பட்டன — {valid} செல்லுபடியாகும், {invalid} பிழைகளுடன்.",
