@@ -66,6 +66,45 @@ _STATUS_KEYS = {
     "scheduled": "status.scheduled",
     "none": "status.none",
     "unknown": "status.unknown",
+    # EasyPost's documented `status_detail` vocabulary. A detail is the line
+    # that says *why* — "Failed — address incorrect" — and it used to be the one
+    # string in a fifty-language application that stayed in English, because it
+    # arrives from the carrier rather than from us. Arriving from elsewhere is
+    # not a reason to print it raw at a user.
+    #
+    # Six of them are the same words as a status above and share its key.
+    # Anything outside this list still falls back to humanize_code, so an
+    # unrecognised detail reads as words rather than as an identifier.
+    "address_correction": "status.address_correction",
+    "arrived_at_destination": "status.arrived_at_destination",
+    "arrived_at_facility": "status.arrived_at_facility",
+    "arrived_at_pickup_location": "status.arrived_at_pickup_location",
+    "awaiting_information": "status.awaiting_information",
+    "damaged": "status.damaged",
+    "delayed": "status.delayed",
+    "delivery_exception": "status.delivery_exception",
+    "departed_facility": "status.departed_facility",
+    "departed_origin_facility": "status.departed_origin_facility",
+    "expired": "status.expired",
+    "held": "status.held",
+    "label_created": "status.label_created",
+    "missorted": "status.missorted",
+    "out_of_transit": "status.out_of_transit",
+    "package_accepted": "status.package_accepted",
+    "package_arrived": "status.package_arrived",
+    "package_departed": "status.package_departed",
+    "package_forwarded": "status.package_forwarded",
+    "package_held": "status.package_held",
+    "package_processed": "status.package_processed",
+    "package_processing": "status.package_processing",
+    "received_at_destination": "status.received_at_destination",
+    "received_at_origin_facility": "status.received_at_origin_facility",
+    "refused": "status.refused",
+    "rescheduled": "status.rescheduled",
+    "status_update": "status.status_update",
+    "transit_exception": "status.transit_exception",
+    "weather_delay": "status.weather_delay",
+    "return": "status.return_to_sender",
 }
 
 
