@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Optional
 
 from app.core.client import client_manager
+from app.core.customs import build_customs_info, currency_for, customs_item, is_international
 from app.core.db import db_cursor
 from app.services.packages import package_code_from_choice
 from app.services.shipments import preferred_label_options
@@ -43,7 +44,26 @@ CSV_COLUMNS = [
     # dropdown; see write_xlsx_template.
     "predefined_package",
     "reference",
+    # Customs. Required only on rows that cross a border, and ignored on those
+    # that do not — see _validate_row. One item per parcel, which is the shape a
+    # batch almost always has; a parcel needing several declared lines is a
+    # single shipment, not a spreadsheet row.
+    #
+    # The item's weight is taken from the parcel `weight` above rather than
+    # asking twice: for a one-item parcel they are the same number, and two
+    # columns that must agree is two columns that can disagree.
+    "customs_description",
+    "customs_quantity",
+    "customs_value",
+    "customs_hs_tariff",
+    "customs_origin_country",
 ]
+
+# Needed on any row whose destination country differs from the sender's. Sending
+# an international shipment without them creates the batch and then fails every
+# label at purchase, with the carrier's own wording and no mention of customs:
+# "At least one item per package must be provided."
+CUSTOMS_REQUIRED_COLUMNS = ("customs_description", "customs_value")
 
 # Header-level requirement: these columns must exist. length/width/height are
 # additionally required *per row* only when that row names no predefined
@@ -69,6 +89,11 @@ _SAMPLE_ROW = {
     "to_country": "US", "to_phone": "5551234567", "to_email": "jane@example.com",
     "length": "10", "width": "6", "height": "4", "weight": "16",
     "predefined_package": "", "reference": "order-1001",
+    # Filled in on the sample row so the columns are self-explanatory, and
+    # harmless on a domestic row, where they are ignored.
+    "customs_description": "Cotton t-shirt", "customs_quantity": "1",
+    "customs_value": "12.50", "customs_hs_tariff": "610910",
+    "customs_origin_country": "GB",
 }
 
 
@@ -131,13 +156,37 @@ class BatchRow:
         return not self.errors
 
 
-def _validate_row(line_number: int, fields: dict) -> BatchRow:
+def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = None) -> BatchRow:
     fields = {k: (str(v) if v is not None else "").strip() for k, v in fields.items()}
     errors = [col for col in REQUIRED_COLUMNS if not fields.get(col)]
 
     # State only where the destination country actually uses one.
     if fields.get("to_country", "").upper() in STATE_REQUIRED_COUNTRIES and not fields.get("to_state"):
         errors.append("to_state")
+
+    # Customs, on rows that cross a border. Checked here so an incomplete row is
+    # refused in the preview, before a batch exists — the alternative is what
+    # this fixes: a batch created against a live account, then every label
+    # failing at purchase.
+    #
+    # `from_country` is unknown when a file is parsed before a sender is chosen.
+    # In that case the row is left alone rather than guessed at; the view
+    # re-validates once the sender is known.
+    if is_international(from_country, fields.get("to_country")):
+        errors.extend(col for col in CUSTOMS_REQUIRED_COLUMNS if not fields.get(col))
+        quantity = fields.get("customs_quantity")
+        if quantity:
+            try:
+                if int(float(quantity)) < 1:
+                    errors.append("customs_quantity must be at least 1")
+            except ValueError:
+                errors.append("customs_quantity is not a number")
+        value = fields.get("customs_value")
+        if value:
+            try:
+                float(value)
+            except ValueError:
+                errors.append("customs_value is not a number")
 
     # A predefined package brings its own dimensions, so length/width/height
     # are only required when no package is named. When they are supplied either
@@ -162,7 +211,7 @@ def _check_header(fieldnames) -> None:
         raise ValueError(f"File is missing required columns: {', '.join(sorted(missing))}")
 
 
-def _parse_xlsx(path: str) -> list[BatchRow]:
+def _parse_xlsx(path: str, from_country: Optional[str] = None) -> list[BatchRow]:
     from openpyxl import load_workbook
 
     wb = load_workbook(path, read_only=True, data_only=True)
@@ -176,29 +225,71 @@ def _parse_xlsx(path: str) -> list[BatchRow]:
         if raw is None or all(c is None or str(c).strip() == "" for c in raw):
             continue  # skip fully blank rows Excel often trails with
         fields = {header[i]: raw[i] if i < len(raw) else "" for i in range(len(header)) if header[i]}
-        rows.append(_validate_row(line_number, fields))
+        rows.append(_validate_row(line_number, fields, from_country))
     return rows
 
 
-def _parse_csv(path: str) -> list[BatchRow]:
+def _parse_csv(path: str, from_country: Optional[str] = None) -> list[BatchRow]:
     rows: list[BatchRow] = []
     with open(path, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         _check_header(reader.fieldnames)
         for line_number, raw_row in enumerate(reader, start=2):
-            rows.append(_validate_row(line_number, raw_row))
+            rows.append(_validate_row(line_number, raw_row, from_country))
     return rows
 
 
-def parse_import(path: str) -> list[BatchRow]:
-    """Parse a recipient file, dispatching on extension (.xlsx or .csv)."""
+def parse_import(path: str, from_country: Optional[str] = None) -> list[BatchRow]:
+    """Parse a recipient file, dispatching on extension (.xlsx or .csv).
+
+    ``from_country`` is the sender's country, and is what makes a row
+    international. Without it customs columns cannot be required, because
+    whether they are needed at all depends on where the parcel is going *from*.
+    """
     if Path(path).suffix.lower() in (".xlsx", ".xlsm"):
-        return _parse_xlsx(path)
-    return _parse_csv(path)
+        return _parse_xlsx(path, from_country)
+    return _parse_csv(path, from_country)
+
+
+def revalidate(rows: list[BatchRow], from_country: Optional[str]) -> list[BatchRow]:
+    """Re-run validation against a (possibly changed) sender country.
+
+    The sender can be switched after a file is loaded, and that alone can turn
+    every row international. Re-checking beats leaving a stale "5 valid, 0 with
+    errors" on screen.
+    """
+    return [_validate_row(r.line_number, dict(r.fields), from_country) for r in rows]
 
 
 # Back-compat alias: the import entry point was CSV-only before .xlsx support.
 parse_csv = parse_import
+
+
+def _row_customs_info(f: dict, from_country: Optional[str], declaration: Optional[dict]) -> Optional[dict]:
+    """The declaration for one row, or None when the row is domestic.
+
+    One customs item, built from the row's own columns; the parcel weight is
+    reused as the item weight (see CSV_COLUMNS). The declaration-level fields —
+    contents type, signer, non-delivery option — are the same for every row in
+    the batch and come from the Batch page, not the spreadsheet.
+    """
+    if not is_international(from_country, f.get("to_country")):
+        return None
+
+    declaration = declaration or {}
+    quantity = f.get("customs_quantity") or "1"
+    item = customs_item(
+        description=f.get("customs_description", ""),
+        quantity=int(float(quantity)),
+        value=float(f.get("customs_value") or 0),
+        # The CSV's weight column is already ounces, which is what a customs
+        # item wants, so it passes through rather than being converted.
+        weight_oz=float(f["weight"]),
+        origin_country=f.get("customs_origin_country") or (from_country or ""),
+        currency=currency_for(from_country),
+        hs_tariff_number=f.get("customs_hs_tariff", ""),
+    )
+    return build_customs_info([item], **declaration)
 
 
 def _row_to_shipment_params(
@@ -210,6 +301,8 @@ def _row_to_shipment_params(
     carrier_account_id: Optional[str] = None,
     delivery_confirmation: Optional[str] = None,
     insurance: Optional[str] = None,
+    from_country: Optional[str] = None,
+    declaration: Optional[dict] = None,
 ) -> dict:
     f = row.fields
     # A predefined package carries fixed dimensions, so send its code alone and
@@ -272,6 +365,13 @@ def _row_to_shipment_params(
     if insurance:
         params["insurance"] = insurance
 
+    # Only attachable at creation. A batch cannot be amended before purchase, so
+    # a shipment that leaves here without a declaration can never acquire one —
+    # it can only fail at the till.
+    customs_info = _row_customs_info(f, from_country, declaration)
+    if customs_info:
+        params["customs_info"] = customs_info
+
     return params
 
 
@@ -284,13 +384,27 @@ def create_batch(
     carrier_account_id: Optional[str] = None,
     delivery_confirmation: Optional[str] = None,
     insurance: Optional[str] = None,
+    from_country: Optional[str] = None,
+    declaration: Optional[dict] = None,
 ):
     """Create a batch. ``carrier`` and ``service`` are required to buy it later
     (see :func:`_row_to_shipment_params`); a batch created without them can be
-    created but never purchased."""
+    created but never purchased.
+
+    ``from_country`` and ``declaration`` carry the customs details for a batch
+    that crosses a border. Both are refused up front rather than half-built: a
+    batch is not amendable, so an international shipment created without a
+    declaration is dead on arrival and has already consumed a batch."""
     valid_rows = [r for r in rows if r.is_valid]
     if not valid_rows:
         raise ValueError("No valid rows to submit.")
+
+    # Fail before the API call, not after. Creating the batch and discovering
+    # this at purchase is the failure being fixed.
+    if any(is_international(from_country, r.fields.get("to_country")) for r in valid_rows):
+        if not declaration:
+            raise ValueError("missing_customs_declaration")
+
     client = client_manager.get_client()
     shipments = [
         _row_to_shipment_params(
@@ -301,6 +415,8 @@ def create_batch(
             carrier_account_id=carrier_account_id,
             delivery_confirmation=delivery_confirmation,
             insurance=insurance,
+            from_country=from_country,
+            declaration=declaration,
         )
         for r in valid_rows
     ]

@@ -31,7 +31,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.core import units
+from app.core import customs, units
 from app.core.countries import COUNTRIES
 from app.core.errors import carrier_messages, format_api_error
 from app.core.settings import load_settings, save_settings
@@ -232,21 +232,10 @@ def _fit_columns_to_widgets(table, *, stretch_col: int = 0, padding: int = 20) -
         table.setColumnWidth(col, width)
 
 
-# Currency for a customs declared value, by origin country. Deliberately small:
-# it covers the countries this app is actually used from, and anything else
-# falls back to USD (EasyPost's own default). A customs form states a value in a
-# currency, and hard-coding USD misstated every non-US sender's declaration.
-_CUSTOMS_CURRENCY_BY_COUNTRY = {
-    "GB": "GBP", "US": "USD", "CA": "CAD", "AU": "AUD", "NZ": "NZD",
-    "CH": "CHF", "JP": "JPY", "CN": "CNY", "IN": "INR", "SG": "SGD",
-    "SE": "SEK", "NO": "NOK", "DK": "DKK", "PL": "PLN", "MX": "MXN",
-    "BR": "BRL", "ZA": "ZAR", "AE": "AED", "HK": "HKD", "KR": "KRW",
-    # The euro area.
-    **{c: "EUR" for c in (
-        "AT", "BE", "CY", "EE", "FI", "FR", "DE", "GR", "IE", "IT", "LV",
-        "LT", "LU", "MT", "NL", "PT", "SK", "SI", "ES", "HR",
-    )},
-}
+# The customs currency map, the declaration shape and the international test
+# used to live here, which is precisely why batch shipments never got them: a
+# second caller cannot import what is private to a view. They are in
+# app/core/customs.py now, and both callers build declarations the same way.
 
 
 class CreateShipmentView(QWidget):
@@ -892,9 +881,9 @@ class CreateShipmentView(QWidget):
     def _is_international(self) -> bool:
         from_rec = self._address_by_id.get(self._from_combo.currentData())
         to_rec = self._address_by_id.get(self._to_combo.currentData())
-        if not from_rec or not to_rec or not from_rec.country or not to_rec.country:
-            return False
-        return from_rec.country.upper() != to_rec.country.upper()
+        return customs.is_international(
+            getattr(from_rec, "country", None), getattr(to_rec, "country", None)
+        )
 
     def _update_customs_visibility(self) -> None:
         # Postal-code quotes never carry a customs declaration — nothing can
@@ -926,30 +915,19 @@ class CreateShipmentView(QWidget):
         validation message rather than pinpointing the exact field, since
         the form has no per-field inline error display.
         """
-        contents_type = self._contents_type_combo.currentData()
-        contents_explanation = self._contents_explanation_input.text().strip()
-        if contents_type == "other" and not contents_explanation:
-            raise ValueError("missing_contents_explanation")
-
         signer = self._customs_signer_input.text().strip()
-        if not signer or not self._customs_certify_checkbox.isChecked():
+        # The tick box is this view's own consent gate, so it is checked here;
+        # everything else the declaration needs is validated by the shared
+        # builder, which raises the same identifiers.
+        if not self._customs_certify_checkbox.isChecked():
             raise ValueError("missing_signer_or_certify")
-
-        restriction_type = self._restriction_type_combo.currentData()
-        restriction_comments = self._restriction_comments_input.text().strip()
-        if restriction_type != "none" and not restriction_comments:
-            raise ValueError("missing_restriction_comments")
 
         # The declared value's currency, taken from the origin country rather
         # than hard-coded to USD. A London sender entering "10" means ten
         # pounds; declaring that as ten dollars misstates the value on a customs
-        # form. Anything unmapped falls back to USD, which is EasyPost's own
-        # default and a safe assumption for an unknown origin.
-        customs_currency = _CUSTOMS_CURRENCY_BY_COUNTRY.get(
-            (from_rec.country or "").upper() if (from_rec := self._address_by_id.get(
-                self._from_combo.currentData())) else "",
-            "USD",
-        )
+        # form.
+        from_rec = self._address_by_id.get(self._from_combo.currentData())
+        customs_currency = customs.currency_for(getattr(from_rec, "country", None))
 
         items = []
         for row in range(self._customs_items_table.rowCount()):
@@ -958,50 +936,28 @@ class CreateShipmentView(QWidget):
             origin_country = origin_combo.currentData()
             if not description or not origin_country:
                 raise ValueError("incomplete_customs_item")
-            item = {
-                "description": description,
-                "quantity": self._customs_items_table.cellWidget(row, 1).value(),
-                "value": self._customs_items_table.cellWidget(row, 2).value(),
-                # A customs item weight is always OUNCES, whatever unit the
-                # parcel form is currently displaying. Sending the raw spin
-                # value understated a kilogram item by a factor of 28 on the
-                # declaration, which is a customs document rather than an
-                # estimate.
-                "weight": units.to_ounces(
+            items.append(customs.customs_item(
+                description=description,
+                quantity=self._customs_items_table.cellWidget(row, 1).value(),
+                value=self._customs_items_table.cellWidget(row, 2).value(),
+                weight_oz=units.to_ounces(
                     self._customs_items_table.cellWidget(row, 3).value(),
                     self._weight_unit,
                 ),
-                "origin_country": origin_country,
-                "currency": customs_currency,
-            }
-            # Omitted entirely when blank rather than sent as null. An explicit
-            # null is a stated "no tariff code" where absence simply means the
-            # field was not supplied, and some carriers treat the two
-            # differently.
-            hs_tariff = self._customs_items_table.cellWidget(row, 4).text().strip()
-            if hs_tariff:
-                item["hs_tariff_number"] = hs_tariff
-            items.append(item)
-        if not items:
-            raise ValueError("no_customs_items")
+                origin_country=origin_country,
+                currency=customs_currency,
+                hs_tariff_number=self._customs_items_table.cellWidget(row, 4).text().strip(),
+            ))
 
-        customs_info = {
-            "contents_type": contents_type,
-            "restriction_type": restriction_type,
-            "non_delivery_option": self._non_delivery_combo.currentData(),
-            "customs_certify": True,
-            "customs_signer": signer,
-            "customs_items": items,
-            # Exemption citation for the (typical) case of an export value under
-            # $2,500 — the threshold above which a real EEI filing is required.
-            # Without some eel_pfc value, some carriers reject the label outright.
-            "eel_pfc": "NOEEI 30.37(a)",
-        }
-        if contents_type == "other":
-            customs_info["contents_explanation"] = contents_explanation
-        if restriction_type != "none":
-            customs_info["restriction_comments"] = restriction_comments
-        return customs_info
+        return customs.build_customs_info(
+            items,
+            customs_signer=signer,
+            contents_type=self._contents_type_combo.currentData(),
+            restriction_type=self._restriction_type_combo.currentData(),
+            non_delivery_option=self._non_delivery_combo.currentData(),
+            contents_explanation=self._contents_explanation_input.text().strip(),
+            restriction_comments=self._restriction_comments_input.text().strip(),
+        )
 
     def _build_rates_group(self) -> QGroupBox:
         group = QGroupBox(tr("create_shipment.rates_group"))
