@@ -31,9 +31,9 @@ saying different things in different languages — one bullet was dropped from
 code check went, being the least newsworthy of the six to a shipper. It still
 ships in the app; it just does not earn store space against the cap.
 
-The copy below is 1231 characters. The longest translation is now Tamil at 1439, the
-shortest Chinese at 387, and nothing is over. **Re-check every language after
-editing, not just this one.**
+The copy below is 1269 characters. The longest translation is now Tamil at 1439,
+the shortest Chinese at 387, and nothing is over. **Re-check every language
+after editing, not just this one.**
 
 • International batch shipments now carry a customs declaration. A batch sent abroad used to be created and then fail every label at purchase, with the carrier asking for "at least one item per package" without ever saying customs. The recipient template gains columns for the item description, value, quantity, tariff code and origin country, and the Batch page asks once for the contents type, the signer and what happens to an undeliverable parcel.
 
