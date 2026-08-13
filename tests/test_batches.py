@@ -193,23 +193,29 @@ def test_xlsx_template_has_package_dropdown(tmp_path):
     # hidden Packages sheet holding every choice.
     wb = load_workbook(str(path))
     ws = wb["Recipients"]
-    assert len(ws.data_validations.dataValidation) == 1
-    dv = ws.data_validations.dataValidation[0]
-    assert "Packages" in dv.formula1
+    # Asserted by name, not by being the only dropdown: the destination and
+    # customs-origin columns are backed by country lists too.
+    package_dvs = [
+        dv for dv in ws.data_validations.dataValidation if "Packages" in dv.formula1
+    ]
+    assert len(package_dvs) == 1
     opts = wb["Packages"]
     assert opts.sheet_state == "hidden"
     listed = [row[0].value for row in opts.iter_rows(min_row=2)]
     assert listed == choices
 
 
-def test_xlsx_template_without_choices_has_no_dropdown(tmp_path):
+def test_xlsx_template_without_choices_has_no_package_dropdown(tmp_path):
+    """No carrier catalogue (offline, empty cache) leaves the package column as
+    free text. The country lists are built in and stay regardless."""
     path = tmp_path / "template.xlsx"
     write_xlsx_template(str(path), [])
 
     wb = load_workbook(str(path))
     ws = wb["Recipients"]
-    assert len(ws.data_validations.dataValidation) == 0
+    assert not [dv for dv in ws.data_validations.dataValidation if "Packages" in dv.formula1]
     assert "Packages" not in wb.sheetnames
+    assert "Countries" in wb.sheetnames
     # Still a usable template.
     rows = parse_import(str(path))
     assert len(rows) == 1 and rows[0].is_valid

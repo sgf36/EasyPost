@@ -154,6 +154,51 @@ def test_creating_an_international_batch_without_a_declaration_is_refused():
                      service="InternationalStandardOnAccount", from_country="GB")
 
 
+def test_uk_is_not_a_country_code():
+    """The one everybody types. EasyPost rejects it, and before reaching the
+    API it also makes a London-to-London parcel look international, because
+    "GB" != "UK" — so the row is asked for customs details it does not need."""
+    row = _validate_row(2, _row(to_country="UK"), from_country="GB")
+    assert not row.is_valid
+    assert any("to_country is not a country code" in e for e in row.errors)
+
+
+def test_a_country_name_is_not_a_code():
+    row = _validate_row(2, _row(to_country="United Kingdom"), from_country="GB")
+    assert not row.is_valid
+
+
+def test_lowercase_and_dropdown_labels_both_normalise():
+    """The spreadsheet dropdown offers "GB — United Kingdom"; a CSV gets typed
+    by hand. Both reduce to the bare code before anything else reads it."""
+    for value in ("gb", "GB — United Kingdom", " gb "):
+        row = _validate_row(2, _row(to_country=value), from_country="GB")
+        assert row.is_valid, (value, row.errors)
+        assert row.fields["to_country"] == "GB"
+        # And a domestic GB row stays domestic, so no customs is demanded.
+        assert "customs_description" not in row.errors
+
+
+def test_a_bad_origin_country_is_caught_too():
+    row = _validate_row(2, _customs_row(customs_origin_country="UK"), from_country="GB")
+    assert not row.is_valid
+    assert any("customs_origin_country is not a country code" in e for e in row.errors)
+
+
+def test_the_xlsx_template_offers_country_dropdowns(tmp_path):
+    from openpyxl import load_workbook
+
+    from app.services.batches import write_xlsx_template
+
+    path = tmp_path / "t.xlsx"
+    write_xlsx_template(str(path), package_choices=["Royal Mail — Letter"])
+    wb = load_workbook(str(path))
+    assert {"Countries", "OriginCountries"} <= set(wb.sheetnames)
+    assert wb["Countries"].max_row - 1 == 197
+    ranges = {str(dv.sqref) for dv in wb["Recipients"].data_validations.dataValidation}
+    assert len(ranges) == 3, ranges       # packages, destination, origin
+
+
 def test_the_reported_case(tmp_path):
     """Five US recipients from a London sender, no customs columns filled in —
     the exact import that reached purchase_failed in production."""
