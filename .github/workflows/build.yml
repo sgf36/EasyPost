@@ -211,8 +211,13 @@ jobs:
       #   MAS_PROVISION_PROFILE_BASE64  base64 of the Mac App Store .provisionprofile
       #   MAS_SIGN_APP_IDENTITY         "Apple Distribution: NAME (TEAMID)"
       #   MAS_SIGN_INSTALLER_IDENTITY   "3rd Party Mac Developer Installer: NAME (TEAMID)"
-      # Upload reuses the existing APPLE_ID / APPLE_APP_PASSWORD secrets, so no
-      # App Store Connect API key is needed.
+      # Upload authenticates with an App Store Connect API key (key
+      # 4CU796U485, App Manager). It replaced an Admin key that CI never used
+      # and that sat in cloud-synced storage; App Manager is the least privilege
+      # that can still manage versions, metadata and submissions.
+      #
+      # The Apple ID and app-specific password remain for *notarisation* of the
+      # direct-download .dmg, which is a separate flow and is left alone.
       - name: Build & upload Mac App Store package (.pkg)
         if: matrix.os == 'macos-latest' && env.HAS_MAS_SIGNING == 'true'
         timeout-minutes: 30
@@ -223,8 +228,9 @@ jobs:
           MAS_PROVISION_PROFILE_BASE64: ${{ secrets.MAS_PROVISION_PROFILE_BASE64 }}
           SIGN_APP_IDENTITY: ${{ secrets.MAS_SIGN_APP_IDENTITY }}
           SIGN_INSTALLER_IDENTITY: ${{ secrets.MAS_SIGN_INSTALLER_IDENTITY }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           BUILD_NUMBER: ${{ github.run_number }}
         run: |
           set -euo pipefail
@@ -260,9 +266,21 @@ jobs:
           export PYTHON=python3
           SKIP_VALIDATE=1 bash packaging/mas/build_mas.sh
 
-          # 5) Upload to App Store Connect, reusing the notarization Apple creds.
+          # 5) Upload to App Store Connect with the API key.
+          #
+          # altool resolves --apiKey by looking for AuthKey_<KeyID>.p8 in
+          # ~/.appstoreconnect/private_keys (among others), so the key is
+          # materialised there under exactly that name and removed afterwards.
+          # The runner is ephemeral, but a key left on disk between steps is
+          # readable by anything that runs after it, and this costs one line.
+          KEYDIR="$HOME/.appstoreconnect/private_keys"
+          mkdir -p "$KEYDIR"
+          echo "$ASC_API_KEY_P8_BASE64" | base64 --decode > "$KEYDIR/AuthKey_$ASC_KEY_ID.p8"
+          chmod 600 "$KEYDIR/AuthKey_$ASC_KEY_ID.p8"
+          trap 'rm -f "$KEYDIR/AuthKey_$ASC_KEY_ID.p8"' EXIT
+
           xcrun altool --upload-app -f dist_mas/EasyPostDesktop.pkg -t macos \
-            -u "$APPLE_ID" -p "$APPLE_APP_PASSWORD"
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
           security delete-keychain "$KEYCHAIN"
 
