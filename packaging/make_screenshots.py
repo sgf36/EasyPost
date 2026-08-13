@@ -112,6 +112,11 @@ def _seed_database(db_path: Path) -> None:
             "INSERT OR REPLACE INTO shipments (id, mode, status, to_address, from_address,"
             " carrier, service, rate_amount, rate_currency, tracking_code)"
             " VALUES (?,?,?,?,?,?,?,?,?,?)",
+            # Two shipments made a thin History table and, once spend stopped
+            # being summed across currencies, a one-bar chart. Most of these are
+            # GBP so the chart has something to compare; the two USD rows keep
+            # the multi-currency total honest and on screen, which is the whole
+            # point of reporting per currency.
             [
                 ("shp_demo1", MODE, "purchased", "Alex Morgan, London",
                  "Northwind Trading", "RoyalMailV3", "RoyalMail2ndClassSignedFor",
@@ -119,6 +124,24 @@ def _seed_database(db_path: Path) -> None:
                 ("shp_demo2", MODE, "purchased", "Sam Rivera, Manchester",
                  "Northwind Trading", "USPS", "Priority", "8.40", "USD",
                  "EZ1000000001"),
+                ("shp_demo3", MODE, "purchased", "Priya Nair, Bristol",
+                 "Northwind Trading", "RoyalMailV3", "RoyalMailTracked24",
+                 "5.95", "GBP", "AA000000002GB"),
+                ("shp_demo4", MODE, "purchased", "Jonas Weber, Leeds",
+                 "Northwind Trading", "Evri", "Next Day", "3.09", "GBP",
+                 "EZ1000000002"),
+                ("shp_demo5", MODE, "purchased", "Chloe Dupont, Glasgow",
+                 "Northwind Trading", "Evri", "Standard", "2.89", "GBP",
+                 "EZ1000000003"),
+                ("shp_demo6", MODE, "purchased", "Marco Rossi, Cardiff",
+                 "Northwind Trading", "DHLExpress", "ExpressWorldwide", "24.60",
+                 "GBP", "EZ1000000004"),
+                ("shp_demo7", MODE, "refunded", "Yuki Tanaka, Belfast",
+                 "Northwind Trading", "FedEx", "FEDEX_GROUND", "11.20", "USD",
+                 "EZ1000000005"),
+                ("shp_demo8", MODE, "purchased", "Ana Silva, Sheffield",
+                 "Northwind Trading", "RoyalMailV3", "RoyalMail1stClass", "4.45",
+                 "GBP", "AA000000003GB"),
             ],
         )
         # The carrier catalogue, so the batch service picker renders populated.
@@ -168,11 +191,27 @@ def _seed_database(db_path: Path) -> None:
             "INSERT OR REPLACE INTO trackers (id, mode, tracking_code, carrier, status,"
             " status_detail, est_delivery_date, last_checked_at)"
             " VALUES (?,?,?,?,?,?,?,datetime('now'))",
+            # Tracking is a screen about colour-coded state, so two rows both
+            # reading the same thing said nothing about it. These span the
+            # range EasyPost actually reports, including a failure with a
+            # detail — the one case where the status alone is not enough.
             [
                 ("trk_demo1", MODE, "AA000000001GB", "RoyalMailV3", "in_transit",
-                 None, "2026-01-14"),
+                 None, "2026-08-15"),
                 ("trk_demo2", MODE, "EZ1000000001", "USPS", "delivered", None,
-                 "2026-01-12"),
+                 "2026-08-11"),
+                ("trk_demo3", MODE, "AA000000002GB", "RoyalMailV3",
+                 "out_for_delivery", None, "2026-08-13"),
+                ("trk_demo4", MODE, "EZ1000000002", "Evri", "pre_transit", None,
+                 "2026-08-18"),
+                ("trk_demo5", MODE, "EZ1000000004", "DHLExpress", "in_transit",
+                 None, "2026-08-14"),
+                ("trk_demo6", MODE, "EZ1000000005", "FedEx", "failure",
+                 "address_incorrect", "2026-08-16"),
+                ("trk_demo7", MODE, "AA000000003GB", "RoyalMailV3",
+                 "return_to_sender", None, "2026-08-19"),
+                ("trk_demo8", MODE, "EZ1000000003", "Evri",
+                 "available_for_pickup", None, "2026-08-13"),
             ],
         )
 
@@ -725,12 +764,17 @@ def _seed_pickup_rates(holder) -> None:
 # makes the customs block appear, and international customs is the headline of
 # 1.2.2. One row carries an error, because a preview that never shows a problem
 # does not explain what "validate" is for.
+# Four rows, not five: the preview table is a fixed height and a fifth row
+# pushed the invalid one out of sight behind a scrollbar, so the summary
+# claimed an error the image could not show.
 _SHOWCASE_IMPORT_ROWS = [
     (2, "Alex Morgan", "Manchester", "GB", "12x9x4 / 16oz", []),
-    (3, "Sam Rivera", "Dublin", "IE", "10x8x4 / 12oz", []),
-    (4, "Priya Nair", "New York", "US", "14x10x6 / 32oz", []),
-    (5, "Jonas Weber", "Berlin", "DE", "12x9x4 / 20oz", []),
-    (6, "Chloe Dupont", "Lyon", "FR", "", ["weight is required"]),
+    (3, "Priya Nair", "New York", "US", "14x10x6 / 32oz", []),
+    (4, "Jonas Weber", "Berlin", "DE", "12x9x4 / 20oz", []),
+    # The invalid row keeps a complete parcel: _render_preview builds its
+    # Parcel cell from the dimension fields, so an empty one renders "xx / oz"
+    # and the error column stops being the thing the eye lands on.
+    (5, "Chloe Dupont", "Lyon", "FR", "12x9x4 / 14oz", ["postcode is required"]),
 ]
 
 
