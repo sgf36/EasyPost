@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
 from app.core.errors import format_api_error
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
-from app.services.carriers import carrier_display_name
+from app.services.formatting import display_carrier, display_status
 from app.services.tracking import create_tracker, list_trackers, refresh_all_trackers, save_tracker_locally
 from app.ui.widgets.async_worker import run_async
 
@@ -162,18 +162,17 @@ class TrackingView(QWidget):
         records = list_trackers()
         self._table.setRowCount(len(records))
         for row, rec in enumerate(records):
-            # A bare "failure" says a parcel is stuck without saying why;
-            # status_detail carries the actual reason ("address_incorrect").
-            status = rec.status or ""
-            if rec.status_detail and rec.status_detail != rec.status:
-                status = f"{status} — {rec.status_detail}"
             values = [
                 rec.tracking_code or "",
                 # Trackers store the carrier as the API returns it
                 # ("RoyalMailV3"); the shared lookup turns that into the name
                 # EasyPost itself publishes.
-                carrier_display_name(rec.carrier or ""),
-                status,
+                display_carrier(rec.carrier or ""),
+                # A bare "failure" says a parcel is stuck without saying why;
+                # status_detail carries the actual reason ("address_incorrect").
+                # display_status translates the status, drops a detail that
+                # says nothing, and never prints in_transit at a user.
+                display_status(rec.status, rec.status_detail),
                 rec.est_delivery_date or "",
                 rec.last_checked_at or "",
             ]

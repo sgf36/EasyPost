@@ -350,6 +350,7 @@ def _capture_window(app, view_class_name: str, path: Path,
     _pin_service_picker(holder, app)
     _seed_rate_table(holder)
     _seed_pickup_rates(holder)
+    _seed_batch_preview(holder)
     _settle(app)
 
     _assert_no_orphan_cell_widgets(window, view_class_name)
@@ -713,6 +714,58 @@ def _seed_pickup_rates(holder) -> None:
         return
     rates = [_DemoPickupRate(*row) for row in _SHOWCASE_PICKUP_RATES]
     view._on_pickup_created(_DemoPickup(rates))
+
+
+# The Batch page is filled by choosing a CSV from a file dialog, which a
+# screenshot run cannot do — so every published batch image showed "No CSV
+# loaded", an empty four-column table and a row of greyed-out buttons. It was
+# the one slot that argued the feature did not work.
+#
+# Two of these five rows are international, which is deliberate: that is what
+# makes the customs block appear, and international customs is the headline of
+# 1.2.2. One row carries an error, because a preview that never shows a problem
+# does not explain what "validate" is for.
+_SHOWCASE_IMPORT_ROWS = [
+    (2, "Alex Morgan", "Manchester", "GB", "12x9x4 / 16oz", []),
+    (3, "Sam Rivera", "Dublin", "IE", "10x8x4 / 12oz", []),
+    (4, "Priya Nair", "New York", "US", "14x10x6 / 32oz", []),
+    (5, "Jonas Weber", "Berlin", "DE", "12x9x4 / 20oz", []),
+    (6, "Chloe Dupont", "Lyon", "FR", "", ["weight is required"]),
+]
+
+
+class _DemoImportRow:
+    """Duck-typed to match what parse_import returns, in the shape
+    _render_preview and _has_international_rows actually read."""
+
+    def __init__(self, line_number, name, city, country, parcel, errors):
+        self.line_number = line_number
+        self.errors = list(errors)
+        self.is_valid = not errors
+        self._parcel = parcel
+        self.fields = {
+            "to_name": name,
+            "to_city": city,
+            "to_country": country,
+            # _render_preview builds the parcel summary from these; the demo
+            # rows carry it pre-formatted, so hand back the pieces it expects.
+            "length": parcel.split("x")[0] if parcel else "",
+            "width": parcel.split("x")[1] if parcel else "",
+            "height": parcel.split("x")[2].split(" /")[0] if parcel else "",
+            "weight": parcel.split("/ ")[1].replace("oz", "") if parcel else "",
+        }
+
+
+def _seed_batch_preview(holder) -> None:
+    """Load invented recipients into the Batch preview, customs block and all."""
+    view = holder.widget() if hasattr(holder, "widget") else holder
+    if not (hasattr(view, "_render_preview") and hasattr(view, "_parsed_rows")):
+        return
+    view._parsed_rows = [_DemoImportRow(*row) for row in _SHOWCASE_IMPORT_ROWS]
+    customs = getattr(view, "_customs_group", None)
+    if customs is not None and hasattr(view, "_has_international_rows"):
+        customs.setVisible(view._has_international_rows())
+    view._render_preview()
 
 
 def main() -> int:

@@ -19,6 +19,12 @@ from PySide6.QtWidgets import (
 
 from app.core.errors import format_api_error
 from app.i18n import tr
+from app.services.formatting import (
+    display_carrier,
+    display_service,
+    display_status,
+    format_money,
+)
 from app.services.insurance import (
     InsuranceAmountError,
     insure_existing_shipment,
@@ -65,7 +71,15 @@ class HistoryView(QWidget):
         columns = [tr(key) if key is not None else "" for key in _COLUMN_KEYS]
         self._table = QTableWidget(0, len(columns))
         self._table.setHorizontalHeaderLabels(columns)
-        self._table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        header = self._table.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        # Stretch divides the width evenly, which gave the actions column the
+        # same share as a date and clipped its buttons to "uest ref" on a
+        # published store screenshot. Buttons have a right size; let them ask
+        # for it and share what is left among the text columns.
+        header.setSectionResizeMode(
+            len(_COLUMN_KEYS) - 1, QHeaderView.ResizeMode.ResizeToContents
+        )
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         # Multi-select purchased shipments to combine their labels onto one sheet.
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -111,12 +125,15 @@ class HistoryView(QWidget):
             values = [
                 rec.tracking_code or "",
                 rec.to_address or "",
-                rec.carrier or "",
-                rec.service or "",
-                f"{rec.rate_amount} {rec.rate_currency}" if rec.rate_amount else "",
-                rec.status or "",
+                # These four were the raw API fields: the Carrier column read
+                # "RoyalMailV3", Service read "RoyalMail2ndClass" and Status
+                # read "purchased", all on a published store screenshot.
+                display_carrier(rec.carrier or ""),
+                display_service(rec.service or ""),
+                format_money(rec.rate_amount, rec.rate_currency) if rec.rate_amount else "",
+                display_status(rec.status),
                 rec.insured_amount or "—",
-                rec.refund_status or "—",
+                display_status(rec.refund_status, blank="—"),
             ]
             for col, value in enumerate(values):
                 self._table.setItem(row, col, QTableWidgetItem(value))
