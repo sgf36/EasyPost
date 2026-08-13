@@ -23,12 +23,23 @@ on:
   workflow_dispatch:
     inputs:
       locale:
-        description: "UI language to render store screenshots in (e.g. en, fr, de, ja)"
+        description: "UI languages for store screenshots, comma-separated (e.g. en,fr,de,ja)"
         required: false
         default: "en"
+      screenshots_only:
+        description: "Render screenshots without building or uploading anything"
+        type: boolean
+        required: false
+        default: false
 
 jobs:
+  # A dispatch aimed at screenshots must not run the build matrix. That matrix
+  # signs, notarizes and uploads a Mac App Store package, so every dispatch mints
+  # a build off github.run_number — capturing seven locales would have burned
+  # seven build numbers and seven notarization waits to produce no binary anyone
+  # wanted. The screenshots job needs neither signing nor packaging.
   build:
+    if: ${{ github.event.inputs.screenshots_only != 'true' }}
     permissions:
       id-token: write # OIDC federated-credential exchange for azure/login
       contents: read
@@ -396,17 +407,38 @@ jobs:
   # shown, since QWidget.grab() paints an unmapped widget.
   #
   # Manual-only: screenshots are a release chore, not something every push needs.
+  # The locale input is comma-separated so one dispatch can capture the whole
+  # localised set. Actions expressions have no split() or replace() — fromJSON
+  # is the only way into a matrix dimension — so the list is turned into JSON
+  # here, in a shell, and consumed as a matrix below.
+  locales:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.split.outputs.list }}
+    steps:
+      - id: split
+        env:
+          RAW: ${{ github.event.inputs.locale || 'en' }}
+        run: |
+          list=$(printf '%s' "$RAW" | tr -d '[:space:]' | tr ',' '\n' \
+                 | grep -v '^$' | sort -u | jq -R . | jq -sc .)
+          echo "list=$list" >> "$GITHUB_OUTPUT"
+          echo "capturing: $list"
+
   screenshots:
     if: github.event_name == 'workflow_dispatch'
+    needs: locales
     strategy:
       fail-fast: false
       matrix:
-        include:
+        target:
           - os: macos-latest
             platform: mac
           - os: windows-latest
             platform: windows
-    runs-on: ${{ matrix.os }}
+        locale: ${{ fromJSON(needs.locales.outputs.list) }}
+    runs-on: ${{ matrix.target.os }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -424,19 +456,26 @@ jobs:
       # — mode banner, navigation sidebar and all — so a bare view is
       # recognisably the same product but visibly not the same screenshot, and
       # looks wrong sitting beside the ones it did not replace.
+      # The window list matches the nine slots the Microsoft Store listing
+      # publishes, so the App Store and Partner Center sets tell the same story
+      # rather than each showing whichever views someone remembered that day.
       - name: Render screenshots
         run: >
           python packaging/make_screenshots.py
-          --platform ${{ matrix.platform }}
-          --locale ${{ github.event.inputs.locale || 'en' }}
+          --platform ${{ matrix.target.platform }}
+          --locale ${{ matrix.locale }}
           --window CreateShipmentView
-          --window BatchView
           --window TrackingView
+          --window AddressBookView
+          --window BatchView
           --window HistoryView
+          --window ReportsView
           --window HtsLookupView
+          --window SettingsView
+          --window PickupsView
           --out dist/screenshots
       - name: Upload screenshots
         uses: actions/upload-artifact@v7
         with:
-          name: screenshots-${{ matrix.platform }}-${{ github.event.inputs.locale || 'en' }}
+          name: screenshots-${{ matrix.target.platform }}-${{ matrix.locale }}
           path: dist/screenshots/**
