@@ -183,7 +183,7 @@ class BatchView(QWidget):
             self,
         )
         self._rates_task.succeeded.connect(
-            lambda shipment: self._on_rates_received(shipment, row.line_number)
+            lambda shipment: self._on_rate_preview_received(shipment, row.line_number)
         )
         self._rates_task.failed.connect(
             lambda exc: (
@@ -195,7 +195,7 @@ class BatchView(QWidget):
             )
         )
 
-    def _on_rates_received(self, shipment, line_number: int) -> None:
+    def _on_rate_preview_received(self, shipment, line_number: int) -> None:
         self._get_rates_btn.setEnabled(True)
         quotes = quoted_services(shipment)
         if not quotes:

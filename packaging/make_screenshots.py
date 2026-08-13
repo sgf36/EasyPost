@@ -657,9 +657,16 @@ class _DemoShipment:
 
 
 def _seed_rate_table(holder) -> None:
-    """Fill the Create Shipment rates table with the invented quotes above."""
+    """Fill the Create Shipment rates table with the invented quotes above.
+
+    Identified by _populate_rates_tree, not by _on_rates_received alone. The
+    Batch page grew a rate preview of its own, and for a while its handler had
+    the same name and a different signature — so this hook found it, called it
+    with the wrong arguments, and every batch screenshot failed. One method name
+    is not an identity.
+    """
     view = holder.widget() if hasattr(holder, "widget") else holder
-    if not hasattr(view, "_on_rates_received"):
+    if not (hasattr(view, "_on_rates_received") and hasattr(view, "_populate_rates_tree")):
         return
 
     # Both address combos default to the first saved address, so the page
