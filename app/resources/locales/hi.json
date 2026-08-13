@@ -568,6 +568,7 @@
   "settings.save_button": "सहेजें",
   "settings.saved_body": "API कुंजियां अपडेट की गईं।",
   "settings.saved_title": "सहेजा गया",
+  "settings.sheet_needs_png_note": "लेबल शीट लेबल छवियों से बनती है, इसलिए फ़ॉर्मैट {format} से बदलकर PNG कर दिया गया है। {format} लेबल शीट पर नहीं रखे जा सकते।",
   "settings.show_keys_button": "कुंजियां दिखाएं",
   "settings.test_key_label": "टेस्ट API कुंजी:",
   "settings.title": "<h2>सेटिंग्स</h2>",

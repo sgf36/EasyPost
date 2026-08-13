@@ -568,6 +568,7 @@
   "settings.save_button": "Save",
   "settings.saved_body": "API keys updated.",
   "settings.saved_title": "Saved",
+  "settings.sheet_needs_png_note": "Label sheets are built from label images, so the format has been switched from {format} to PNG. {format} labels cannot be placed on a sheet.",
   "settings.show_keys_button": "Show keys",
   "settings.test_key_label": "Test API key:",
   "settings.title": "<h2>Settings</h2>",

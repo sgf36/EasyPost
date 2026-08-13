@@ -568,6 +568,7 @@
   "settings.save_button": "सुरक्षित गर्नुहोस्",
   "settings.saved_body": "API कुञ्जीहरू अद्यावधिक गरियो।",
   "settings.saved_title": "सुरक्षित गरियो",
+  "settings.sheet_needs_png_note": "लेबल पानाहरू लेबल छविबाट बनाइन्छ, त्यसैले ढाँचा {format} बाट PNG मा परिवर्तन गरियो। {format} लेबल पानामा राख्न सकिँदैन।",
   "settings.show_keys_button": "कुञ्जीहरू देखाउनुहोस्",
   "settings.test_key_label": "परीक्षण API कुञ्जी:",
   "settings.title": "<h2>सेटिङ</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "አስቀምጥ",
   "settings.saved_body": "የAPI ቁልፎች ተዘምነዋል።",
   "settings.saved_title": "ተቀምጧል",
+  "settings.sheet_needs_png_note": "የመለያ ወረቀቶች ከመለያ ምስሎች ይሠራሉ፣ ስለዚህ ቅርጸቱ ከ{format} ወደ PNG ተቀይሯል። የ{format} መለያዎች በወረቀት ላይ ማስቀመጥ አይቻልም።",
   "settings.show_keys_button": "ቁልፎችን አሳይ",
   "settings.test_key_label": "የሙከራ API ቁልፍ:",
   "settings.title": "<h2>ቅንብሮች</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "Simpan",
   "settings.saved_body": "Kunci API dikemas kini.",
   "settings.saved_title": "Disimpan",
+  "settings.sheet_needs_png_note": "Helaian label disusun daripada imej label, jadi format telah ditukar daripada {format} kepada PNG. Label {format} tidak boleh diletakkan pada helaian.",
   "settings.show_keys_button": "Tunjukkan kunci",
   "settings.test_key_label": "Kunci API ujian:",
   "settings.title": "<h2>Tetapan</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "Salvează",
   "settings.saved_body": "Cheile API au fost actualizate.",
   "settings.saved_title": "Salvat",
+  "settings.sheet_needs_png_note": "Colile de etichete sunt compuse din imagini, așa că formatul a fost schimbat din {format} în PNG. Etichetele {format} nu pot fi plasate pe o coală.",
   "settings.show_keys_button": "Afișează cheile",
   "settings.test_key_label": "Cheie API test:",
   "settings.title": "<h2>Setări</h2>",

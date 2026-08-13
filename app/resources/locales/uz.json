@@ -568,6 +568,7 @@
   "settings.save_button": "Saqlash",
   "settings.saved_body": "API kalitlari yangilandi.",
   "settings.saved_title": "Saqlandi",
+  "settings.sheet_needs_png_note": "Yorliq varaqlari yorliq rasmlaridan yigiladi, shuning uchun format {format} dan PNG ga ozgartirildi. {format} yorliqlarini varaqqa joylashtirib bolmaydi.",
   "settings.show_keys_button": "Kalitlarni ko'rsatish",
   "settings.test_key_label": "Sinov API kaliti:",
   "settings.title": "<h2>Sozlamalar</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "সংরক্ষণ করুন",
   "settings.saved_body": "API কী হালনাগাদ করা হয়েছে।",
   "settings.saved_title": "সংরক্ষিত",
+  "settings.sheet_needs_png_note": "লেবেল শিট লেবেলের ছবি থেকে তৈরি হয়, তাই ফরম্যাট {format} থেকে PNG করা হয়েছে। {format} লেবেল শিটে বসানো যায় না।",
   "settings.show_keys_button": "কী দেখান",
   "settings.test_key_label": "টেস্ট API কী:",
   "settings.title": "<h2>সেটিংস</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "ಉಳಿಸಿ",
   "settings.saved_body": "API ಕೀಗಳನ್ನು ನವೀಕರಿಸಲಾಗಿದೆ.",
   "settings.saved_title": "ಉಳಿಸಲಾಗಿದೆ",
+  "settings.sheet_needs_png_note": "ಲೇಬಲ್ ಶೀಟ್‌ಗಳು ಲೇಬಲ್ ಚಿತ್ರಗಳಿಂದ ರಚನೆಯಾಗುತ್ತವೆ, ಆದ್ದರಿಂದ ಸ್ವರೂಪವನ್ನು {format} ನಿಂದ PNG ಗೆ ಬದಲಾಯಿಸಲಾಗಿದೆ. {format} ಲೇಬಲ್‌ಗಳನ್ನು ಶೀಟ್‌ನಲ್ಲಿ ಇರಿಸಲಾಗದು.",
   "settings.show_keys_button": "ಕೀಗಳನ್ನು ತೋರಿಸಿ",
   "settings.test_key_label": "ಟೆಸ್ಟ್ API ಕೀ:",
   "settings.title": "<h2>ಸೆಟ್ಟಿಂಗ್‌ಗಳು</h2>",

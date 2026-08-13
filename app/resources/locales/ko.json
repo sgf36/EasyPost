@@ -568,6 +568,7 @@
   "settings.save_button": "저장",
   "settings.saved_body": "API 키가 업데이트되었습니다.",
   "settings.saved_title": "저장됨",
+  "settings.sheet_needs_png_note": "라벨 시트는 라벨 이미지로 구성되므로 형식이 {format}에서 PNG로 변경되었습니다. {format} 라벨은 시트에 배치할 수 없습니다.",
   "settings.show_keys_button": "키 표시",
   "settings.test_key_label": "테스트 API 키:",
   "settings.title": "<h2>설정</h2>",

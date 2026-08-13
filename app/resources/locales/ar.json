@@ -568,6 +568,7 @@
   "settings.save_button": "حفظ",
   "settings.saved_body": "تم تحديث مفاتيح API.",
   "settings.saved_title": "تم الحفظ",
+  "settings.sheet_needs_png_note": "تُركَّب أوراق الملصقات من صور الملصقات، لذلك تم تغيير الصيغة من {format} إلى PNG. لا يمكن وضع ملصقات {format} على ورقة.",
   "settings.show_keys_button": "إظهار المفاتيح",
   "settings.test_key_label": "مفتاح API للاختبار:",
   "settings.title": "<h2>الإعدادات</h2>",

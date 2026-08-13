@@ -568,6 +568,7 @@
   "settings.save_button": "保存",
   "settings.saved_body": "APIキーを更新しました。",
   "settings.saved_title": "保存済み",
+  "settings.sheet_needs_png_note": "ラベルシートはラベル画像から作成されるため、形式を {format} から PNG に切り替えました。{format} のラベルはシートに配置できません。",
   "settings.show_keys_button": "キーを表示",
   "settings.test_key_label": "テストAPIキー:",
   "settings.title": "<h2>設定</h2>",

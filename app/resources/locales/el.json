@@ -568,6 +568,7 @@
   "settings.save_button": "Αποθήκευση",
   "settings.saved_body": "Τα κλειδιά API ενημερώθηκαν.",
   "settings.saved_title": "Αποθηκεύτηκε",
+  "settings.sheet_needs_png_note": "Τα φύλλα ετικετών συντίθενται από εικόνες, οπότε η μορφή άλλαξε από {format} σε PNG. Οι ετικέτες {format} δεν μπορούν να τοποθετηθούν σε φύλλο.",
   "settings.show_keys_button": "Εμφάνιση κλειδιών",
   "settings.test_key_label": "Κλειδί API δοκιμής:",
   "settings.title": "<h2>Ρυθμίσεις</h2>",

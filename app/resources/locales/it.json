@@ -568,6 +568,7 @@
   "settings.save_button": "Salva",
   "settings.saved_body": "Chiavi API aggiornate.",
   "settings.saved_title": "Salvato",
+  "settings.sheet_needs_png_note": "I fogli di etichette sono composti da immagini, quindi il formato è passato da {format} a PNG. Le etichette {format} non possono essere collocate su un foglio.",
   "settings.show_keys_button": "Mostra chiavi",
   "settings.test_key_label": "Chiave API di test:",
   "settings.title": "<h2>Impostazioni</h2>",

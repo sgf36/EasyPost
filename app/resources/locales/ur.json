@@ -568,6 +568,7 @@
   "settings.save_button": "محفوظ کریں",
   "settings.saved_body": "API کلیدیں اپ ڈیٹ ہو گئیں۔",
   "settings.saved_title": "محفوظ شدہ",
+  "settings.sheet_needs_png_note": "لیبل شیٹ لیبل کی تصاویر سے بنتی ہے، اس لیے فارمیٹ {format} سے PNG کر دیا گیا ہے۔ {format} لیبل شیٹ پر نہیں رکھے جا سکتے۔",
   "settings.show_keys_button": "کلیدیں دکھائیں",
   "settings.test_key_label": "ٹیسٹ API کلید:",
   "settings.title": "<h2>ترتیبات</h2>",

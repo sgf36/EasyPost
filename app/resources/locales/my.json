@@ -568,6 +568,7 @@
   "settings.save_button": "သိမ်းဆည်းရန်",
   "settings.saved_body": "API သော့များ အပ်ဒိတ်လုပ်ပြီးပါပြီ။",
   "settings.saved_title": "သိမ်းဆည်းပြီးပါပြီ",
+  "settings.sheet_needs_png_note": "လေဘယ်စာရွက်များကို လေဘယ်ပုံများမှ ဖွဲ့စည်းသောကြောင့် ဖော်မတ်ကို {format} မှ PNG သို့ ပြောင်းလိုက်သည်။ {format} လေဘယ်များကို စာရွက်ပေါ်တွင် မထားနိုင်ပါ။",
   "settings.show_keys_button": "သော့များကို ပြရန်",
   "settings.test_key_label": "စမ်းသပ် API သော့:",
   "settings.title": "<h2>ဆက်တင်များ</h2>",

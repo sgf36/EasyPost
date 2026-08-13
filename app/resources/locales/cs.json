@@ -568,6 +568,7 @@
   "settings.save_button": "Uložit",
   "settings.saved_body": "API klíče byly aktualizovány.",
   "settings.saved_title": "Uloženo",
+  "settings.sheet_needs_png_note": "Archy štítků se skládají z obrázků štítků, proto byl formát změněn z {format} na PNG. Štítky {format} nelze na arch umístit.",
   "settings.show_keys_button": "Zobrazit klíče",
   "settings.test_key_label": "Testovací API klíč:",
   "settings.title": "<h2>Nastavení</h2>",

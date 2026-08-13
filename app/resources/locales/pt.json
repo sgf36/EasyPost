@@ -568,6 +568,7 @@
   "settings.save_button": "Salvar",
   "settings.saved_body": "Chaves de API atualizadas.",
   "settings.saved_title": "Salvo",
+  "settings.sheet_needs_png_note": "As folhas de etiquetas são compostas a partir de imagens, pelo que o formato passou de {format} para PNG. As etiquetas {format} não podem ser colocadas numa folha.",
   "settings.show_keys_button": "Mostrar chaves",
   "settings.test_key_label": "Chave de API de teste:",
   "settings.title": "<h2>Configurações</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "സംരക്ഷിക്കുക",
   "settings.saved_body": "API കീകൾ അപ്ഡേറ്റ് ചെയ്തു.",
   "settings.saved_title": "സംരക്ഷിച്ചു",
+  "settings.sheet_needs_png_note": "ലേബൽ ഷീറ്റുകൾ ലേബൽ ചിത്രങ്ങളിൽ നിന്നാണ് നിർമ്മിക്കുന്നത്, അതിനാൽ ഫോർമാറ്റ് {format} ൽ നിന്ന് PNG ആക്കി. {format} ലേബലുകൾ ഷീറ്റിൽ വയ്ക്കാനാവില്ല.",
   "settings.show_keys_button": "കീകൾ കാണിക്കുക",
   "settings.test_key_label": "ടെസ്റ്റ് API കീ:",
   "settings.title": "<h2>ക്രമീകരണങ്ങൾ</h2>",

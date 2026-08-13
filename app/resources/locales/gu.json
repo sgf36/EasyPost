@@ -568,6 +568,7 @@
   "settings.save_button": "સાચવો",
   "settings.saved_body": "API કી અપડેટ થઈ.",
   "settings.saved_title": "સાચવાયું",
+  "settings.sheet_needs_png_note": "લેબલ શીટ લેબલ છબીઓમાંથી બને છે, તેથી ફોર્મેટ {format} થી બદલીને PNG કરાયું છે. {format} લેબલ શીટ પર મૂકી શકાતાં નથી.",
   "settings.show_keys_button": "કી બતાવો",
   "settings.test_key_label": "ટેસ્ટ API કી:",
   "settings.title": "<h2>સેટિંગ્સ</h2>",

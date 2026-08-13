@@ -568,6 +568,7 @@
   "settings.save_button": "Simpen",
   "settings.saved_body": "Kunci API wis dianyari.",
   "settings.saved_title": "Disimpen",
+  "settings.sheet_needs_png_note": "Lembar label disusun saka gambar label, mula formate diganti saka {format} dadi PNG. Label {format} ora bisa dipasang ing lembar.",
   "settings.show_keys_button": "Tampilake kunci",
   "settings.test_key_label": "Kunci API uji:",
   "settings.title": "<h2>Setelan</h2>",

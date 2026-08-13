@@ -568,6 +568,7 @@
   "settings.save_button": "Zapisz",
   "settings.saved_body": "Klucze API zaktualizowane.",
   "settings.saved_title": "Zapisano",
+  "settings.sheet_needs_png_note": "Arkusze etykiet składane są z obrazów etykiet, dlatego format zmieniono z {format} na PNG. Etykiet {format} nie da się umieścić na arkuszu.",
   "settings.show_keys_button": "Pokaż klucze",
   "settings.test_key_label": "Testowy klucz API:",
   "settings.title": "<h2>Ustawienia</h2>",

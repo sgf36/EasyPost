@@ -568,6 +568,7 @@
   "settings.save_button": "บันทึก",
   "settings.saved_body": "อัปเดตคีย์ API แล้ว",
   "settings.saved_title": "บันทึกแล้ว",
+  "settings.sheet_needs_png_note": "แผ่นฉลากประกอบขึ้นจากภาพฉลาก จึงเปลี่ยนรูปแบบจาก {format} เป็น PNG ฉลาก {format} ไม่สามารถวางบนแผ่นได้",
   "settings.show_keys_button": "แสดงคีย์",
   "settings.test_key_label": "คีย์ API สำหรับทดสอบ:",
   "settings.title": "<h2>การตั้งค่า</h2>",

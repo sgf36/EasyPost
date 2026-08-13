@@ -568,6 +568,7 @@
   "settings.save_button": "Chekwaa",
   "settings.saved_body": "Emelitela igodo API.",
   "settings.saved_title": "Echekwara",
+  "settings.sheet_needs_png_note": "A na-ewu mpempe akara site na foto akara, ya mere a gbanwere ụdị site na {format} gaa PNG. Enweghị ike itinye akara {format} na mpempe.",
   "settings.show_keys_button": "Gosi igodo",
   "settings.test_key_label": "Igodo API Nnwale:",
   "settings.title": "<h2>Ntọala</h2>",

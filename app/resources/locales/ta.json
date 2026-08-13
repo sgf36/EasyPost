@@ -568,6 +568,7 @@
   "settings.save_button": "சேமி",
   "settings.saved_body": "API கீகள் புதுப்பிக்கப்பட்டன.",
   "settings.saved_title": "சேமிக்கப்பட்டது",
+  "settings.sheet_needs_png_note": "லேபிள் தாள்கள் லேபிள் படங்களிலிருந்து உருவாக்கப்படுகின்றன, எனவே வடிவம் {format} இலிருந்து PNG ஆக மாற்றப்பட்டது. {format} லேபிள்களை தாளில் வைக்க முடியாது.",
   "settings.show_keys_button": "கீகளைக் காட்டு",
   "settings.test_key_label": "சோதனை API கீ:",
   "settings.title": "<h2>அமைப்புகள்</h2>",

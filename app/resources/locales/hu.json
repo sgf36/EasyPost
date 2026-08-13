@@ -568,6 +568,7 @@
   "settings.save_button": "Mentés",
   "settings.saved_body": "Az API-kulcsok frissítve.",
   "settings.saved_title": "Mentve",
+  "settings.sheet_needs_png_note": "A címkeívek címkeképekből állnak össze, ezért a formátum {format} helyett PNG lett. A(z) {format} címkék nem helyezhetők ívre.",
   "settings.show_keys_button": "Kulcsok megjelenítése",
   "settings.test_key_label": "Teszt API-kulcs:",
   "settings.title": "<h2>Beállítások</h2>",

@@ -568,6 +568,7 @@
   "settings.save_button": "Kaydi",
   "settings.saved_body": "Furayaasha API waa la cusboonaysiiyay.",
   "settings.saved_title": "La Kaydiyay",
+  "settings.sheet_needs_png_note": "Xaashiyaha calaamadaha waxaa laga sameeyaa sawirro calaamad, sidaas darteed qaabka waxaa laga beddelay {format} loona rogay PNG. Calaamadaha {format} laguma dhigi karo xaashi.",
   "settings.show_keys_button": "Muuji Furayaasha",
   "settings.test_key_label": "Furaha API-ga Tijaabada:",
   "settings.title": "<h2>Dejinta</h2>",

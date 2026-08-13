@@ -568,6 +568,7 @@
   "settings.save_button": "Ajiye",
   "settings.saved_body": "An sabunta maɓallan API.",
   "settings.saved_title": "An Ajiye",
+  "settings.sheet_needs_png_note": "Ana gina takardun lakabi daga hotunan lakabi, don haka an canza tsari daga {format} zuwa PNG. Ba a iya sanya lakabin {format} a takarda.",
   "settings.show_keys_button": "Nuna maɓallan",
   "settings.test_key_label": "Maɓallin API na gwaji:",
   "settings.title": "<h2>Saitunan</h2>",
