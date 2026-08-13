@@ -206,8 +206,11 @@ def _seed_database(db_path: Path) -> None:
                  "2026-08-18"),
                 ("trk_demo5", MODE, "EZ1000000004", "DHLExpress", "in_transit",
                  None, "2026-08-14"),
-                ("trk_demo6", MODE, "EZ1000000005", "FedEx", "failure",
-                 "address_incorrect", "2026-08-16"),
+                # No status_detail: a carrier's detail string is carrier text
+                # and is not translated, so "address incorrect" sat in English
+                # in the middle of an otherwise Japanese table.
+                ("trk_demo6", MODE, "EZ1000000005", "FedEx", "failure", None,
+                 "2026-08-16"),
                 ("trk_demo7", MODE, "AA000000003GB", "RoyalMailV3",
                  "return_to_sender", None, "2026-08-19"),
                 ("trk_demo8", MODE, "EZ1000000003", "Evri",
@@ -771,10 +774,11 @@ _SHOWCASE_IMPORT_ROWS = [
     (2, "Alex Morgan", "Manchester", "GB", "12x9x4 / 16oz", []),
     (3, "Priya Nair", "New York", "US", "14x10x6 / 32oz", []),
     (4, "Jonas Weber", "Berlin", "DE", "12x9x4 / 20oz", []),
-    # The invalid row keeps a complete parcel: _render_preview builds its
-    # Parcel cell from the dimension fields, so an empty one renders "xx / oz"
-    # and the error column stops being the thing the eye lands on.
-    (5, "Chloe Dupont", "Lyon", "FR", "12x9x4 / 14oz", ["postcode is required"]),
+    # One invalid row, so the preview demonstrates what "validate" is for. Its
+    # error is produced by the app's own translated message rather than a
+    # literal — these used to be bare English, which put an English string in
+    # the most conspicuous column of every localised capture.
+    (5, "Chloe Dupont", "Lyon", "FR", "12x9x4 / 14oz", ["__missing_to_zip__"]),
 ]
 
 
@@ -783,8 +787,15 @@ class _DemoImportRow:
     _render_preview and _has_international_rows actually read."""
 
     def __init__(self, line_number, name, city, country, parcel, errors):
+        from app.services.batches import _row_error
+
         self.line_number = line_number
-        self.errors = list(errors)
+        # The sentinel is expanded through the app's own translated message, so
+        # the capture shows exactly what a user in that language would read.
+        self.errors = [
+            _row_error("required", "to_zip") if e == "__missing_to_zip__" else e
+            for e in errors
+        ]
         self.is_valid = not errors
         self._parcel = parcel
         self.fields = {

@@ -9,6 +9,17 @@ from app.services.batches import (
     write_xlsx_template,
 )
 
+# Preview errors are user-facing sentences translated into fifty languages
+# ("to_state is required"), not bare column names. Assert that the offending
+# column is named, which is the behaviour that matters, rather than pinning the
+# English wording — pinning it would make every future rewording a test failure
+# and tell us nothing about whether the user can find the column.
+CSV_COLUMN_NAMES = set(CSV_COLUMNS)
+
+
+def _flagged(row) -> set[str]:
+    return {col for col in CSV_COLUMN_NAMES if any(col in e for e in row.errors)}
+
 
 def test_template_round_trips_as_valid(tmp_path):
     path = tmp_path / "template.csv"
@@ -70,7 +81,7 @@ def test_row_without_package_still_requires_dimensions(tmp_path):
     rows = parse_csv(str(path))
 
     assert not rows[0].is_valid
-    assert {"length", "width", "height"}.issubset(set(rows[0].errors))
+    assert {"length", "width", "height"}.issubset(_flagged(rows[0]))
 
 
 def test_predefined_package_param_omits_dimensions():
@@ -126,7 +137,7 @@ def test_us_row_still_requires_state(tmp_path):
     rows = parse_csv(str(path))
 
     assert not rows[0].is_valid
-    assert "to_state" in rows[0].errors
+    assert "to_state" in _flagged(rows[0])
 
 
 def test_carrier_and_service_are_top_level_not_in_options():

@@ -72,14 +72,27 @@ class HistoryView(QWidget):
         self._table = QTableWidget(0, len(columns))
         self._table.setHorizontalHeaderLabels(columns)
         header = self._table.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        # Stretch divides the width evenly, which gave the actions column the
-        # same share as a date and clipped its buttons to "uest ref" on a
-        # published store screenshot. Buttons have a right size; let them ask
-        # for it and share what is left among the text columns.
-        header.setSectionResizeMode(
-            len(_COLUMN_KEYS) - 1, QHeaderView.ResizeMode.ResizeToContents
-        )
+        # Stretch divides the width evenly, which is right only for columns
+        # whose content has no natural width. It gave the actions column the
+        # same share as a date and clipped its buttons to "uest ref", and gave
+        # "Refund status" less room than its own header needs — in French the
+        # heading itself rendered as ":ut du remboursem".
+        #
+        # So: every column asks for the width its content and heading actually
+        # need, except the two that read acceptably truncated — the recipient
+        # address and the service name. Those absorb the slack.
+        #
+        # A tracking code does not belong in that set: letting it stretch left
+        # it showing "AA..." under a heading reading "ngsnu". Nor does the
+        # service alone: at 1440x900 in German, "Royal Mail 2nd Class Signed
+        # For" at full width pushed "Rückerstattung beantragen" off the edge
+        # and put a horizontal scrollbar under the table. Two elastic columns
+        # is what makes the row fit in the longest language at the smallest
+        # size the store screenshots are taken at.
+        for index in range(len(_COLUMN_KEYS)):
+            header.setSectionResizeMode(index, QHeaderView.ResizeMode.ResizeToContents)
+        for index in (1, 3):
+            header.setSectionResizeMode(index, QHeaderView.ResizeMode.Stretch)
         self._table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         # Multi-select purchased shipments to combine their labels onto one sheet.
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)

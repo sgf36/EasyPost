@@ -10,7 +10,7 @@ class DashboardView(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(tr("dashboard.title")))
-        layout.addWidget(
-            QLabel(tr("dashboard.placeholder_text"))
-        )
+        placeholder = QLabel(tr("dashboard.placeholder_text"))
+        placeholder.setWordWrap(True)
+        layout.addWidget(placeholder)
         layout.addStretch(1)

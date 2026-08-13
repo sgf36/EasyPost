@@ -31,7 +31,11 @@ class InsuranceView(QWidget):
 
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"<h2>{tr('insurance.title')}</h2>"))
-        layout.addWidget(QLabel(tr("insurance.intro_text")))
+        # 168 characters in English, 243 in German. Unwrapped, that single line
+        # is the minimum width of the entire page.
+        intro = QLabel(tr("insurance.intro_text"))
+        intro.setWordWrap(True)
+        layout.addWidget(intro)
         layout.addWidget(self._build_form_group())
         layout.addStretch(1)
 
