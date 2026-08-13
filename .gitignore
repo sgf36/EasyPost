@@ -6,9 +6,24 @@ dist/
 *.spec.bak
 .pytest_cache/
 
-# Never commit signing keys
+# Never commit signing keys.
+#
+# This said so before it was true: it covered *.pem and *PRIVATE-KEY* and
+# nothing else, while the actual Apple signing material is .p8, .p12, .key,
+# .cer and provisioning profiles. None of it lives in this repository today —
+# but this repository is public, and a `git add -A` has already swept 14 MB of
+# listing zips into it once (see the commit that untracked them). The cost of
+# that mistake with an App Store Connect key in the tree is not recoverable by
+# untracking it afterwards.
 *.pem
 *PRIVATE-KEY*
+*.p8
+*.p12
+*.key
+*.cer
+*.csr
+*.mobileprovision
+*.provisionprofile
 
 # Build-variant flags (created at package time, never committed)
 app/resources/license_required.flag
