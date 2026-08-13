@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "बॅच खरेदी झाली, परंतु त्रुटींसह",
   "batch_shipments.purchased_body": "बॅच खरेदी सादर केली.",
   "batch_shipments.purchased_title": "बॅच खरेदी केली",
+  "batch_shipments.quoted_only_note": "फक्त ओळ {line} साठी मिळालेल्या सेवा दाखवत आहोत. सर्व सेवा पाहण्यासाठी “सर्व कॅरियर दाखवा” निवडा.",
   "batch_shipments.refresh_failed_body": "बॅच रिफ्रेश करता आली नाही:\n{error}",
   "batch_shipments.refresh_status_button": "बॅच स्थिती रिफ्रेश करा",
   "batch_shipments.rows_loaded_summary": "{total} ओळी लोड झाल्या — {valid} वैध, {invalid} त्रुटींसह.",

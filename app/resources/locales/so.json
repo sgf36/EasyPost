@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Wadarka waa la iibsaday, dhibaatooyin la wata",
   "batch_shipments.purchased_body": "Iibsashada wadarta waa la gudbiyay.",
   "batch_shipments.purchased_title": "Wadarka Waa La Iibsaday",
+  "batch_shipments.quoted_only_note": "Waxaa la muujinayaa oo keliya adeegyada qiimo loo bixiyay safka {line}. Calaamadee “Muuji dhammaan shirkadaha gaadiidka” si aad u aragto dhammaan.",
   "batch_shipments.refresh_failed_body": "Wadarka lama cusboonaysiin karin:\n{error}",
   "batch_shipments.refresh_status_button": "Cusboonaysii xaalada wadarta",
   "batch_shipments.rows_loaded_summary": "{total} saf ayaa la soo shubay — {valid} way saxsan yihiin, {invalid} ayaa khalad leh.",

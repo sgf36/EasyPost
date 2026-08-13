@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "An sayi rukuni da matsaloli",
   "batch_shipments.purchased_body": "An sallama sayen rukuni.",
   "batch_shipments.purchased_title": "An sayi rukuni",
+  "batch_shipments.quoted_only_note": "Ana nuna sabis ɗin da aka bayar da farashi don layi {line} kawai. Zaɓi “Nuna duk kamfanonin jigilar kaya” don ganin duka.",
   "batch_shipments.refresh_failed_body": "Ba a iya sabunta rukuni ba:\n{error}",
   "batch_shipments.refresh_status_button": "Sabunta matsayin rukuni",
   "batch_shipments.rows_loaded_summary": "An loda layuka {total} — {valid} ingantattu, {invalid} da kurakurai.",

@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Kundi limenunuliwa likiwa na matatizo",
   "batch_shipments.purchased_body": "Ununuzi wa kundi umewasilishwa.",
   "batch_shipments.purchased_title": "Kundi limenunuliwa",
+  "batch_shipments.quoted_only_note": "Inaonyesha tu huduma zilizonukuliwa kwa mstari {line}. Tiki “Onyesha kampuni zote za usafirishaji” kuona zote.",
   "batch_shipments.refresh_failed_body": "Imeshindwa kusasisha kundi:\n{error}",
   "batch_shipments.refresh_status_button": "Sasisha hali ya kundi",
   "batch_shipments.rows_loaded_summary": "Safu {total} zimepakiwa — {valid} halali, {invalid} zenye makosa.",

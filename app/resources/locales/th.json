@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ซื้อชุดพัสดุแล้วแต่มีปัญหา",
   "batch_shipments.purchased_body": "ส่งคำสั่งซื้อชุดพัสดุแล้ว",
   "batch_shipments.purchased_title": "ซื้อชุดพัสดุสำเร็จ",
+  "batch_shipments.quoted_only_note": "แสดงเฉพาะบริการที่เสนอราคาสำหรับบรรทัด {line} ติ๊ก “แสดงผู้ให้บริการขนส่งทั้งหมด” เพื่อดูทั้งหมด",
   "batch_shipments.refresh_failed_body": "ไม่สามารถรีเฟรชชุดพัสดุได้:\n{error}",
   "batch_shipments.refresh_status_button": "รีเฟรชสถานะชุดพัสดุ",
   "batch_shipments.rows_loaded_summary": "โหลดข้อมูลแล้ว {total} แถว — ถูกต้อง {valid} รายการ มีข้อผิดพลาด {invalid} รายการ",

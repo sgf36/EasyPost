@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Η παρτίδα αγοράστηκε με προβλήματα",
   "batch_shipments.purchased_body": "Η αγορά της παρτίδας υποβλήθηκε.",
   "batch_shipments.purchased_title": "Η παρτίδα αγοράστηκε",
+  "batch_shipments.quoted_only_note": "Εμφανίζονται μόνο οι υπηρεσίες με προσφορά για τη γραμμή {line}. Επιλέξτε «Εμφάνιση όλων των μεταφορέων» για να τις δείτε όλες.",
   "batch_shipments.refresh_failed_body": "Δεν ήταν δυνατή η ανανέωση της παρτίδας:\n{error}",
   "batch_shipments.refresh_status_button": "Ανανέωση κατάστασης παρτίδας",
   "batch_shipments.rows_loaded_summary": "Φορτώθηκαν {total} γραμμές — {valid} έγκυρες, {invalid} με σφάλματα.",

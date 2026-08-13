@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "బ్యాచ్ కొనుగోలు చేయబడింది, సమస్యలతో",
   "batch_shipments.purchased_body": "బ్యాచ్ కొనుగోలు సమర్పించబడింది.",
   "batch_shipments.purchased_title": "బ్యాచ్ కొనుగోలు చేయబడింది",
+  "batch_shipments.quoted_only_note": "{line} వరుసకు వచ్చిన సేవలను మాత్రమే చూపిస్తోంది. అన్నీ చూడటానికి “అన్ని క్యారియర్‌లను చూపించు” టిక్ చేయండి.",
   "batch_shipments.refresh_failed_body": "బ్యాచ్‌ను రిఫ్రెష్ చేయలేకపోయాము:\n{error}",
   "batch_shipments.refresh_status_button": "బ్యాచ్ స్థితిని రిఫ్రెష్ చేయండి",
   "batch_shipments.rows_loaded_summary": "{total} అడ్డు వరుసలు లోడ్ అయ్యాయి — {valid} చెల్లుబాటు అయ్యేవి, {invalid} లోపాలతో ఉన్నవి.",

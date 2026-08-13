@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "කණ්ඩායම ගැටලු සහිතව මිලදී ගන්නා ලදී",
   "batch_shipments.purchased_body": "කණ්ඩායම් මිලදී ගැනීම ඉදිරිපත් කරන ලදී.",
   "batch_shipments.purchased_title": "කණ්ඩායම මිලදී ගන්නා ලදී",
+  "batch_shipments.quoted_only_note": "{line} පේළිය සඳහා මිල ගණන් ලැබුණු සේවා පමණක් පෙන්වයි. සියල්ල බැලීමට “සියලු භාරදෙන සමාගම් පෙන්වන්න” තෝරන්න.",
   "batch_shipments.refresh_failed_body": "කණ්ඩායම නැවුම් කළ නොහැකි විය:\n{error}",
   "batch_shipments.refresh_status_button": "කණ්ඩායම් තත්ත්වය නැවුම් කරන්න",
   "batch_shipments.rows_loaded_summary": "පේළි {total} ක් පූරණය විය — වලංගු {valid}, දෝෂ සහිත {invalid}.",

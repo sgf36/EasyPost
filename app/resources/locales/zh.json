@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "批量购买存在问题",
   "batch_shipments.purchased_body": "批量购买已提交。",
   "batch_shipments.purchased_title": "批量购买成功",
+  "batch_shipments.quoted_only_note": "仅显示第 {line} 行报价中的服务。勾选“显示所有承运商”可查看全部服务。",
   "batch_shipments.refresh_failed_body": "无法刷新批次：\n{error}",
   "batch_shipments.refresh_status_button": "刷新批次状态",
   "batch_shipments.rows_loaded_summary": "已加载 {total} 行 — 其中 {valid} 行有效，{invalid} 行有误。",

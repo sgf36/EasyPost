@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "ಬ್ಯಾಚ್ ಖರೀದಿಸಲಾಗಿದೆ, ಆದರೆ ಸಮಸ್ಯೆಗಳಿವೆ",
   "batch_shipments.purchased_body": "ಬ್ಯಾಚ್ ಖರೀದಿ ಸಲ್ಲಿಸಲಾಗಿದೆ.",
   "batch_shipments.purchased_title": "ಬ್ಯಾಚ್ ಖರೀದಿಸಲಾಗಿದೆ",
+  "batch_shipments.quoted_only_note": "{line} ಸಾಲಿಗೆ ದರ ನೀಡಿದ ಸೇವೆಗಳನ್ನು ಮಾತ್ರ ತೋರಿಸಲಾಗುತ್ತಿದೆ. ಎಲ್ಲವನ್ನೂ ನೋಡಲು “ಎಲ್ಲಾ ವಾಹಕಗಳನ್ನು ತೋರಿಸಿ” ಗುರುತಿಸಿ.",
   "batch_shipments.refresh_failed_body": "ಬ್ಯಾಚ್ ರಿಫ್ರೆಶ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ:\n{error}",
   "batch_shipments.refresh_status_button": "ಬ್ಯಾಚ್ ಸ್ಥಿತಿ ರಿಫ್ರೆಶ್ ಮಾಡಿ",
   "batch_shipments.rows_loaded_summary": "{total} ಸಾಲುಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಿದೆ — {valid} ಮಾನ್ಯ, {invalid} ದೋಷಗಳೊಂದಿಗೆ.",

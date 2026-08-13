@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Batch dibeli dengan masalah",
   "batch_shipments.purchased_body": "Pembelian batch telah dikirim.",
   "batch_shipments.purchased_title": "Batch dibeli",
+  "batch_shipments.quoted_only_note": "Hanya menampilkan layanan yang ditawarkan untuk baris {line}. Centang “Tampilkan semua kurir” untuk melihat semuanya.",
   "batch_shipments.refresh_failed_body": "Tidak dapat menyegarkan batch:\n{error}",
   "batch_shipments.refresh_status_button": "Segarkan status batch",
   "batch_shipments.rows_loaded_summary": "{total} baris dimuat — {valid} valid, {invalid} bermasalah.",

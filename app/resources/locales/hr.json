@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Grupa kupljena uz probleme",
   "batch_shipments.purchased_body": "Kupnja grupe je poslana.",
   "batch_shipments.purchased_title": "Grupa kupljena",
+  "batch_shipments.quoted_only_note": "Prikazuju se samo usluge s ponudom za redak {line}. Označite „Prikaži sve dostavljače” da biste vidjeli sve.",
   "batch_shipments.refresh_failed_body": "Grupu nije moguće osvježiti:\n{error}",
   "batch_shipments.refresh_status_button": "Osvježi status grupe",
   "batch_shipments.rows_loaded_summary": "Učitano redaka: {total} — valjanih: {valid}, s pogreškama: {invalid}.",

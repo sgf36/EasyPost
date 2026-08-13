@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Пакет придбано з проблемами",
   "batch_shipments.purchased_body": "Купівлю пакета надіслано.",
   "batch_shipments.purchased_title": "Пакет придбано",
+  "batch_shipments.quoted_only_note": "Показано лише послуги, запропоновані для рядка {line}. Позначте «Показати всіх перевізників», щоб побачити всі.",
   "batch_shipments.refresh_failed_body": "Не вдалося оновити пакет:\n{error}",
   "batch_shipments.refresh_status_button": "Оновити статус пакета",
   "batch_shipments.rows_loaded_summary": "Завантажено {total} рядків — {valid} дійсних, {invalid} з помилками.",

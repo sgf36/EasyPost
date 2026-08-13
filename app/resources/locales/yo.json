@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "A ra ìdìpọ̀ pẹ̀lú ìṣòro",
   "batch_shipments.purchased_body": "A ti fi rírà ìdìpọ̀ ránṣẹ́.",
   "batch_shipments.purchased_title": "A ti ra ìdìpọ̀",
+  "batch_shipments.quoted_only_note": "Àwọn iṣẹ́ tí a fún ní iye fún ìlà {line} nìkan ni a fi hàn. Sàmì sí “Fi gbogbo àwọn olùgbé hàn” láti rí gbogbo rẹ̀.",
   "batch_shipments.refresh_failed_body": "A kò lè tún ìdìpọ̀ ṣe:\n{error}",
   "batch_shipments.refresh_status_button": "Tún ipò ìdìpọ̀ ṣe",
   "batch_shipments.rows_loaded_summary": "Ìlà {total} ni a gbé wọlé — {valid} tọ́, {invalid} ní àṣìṣe.",

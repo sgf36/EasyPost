@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Kelompok dibeli dengan masalah",
   "batch_shipments.purchased_body": "Pembelian kelompok dihantar.",
   "batch_shipments.purchased_title": "Kelompok dibeli",
+  "batch_shipments.quoted_only_note": "Hanya memaparkan perkhidmatan yang disebut harga untuk baris {line}. Tandakan “Tunjukkan semua syarikat penghantaran” untuk melihat semua.",
   "batch_shipments.refresh_failed_body": "Tidak dapat menyegarkan kelompok:\n{error}",
   "batch_shipments.refresh_status_button": "Segarkan status kelompok",
   "batch_shipments.rows_loaded_summary": "{total} baris dimuatkan — {valid} sah, {invalid} mempunyai ralat.",

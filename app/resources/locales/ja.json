@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "一括購入完了(問題あり)",
   "batch_shipments.purchased_body": "一括購入を送信しました。",
   "batch_shipments.purchased_title": "一括購入完了",
+  "batch_shipments.quoted_only_note": "{line} 行目の見積もりで返ってきたサービスのみ表示しています。すべて表示するには「すべての配送業者を表示」にチェックを入れてください。",
   "batch_shipments.refresh_failed_body": "一括を更新できませんでした:\n{error}",
   "batch_shipments.refresh_status_button": "一括の状態を更新",
   "batch_shipments.rows_loaded_summary": "{total}行を読み込みました — 有効:{valid}件、エラー:{invalid}件。",

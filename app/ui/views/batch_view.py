@@ -40,6 +40,8 @@ from app.services.batches import (
     create_batch,
     generate_batch_label,
     parse_import,
+    quoted_services,
+    rate_representative_row,
     retrieve_batch,
     revalidate,
     save_batch_locally,
@@ -144,11 +146,69 @@ class BatchView(QWidget):
 
         self._summary_label = QLabel(tr("batch_shipments.no_csv_loaded"))
 
+        # Rating belongs here rather than beside Create batch: it is a question
+        # about the parcels just imported, and its answer narrows the carrier
+        # and service list below. It cannot be folded into Create batch, which
+        # is the opposite order — a batch is never rated, so its carrier and
+        # service must already be chosen before it is created.
+        self._get_rates_btn = QPushButton(tr("create_shipment.get_rates_button"))
+        self._get_rates_btn.setEnabled(False)
+        self._get_rates_btn.clicked.connect(self._on_get_rates)
+
+        button_row = QHBoxLayout()
+        button_row.addWidget(self._summary_label, stretch=1)
+        button_row.addWidget(self._get_rates_btn)
+
         layout = QVBoxLayout()
-        layout.addWidget(self._summary_label)
+        layout.addLayout(button_row)
         layout.addWidget(self._preview_table)
         group.setLayout(layout)
         return group
+
+    def _on_get_rates(self) -> None:
+        """Rate the first valid row to see what this route actually supports."""
+        from_id = self._from_combo.currentData()
+        row = next((r for r in self._parsed_rows if r.is_valid), None)
+        if not from_id or row is None:
+            return
+
+        self._get_rates_btn.setEnabled(False)
+        self._rates_task = run_async(
+            lambda: rate_representative_row(
+                from_id,
+                row,
+                from_country=self._from_country(),
+                declaration=self._declaration(),
+            ),
+            self,
+        )
+        self._rates_task.succeeded.connect(
+            lambda shipment: self._on_rates_received(shipment, row.line_number)
+        )
+        self._rates_task.failed.connect(
+            lambda exc: (
+                self._get_rates_btn.setEnabled(True),
+                QMessageBox.critical(
+                    self, tr("common.error"),
+                    tr("batch_shipments.create_failed_body", error=format_api_error(exc)),
+                ),
+            )
+        )
+
+    def _on_rates_received(self, shipment, line_number: int) -> None:
+        self._get_rates_btn.setEnabled(True)
+        quotes = quoted_services(shipment)
+        if not quotes:
+            # Worth saying out loud. No rates for the representative parcel
+            # means no service will carry it, and creating the batch anyway
+            # produces one that cannot be bought.
+            QMessageBox.information(
+                self,
+                tr("create_shipment.no_rates_title"),
+                tr("create_shipment.no_rates_body"),
+            )
+            return
+        self._service_picker.set_quoted_services(quotes, line_number)
 
     def _build_customs_group(self) -> QGroupBox:
         """Declaration-level customs fields, shared by every row in the batch.
@@ -377,6 +437,12 @@ class BatchView(QWidget):
         )
         self._create_batch_btn.setEnabled(
             rows_ready and self._service_picker.is_complete() and customs_ready
+        )
+        # Rating needs a sender and a valid row, and an international one needs
+        # its declaration too — the rated shipment carries the same customs_info
+        # the batch will, or it would answer a different question.
+        self._get_rates_btn.setEnabled(
+            rows_ready and bool(self._from_combo.currentData()) and customs_ready
         )
 
     def _on_create_batch(self) -> None:

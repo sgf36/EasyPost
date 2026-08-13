@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "बैच समस्याओं के साथ खरीदा गया",
   "batch_shipments.purchased_body": "बैच खरीद सबमिट कर दी गई है।",
   "batch_shipments.purchased_title": "बैच खरीदा गया",
+  "batch_shipments.quoted_only_note": "केवल पंक्ति {line} के लिए मिली सेवाएं दिखाई जा रही हैं। सभी सेवाएं देखने के लिए “सभी कैरियर दिखाएं” चुनें।",
   "batch_shipments.refresh_failed_body": "बैच रीफ़्रेश नहीं किया जा सका:\n{error}",
   "batch_shipments.refresh_status_button": "बैच स्थिति रीफ़्रेश करें",
   "batch_shipments.rows_loaded_summary": "{total} पंक्तियां लोड हुईं — {valid} मान्य, {invalid} त्रुटियों सहित।",

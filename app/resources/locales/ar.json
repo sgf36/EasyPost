@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "تم شراء الدفعة مع وجود مشكلات",
   "batch_shipments.purchased_body": "تم إرسال طلب شراء الدفعة.",
   "batch_shipments.purchased_title": "تم شراء الدفعة",
+  "batch_shipments.quoted_only_note": "تُعرض فقط الخدمات المسعّرة للسطر {line}. حدّد ”إظهار جميع شركات الشحن“ لعرض كل الخدمات.",
   "batch_shipments.refresh_failed_body": "تعذر تحديث الدفعة:\n{error}",
   "batch_shipments.refresh_status_button": "تحديث حالة الدفعة",
   "batch_shipments.rows_loaded_summary": "تم تحميل {total} صف — {valid} صالح، {invalid} به أخطاء.",

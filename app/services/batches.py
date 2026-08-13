@@ -375,6 +375,65 @@ def _row_to_shipment_params(
     return params
 
 
+def rate_representative_row(
+    from_address_id: str,
+    row: BatchRow,
+    *,
+    from_country: Optional[str] = None,
+    declaration: Optional[dict] = None,
+    delivery_confirmation: Optional[str] = None,
+    insurance: Optional[str] = None,
+):
+    """Rate ONE row as an ordinary shipment, to find out what carriers quote.
+
+    A batch is never rated, so the carrier and service have to be named before
+    anything is priced — which means choosing them blind from a catalogue where
+    Royal Mail alone publishes 243 services. Naming one the route does not
+    support creates a batch that fails at purchase, and that failure is the
+    expensive kind.
+
+    A single shipment *is* rated, so this creates one from a real row and reads
+    the answer. Deliberately built by the same `_row_to_shipment_params` the
+    batch will use, minus the carrier and service: rating a differently-shaped
+    payload would answer a question nobody asked. Creating a shipment costs
+    nothing — only buying does — and an unbought shipment simply expires.
+
+    Carrier and service are omitted on purpose. Naming them is what narrows
+    EasyPost's reply to that one service instead of everything available.
+    """
+    params = _row_to_shipment_params(
+        row,
+        from_address_id,
+        from_country=from_country,
+        declaration=declaration,
+        delivery_confirmation=delivery_confirmation,
+        insurance=insurance,
+    )
+    client = client_manager.get_client()
+    return client.shipment.create(**params)
+
+
+def quoted_services(shipment) -> list[dict]:
+    """Flatten a rated shipment into the carrier/service pairs it quoted.
+
+    Only what the picker needs: which pairs exist, and what each costs so the
+    list can show a price beside a name.
+    """
+    quotes = []
+    for rate in getattr(shipment, "rates", None) or []:
+        carrier = getattr(rate, "carrier", None)
+        service = getattr(rate, "service", None)
+        if not carrier or not service:
+            continue
+        quotes.append({
+            "carrier": carrier,
+            "service": service,
+            "rate": getattr(rate, "rate", None),
+            "currency": getattr(rate, "currency", None),
+        })
+    return quotes
+
+
 def create_batch(
     from_address_id: str,
     rows: list[BatchRow],

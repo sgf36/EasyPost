@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Batch acquistato con problemi",
   "batch_shipments.purchased_body": "Acquisto batch inviato.",
   "batch_shipments.purchased_title": "Batch acquistato",
+  "batch_shipments.quoted_only_note": "Vengono mostrati solo i servizi quotati per la riga {line}. Spunta “Mostra tutti i corrieri” per vederli tutti.",
   "batch_shipments.refresh_failed_body": "Impossibile aggiornare il batch:\n{error}",
   "batch_shipments.refresh_status_button": "Aggiorna stato batch",
   "batch_shipments.rows_loaded_summary": "{total} righe caricate — {valid} valide, {invalid} con errori.",

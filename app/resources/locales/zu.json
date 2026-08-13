@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "I-batch ithengwe nezinkinga",
   "batch_shipments.purchased_body": "Ukuthenga kwe-batch kuthunyelwe.",
   "batch_shipments.purchased_title": "I-batch ithengiwe",
+  "batch_shipments.quoted_only_note": "Kubonisa kuphela izinsizakalo ezinikezwe intengo kumugqa {line}. Maka u-“Bonisa zonke izinkampani ezithuthayo” ukubona zonke.",
   "batch_shipments.refresh_failed_body": "Ayikwazanga ukuvuselela i-batch:\n{error}",
   "batch_shipments.refresh_status_button": "Vuselela isimo se-batch",
   "batch_shipments.rows_loaded_summary": "{total} imigqa elayishiwe — {valid} evumelekile, {invalid} enamaphutha.",

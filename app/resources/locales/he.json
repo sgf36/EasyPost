@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "האצווה נרכשה עם תקלות",
   "batch_shipments.purchased_body": "בקשת רכישת האצווה נשלחה.",
   "batch_shipments.purchased_title": "האצווה נרכשה",
+  "batch_shipments.quoted_only_note": "מוצגים רק השירותים שהוצעו לשורה {line}. סמנו “הצג את כל חברות השילוח” כדי לראות את כולם.",
   "batch_shipments.refresh_failed_body": "לא ניתן היה לרענן את האצווה:\n{error}",
   "batch_shipments.refresh_status_button": "רענן את סטטוס האצווה",
   "batch_shipments.rows_loaded_summary": "נטענו {total} שורות — {valid} תקינות, {invalid} עם שגיאות.",

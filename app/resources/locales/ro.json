@@ -108,6 +108,7 @@
   "batch_shipments.purchase_problems_title": "Lot achiziționat cu probleme",
   "batch_shipments.purchased_body": "Achiziția lotului a fost trimisă.",
   "batch_shipments.purchased_title": "Lot achiziționat",
+  "batch_shipments.quoted_only_note": "Se afișează doar serviciile cotate pentru linia {line}. Bifează „Arată toți transportatorii” pentru a le vedea pe toate.",
   "batch_shipments.refresh_failed_body": "Lotul nu a putut fi actualizat:\n{error}",
   "batch_shipments.refresh_status_button": "Actualizează starea lotului",
   "batch_shipments.rows_loaded_summary": "{total} rânduri încărcate — {valid} valide, {invalid} cu erori.",
