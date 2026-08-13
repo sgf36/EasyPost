@@ -17,18 +17,29 @@ Written for a shipper, not a developer.
 ## en-US ReleaseNotes
 
 The Microsoft Store ReleaseNotes field caps at **1500 characters**, and every
-translation has to fit the same cap. The copy below is 1431, leaving 69 of
-headroom. A seven-bullet draft came to 1496 — inside the cap but too tight to
-edit, and a wall of text to read — so two bullets were merged rather than
-trimmed word by word. Check the count before editing.
+translation has to fit the same cap — which is the constraint that actually
+bites, because English is among the most compact of the 47.
+
+A six-bullet English draft came to 1431, comfortably inside the cap on its own.
+Translated, **thirteen languages went over**, Tamil worst at 1633, and ten more
+landed within 100 of the limit. Romance and Bantu languages expand roughly a
+tenth over English; the Indic scripts more.
+
+Rather than trim thirteen translations individually — which leaves the set
+saying different things in different languages — one bullet was dropped from
+**all 47 uniformly**, which is how 1.2.0 handled the same problem. The country
+code check went, being the least newsworthy of the six to a shipper. It still
+ships in the app; it just does not earn store space against the cap.
+
+The copy below is 1231 characters. The longest translation is now Tamil at 1439, the
+shortest Chinese at 387, and nothing is over. **Re-check every language after
+editing, not just this one.**
 
 • International batch shipments now carry a customs declaration. A batch sent abroad used to be created and then fail every label at purchase, with the carrier asking for "at least one item per package" without ever saying customs. The recipient template gains columns for the item description, value, quantity, tariff code and origin country, and the Batch page asks once for the contents type, the signer and what happens to an undeliverable parcel.
 
 • Rows crossing a border are checked before the batch exists, so anything missing appears in the preview while it can still be fixed. Declared values are stated in the sender's own currency, so twelve pounds is declared as pounds rather than dollars.
 
 • Get Rates prices one parcel from the import and narrows the carrier and service lists to what the route really supports, each with its price alongside. Choosing a batch service was previously done blind, against a catalogue of hundreds.
-
-• Country codes are checked, and offered as a dropdown in the workbook. "UK" is not one, and typing it produced a row that looked international when it was not.
 
 • The label sheet is chosen in Settings now, beside the label format and the printer, instead of only inside a dialog that opens after a label has been bought. Choosing a sheet sets the format to PNG, since a sheet is built from label images.
 
