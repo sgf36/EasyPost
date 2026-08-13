@@ -16,12 +16,19 @@ from pathlib import Path
 from typing import Optional
 
 from app.core.client import client_manager
+from app.core.countries import COUNTRIES
 from app.core.customs import build_customs_info, currency_for, customs_item, is_international
 from app.core.db import db_cursor
 from app.services.packages import package_code_from_choice
 from app.services.shipments import preferred_label_options
 
 logger = logging.getLogger(__name__)
+
+_COUNTRY_CODES = {code for code, _ in COUNTRIES}
+# Offered as the spreadsheet dropdown, and reduced back to the bare code at
+# import (see country_code_from_choice). The name is what makes 197 codes
+# navigable — nobody scrolling a list of bare pairs finds "GB" by looking.
+COUNTRY_CHOICES = [f"{code} — {name}" for code, name in COUNTRIES]
 
 CSV_COLUMNS = [
     "to_name",
@@ -83,6 +90,24 @@ STATE_REQUIRED_COUNTRIES = {"US", "CA", "AU", "IN", "BR", "MX", "MY", "AR"}
 
 DIMENSION_COLUMNS = ("length", "width", "height")
 
+# Columns holding an ISO country code, checked against the real list.
+#
+# Nothing validated these before, and a wrong code is not a harmless typo. "UK"
+# is the one everybody types: EasyPost rejects it, and on the way there it also
+# makes a London-to-London parcel look international — GB != UK — so the row is
+# asked for customs details it does not need. A code that is merely wrong is
+# easier to explain here than at the carrier.
+COUNTRY_COLUMNS = ("to_country", "customs_origin_country")
+
+
+def country_code_from_choice(value: str) -> str:
+    """Reduce a dropdown label ("GB — United Kingdom") to its code.
+
+    A bare code typed straight into a CSV passes through unchanged, the same
+    contract as package_code_from_choice.
+    """
+    return (value or "").split("—")[0].strip().upper()
+
 _SAMPLE_ROW = {
     "to_name": "Jane Doe", "to_company": "", "to_street1": "123 Main St",
     "to_street2": "", "to_city": "Boston", "to_state": "MA", "to_zip": "02110",
@@ -119,8 +144,6 @@ def write_xlsx_template(path: str, package_choices: Optional[list[str]] = None) 
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.datavalidation import DataValidation
 
-    choices = [c for c in (package_choices or []) if c]
-
     wb = Workbook()
     ws = wb.active
     ws.title = "Recipients"
@@ -128,19 +151,34 @@ def write_xlsx_template(path: str, package_choices: Optional[list[str]] = None) 
     ws.append([_SAMPLE_ROW[col] for col in CSV_COLUMNS])
     ws.freeze_panes = "A2"
 
-    if choices:
-        opts = wb.create_sheet("Packages")
-        opts.append(["predefined_package"])
+    def add_dropdown(sheet_name: str, column: str, choices: list[str]) -> None:
+        """Back a column with a real dropdown, listing the choices on a hidden
+        sheet and referencing them by range. An inline list formula is capped
+        near 255 characters, which both the carrier set and 197 countries blow
+        straight past."""
+        choices = [c for c in choices if c]
+        if not choices:
+            return
+        opts = wb.create_sheet(sheet_name)
+        opts.append([column])
         for name in choices:
             opts.append([name])
         opts.sheet_state = "hidden"
 
-        pkg_col = get_column_letter(CSV_COLUMNS.index("predefined_package") + 1)
-        ref = f"Packages!$A$2:$A${len(choices) + 1}"
+        letter = get_column_letter(CSV_COLUMNS.index(column) + 1)
+        ref = f"{sheet_name}!$A$2:$A${len(choices) + 1}"
         dv = DataValidation(type="list", formula1=f"={ref}", allow_blank=True)
         # Apply to the data rows below the header, not the header itself.
-        dv.add(f"{pkg_col}2:{pkg_col}1048576")
+        dv.add(f"{letter}2:{letter}1048576")
         ws.add_data_validation(dv)
+
+    add_dropdown("Packages", "predefined_package", package_choices or [])
+    # Country codes get the same treatment as packages, and for a better
+    # reason: "UK" is not a country code, and typing it produced a row that
+    # validated, then failed at the carrier — and looked international when it
+    # was not. A list nobody can mistype removes the whole class.
+    add_dropdown("Countries", "to_country", COUNTRY_CHOICES)
+    add_dropdown("OriginCountries", "customs_origin_country", COUNTRY_CHOICES)
 
     wb.save(path)
 
@@ -158,7 +196,19 @@ class BatchRow:
 
 def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = None) -> BatchRow:
     fields = {k: (str(v) if v is not None else "").strip() for k, v in fields.items()}
+    # Country columns are reduced to a bare code up front, so the dropdown's
+    # "GB — United Kingdom" and a hand-typed "gb" both become "GB" before
+    # anything else — including the international test — looks at them.
+    for column in COUNTRY_COLUMNS:
+        if fields.get(column):
+            fields[column] = country_code_from_choice(fields[column])
+
     errors = [col for col in REQUIRED_COLUMNS if not fields.get(col)]
+
+    for column in COUNTRY_COLUMNS:
+        value = fields.get(column)
+        if value and value not in _COUNTRY_CODES:
+            errors.append(f"{column} is not a country code")
 
     # State only where the destination country actually uses one.
     if fields.get("to_country", "").upper() in STATE_REQUIRED_COUNTRIES and not fields.get("to_state"):
