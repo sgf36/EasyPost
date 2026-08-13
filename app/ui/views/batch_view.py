@@ -10,12 +10,15 @@ import webbrowser
 
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QFileDialog,
+    QFormLayout,
     QGroupBox,
     QHBoxLayout,
     QHeaderView,
     QLabel,
+    QLineEdit,
     QMessageBox,
     QPushButton,
     QTableWidget,
@@ -24,6 +27,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.core.customs import is_international
 from app.core.errors import format_api_error
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
@@ -37,6 +41,7 @@ from app.services.batches import (
     generate_batch_label,
     parse_import,
     retrieve_batch,
+    revalidate,
     save_batch_locally,
     track_batch_shipments,
     write_csv_template,
@@ -84,9 +89,11 @@ class BatchView(QWidget):
         layout.addWidget(QLabel(f"<h2>{tr('batch_shipments.title')}</h2>"))
         layout.addWidget(self._build_import_group())
         layout.addWidget(self._build_preview_group(), stretch=1)
+        layout.addWidget(self._build_customs_group())
         layout.addWidget(self._service_picker)
         layout.addWidget(self._build_batch_group())
 
+        self._from_combo.currentIndexChanged.connect(self._on_from_address_changed)
         self.refresh_address_choices()
         self._service_picker.load_catalogue()
 
@@ -143,6 +150,63 @@ class BatchView(QWidget):
         group.setLayout(layout)
         return group
 
+    def _build_customs_group(self) -> QGroupBox:
+        """Declaration-level customs fields, shared by every row in the batch.
+
+        Deliberately built from the existing ``create_shipment.*`` strings
+        rather than new ones: it is the same declaration, asked for in the same
+        words, and reusing them means this needs no new translation in any of
+        the fifty locales.
+
+        Per-item detail — description, value, tariff code — is per row and comes
+        from the spreadsheet, since it differs for every parcel. What is asked
+        for here is only what is the same for all of them.
+        """
+        group = QGroupBox(tr("create_shipment.customs_group_title"))
+        self._customs_group = group
+        group.setVisible(False)
+
+        self._contents_type_combo = QComboBox()
+        for value, key in (
+            ("merchandise", "create_shipment.contents_type_merchandise"),
+            ("documents", "create_shipment.contents_type_documents"),
+            ("gift", "create_shipment.contents_type_gift"),
+            ("sample", "create_shipment.contents_type_sample"),
+            ("returned_goods", "create_shipment.contents_type_returned_goods"),
+        ):
+            self._contents_type_combo.addItem(tr(key), value)
+
+        self._non_delivery_combo = QComboBox()
+        for value, key in (
+            ("return", "create_shipment.non_delivery_return"),
+            ("abandon", "create_shipment.non_delivery_abandon"),
+        ):
+            self._non_delivery_combo.addItem(tr(key), value)
+
+        self._customs_signer_input = QLineEdit()
+        self._customs_certify_checkbox = QCheckBox(tr("create_shipment.customs_certify_checkbox"))
+        self._customs_signer_input.textChanged.connect(self._update_create_enabled)
+        self._customs_certify_checkbox.stateChanged.connect(self._update_create_enabled)
+
+        form = QFormLayout()
+        form.addRow(QLabel(tr("create_shipment.customs_intro")))
+        form.addRow(tr("create_shipment.contents_type_label"), self._contents_type_combo)
+        form.addRow(tr("create_shipment.non_delivery_label"), self._non_delivery_combo)
+        form.addRow(tr("create_shipment.customs_signer_label"), self._customs_signer_input)
+        form.addRow(self._customs_certify_checkbox)
+        group.setLayout(form)
+        return group
+
+    def _declaration(self) -> dict | None:
+        """The batch-level half of the declaration, or None when not needed."""
+        if not self._has_international_rows():
+            return None
+        return {
+            "customs_signer": self._customs_signer_input.text().strip(),
+            "contents_type": self._contents_type_combo.currentData(),
+            "non_delivery_option": self._non_delivery_combo.currentData(),
+        }
+
     def _build_batch_group(self) -> QGroupBox:
         group = QGroupBox(tr("batch_shipments.batch_group_title"))
         self._create_batch_btn = QPushButton(tr("batch_shipments.create_batch_button"))
@@ -183,10 +247,37 @@ class BatchView(QWidget):
 
     def refresh_address_choices(self) -> None:
         self._from_combo.clear()
+        self._address_by_id = {}
         for rec in list_addresses():
+            self._address_by_id[rec.id] = rec
             self._from_combo.addItem(
                 address_choice_label(rec), rec.id
             )
+        self._on_from_address_changed()
+
+    def _from_country(self) -> str | None:
+        rec = self._address_by_id.get(self._from_combo.currentData())
+        return getattr(rec, "country", None)
+
+    def _has_international_rows(self) -> bool:
+        country = self._from_country()
+        return any(
+            is_international(country, r.fields.get("to_country"))
+            for r in self._parsed_rows
+        )
+
+    def _on_from_address_changed(self) -> None:
+        """Re-check the loaded rows against the new sender.
+
+        Switching sender can turn a whole file international on its own, and
+        leaving a stale "5 valid, 0 with errors" on screen is how an
+        undeclarable batch reached a live account.
+        """
+        if self._parsed_rows:
+            self._parsed_rows = revalidate(self._parsed_rows, self._from_country())
+            self._render_preview()
+        self._customs_group.setVisible(self._has_international_rows())
+        self._update_create_enabled()
 
     def _on_download_template(self) -> None:
         # Excel default: only a workbook can carry the package dropdown. CSV
@@ -231,12 +322,16 @@ class BatchView(QWidget):
         if not path:
             return
         try:
-            self._parsed_rows = parse_import(path)
+            self._parsed_rows = parse_import(path, self._from_country())
             self._csv_path = path
         except Exception as exc:  # noqa: BLE001
             QMessageBox.critical(self, tr("batch_shipments.invalid_csv_title"), str(exc))
             return
 
+        self._customs_group.setVisible(self._has_international_rows())
+        self._render_preview()
+
+    def _render_preview(self) -> None:
         valid_count = sum(1 for r in self._parsed_rows if r.is_valid)
         self._summary_label.setText(
             tr(
@@ -272,7 +367,17 @@ class BatchView(QWidget):
         cannot be bought at all, so the button stays disabled rather than
         producing a dead batch."""
         rows_ready = getattr(self, "_valid_row_count", 0) > 0
-        self._create_batch_btn.setEnabled(rows_ready and self._service_picker.is_complete())
+        # An international batch also needs its declaration signed. Without it
+        # the batch is created and every label fails at purchase, so the button
+        # stays disabled rather than producing a batch that cannot be bought —
+        # the same reasoning as the service picker above.
+        declaration = self._declaration()
+        customs_ready = declaration is None or (
+            bool(declaration["customs_signer"]) and self._customs_certify_checkbox.isChecked()
+        )
+        self._create_batch_btn.setEnabled(
+            rows_ready and self._service_picker.is_complete() and customs_ready
+        )
 
     def _on_create_batch(self) -> None:
         from_id = self._from_combo.currentData()
@@ -304,6 +409,8 @@ class BatchView(QWidget):
                 service=selection.service,
                 delivery_confirmation=selection.delivery_confirmation,
                 insurance=selection.insurance,
+                from_country=self._from_country(),
+                declaration=self._declaration(),
             ),
             self,
         )
