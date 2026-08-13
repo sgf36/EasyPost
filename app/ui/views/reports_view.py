@@ -6,6 +6,7 @@ from PySide6.QtGui import QPainter
 from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
+    QHeaderView,
     QLabel,
     QPushButton,
     QTableWidget,
@@ -48,6 +49,13 @@ class ReportsView(QWidget):
             tr("reports.col_category"),
             tr("reports.col_count"),
         ])
+        # Default column widths clipped "Status: Purchased" to "Status: ..." in
+        # every language, English included, at the window size the Mac App Store
+        # screenshots are taken at. A count needs the width of a number; the
+        # category should have the rest.
+        breakdown_header = self._breakdown_table.horizontalHeader()
+        breakdown_header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        breakdown_header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         breakdown_layout = QVBoxLayout()
         breakdown_layout.addWidget(self._breakdown_table)
         self._breakdown_group.setLayout(breakdown_layout)

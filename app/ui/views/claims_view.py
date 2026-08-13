@@ -60,7 +60,12 @@ class ClaimsView(QWidget):
 
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"<h2>{tr('claims.title')}</h2>"))
-        layout.addWidget(QLabel(tr("claims.description")))
+        # Wrapped, or the sentence sets the minimum width of the whole page —
+        # every view sits in a QScrollArea with setWidgetResizable(True), which
+        # honours a non-wrapping label's full single-line width.
+        description = QLabel(tr("claims.description"))
+        description.setWordWrap(True)
+        layout.addWidget(description)
         layout.addWidget(self._build_form_group())
         layout.addWidget(self._build_table_group(), stretch=1)
 

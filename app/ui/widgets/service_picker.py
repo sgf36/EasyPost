@@ -50,12 +50,20 @@ from app.ui.widgets.async_worker import run_async
 # page published "DHL Expre" and "ExpressWorldw" on store screenshots in all
 # seven languages. Same defect as the Package combo's "Custom di" (6070f4a),
 # different cause, so that fix did not cover these.
-_COMBO_MIN_WIDTH = 220
+#
+# The floor is measured in characters, not pixels. A pixel minimum does not
+# know the font, and a value generous enough for English is a value that makes
+# the whole Batch page overflow its window in German — which it did, at 220px,
+# pushing "Datei wählen…" off the right edge. Eighteen characters covers
+# "ExpressWorldwide" and every carrier name in the catalogue.
+_COMBO_MIN_CHARS = 18
 
 
 def _widen(combo: QComboBox) -> None:
-    combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
-    combo.setMinimumWidth(_COMBO_MIN_WIDTH)
+    combo.setMinimumContentsLength(_COMBO_MIN_CHARS)
+    combo.setSizeAdjustPolicy(
+        QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+    )
 
 
 @dataclass(frozen=True)

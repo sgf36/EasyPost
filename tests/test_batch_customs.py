@@ -27,6 +27,16 @@ from app.services.batches import (
 DECLARATION = {"customs_signer": "S Fields", "contents_type": "merchandise"}
 
 
+def _flagged(row) -> set[str]:
+    """Which columns a row's errors name.
+
+    Preview errors are translated sentences ("customs_value is required"), not
+    bare column names, so assert the column is named rather than pinning the
+    English wording.
+    """
+    return {col for col in CSV_COLUMNS if any(col in e for e in row.errors)}
+
+
 def _row(**overrides):
     fields = {
         "to_name": "Karen Fields", "to_street1": "1 Sunset Blvd",
@@ -68,8 +78,8 @@ def test_domestic_row_needs_no_customs():
 def test_international_row_without_customs_is_rejected():
     row = _validate_row(2, _row(), from_country="GB")
     assert not row.is_valid
-    assert "customs_description" in row.errors
-    assert "customs_value" in row.errors
+    assert "customs_description" in _flagged(row)
+    assert "customs_value" in _flagged(row)
 
 
 def test_international_row_with_customs_is_accepted():
@@ -89,7 +99,7 @@ def test_switching_sender_country_revalidates():
     assert rows[0].is_valid
     again = revalidate(rows, from_country="GB")
     assert not again[0].is_valid
-    assert "customs_description" in again[0].errors
+    assert "customs_description" in _flagged(again[0])
 
 
 def test_domestic_shipment_carries_no_customs_info():
@@ -160,7 +170,7 @@ def test_uk_is_not_a_country_code():
     "GB" != "UK" — so the row is asked for customs details it does not need."""
     row = _validate_row(2, _row(to_country="UK"), from_country="GB")
     assert not row.is_valid
-    assert any("to_country is not a country code" in e for e in row.errors)
+    assert "to_country" in _flagged(row)
 
 
 def test_a_country_name_is_not_a_code():
@@ -176,13 +186,13 @@ def test_lowercase_and_dropdown_labels_both_normalise():
         assert row.is_valid, (value, row.errors)
         assert row.fields["to_country"] == "GB"
         # And a domestic GB row stays domestic, so no customs is demanded.
-        assert "customs_description" not in row.errors
+        assert "customs_description" not in _flagged(row)
 
 
 def test_a_bad_origin_country_is_caught_too():
     row = _validate_row(2, _customs_row(customs_origin_country="UK"), from_country="GB")
     assert not row.is_valid
-    assert any("customs_origin_country is not a country code" in e for e in row.errors)
+    assert "customs_origin_country" in _flagged(row)
 
 
 def test_the_xlsx_template_offers_country_dropdowns(tmp_path):
@@ -216,4 +226,4 @@ def test_the_reported_case(tmp_path):
     rows = parse_import(str(path), from_country="GB")
     assert len(rows) == 5
     assert all(not r.is_valid for r in rows), "every international row should be flagged"
-    assert all("customs_description" in r.errors for r in rows)
+    assert all("customs_description" in _flagged(r) for r in rows)

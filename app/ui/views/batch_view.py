@@ -12,6 +12,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QGridLayout,
     QFileDialog,
     QFormLayout,
     QGroupBox,
@@ -120,6 +121,15 @@ class BatchView(QWidget):
         row = QHBoxLayout()
 
         self._from_combo = QComboBox()
+        # A combo will not shrink below the width of its longest address unless
+        # told it may, so in German — where "Vorlage herunterladen" and
+        # "Datei wählen…" are half again as long as their English labels — the
+        # row overflowed and cut the second button off the edge of the window.
+        # The address is the elastic part here; the buttons are not.
+        self._from_combo.setMinimumContentsLength(12)
+        self._from_combo.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
+        )
         template_btn = QPushButton(tr("batch_shipments.download_template_button"))
         template_btn.clicked.connect(self._on_download_template)
         browse_btn = QPushButton(tr("batch_shipments.choose_csv_button"))
@@ -249,7 +259,14 @@ class BatchView(QWidget):
         self._customs_certify_checkbox.stateChanged.connect(self._update_create_enabled)
 
         form = QFormLayout()
-        form.addRow(QLabel(tr("create_shipment.customs_intro")))
+        # A QLabel that does not wrap reports its whole single line as its
+        # minimum width, and a QScrollArea with setWidgetResizable honours that
+        # — so this one sentence set the minimum width of the entire Batch page.
+        # In English it fitted; in German it is half again as long, and the page
+        # grew a horizontal scrollbar that pushed "Datei wählen…" off the edge.
+        customs_intro = QLabel(tr("create_shipment.customs_intro"))
+        customs_intro.setWordWrap(True)
+        form.addRow(customs_intro)
         form.addRow(tr("create_shipment.contents_type_label"), self._contents_type_combo)
         form.addRow(tr("create_shipment.non_delivery_label"), self._non_delivery_combo)
         form.addRow(tr("create_shipment.customs_signer_label"), self._customs_signer_input)
@@ -292,12 +309,26 @@ class BatchView(QWidget):
         self._status_label = QLabel(tr("batch_shipments.no_batch_label"))
         self._status_label.setWordWrap(True)
 
-        row = QHBoxLayout()
-        row.addWidget(self._create_batch_btn)
-        row.addWidget(self._refresh_status_btn)
-        row.addWidget(self._buy_batch_btn)
-        row.addWidget(self._generate_labels_btn)
-        row.addWidget(self._export_sheet_btn)
+        # Five buttons on one row is an English-only layout. Their German
+        # labels — "Batch erstellen (Preise abrufen)", "Alle Sendungen im Batch
+        # kaufen", "Kombinierte Etiketten erzeugen" — need 1320 points side by
+        # side, against roughly 1245 available in a 1440-point window. That one
+        # row set the minimum width of the whole page and gave it a horizontal
+        # scrollbar, which is why controls two sections *above* it were being
+        # cut off the right-hand edge.
+        #
+        # A grid wraps instead: one row where there is space, three-plus-two
+        # where there is not, in any language.
+        row = QGridLayout()
+        row.setContentsMargins(0, 0, 0, 0)
+        for index, button in enumerate((
+            self._create_batch_btn,
+            self._refresh_status_btn,
+            self._buy_batch_btn,
+            self._generate_labels_btn,
+            self._export_sheet_btn,
+        )):
+            row.addWidget(button, index // 3, index % 3)
 
         layout = QVBoxLayout()
         layout.addLayout(row)

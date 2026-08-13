@@ -19,6 +19,7 @@ from app.core.client import client_manager
 from app.core.countries import COUNTRIES
 from app.core.customs import build_customs_info, currency_for, customs_item, is_international
 from app.core.db import db_cursor
+from app.i18n import tr
 from app.services.packages import package_code_from_choice
 from app.services.shipments import preferred_label_options
 
@@ -194,6 +195,22 @@ class BatchRow:
         return not self.errors
 
 
+def _row_error(kind: str, field: str) -> str:
+    """One preview-table error, in the user's language.
+
+    These used to be bare English: a missing postcode appeared as "to_zip", a
+    bad figure as "weight is not a number". The application is translated into
+    fifty languages and this column was the one place it still spoke English —
+    the more conspicuous because it is the column a user is sent to read.
+
+    The **column name stays untranslated inside the sentence**, deliberately.
+    It is not prose: it is the literal heading the user must find in their own
+    spreadsheet to fix the row, and translating it would send them looking for
+    a column that is not there.
+    """
+    return tr(f"batch_errors.{kind}", field=field)
+
+
 def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = None) -> BatchRow:
     fields = {k: (str(v) if v is not None else "").strip() for k, v in fields.items()}
     # Country columns are reduced to a bare code up front, so the dropdown's
@@ -203,16 +220,16 @@ def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = 
         if fields.get(column):
             fields[column] = country_code_from_choice(fields[column])
 
-    errors = [col for col in REQUIRED_COLUMNS if not fields.get(col)]
+    errors = [_row_error("required", col) for col in REQUIRED_COLUMNS if not fields.get(col)]
 
     for column in COUNTRY_COLUMNS:
         value = fields.get(column)
         if value and value not in _COUNTRY_CODES:
-            errors.append(f"{column} is not a country code")
+            errors.append(_row_error("not_a_country_code", column))
 
     # State only where the destination country actually uses one.
     if fields.get("to_country", "").upper() in STATE_REQUIRED_COUNTRIES and not fields.get("to_state"):
-        errors.append("to_state")
+        errors.append(_row_error("required", "to_state"))
 
     # Customs, on rows that cross a border. Checked here so an incomplete row is
     # refused in the preview, before a batch exists — the alternative is what
@@ -223,26 +240,28 @@ def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = 
     # In that case the row is left alone rather than guessed at; the view
     # re-validates once the sender is known.
     if is_international(from_country, fields.get("to_country")):
-        errors.extend(col for col in CUSTOMS_REQUIRED_COLUMNS if not fields.get(col))
+        errors.extend(_row_error("required", col)
+                      for col in CUSTOMS_REQUIRED_COLUMNS if not fields.get(col))
         quantity = fields.get("customs_quantity")
         if quantity:
             try:
                 if int(float(quantity)) < 1:
-                    errors.append("customs_quantity must be at least 1")
+                    errors.append(_row_error("at_least_one", "customs_quantity"))
             except ValueError:
-                errors.append("customs_quantity is not a number")
+                errors.append(_row_error("not_a_number", "customs_quantity"))
         value = fields.get("customs_value")
         if value:
             try:
                 float(value)
             except ValueError:
-                errors.append("customs_value is not a number")
+                errors.append(_row_error("not_a_number", "customs_value"))
 
     # A predefined package brings its own dimensions, so length/width/height
     # are only required when no package is named. When they are supplied either
     # way, they must still be numeric.
     if not fields.get("predefined_package"):
-        errors.extend(col for col in DIMENSION_COLUMNS if not fields.get(col))
+        errors.extend(_row_error("required", col)
+                      for col in DIMENSION_COLUMNS if not fields.get(col))
 
     for numeric_col in (*DIMENSION_COLUMNS, "weight"):
         value = fields.get(numeric_col)
@@ -250,7 +269,7 @@ def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = 
             try:
                 float(value)
             except ValueError:
-                errors.append(f"{numeric_col} is not a number")
+                errors.append(_row_error("not_a_number", numeric_col))
 
     return BatchRow(line_number=line_number, fields=fields, errors=errors)
 
