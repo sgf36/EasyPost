@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
 from app.core.errors import carrier_messages, format_api_error
 from app.i18n import tr
 from app.services.addresses import address_choice_label, list_addresses
+from app.services.formatting import display_carrier, display_service, display_status
 from app.services.pickups import buy_pickup, cancel_pickup, create_pickup, list_pickups, save_pickup_locally
 from app.services.shipments import list_shipments
 from app.ui.widgets.async_worker import run_async
@@ -146,7 +147,10 @@ class PickupsView(QWidget):
         for rec in list_shipments():
             if not rec.tracking_code:
                 continue
-            item = QListWidgetItem(f"{rec.tracking_code} — {rec.carrier} {rec.service}")
+            item = QListWidgetItem(
+                f"{rec.tracking_code} — {display_carrier(rec.carrier or '')} "
+                f"{display_service(rec.service or '')}".rstrip()
+            )
             item.setData(1000, rec.id)
             self._shipments_list.addItem(item)
 
@@ -201,9 +205,11 @@ class PickupsView(QWidget):
         rates = getattr(pickup, "pickup_rates", None) or getattr(pickup, "rates", None) or []
         self._rates_table.setRowCount(len(rates))
         for row, rate in enumerate(rates):
+            # The Service column published FEDEX_GROUND raw beside a humanised
+            # "DHL Express" in the column next to it.
             values = [
-                getattr(rate, "carrier", ""),
-                getattr(rate, "service", ""),
+                display_carrier(getattr(rate, "carrier", "")),
+                display_service(getattr(rate, "service", "")),
                 getattr(rate, "rate", ""),
                 getattr(rate, "currency", ""),
             ]
@@ -260,7 +266,7 @@ class PickupsView(QWidget):
                 rec.address or "",
                 rec.min_datetime or "",
                 rec.max_datetime or "",
-                rec.status or "",
+                display_status(rec.status),
             ]
             for col, value in enumerate(values):
                 self._scheduled_table.setItem(row, col, QTableWidgetItem(value))

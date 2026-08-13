@@ -1,6 +1,5 @@
 """Create a shipment, shop rates, buy a label, and save/open it."""
 
-import re
 import webbrowser
 from functools import partial
 
@@ -37,7 +36,7 @@ from app.core.errors import carrier_messages, format_api_error
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
 from app.services.addresses import address_choice_label, list_addresses
-from app.services.carriers import carrier_display_name, carrier_is_known
+from app.services.formatting import display_carrier, humanize_code
 from app.services.insurance import INSURANCE_MAX_USD
 from app.services.packages import (
     delete_saved_package,
@@ -1031,74 +1030,20 @@ class CreateShipmentView(QWidget):
         group.setLayout(layout)
         return group
 
-    _CAMEL_SPLIT = re.compile(
-        r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[A-Za-z])(?=[0-9])"
-    )
 
-    # Title-casing an all-caps service name gets the brand wrong: FEDEX_GROUND
-    # becomes "Fedex Ground", sitting under a group header that correctly reads
-    # "FedEx". Restore the handful of names whose own capitalisation is not
-    # simple title case.
-    _BRAND_CASE = {
-        "Fedex": "FedEx",
-        "Usps": "USPS",
-        "Ups": "UPS",
-        "Dhl": "DHL",
-        "Ontrac": "OnTrac",
-        "Lasership": "LaserShip",
-    }
+    # These two used to be implemented here, and that was the bug. Every other
+    # view read the raw API field instead, so Create Shipment showed "FedEx
+    # Ground" while Pickups showed FEDEX_GROUND, History showed RoyalMailV3 and
+    # Tracking showed in_transit — all of them on published store screenshots.
+    # The implementation now lives in app/services/formatting.py and these are
+    # thin aliases so existing callers here keep working.
+    @staticmethod
+    def _humanize_service(name: str) -> str:
+        return humanize_code(name)
 
-    @classmethod
-    def _humanize_service(cls, name: str) -> str:
-        """Space out a run-together carrier service name so it reads as words.
-
-        EasyPost returns names like ``InternationalBusinessParcelsTracked30kg``;
-        splitting at camelCase and letter/digit boundaries gives ``International
-        Business Parcels Tracked 30kg``, which is far quicker to scan and lets a
-        clipped name break at a sensible point. Names that already contain
-        spaces are left untouched. The same spacing turns a carrier code
-        (``RoyalMailV3``) into a readable group-header name.
-
-        Some carriers shout instead of camelCasing — FedEx returns
-        ``FEDEX_GROUND`` — which sat raw and upper-case beside its humanised
-        neighbours in the rates table. Underscores become spaces and an
-        all-caps word is title-cased, so it reads as words like the rest. Real
-        acronyms (USPS, DHL) are single tokens and untouched."""
-        if not name or " " in name:
-            return name
-        if "_" in name:
-            return " ".join(
-                # Three letters counts: FEDEX_2_DAY was leaving "DAY" shouting.
-                # Genuine three-letter acronyms come back through _BRAND_CASE.
-                cls._BRAND_CASE.get(part.title(), part.title())
-                if part.isupper() and len(part) > 2
-                else part
-                for part in name.split("_")
-                if part
-            )
-        return cls._CAMEL_SPLIT.sub(" ", name)
-
-    @classmethod
-    def _carrier_display_name(cls, carrier: str) -> str:
-        """Group-header label for a carrier code off a rate.
-
-        Rates report the carrier CamelCased ("RoyalMailV3"); the shared lookup
-        is case-insensitive and backed by the names EasyPost itself publishes,
-        so it resolves either spelling. Only when the carrier is unknown to that
-        catalogue — an offline first run, say — does this fall back to
-        camel-splitting the code, which reads acceptably for plain acronyms
-        (USPS, UPS, DHL).
-
-        Ask the catalogue whether it knows the carrier rather than inferring it
-        from the returned name. Some carriers' display name IS their code, so
-        comparing the two calls them unrecognised and camel-splits them: FedEx
-        reached a published store screenshot as "Fed Ex" that way."""
-        if not carrier:
-            return "—"
-        resolved = carrier_display_name(carrier)
-        if carrier_is_known(carrier):
-            return resolved
-        return cls._humanize_service(carrier)
+    @staticmethod
+    def _carrier_display_name(carrier: str) -> str:
+        return display_carrier(carrier, blank="—")
 
     def _build_rate_service_cell(self, rate, *, cheapest: bool, fastest: bool) -> QWidget:
         """The service cell of a child row: the humanised service name plus any

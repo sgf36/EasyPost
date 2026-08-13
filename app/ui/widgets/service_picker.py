@@ -44,6 +44,20 @@ from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
 
 
+# A QComboBox defaults to AdjustToContentsOnFirstShow, and both of these are
+# empty when first shown — carriers and services arrive from an async catalogue
+# load afterwards. So each sized itself to nothing and stayed there: the Batch
+# page published "DHL Expre" and "ExpressWorldw" on store screenshots in all
+# seven languages. Same defect as the Package combo's "Custom di" (6070f4a),
+# different cause, so that fix did not cover these.
+_COMBO_MIN_WIDTH = 220
+
+
+def _widen(combo: QComboBox) -> None:
+    combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+    combo.setMinimumWidth(_COMBO_MIN_WIDTH)
+
+
 @dataclass(frozen=True)
 class ServiceSelection:
     """What the user chose, in the exact shapes the batch service expects."""
@@ -74,6 +88,7 @@ class ServicePicker(QGroupBox):
         self._quoted_line: Optional[int] = None
 
         self._carrier_combo = QComboBox()
+        _widen(self._carrier_combo)
         self._carrier_combo.currentIndexChanged.connect(self._on_carrier_changed)
 
         self._show_all_check = QCheckBox(tr("batch_shipments.show_all_carriers"))
@@ -95,6 +110,7 @@ class ServicePicker(QGroupBox):
         self._service_filter.textChanged.connect(lambda _: self._populate_services())
 
         self._service_combo = QComboBox()
+        _widen(self._service_combo)
         self._service_combo.currentIndexChanged.connect(self._on_service_changed)
 
         service_box = QVBoxLayout()

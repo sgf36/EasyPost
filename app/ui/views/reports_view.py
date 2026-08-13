@@ -15,12 +15,14 @@ from PySide6.QtWidgets import (
 )
 
 from app.i18n import tr
+from app.services.formatting import display_carrier, display_status, format_money_map
 from app.services.reports import (
     label_counts_by_status,
+    primary_currency,
     refund_status_breakdown,
     spend_by_carrier,
     total_labels_purchased,
-    total_spend,
+    total_spend_by_currency,
 )
 
 
@@ -60,24 +62,42 @@ class ReportsView(QWidget):
         self.refresh()
 
     def refresh(self) -> None:
-        spend = spend_by_carrier()
+        # Every figure carries its currency. Summing across them produced
+        # "12.25" for 3.85 GBP plus 8.40 USD, and that number reached both
+        # store listings before anyone read it.
         self._summary_label.setText(
             tr(
                 "reports.summary_label",
-                total_spend=f"{total_spend():.2f}",
+                total_spend=format_money_map(total_spend_by_currency()),
                 labels_purchased=total_labels_purchased(),
             )
         )
-        self._render_chart(spend)
+        self._render_chart(spend_by_carrier())
         self._render_breakdown()
 
-    def _render_chart(self, spend: dict) -> None:
+    def _render_chart(self, spend: dict[str, dict[str, float]]) -> None:
+        """One currency per chart, named in its own title.
+
+        A bar chart has one axis and an axis has one unit, so pounds and
+        dollars cannot share it. Rather than plot incomparable bars the chart
+        shows the currency most of the spend is in and says which; the rest is
+        still in the summary line above.
+        """
+        currency = primary_currency()
         chart = QChart()
-        chart.setTitle(tr("reports.spend_chart_title"))
+        title = tr("reports.spend_chart_title")
+        chart.setTitle(f"{title} ({currency})" if currency else title)
 
         bar_set = QBarSet(tr("reports.spend_series_name"))
-        categories = list(spend.keys()) or [tr("reports.no_data_label")]
-        values = list(spend.values()) or [0]
+        # Carriers are stored as the API returns them ("RoyalMailV3"); the axis
+        # was labelling its bars with that raw code.
+        per_carrier = {
+            display_carrier(carrier): by_ccy.get(currency, 0.0)
+            for carrier, by_ccy in spend.items()
+            if by_ccy.get(currency)
+        }
+        categories = list(per_carrier) or [tr("reports.no_data_label")]
+        values = list(per_carrier.values()) or [0]
         for value in values:
             bar_set.append(value)
 
@@ -102,8 +122,15 @@ class ReportsView(QWidget):
         statuses = label_counts_by_status()
         refunds = refund_status_breakdown()
 
-        rows = [(tr("reports.status_row_label", status=k), v) for k, v in statuses.items()]
-        rows += [(tr("reports.refund_row_label", status=k), v) for k, v in refunds.items()]
+        # "Status: purchased" was as raw as the tracking table's in_transit.
+        rows = [
+            (tr("reports.status_row_label", status=display_status(k)), v)
+            for k, v in statuses.items()
+        ]
+        rows += [
+            (tr("reports.refund_row_label", status=display_status(k)), v)
+            for k, v in refunds.items()
+        ]
 
         self._breakdown_table.setRowCount(len(rows))
         for row_idx, (label, count) in enumerate(rows):
