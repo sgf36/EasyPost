@@ -193,6 +193,19 @@ async function handleProxy(request, env, url) {
     return json({ error: "bad_kek" }, 401);
   }
 
+  // `url.search` must reach EasyPost unmodified. The mobile app's list screens
+  // page with `page_size` and `before_id`; before they were forwarded, one
+  // unparameterised GET returned only the first page — in the review account
+  // that meant 25 of 54 trackers, every one of them `delivered`, so the app
+  // looked incapable of showing any other status.
+  //
+  // This is a cross-repo contract. The code is here; the dependency on it is in
+  // `sgf36/Easy-Post-Mobile-Companion`, so nothing in this repository fails if
+  // it breaks. Strip the query, filter it, or start allow-listing on the full
+  // URL instead of the path, and the mobile lists silently go short. No error,
+  // no failing test here, just less data.
+  //
+  // `isAllowed` checks method and path only, deliberately — see its call above.
   const upstream = `${env.EASYPOST_API_BASE}${epPath}${url.search}`;
   const headers = {
     authorization: "Basic " + btoa(easypostKey + ":"),
