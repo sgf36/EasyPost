@@ -478,99 +478,161 @@ export default {
     if (request.method !== "POST" || url.pathname !== "/paddle/webhook") {
       return new Response("Not found", { status: 404 });
     }
-
-    const raw = await request.text();
-    const sig = request.headers.get("Paddle-Signature") || "";
-    if (!verifyPaddleSignature(raw, sig, env.PADDLE_WEBHOOK_SECRET)) {
-      return new Response("invalid signature", { status: 401 });
-    }
-
-    const event = JSON.parse(raw);
-    const data = event.data || {};
-
-    // A refunded or charged-back purchase must stop working. Revoking also frees
-    // the seats, so a replacement key issued later starts from a clean slate.
-    //
-    // Paddle signals this with adjustment.created, NOT transaction.refunded -
-    // that event does not exist and the notification destination rejects it as
-    // an invalid subscription. The second name is kept only as a harmless guard.
-    if (event.event_type === "adjustment.created"
-        || event.event_type === "transaction.refunded") {
-      const txnId = data.transaction_id || data.id || "";
-      if (txnId && env.LICENSES) {
-        await revokeOrder(env.LICENSES, txnId, event.event_type.split(".")[1]);
-        return json({ status: "revoked", transaction: txnId });
-      }
-      return json({ ignored: "no-transaction-id" });
-    }
-
-    // Subscription lifecycle. The licence key never changes; what changes is how
-    // long an activation receipt is worth, so all these do is keep the record of
-    // what has been paid for up to date.
-    if (event.event_type.startsWith("subscription.")) {
-      const subId = data.id || "";
-      if (!subId || !env.LICENSES) return json({ ignored: "no-subscription-id" });
-
-      const priceIds = (data.items || []).map((i) => i.price && i.price.id);
-      const subTier = tierForPrice(env, priceIds) || "";
-      const status = event.event_type === "subscription.canceled"
-        ? "canceled"
-        : (data.status || "active");
-      // next_billed_at is what has actually been paid up to; current_billing_period
-      // is the fallback when a subscription is cancelled and simply runs out.
-      const periodEnd = data.next_billed_at
-        || (data.current_billing_period && data.current_billing_period.ends_at)
-        || "";
-
-      await recordSubscription(env.LICENSES, subId, status, periodEnd, subTier);
-      return json({ status: "subscription_recorded", subscription: subId, state: status });
-    }
-
-    if (event.event_type !== "transaction.completed") return json({ ignored: event.event_type });
-
-    const priceIds = (data.items || []).map((i) => i.price && i.price.id);
-    const tier = tierForPrice(env, priceIds);
-    if (!tier) return json({ ignored: "other-price" });
-
-    // Count the launch discount against its 26, so the website can show how many
-    // are left. Only real first purchases carry it; a renewal never does.
-    if (env.LICENSES && data.discount_id === PROMO.id && data.origin !== "subscription_recurring") {
-      await recordPromoRedemption(env.LICENSES, data.discount_id, data.id || "");
-    }
-
-    const base = env.PADDLE_API_BASE || "https://api.paddle.com";
-    const product = env.LICENSE_PRODUCT_ID || "easypost-desktop";
-    const txn = data.id || "";
-    const subId = data.subscription_id || "";
-    const annual = TIER_PLANS[tier] === "annual";
-
-    // An annual key names the subscription, not the transaction, so it stays
-    // valid across every renewal and activation can look up what is paid for.
-    const orderRef = annual && subId ? subId : txn;
-
-    // A renewal is a fresh transaction against a key the customer already has.
-    // Minting is harmless (it is deterministic), but emailing again would be
-    // noise, so only the first transaction sends anything.
-    const isRenewal = data.origin === "subscription_recurring";
-
-    // Deterministic iat, so Paddle retries mint the identical key. For a
-    // subscription that means every renewal reproduces the original key rather
-    // than a new one the customer would have to paste.
-    const iat = annual && subId
-      ? (data.billed_at || event.occurred_at || "1970-01-01T00:00:00Z")
-      : (event.occurred_at || "1970-01-01T00:00:00Z");
-    const stableIat = annual && subId ? "subscription" : iat;
-
-    const email = await getCustomerEmail(base, env.PADDLE_API_KEY, data.customer_id);
-    const licenseKey = mintLicense(
-      env.LICENSE_PRIVATE_KEY_PEM, product, email, orderRef, stableIat, tier
-    );
-
-    if (isRenewal) {
-      return json({ status: "renewal_noted", subscription: subId, tier });
-    }
-    await sendLicenseEmail(env.RESEND_API_KEY, env.LICENSE_FROM_EMAIL, email, licenseKey, tier);
-
-    return json({ status: "license_issued", transaction: txn, order: orderRef, tier });
+    return handlePaddleWebhook(request, env);
   },
 };
+
+// Every throw in the webhook path used to surface at Paddle as a bare
+// "500 error code: 1101" — Cloudflare's way of saying "the Worker raised
+// something", with no file, no line and no stage. Diagnosing the first real
+// paid order therefore meant reading the source and reasoning about which call
+// could raise. It was none of the obvious candidates: the deployed bundle had
+// been built by an older toolchain that routed node:crypto's `sign` through an
+// unenv "not implemented" stub, so mintLicense threw on a Worker whose source
+// was entirely correct.
+//
+// This wrapper does not stop that happening again. It makes it a one-minute
+// diagnosis instead of an afternoon: the stage is named in the response Paddle
+// records, and the exception is logged with its stack.
+//
+// It deliberately still returns 500. Paddle retries on 5xx, and a licence that
+// failed to mint SHOULD be retried — swallowing the error into a 200 would lose
+// the order silently, which is the one outcome worse than a slow diagnosis.
+async function handlePaddleWebhook(request, env) {
+  let stage = "read-body";
+  try {
+    return await processPaddleWebhook(request, env, (s) => { stage = s; });
+  } catch (err) {
+    // Logged, not just returned: the response body is capped and Paddle's log
+    // is awkward to read, whereas `wrangler tail` shows this immediately.
+    // Requires [observability] in wrangler.toml — see that file.
+    console.error(`paddle webhook failed at stage=${stage}:`, err && err.stack ? err.stack : err);
+    return new Response(
+      JSON.stringify({
+        error: "webhook_failed",
+        stage,
+        // Our own throw messages ("paddle customers 401"), never an env value.
+        message: String((err && err.message) || err).slice(0, 300),
+      }),
+      { status: 500, headers: { "content-type": "application/json" } },
+    );
+  }
+}
+
+async function processPaddleWebhook(request, env, setStage) {
+  setStage("read-body");
+  const raw = await request.text();
+  const sig = request.headers.get("Paddle-Signature") || "";
+
+  setStage("verify-signature");
+  if (!verifyPaddleSignature(raw, sig, env.PADDLE_WEBHOOK_SECRET)) {
+    return new Response("invalid signature", { status: 401 });
+  }
+
+  setStage("parse-payload");
+  const event = JSON.parse(raw);
+  const data = event.data || {};
+
+  // A refunded or charged-back purchase must stop working. Revoking also frees
+  // the seats, so a replacement key issued later starts from a clean slate.
+  //
+  // Paddle signals this with adjustment.created, NOT transaction.refunded -
+  // that event does not exist and the notification destination rejects it as
+  // an invalid subscription. The second name is kept only as a harmless guard.
+  if (event.event_type === "adjustment.created"
+      || event.event_type === "transaction.refunded") {
+    const txnId = data.transaction_id || data.id || "";
+    if (txnId && env.LICENSES) {
+      setStage("revoke-order");
+      await revokeOrder(env.LICENSES, txnId, event.event_type.split(".")[1]);
+      return json({ status: "revoked", transaction: txnId });
+    }
+    return json({ ignored: "no-transaction-id" });
+  }
+
+  // Subscription lifecycle. The licence key never changes; what changes is how
+  // long an activation receipt is worth, so all these do is keep the record of
+  // what has been paid for up to date.
+  if (event.event_type.startsWith("subscription.")) {
+    const subId = data.id || "";
+    if (!subId || !env.LICENSES) return json({ ignored: "no-subscription-id" });
+
+    const priceIds = (data.items || []).map((i) => i.price && i.price.id);
+    const subTier = tierForPrice(env, priceIds) || "";
+    const status = event.event_type === "subscription.canceled"
+      ? "canceled"
+      : (data.status || "active");
+    // next_billed_at is what has actually been paid up to; current_billing_period
+    // is the fallback when a subscription is cancelled and simply runs out.
+    const periodEnd = data.next_billed_at
+      || (data.current_billing_period && data.current_billing_period.ends_at)
+      || "";
+
+    setStage("record-subscription");
+    await recordSubscription(env.LICENSES, subId, status, periodEnd, subTier);
+    return json({ status: "subscription_recorded", subscription: subId, state: status });
+  }
+
+  if (event.event_type !== "transaction.completed") return json({ ignored: event.event_type });
+
+  const priceIds = (data.items || []).map((i) => i.price && i.price.id);
+  const tier = tierForPrice(env, priceIds);
+  if (!tier) return json({ ignored: "other-price" });
+
+  // Count the launch discount against its 26, so the website can show how many
+  // are left. Only real first purchases carry it; a renewal never does.
+  //
+  // Note this runs BEFORE minting, so a redemption is recorded even on an
+  // attempt that later throws. That is why /promo read "used: 1" while no key
+  // existed during the 2026-08-14 incident.
+  if (env.LICENSES && data.discount_id === PROMO.id && data.origin !== "subscription_recurring") {
+    setStage("record-promo-redemption");
+    await recordPromoRedemption(env.LICENSES, data.discount_id, data.id || "");
+  }
+
+  const base = env.PADDLE_API_BASE || "https://api.paddle.com";
+  const product = env.LICENSE_PRODUCT_ID || "easypost-desktop";
+  const txn = data.id || "";
+  const subId = data.subscription_id || "";
+  const annual = TIER_PLANS[tier] === "annual";
+
+  // An annual key names the subscription, not the transaction, so it stays
+  // valid across every renewal and activation can look up what is paid for.
+  const orderRef = annual && subId ? subId : txn;
+
+  // A renewal is a fresh transaction against a key the customer already has.
+  // Minting is harmless (it is deterministic), but emailing again would be
+  // noise, so only the first transaction sends anything.
+  const isRenewal = data.origin === "subscription_recurring";
+
+  // Deterministic iat, so Paddle retries mint the identical key. For a
+  // subscription that means every renewal reproduces the original key rather
+  // than a new one the customer would have to paste.
+  const iat = annual && subId
+    ? (data.billed_at || event.occurred_at || "1970-01-01T00:00:00Z")
+    : (event.occurred_at || "1970-01-01T00:00:00Z");
+  const stableIat = annual && subId ? "subscription" : iat;
+
+  setStage("customer-lookup");
+  const email = await getCustomerEmail(base, env.PADDLE_API_KEY, data.customer_id);
+
+  // The stage that failed on 2026-08-14, and the reason this wrapper exists: a
+  // stale deployed bundle routed node:crypto's sign through an unenv stub, so
+  // this line threw on source that was entirely correct.
+  setStage("mint-licence");
+  const licenseKey = mintLicense(
+    env.LICENSE_PRIVATE_KEY_PEM, product, email, orderRef, stableIat, tier
+  );
+
+  if (isRenewal) {
+    return json({ status: "renewal_noted", subscription: subId, tier });
+  }
+
+  // Awaited before the success response, and sendLicenseEmail throws on any
+  // non-2xx from Resend — so a license_issued body proves Resend accepted the
+  // message. It does not prove the mail reached an inbox.
+  setStage("send-email");
+  await sendLicenseEmail(env.RESEND_API_KEY, env.LICENSE_FROM_EMAIL, email, licenseKey, tier);
+
+  return json({ status: "license_issued", transaction: txn, order: orderRef, tier });
+}
