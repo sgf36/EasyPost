@@ -14,12 +14,16 @@ on:
       - "store_assets/**"
       - "**/*.md"
       - "LICENSE"
+  # No paths-ignore here, deliberately. `build (macos-latest)` and
+  # `build (windows-latest)` are required status checks on main, and a workflow
+  # that never triggers reports nothing at all — so a pull request touching only
+  # site/ or a .md file would sit BLOCKED for ever, waiting on checks that can
+  # never arrive. Filtering paths on push is fine; pushes are not gated.
+  #
+  # The cost is a build on documentation-only pull requests. That is acceptable
+  # now that the publishing steps below are guarded: a pull-request build
+  # compiles and tests, and signs, notarizes or uploads nothing.
   pull_request:
-    paths-ignore:
-      - "site/**"
-      - "store_assets/**"
-      - "**/*.md"
-      - "LICENSE"
   workflow_dispatch:
     inputs:
       locale:
@@ -120,8 +124,12 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: bash packaging/verify_variant_flags.sh dist/EasyPostDesktop.app
 
+      # Never on a pull request. Notarization is a paid round-trip to Apple that
+      # tells a reviewer nothing a plain build does not, and the Windows signing
+      # step below has excluded pull requests all along — this only makes the
+      # two consistent.
       - name: Sign, notarize & package macOS (.dmg)
-        if: matrix.os == 'macos-latest' && env.HAS_MACOS_SIGNING == 'true'
+        if: matrix.os == 'macos-latest' && env.HAS_MACOS_SIGNING == 'true' && github.event_name != 'pull_request'
         # Hard ceiling on the whole step. Run 29849490422 sat here for 1h58m:
         # the DMG uploaded fine, then `notarytool --wait` silently retried a
         # dead runner network until it gave up. Without this the job would
@@ -229,8 +237,12 @@ jobs:
       #
       # The Apple ID and app-specific password remain for *notarisation* of the
       # direct-download .dmg, which is a separate flow and is left alone.
+      # Never on a pull request, and this one matters more than the notarization
+      # guard above: the step stamps CFBundleVersion from github.run_number and
+      # uploads to App Store Connect, so an unguarded pull-request build mints a
+      # real Mac App Store build off a branch nobody has merged.
       - name: Build & upload Mac App Store package (.pkg)
-        if: matrix.os == 'macos-latest' && env.HAS_MAS_SIGNING == 'true'
+        if: matrix.os == 'macos-latest' && env.HAS_MAS_SIGNING == 'true' && github.event_name != 'pull_request'
         timeout-minutes: 30
         env:
           HAS_MAS_SIGNING: ${{ secrets.MAS_CERTIFICATE_P12_BASE64 != '' }}
