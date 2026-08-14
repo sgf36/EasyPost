@@ -62,6 +62,7 @@
   "android_app.needs_production": "La aplicación de Android se empareja con la versión de producción. Active una licencia de producción para descargarla y emparejarla.",
   "android_app.play_soon": "Próximamente en Google Play. Esta descarga directa es una versión de acceso anticipado para titulares de una licencia de producción mientras se finaliza la ficha en Play Store.",
   "android_app.reinstall_note": "Esta versión de acceso anticipado se firma de forma independiente de la versión de Google Play. Puede que sea necesario reinstalar desde Google Play una vez que la ficha esté disponible; el emparejamiento se conserva, por lo que no se pierde nada.",
+  "android_app.requirement": "Requiere Android 7.0 o posterior.",
   "android_app.steps": "1. Descargue el APK en el teléfono Android o transfiéralo.\n2. Abra el archivo y, si se le solicita, permita la instalación desde esta fuente.\n3. Abra Easy-Post Mobile Companion y seleccione Emparejar.\n4. Genere un código de emparejamiento en Herramientas y luego Emparejar aplicación móvil, y escanéelo.",
   "android_app.steps_group": "Cómo instalar",
   "android_app.title": "Aplicación de Android",

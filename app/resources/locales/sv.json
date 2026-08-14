@@ -62,6 +62,7 @@
   "android_app.needs_production": "Android-appen parkopplas med produktionsversionen. Aktivera en produktionslicens för att ladda ner och parkoppla den.",
   "android_app.play_soon": "Kommer snart till Google Play. Den här direkta nedladdningen är en tidig version för innehavare av produktionslicens medan listningen i Play Store färdigställs.",
   "android_app.reinstall_note": "Den här tidiga versionen är signerad oberoende av Google Play-utgåvan. Ominstallation från Google Play kan krävas när listningen är aktiv; parkopplingen följer med, så inget går förlorat.",
+  "android_app.requirement": "Kräver Android 7.0 eller senare.",
   "android_app.steps": "1. Ladda ner APK-filen till Android-telefonen, eller överför den dit.\n2. Öppna filen och tillåt sedan installation från den här källan om du uppmanas.\n3. Öppna Easy-Post Mobile Companion och välj Parkoppla.\n4. Skapa en parkopplingskod under Verktyg och sedan Parkoppla mobilapp, och skanna den.",
   "android_app.steps_group": "Så här installerar du",
   "android_app.title": "Android-app",

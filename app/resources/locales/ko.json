@@ -62,6 +62,7 @@
   "android_app.needs_production": "Android 앱은 프로덕션 버전과 페어링됩니다. 다운로드하고 페어링하려면 프로덕션 라이선스를 활성화하세요.",
   "android_app.play_soon": "곧 Google Play에서 출시됩니다. 이 직접 다운로드는 Play Store 등록이 완료되는 동안 프로덕션 라이선스 보유자를 위한 얼리 액세스 빌드입니다.",
   "android_app.reinstall_note": "이 얼리 액세스 빌드는 Google Play 릴리스와 별도로 서명되었습니다. 등록이 게시되면 Google Play에서 다시 설치해야 할 수 있습니다. 페어링은 유지되므로 손실되는 것은 없습니다.",
+  "android_app.requirement": "Android 7.0 이상이 필요합니다.",
   "android_app.steps": "1. APK를 Android 휴대폰에 다운로드하거나 전송하세요.\n2. 파일을 열고 메시지가 표시되면 이 출처의 설치를 허용하세요.\n3. Easy-Post Mobile Companion을 열고 페어링을 선택하세요.\n4. 도구 다음 모바일 앱 페어링에서 페어링 코드를 생성하고 스캔하세요.",
   "android_app.steps_group": "설치 방법",
   "android_app.title": "Android 앱",

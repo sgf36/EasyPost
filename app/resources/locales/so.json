@@ -62,6 +62,7 @@
   "android_app.needs_production": "Appka Android wuxuu la xiriiraa nooca wax-soo-saarka. Kici shatiga wax-soo-saarka si aad u soo dejiso oo u xirto.",
   "android_app.play_soon": "Dhawaan ayaa ka iman doonta Google Play. Soo dejintan tooska ah waa nooc helitaanka hore ah oo loogu talagalay kuwa haysta shatiga wax-soo-saarka inta liiska Play Store la dhammaystirayo.",
   "android_app.reinstall_note": "Noocan helitaanka hore waxaa si madax-bannaan loogu saxeexay marka loo eego siideynta Google Play. Dib-u-rakibaad ka timid Google Play ayaa laga yaabaa in loo baahdo marka liiska uu noolaado; isku xirku wuu socon doonaa, sidaas darteed waxba lama lumin.",
+  "android_app.requirement": "Waxay u baahan tahay Android 7.0 ama ka dambeeya.",
   "android_app.steps": "1. Soo deji APK-ga taleefanka Android, ama u wareeji.\n2. Fur faylka, ka dibna ogolow rakibaadda isha marka lagu weydiiyo.\n3. Fur Easy-Post Mobile Companion oo dooro Isku xir.\n4. Samee koodh isku xir hoosta Qalabka ka dibna Isku xir aaladda mobilka, oo iskaan.",
   "android_app.steps_group": "Sida loo rakibo",
   "android_app.title": "Appka Android",

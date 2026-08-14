@@ -62,6 +62,7 @@
   "android_app.needs_production": "Ngwa Android na-ejikọ na ụdị prọdọkshọn. Mee ka laịsens prọdọkshọn rụọ ọrụ iji budata ma jikọọ ya.",
   "android_app.play_soon": "Na-abịa n'oge na-adịghị anya na Google Play. Nbudata ozugbo a bụ ụdị ohere mbụ maka ndị nwe laịsens prọdọkshọn ka a na-emecha ndepụta Play Store.",
   "android_app.reinstall_note": "A bịanyere aka na ụdị ohere mbụ a n'adabereghị na mwepụta Google Play. Enwere ike ịchọ ka i wụnyeghachi site na Google Play ozugbo ndepụta ahụ dịrị; njikọ na-agafe, ya mere ọ dịghị ihe furu efu.",
+  "android_app.requirement": "Chọrọ Android 7.0 maọbụ nke ka elu.",
   "android_app.steps": "1. Budata APK n'ime ekwentị Android, ma ọ bụ bufee ya.\n2. Meghee faịlụ ahụ, wee kwe ka a wụnye site na isi mmalite a ma ọ bụrụ na a jụọ.\n3. Meghee Easy-Post Mobile Companion wee họrọ Jikọọ.\n4. Mepụta koodu njikọ n'okpuru Ngwaọrụ wee Jikọọ ngwa ekwentị, ma skenee ya.",
   "android_app.steps_group": "Otu esi wụnye",
   "android_app.title": "Ngwa Android",

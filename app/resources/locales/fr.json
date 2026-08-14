@@ -62,6 +62,7 @@
   "android_app.needs_production": "L'application Android se jumelle avec la version de production. Activez une licence de production pour la télécharger et la jumeler.",
   "android_app.play_soon": "Bientôt disponible sur Google Play. Ce téléchargement direct est une version en accès anticipé destinée aux titulaires d'une licence de production, le temps que la fiche du Play Store soit finalisée.",
   "android_app.reinstall_note": "Cette version en accès anticipé est signée indépendamment de la version Google Play. Une réinstallation depuis Google Play pourra être nécessaire une fois la fiche en ligne ; le jumelage est conservé, rien n'est donc perdu.",
+  "android_app.requirement": "Nécessite Android 7.0 ou version ultérieure.",
   "android_app.steps": "1. Téléchargez l'APK sur le téléphone Android, ou transférez-le.\n2. Ouvrez le fichier, puis autorisez l'installation depuis cette source si vous y êtes invité.\n3. Ouvrez Easy-Post Mobile Companion et choisissez Jumeler.\n4. Générez un code de jumelage sous Outils puis Jumeler l'application mobile, et scannez-le.",
   "android_app.steps_group": "Comment installer",
   "android_app.title": "Application Android",

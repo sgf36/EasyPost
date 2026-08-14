@@ -62,6 +62,7 @@
   "android_app.needs_production": "Android ilovasi ishlab chiqarish versiyasi bilan ulanadi. Uni yuklab olish va ulash uchun ishlab chiqarish litsenziyasini faollashtiring.",
   "android_app.play_soon": "Tez orada Google Play'da. Ushbu to'g'ridan-to'g'ri yuklab olish — Play Store ro'yxati yakunlanayotgan vaqtda ishlab chiqarish litsenziyasi egalari uchun erta kirish versiyasidir.",
   "android_app.reinstall_note": "Ushbu erta kirish versiyasi Google Play relizidan alohida imzolangan. Ro'yxat faollashgach, Google Play'dan qayta o'rnatish talab qilinishi mumkin; ulanish saqlanib qoladi, shuning uchun hech narsa yo'qolmaydi.",
+  "android_app.requirement": "Android 7.0 yoki undan yuqori versiya talab qilinadi.",
   "android_app.steps": "1. APK faylini Android telefoniga yuklab oling yoki uni ko'chirib o'tkazing.\n2. Faylni oching, so'ng so'ralsa, ushbu manbadan o'rnatishga ruxsat bering.\n3. Easy-Post Mobile Companion ilovasini oching va Ulash tugmasini tanlang.\n4. Vositalar bo'limida, so'ng Mobil ilovani ulash orqali ulash kodini yarating va uni skanerlang.",
   "android_app.steps_group": "O'rnatish tartibi",
   "android_app.title": "Android ilovasi",

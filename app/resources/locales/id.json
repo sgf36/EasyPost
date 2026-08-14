@@ -62,6 +62,7 @@
   "android_app.needs_production": "Aplikasi Android dipasangkan dengan versi produksi. Aktifkan lisensi produksi untuk mengunduh dan memasangkannya.",
   "android_app.play_soon": "Segera hadir di Google Play. Unduhan langsung ini adalah versi akses awal untuk pemegang lisensi produksi selagi daftar Play Store sedang difinalkan.",
   "android_app.reinstall_note": "Versi akses awal ini ditandatangani secara terpisah dari rilis Google Play. Pemasangan ulang dari Google Play mungkin diperlukan setelah daftarnya aktif; pemasangan tetap terbawa, jadi tidak ada yang hilang.",
+  "android_app.requirement": "Memerlukan Android 7.0 atau yang lebih baru.",
   "android_app.steps": "1. Unduh APK ke ponsel Android, atau transfer ke ponsel.\n2. Buka file tersebut, lalu izinkan pemasangan dari sumber ini jika diminta.\n3. Buka Easy-Post Mobile Companion dan pilih Pasangkan.\n4. Buat kode pemasangan di Alat lalu Pasangkan aplikasi seluler, dan pindai kode tersebut.",
   "android_app.steps_group": "Cara memasang",
   "android_app.title": "Aplikasi Android",

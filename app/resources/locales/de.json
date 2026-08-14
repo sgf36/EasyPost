@@ -62,6 +62,7 @@
   "android_app.needs_production": "Die Android-App wird mit der Produktionsversion gekoppelt. Aktivieren Sie eine Produktionslizenz, um sie herunterzuladen und zu koppeln.",
   "android_app.play_soon": "Demnächst bei Google Play. Dieser Direkt-Download ist ein Early-Access-Build für Inhaber einer Produktionslizenz, während der Eintrag im Play Store fertiggestellt wird.",
   "android_app.reinstall_note": "Dieser Early-Access-Build wird unabhängig von der Google-Play-Veröffentlichung signiert. Eine Neuinstallation über Google Play kann erforderlich sein, sobald der Eintrag verfügbar ist; die Kopplung bleibt erhalten, sodass nichts verloren geht.",
+  "android_app.requirement": "Erfordert Android 7.0 oder neuer.",
   "android_app.steps": "1. Laden Sie die APK auf das Android-Telefon herunter oder übertragen Sie sie dorthin.\n2. Öffnen Sie die Datei und erlauben Sie bei Aufforderung die Installation aus dieser Quelle.\n3. Öffnen Sie Easy-Post Mobile Companion und wählen Sie Koppeln.\n4. Erzeugen Sie unter Werkzeuge und dann Mobile App koppeln einen Kopplungscode und scannen Sie ihn.",
   "android_app.steps_group": "Installationsanleitung",
   "android_app.title": "Android-App",

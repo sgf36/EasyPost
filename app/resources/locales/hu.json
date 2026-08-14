@@ -62,6 +62,7 @@
   "android_app.needs_production": "Az Android alkalmazás az éles verzióval párosítható. Aktiváljon egy éles licencet a letöltéséhez és párosításához.",
   "android_app.play_soon": "Hamarosan elérhető a Google Play áruházban. Ez a közvetlen letöltés korai hozzáférésű build az éles licenc tulajdonosai számára, amíg a Play Store-oldal véglegesítése folyamatban van.",
   "android_app.reinstall_note": "Ez a korai hozzáférésű build a Google Play-kiadástól függetlenül van aláírva. A Google Play áruházból való újratelepítésre lehet szükség, amint az oldal elérhetővé válik; a párosítás megmarad, így semmi sem vész el.",
+  "android_app.requirement": "Android 7.0 vagy újabb szükséges.",
   "android_app.steps": "1. Töltse le az APK-t az Android telefonra, vagy másolja át.\n2. Nyissa meg a fájlt, majd engedélyezze a telepítést ebből a forrásból, ha a rendszer kéri.\n3. Nyissa meg az Easy-Post Mobile Companion alkalmazást, és válassza a Párosítás lehetőséget.\n4. Hozzon létre egy párosítási kódot az Eszközök, majd a Mobilalkalmazás párosítása menüpontban, és olvassa be.",
   "android_app.steps_group": "Telepítés",
   "android_app.title": "Android alkalmazás",

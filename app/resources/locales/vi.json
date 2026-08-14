@@ -62,6 +62,7 @@
   "android_app.needs_production": "Ứng dụng Android ghép nối với phiên bản chính thức. Kích hoạt giấy phép bản chính thức để tải và ghép nối.",
   "android_app.play_soon": "Sắp có trên Google Play. Bản tải trực tiếp này là bản truy cập sớm dành cho người giữ giấy phép bản chính thức trong khi trang niêm yết trên Play Store đang được hoàn thiện.",
   "android_app.reinstall_note": "Bản truy cập sớm này được ký độc lập với bản phát hành trên Google Play. Có thể cần cài đặt lại từ Google Play khi trang niêm yết hoạt động; việc ghép nối vẫn được giữ lại, nên không mất gì cả.",
+  "android_app.requirement": "Yêu cầu Android 7.0 trở lên.",
   "android_app.steps": "1. Tải APK về điện thoại Android, hoặc chuyển nó sang.\n2. Mở tệp, sau đó cho phép cài đặt từ nguồn này nếu được nhắc.\n3. Mở Easy-Post Mobile Companion và chọn Ghép nối.\n4. Tạo mã ghép nối trong mục Công cụ rồi Ghép nối ứng dụng di động, và quét mã đó.",
   "android_app.steps_group": "Cách cài đặt",
   "android_app.title": "Ứng dụng Android",

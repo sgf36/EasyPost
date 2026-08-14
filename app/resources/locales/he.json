@@ -62,6 +62,7 @@
   "android_app.needs_production": "אפליקציית Android מצטמדת לגרסת ההפקה. הפעל רישיון הפקה כדי להוריד ולצמד אותה.",
   "android_app.play_soon": "בקרוב ב-Google Play. הורדה ישירה זו היא גרסת גישה מוקדמת עבור בעלי רישיון הפקה, עד להשלמת הרישום ב-Play Store.",
   "android_app.reinstall_note": "גרסת גישה מוקדמת זו חתומה באופן עצמאי מגרסת Google Play. ייתכן שיידרש להתקין מחדש מ-Google Play לאחר שהרישום יעלה לאוויר; הצימוד נשמר, כך שדבר לא יאבד.",
+  "android_app.requirement": "דרוש Android 7.0 ואילך.",
   "android_app.steps": "1. הורד את קובץ ה-APK לטלפון ה-Android, או העבר אותו אליו.\n2. פתח את הקובץ, ולאחר מכן אשר התקנה ממקור זה אם תתבקש.\n3. פתח את Easy-Post Mobile Companion ובחר בצימוד.\n4. צור קוד צימוד תחת כלים ואז צימוד אפליקציית הנייד, וסרוק אותו.",
   "android_app.steps_group": "כיצד להתקין",
   "android_app.title": "אפליקציית Android",

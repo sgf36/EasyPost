@@ -62,6 +62,7 @@
   "android_app.needs_production": "Aplicația Android se asociază cu versiunea de producție. Activează o licență de producție pentru a o descărca și asocia.",
   "android_app.play_soon": "În curând pe Google Play. Această descărcare directă este o versiune cu acces timpuriu pentru deținătorii de licență de producție, până când listarea în Play Store este finalizată.",
   "android_app.reinstall_note": "Această versiune cu acces timpuriu este semnată independent de versiunea din Google Play. Poate fi necesară reinstalarea din Google Play după publicarea listării; asocierea se păstrează, așa că nu se pierde nimic.",
+  "android_app.requirement": "Necesită Android 7.0 sau mai nou.",
   "android_app.steps": "1. Descarcă fișierul APK pe telefonul Android sau transferă-l pe acesta.\n2. Deschide fișierul, apoi permite instalarea din această sursă dacă ți se solicită.\n3. Deschide Easy-Post Mobile Companion și alege Asociere.\n4. Generează un cod de asociere din Instrumente, apoi Asociere aplicație mobilă, și scanează-l.",
   "android_app.steps_group": "Cum se instalează",
   "android_app.title": "Aplicație Android",

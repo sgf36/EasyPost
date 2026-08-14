@@ -62,6 +62,7 @@
   "android_app.needs_production": "App Android máa so pọ̀ mọ́ ẹ̀yà ìṣàmúlò gidi. Mú ìwé àṣẹ ìṣàmúlò gidi ṣiṣẹ́ láti gbà á sílẹ̀ àti láti so ó pọ̀.",
   "android_app.play_soon": "Yóò dé láìpẹ́ lórí Google Play. Àgbàsílẹ̀ tààrà yìí jẹ́ ẹ̀yà àǹfààní àkọ́kọ́ fún àwọn tó ní ìwé àṣẹ ìṣàmúlò gidi nígbà tí à ń parí àkọsílẹ̀ lórí Play Store.",
   "android_app.reinstall_note": "Ẹ̀yà àǹfààní àkọ́kọ́ yìí ni a fọwọ́sí lọ́tọ̀ọ̀tọ̀ yàtọ̀ sí ìtújáde Google Play. Ó lè yẹ kí a tún fi sórí ẹ̀rọ láti Google Play nígbà tí àkọsílẹ̀ náà bá wà láàyè; ìso-pọ̀ yóò dúró, nítorí náà kò sí ohun tí yóò sọnù.",
+  "android_app.requirement": "Ó nílò Android 7.0 tàbí tuntun.",
   "android_app.steps": "1. Gba APK sílẹ̀ sórí fóònù Android, tàbí kí o gbé e wá.\n2. Ṣí fáìlì náà, kí o sì gba ìfisórí-ẹrọ láti orísun yìí láàyè bí a bá béèrè.\n3. Ṣí Easy-Post Mobile Companion kí o sì yan So Pọ̀.\n4. Dá koodu ìso-pọ̀ sílẹ̀ lábẹ́ Irinṣẹ́ lẹ́yìn náà So app alágbèéká pọ̀, kí o sì ṣàyẹ̀wò rẹ̀.",
   "android_app.steps_group": "Bí a ṣe ń fi sórí ẹ̀rọ",
   "android_app.title": "App Android",

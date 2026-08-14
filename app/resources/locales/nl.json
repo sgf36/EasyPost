@@ -62,6 +62,7 @@
   "android_app.needs_production": "De Android-app koppelt met de productieversie. Activeer een productielicentie om deze te downloaden en te koppelen.",
   "android_app.play_soon": "Binnenkort beschikbaar in Google Play. Deze directe download is een early-accessversie voor houders van een productielicentie terwijl de Play Store-vermelding wordt afgerond.",
   "android_app.reinstall_note": "Deze early-accessversie is onafhankelijk van de Google Play-release ondertekend. Mogelijk moet je opnieuw installeren via Google Play zodra de vermelding live is; de koppeling blijft behouden, dus er gaat niets verloren.",
+  "android_app.requirement": "Vereist Android 7.0 of hoger.",
   "android_app.steps": "1. Download de APK naar de Android-telefoon of zet deze over.\n2. Open het bestand en sta installatie vanaf deze bron toe indien daarom wordt gevraagd.\n3. Open Easy-Post Mobile Companion en kies Mobiele app koppelen.\n4. Genereer een koppelingscode onder Hulpmiddelen en vervolgens Mobiele app koppelen, en scan deze.",
   "android_app.steps_group": "Zo installeer je het",
   "android_app.title": "Android-app",

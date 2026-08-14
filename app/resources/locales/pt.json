@@ -62,6 +62,7 @@
   "android_app.needs_production": "O aplicativo Android pareia com a versão de produção. Ative uma licença de produção para baixá-lo e pareá-lo.",
   "android_app.play_soon": "Em breve na Google Play. Este download direto é uma versão de acesso antecipado para titulares de licença de produção enquanto a listagem na Play Store é finalizada.",
   "android_app.reinstall_note": "Esta versão de acesso antecipado é assinada de forma independente do lançamento na Google Play. Pode ser necessário reinstalar pela Google Play quando a listagem estiver disponível; o pareamento é mantido, então nada é perdido.",
+  "android_app.requirement": "Requer Android 7.0 ou posterior.",
   "android_app.steps": "1. Baixe o APK no telefone Android ou transfira-o para ele.\n2. Abra o arquivo e permita a instalação desta origem, se solicitado.\n3. Abra o Easy-Post Mobile Companion e escolha Parear.\n4. Gere um código de pareamento em Ferramentas e depois Parear aplicativo móvel, e escaneie-o.",
   "android_app.steps_group": "Como instalar",
   "android_app.title": "Aplicativo Android",
