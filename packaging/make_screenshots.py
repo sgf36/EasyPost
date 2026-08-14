@@ -338,6 +338,37 @@ def _capture(widget, path: Path, width: int, height: int, scale: int) -> None:
         raise RuntimeError(f"Could not write {path}")
 
 
+def _navigable_views(app):
+    """Every view class the navigation can reach, and the window it came from.
+
+    The nav is assembled once per MainWindow and some entries are conditional —
+    the Android app page appears only on a direct-download build held by a
+    production licensee, so it is never present in a screenshot run whatever the
+    caller asks for.
+
+    **The window is returned, not closed.** Several pages start a background
+    catalogue fetch in their constructor, and destroying the window while those
+    QThreads are still winding down aborts the process outright on Windows
+    (0xC0000409, STATUS_STACK_BUFFER_OVERRUN) — which is exactly what a
+    close()/deleteLater() here did. The caller holds it alive for the run, as it
+    already does for every captured window.
+    """
+    from app.ui.main_window import MainWindow
+    from PySide6.QtCore import Qt
+
+    window = MainWindow()
+    window._show_app_shell()
+    names = set()
+    for row in range(window._nav.count()):
+        index = window._nav.item(row).data(Qt.ItemDataRole.UserRole)
+        if index is None:  # section header
+            continue
+        holder = window._view_stack.widget(index)
+        view = holder.widget() if hasattr(holder, "widget") else holder
+        names.add(type(view).__name__)
+    return names, window
+
+
 def _capture_window(app, view_class_name: str, path: Path,
                     width: int, height: int, scale: int) -> None:
     """Paint the whole application window with one page selected.
@@ -909,12 +940,43 @@ def main() -> int:
                 f"pairing tokens, and screenshots are published publicly."
             )
 
+    # Check every requested view is reachable before capturing anything.
+    #
+    # Without this the run fails once per target size — four identical
+    # "No navigation entry renders X" lines for one cause — and the message
+    # never says why the page is missing. It is almost always the same reason:
+    # some entries are conditional on the build variant or on holding a
+    # production licence, and a screenshot run has neither. Naming what IS
+    # available turns a puzzle into a typo check.
+    probe_window = None
+    if args.window:
+        available, probe_window = _navigable_views(app)
+        missing = [v for v in args.window
+                   if v != PRINT_SHEET and v not in available]
+        if missing:
+            print(
+                f"Not in the navigation: {', '.join(sorted(missing))}.\n"
+                f"Available: {', '.join(sorted(available))}.\n"
+                "Pages gated on the build variant or a production licence "
+                "(the Android app page, for one) never appear in a screenshot "
+                "run, because it has stubbed credentials and no licence. "
+                "Capture those by constructing the view directly — see "
+                "packaging/check_layout_widths.py."
+            )
+            sys.stdout.flush()
+            # os._exit, not SystemExit: a window exists by now, and unwinding
+            # Qt while its background catalogue fetches are still in flight
+            # aborts the process with 0xC0000409 — so the honest exit code
+            # would be replaced by a crash code. Same reason as the exit at the
+            # end of this function.
+            os._exit(2)
+
     out_root = Path(args.out) / args.platform / args.locale
     written = 0
     # Held for the lifetime of the run. Destroying a page while its background
     # catalogue fetch is still in flight made the worker emit onto a dead
     # object: "RuntimeError: Signal source has been deleted".
-    alive = []
+    alive = [probe_window] if probe_window is not None else []
     for label, width, height, scale in TARGETS[args.platform]:
         if args.window:
             for view_class in args.window:
