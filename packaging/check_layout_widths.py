@@ -44,6 +44,12 @@ VIEWS = [
     ("PickupsView", "app.ui.views.pickups_view"),
     ("InsuranceView", "app.ui.views.insurance_view"),
     ("ClaimsView", "app.ui.views.claims_view"),
+    # Not capturable by make_screenshots: its navigation entry exists only on a
+    # direct-download build held by a production licensee, and a screenshot run
+    # has stubbed credentials and no licence. Constructing it works, which is
+    # the whole reason this checker builds views itself rather than driving the
+    # window — so the one page the harness cannot reach is still measured.
+    ("AndroidAppView", "app.ui.views.android_app_view"),
 ]
 
 import importlib  # noqa: E402
