@@ -4,6 +4,21 @@ compatibility_date = "2025-06-01"
 # node:crypto (Ed25519 signing + HMAC) requires nodejs_compat.
 compatibility_flags = ["nodejs_compat"]
 
+# Logs, because this Worker is the money path and it failed silently once.
+#
+# A first paid order never produced a licence. All Paddle could show was the
+# delivery log: four "401 invalid signature", two "404 Not found", then a bare
+# "500 error code: 1101" — Cloudflare's way of saying the Worker threw, with no
+# hint as to where. Diagnosing it meant reading the source and reasoning about
+# which call could raise, because there was nothing else to look at.
+#
+# Sampling is 1.0 deliberately. This Worker handles a handful of requests a day
+# and each one is a purchase, an activation or a support message; there is no
+# volume argument for throwing any of them away.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 # The seat ledger: which computers each licence is on, plus revocations.
 [[d1_databases]]
 binding = "LICENSES"
