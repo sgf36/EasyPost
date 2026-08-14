@@ -8,15 +8,24 @@
   built and BEFORE signing (entitlements + a sandboxed Info.plist must agree).
 
   This file is a reference/patch source, not a standalone plist — build_mas.sh
-  reads each key from here and applies it. Keep CFBundleShortVersionString aligned
-  with the app version (Windows is at 1.0.6.0 → macOS 1.0.6).
+  reads each key from here and applies it.
+
+  The two version keys below are PLACEHOLDERS. CI overwrites both before the
+  bundle is signed (see .github/workflows/build.yml, "Stamp the version"):
+  CFBundleShortVersionString comes from app.config.APP_VERSION and CFBundleVersion
+  from github.run_number, because App Store Connect rejects a re-used
+  CFBundleVersion. Editing them here changes nothing about a CI build.
+
+  They are kept roughly current anyway, so that a hand-run build_mas.sh produces
+  something sane rather than claiming to be 1.0 — but they are not the source of
+  truth and will drift. app/config.py is the source of truth.
 -->
 <plist version="1.0">
 <dict>
   <key>CFBundleShortVersionString</key>
-  <string>1.0</string>
+  <string>1.2.5</string>
   <key>CFBundleVersion</key>
-  <string>3</string>
+  <string>1</string>
   <key>LSMinimumSystemVersion</key>
   <string>12.0</string>
   <key>LSApplicationCategoryType</key>
