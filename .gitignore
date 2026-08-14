@@ -25,6 +25,18 @@ dist/
 *.mobileprovision
 *.provisionprofile
 
+# Worker dev secrets. `wrangler dev` reads .dev.vars from the Worker's own
+# directory, and it holds live values — the Paddle webhook secret, the Paddle
+# API key, the licence signing key, the Resend key.
+#
+# Only server/easypost-mobile-proxy ignored its own; the licence webhook and the
+# MCP relay did not, so a .dev.vars created in either would have been offered up
+# by `git add -A` in a public repository. None has ever been committed — checked
+# across every branch — so this closes a gap rather than cleaning up a leak.
+# Rooted at the repository so it covers Workers added later too.
+**/.dev.vars
+**/.dev.vars.*
+
 # Build-variant flags (created at package time, never committed)
 app/resources/license_required.flag
 app/resources/mcp_supported.flag
