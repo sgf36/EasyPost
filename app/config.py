@@ -57,7 +57,7 @@ ANDROID_APK_URL = (
 )
 # SHA-256 of the currently published APK, shown so a sideloaded download can be
 # verified before installing. Update this whenever a new APK release is cut.
-ANDROID_APK_SHA256 = "bf6aa6a8ff5e504786569f5c4e7b4828cfe9763611be2874051eacab04359734"
+ANDROID_APK_SHA256 = "7990f524a7b306e73eaedc429ba8afa712bc796549b5194c0d18ccecae6a907b"
 
 # The Mac App Store build gates production behind a StoreKit In-App Purchase
 # ("Production Unlock") instead of a pasted Paddle key or a Windows Store add-on.
