@@ -62,6 +62,7 @@
   "android_app.needs_production": "The Android app pairs with the production version. Activate a production licence to download and pair it.",
   "android_app.play_soon": "Coming soon to Google Play. This direct download is an early-access build for production licence holders while the Play Store listing is finalised.",
   "android_app.reinstall_note": "This early-access build is signed independently of the Google Play release. Reinstalling from Google Play may be required once the listing is live; pairing carries across, so nothing is lost.",
+  "android_app.requirement": "Requires Android 7.0 or later.",
   "android_app.steps": "1. Download the APK onto the Android phone, or transfer it across.\n2. Open the file, then allow installation from this source if prompted.\n3. Open Easy-Post Mobile Companion and choose Pair.\n4. Generate a pairing code under Tools then Pair mobile app, and scan it.",
   "android_app.steps_group": "How to install",
   "android_app.title": "Android app",

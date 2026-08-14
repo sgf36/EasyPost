@@ -62,6 +62,7 @@
   "android_app.needs_production": "Programu ya Android huoanishwa na toleo la uzalishaji. Amilisha leseni ya uzalishaji ili kuipakua na kuioanisha.",
   "android_app.play_soon": "Inakuja hivi karibuni kwenye Google Play. Upakuaji huu wa moja kwa moja ni toleo la awali kwa wenye leseni ya uzalishaji wakati orodha ya Play Store inakamilishwa.",
   "android_app.reinstall_note": "Toleo hili la awali limetiwa saini kwa kujitegemea na toleo la Google Play. Huenda ukahitaji kusakinisha upya kutoka Google Play mara orodha itakapokuwa hai; uoanishaji hubaki, kwa hivyo hakuna kinachopotea.",
+  "android_app.requirement": "Inahitaji Android 7.0 au toleo jipya zaidi.",
   "android_app.steps": "1. Pakua APK kwenye simu ya Android, au uihamishe hadi humo.\n2. Fungua faili, kisha uruhusu usakinishaji kutoka chanzo hiki ukiombwa.\n3. Fungua Easy-Post Mobile Companion na uchague Oanisha.\n4. Tengeneza msimbo wa kuoanisha chini ya Zana kisha Oanisha programu ya simu, na uuchanganue.",
   "android_app.steps_group": "Jinsi ya kusakinisha",
   "android_app.title": "Programu ya Android",

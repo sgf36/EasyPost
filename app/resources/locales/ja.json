@@ -62,6 +62,7 @@
   "android_app.needs_production": "Androidアプリは本番バージョンとペアリングします。ダウンロードしてペアリングするには、本番ライセンスを有効化してください。",
   "android_app.play_soon": "Google Playでまもなく提供予定です。この直接ダウンロードは、Play Storeのストア掲載が確定するまでの、本番ライセンス所有者向けの早期アクセス版です。",
   "android_app.reinstall_note": "この早期アクセス版は、Google Play版とは独立して署名されています。ストア掲載が公開されたら、Google Playから再インストールが必要になる場合があります。ペアリングは引き継がれるため、何も失われません。",
+  "android_app.requirement": "Android 7.0 以降が必要です。",
   "android_app.steps": "1. APKをAndroid電話にダウンロードするか、転送します。\n2. ファイルを開き、求められた場合はこのソースからのインストールを許可します。\n3. Easy-Post Mobile Companionを開き、ペアリングを選択します。\n4. ツール、次にモバイルアプリをペアリングでペアリングコードを生成し、スキャンします。",
   "android_app.steps_group": "インストール方法",
   "android_app.title": "Androidアプリ",

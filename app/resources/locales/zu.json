@@ -62,6 +62,7 @@
   "android_app.needs_production": "Uhlelo lokusebenza lwe-Android lubhangqa nenguqulo yokusebenza ngempela. Yenza ilayisensi yokukhiqiza isebenze ukuze uyilande futhi uyibhangqe.",
   "android_app.play_soon": "Izofika maduze ku-Google Play. Lokhu kulanda okuqondile kuyinguqulo yokufinyelela kwakuqala kwabaphethe ilayisensi yokukhiqiza ngesikhathi uhlu lwe-Play Store lusaqedelwa.",
   "android_app.reinstall_note": "Le nguqulo yokufinyelela kwakuqala isayinwe ngokuzimela kokukhishwa kwe-Google Play. Kungadingeka ukufaka kabusha kusuka ku-Google Play uma uhlu selusebenza; ukubhangqa kuyaqhubeka, ngakho akukho lutho olulahlekayo.",
+  "android_app.requirement": "Idinga i-Android 7.0 noma ngaphezulu.",
   "android_app.steps": "1. Landa i-APK efonini ye-Android, noma uyidlulisele kuyo.\n2. Vula ifayela, bese uvumela ukufakwa kusuka kulo mthombo uma ucelwa.\n3. Vula i-Easy-Post Mobile Companion bese ukhetha Bhangqa.\n4. Khiqiza ikhodi yokubhangqa ngaphansi kwe-Amathuluzi bese uthi Bhangqa uhlelo lokusebenza lweselula, bese uyiskena.",
   "android_app.steps_group": "Indlela yokufaka",
   "android_app.title": "Uhlelo lokusebenza lwe-Android",

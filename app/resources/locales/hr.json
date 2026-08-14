@@ -62,6 +62,7 @@
   "android_app.needs_production": "Android aplikacija uparuje se s produkcijskom verzijom. Aktivirajte produkcijsku licencu da biste je preuzeli i uparili.",
   "android_app.play_soon": "Uskoro na Google Play. Ovo izravno preuzimanje je verzija ranog pristupa za nositelje produkcijske licence dok se ne dovrši unos na Play Store.",
   "android_app.reinstall_note": "Ova verzija ranog pristupa potpisana je neovisno o Google Play izdanju. Nakon što unos postane aktivan, možda će biti potrebna ponovna instalacija s Google Playa; uparivanje se prenosi, pa se ništa ne gubi.",
+  "android_app.requirement": "Zahtijeva Android 7.0 ili noviji.",
   "android_app.steps": "1. Preuzmite APK na Android telefon ili ga prenesite.\n2. Otvorite datoteku, a zatim dopustite instalaciju iz ovog izvora ako se to zatraži.\n3. Otvorite Easy-Post Mobile Companion i odaberite Upari.\n4. Generirajte kôd za uparivanje pod Alati pa Uparivanje mobilne aplikacije i skenirajte ga.",
   "android_app.steps_group": "Kako instalirati",
   "android_app.title": "Android aplikacija",

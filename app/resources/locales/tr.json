@@ -62,6 +62,7 @@
   "android_app.needs_production": "Android uygulaması üretim sürümüyle eşleşir. İndirmek ve eşleştirmek için bir üretim lisansı etkinleştirin.",
   "android_app.play_soon": "Yakında Google Play'de. Bu doğrudan indirme, Play Store girişi tamamlanırken üretim lisansı sahipleri için erken erişim sürümüdür.",
   "android_app.reinstall_note": "Bu erken erişim sürümü, Google Play sürümünden bağımsız olarak imzalanmıştır. Giriş yayına alındığında Google Play'den yeniden kurulum gerekebilir; eşleştirme korunur, dolayısıyla hiçbir şey kaybolmaz.",
+  "android_app.requirement": "Android 7.0 veya üzeri gerekir.",
   "android_app.steps": "1. APK'yı Android telefona indirin veya telefona aktarın.\n2. Dosyayı açın, ardından istenirse bu kaynaktan kuruluma izin verin.\n3. Easy-Post Mobile Companion'ı açın ve Eşleştir'i seçin.\n4. Araçlar ardından Mobil uygulamayı eşleştir altında bir eşleştirme kodu oluşturun ve tarayın.",
   "android_app.steps_group": "Nasıl kurulur",
   "android_app.title": "Android uygulaması",

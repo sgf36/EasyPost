@@ -62,6 +62,7 @@
   "android_app.needs_production": "Manhajar Android tana haɗuwa da sigar samarwa. Kunna lasisin samarwa don sauke shi da haɗa shi.",
   "android_app.play_soon": "Ana zuwa nan ba da jimawa ba a Google Play. Wannan saukewa kai tsaye gini ne na samun dama da wuri ga masu lasisin samarwa yayin da ake kammala jerin Play Store.",
   "android_app.reinstall_note": "An sanya hannu kan wannan ginin samun dama da wuri daban da fitowar Google Play. Ana iya buƙatar sāke shigarwa daga Google Play da zarar jerin ya kunna; haɗin yana ci gaba, don haka babu abin da ake rasa.",
+  "android_app.requirement": "Yana buƙatar Android 7.0 ko sama.",
   "android_app.steps": "1. Sauke APK a wayar Android, ko ka canja shi.\n2. Buɗe fayil ɗin, sannan ka ba da izinin shigarwa daga wannan tushe idan aka nema.\n3. Buɗe Easy-Post Mobile Companion sannan ka zaɓi Haɗa.\n4. Ƙirƙira lambar haɗi ƙarƙashin Kayan aiki sannan Haɗa manhajar wayar hannu, sannan ka yi scan ɗinta.",
   "android_app.steps_group": "Yadda ake shigarwa",
   "android_app.title": "Manhajar Android",

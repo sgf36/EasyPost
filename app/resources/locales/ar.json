@@ -62,6 +62,7 @@
   "android_app.needs_production": "يقترن تطبيق Android بإصدار الإنتاج. فعّل ترخيص إنتاج لتنزيله وإقرانه.",
   "android_app.play_soon": "قريبًا على Google Play. هذا التنزيل المباشر هو إصدار وصول مبكر لحاملي ترخيص الإنتاج ريثما يكتمل إدراج التطبيق في Play Store.",
   "android_app.reinstall_note": "تم توقيع إصدار الوصول المبكر هذا بشكل مستقل عن إصدار Google Play. قد تكون إعادة التثبيت من Google Play مطلوبة بمجرد توفر الإدراج؛ ويبقى الإقران قائمًا، لذلك لا يُفقد أي شيء.",
+  "android_app.requirement": "يتطلب Android 7.0 أو أحدث.",
   "android_app.steps": "1. نزّل ملف APK على هاتف Android، أو انقله إليه.\n2. افتح الملف، ثم اسمح بالتثبيت من هذا المصدر إذا طُلب منك ذلك.\n3. افتح Easy-Post Mobile Companion واختر إقران.\n4. أنشئ رمز إقران من الأدوات ثم إقران التطبيق المحمول، وامسحه ضوئيًا.",
   "android_app.steps_group": "كيفية التثبيت",
   "android_app.title": "تطبيق Android",

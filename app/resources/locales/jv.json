@@ -62,6 +62,7 @@
   "android_app.needs_production": "Aplikasi Android dipasangake karo versi produksi. Aktifake lisensi produksi kanggo ngundhuh lan masangake.",
   "android_app.play_soon": "Bakal enggal rawuh ing Google Play. Undhuhan langsung iki minangka versi akses awal kanggo sing duwe lisensi produksi nalika daftar Play Store lagi difinalake.",
   "android_app.reinstall_note": "Versi akses awal iki ditandatangani kanthi kapisah saka rilis Google Play. Pemasangan ulang saka Google Play bisa uga dibutuhake yen daftar wis aktif; pemasangan tetep kagawa, dadi ora ana sing ilang.",
+  "android_app.requirement": "Mbutuhake Android 7.0 utawa luwih anyar.",
   "android_app.steps": "1. Undhuh APK menyang telpon Android, utawa transfer.\n2. Bukak file kasebut, banjur idini pemasangan saka sumber iki yen dijaluk.\n3. Bukak Easy-Post Mobile Companion banjur pilih Pasang.\n4. Gawe kode pemasangan ing Piranti banjur Pasangake aplikasi seluler, lan pindai kode kasebut.",
   "android_app.steps_group": "Cara masang",
   "android_app.title": "Aplikasi Android",

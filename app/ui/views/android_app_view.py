@@ -54,6 +54,18 @@ class AndroidAppView(QWidget):
         self._download_btn.clicked.connect(self._on_download_clicked)
         layout.addWidget(self._download_btn)
 
+        # Under the button, because this is the moment it matters. The APK is
+        # signed with APK Signature Scheme v2 only and carries no v1 JAR
+        # signature; v2 arrived in Android 7.0, so 5.x and 6.x cannot verify the
+        # file and refuse to install it — with an error that never mentions why.
+        # The website states the same floor; saying nothing here was not a false
+        # claim, but it left the one page that hands over the file silent about
+        # the one thing that stops it working.
+        requirement = QLabel(tr("android_app.requirement"))
+        requirement.setWordWrap(True)
+        requirement.setStyleSheet(f"color: {TEXT_MUTED};")
+        layout.addWidget(requirement)
+
         steps_group = QGroupBox(tr("android_app.steps_group"))
         steps_layout = QVBoxLayout(steps_group)
         steps = QLabel(tr("android_app.steps"))
