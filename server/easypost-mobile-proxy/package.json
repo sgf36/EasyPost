@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
+    "dev:init": "wrangler d1 execute easypost-mobile --local --file=schema.sql",
     "deploy": "wrangler deploy",
     "test": "node --test"
   },
