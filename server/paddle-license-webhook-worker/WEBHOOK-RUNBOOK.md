@@ -103,14 +103,30 @@ That last clause is the whole problem.
 
 ## 2. THE TRAP — read this one first
 
-**There are THREE Paddle notification destinations pointing at the exact same
-URL, each with a DIFFERENT signing secret.**
+**At least FOUR Paddle notification destinations point at the exact same URL,
+each with a DIFFERENT signing secret.**
 
-| ID | Name (after 2026-08-16 rename) | Secret fragment | Role |
+| ID | Name | Secret fragment | Role |
 |---|---|---|---|
-| `ntfset_01kyfxwd5ah6djw2cc3fn5wagx` | LIVE licence webhook - USE THIS ONE | `01kyfxwd` | **Canonical.** All Aug purchase history. |
-| `ntfset_01kyfxsvp00xzb11tnkn9x26t0` | DUPLICATE - DO NOT USE | `01kyfxsv` | Dead duplicate. |
-| `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` | Easy-Post Desktop licence issuer (Cloudflare Worker) | `01ky3g1b` | **The worst decoy.** Original from July. Its name is the most convincing of the three. |
+| `ntfset_01kyfxwd5ah6djw2cc3fn5wagx` | LIVE licence webhook - USE THIS ONE | `01kyfxwd` | **Canonical. Keep.** All Aug purchase history; the Worker holds this secret. |
+| `ntfset_01kyfxsvp00xzb11tnkn9x26t0` | DUPLICATE - DO NOT USE | `01kyfxsv` | Dead. Never received an event. |
+| `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` | Easy-Post Desktop licence issuer (Cloudflare Worker) | `01ky3g1b` | Dead since July. **The worst-named decoy** — it sounds the most correct. |
+| `ntfset_01m00qas4nz06bbqp09ffk47m2` | Easy-Post Licensing Webhook | `01m00qas` | Created 2026-08-14 and left **active**. Invisible to event-grouping because it never fired. |
+
+### ⚠️ The API cannot enumerate destinations — the dashboard is the only list
+
+`notificationSettings.list()` returns `[]` under this key for **every** filter
+combination: default, `active: true`, `active: false`, both `traffic_source`
+values, explicit `per_page`, explicit `order_by`. All seven were tried on
+2026-08-16. `get(<id>)` works, but only if the id is already known.
+
+Grouping notifications by `notification_setting_id` finds only destinations that
+have **received an event**, so anything newly created is invisible. The fourth
+destination above was missed exactly this way and surfaced only because the
+account owner read it off the dashboard.
+
+**Never state that the destination list is complete on API evidence alone. Ask
+for the dashboard list.**
 
 ### Identifying a destination from its secret (verified 2026-08-16)
 
