@@ -113,6 +113,43 @@ each with a DIFFERENT signing secret.**
 | `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` | Easy-Post Desktop licence issuer (Cloudflare Worker) | `01ky3g1b` | Dead since July. **The worst-named decoy** — it sounds the most correct. |
 | `ntfset_01m00qas4nz06bbqp09ffk47m2` | Easy-Post Licensing Webhook | `01m00qas` | Created 2026-08-14 and left **active**. Invisible to event-grouping because it never fired. |
 
+### Why there are so many: Paddle cannot rotate a secret in place
+
+**There is no "rotate secret" action.** To change a signing secret you must
+**create a new notification destination**, which gets a **new ID and a new
+secret**, then retire the old one. So *every rotation permanently adds another
+destination pointing at the same URL*. The trap in this section is not an
+accident — it is the direct, cumulative result of rotating four times.
+
+Consequences that have each caused a real outage:
+
+- **The identification prefix changes on every rotation.** A secret is
+  `pdl_` + *its own* destination id + `_` + 32 random chars, so after rotating,
+  the live secret no longer starts with the old id. Any note saying "the correct
+  one contains `01kyfxwd`" is only true until the next rotation. **Treat the
+  prefix as an identifier for *today's* destinations, not a permanent fact.**
+- **Two steps, not one.** Creating the destination does nothing on its own; the
+  new secret must also go into the Worker. Doing only the Paddle half gives
+  `401 invalid signature`; doing only the Worker half gives the same.
+- **Disable the old destination**, or it stays active with a secret the Worker
+  no longer holds and 401s on every event forever.
+
+**The correct rotation procedure:**
+
+1. Create a new destination in Paddle, URL
+   `https://easypost-license-webhook.sgf36.workers.dev/paddle/webhook`,
+   subscribed to the same events, `traffic_source: all`.
+2. Copy its secret (copy button) and run §4's `wrangler secret put`.
+3. Verify per §5 — replay, expect **200**.
+4. **Only then** disable the previous destination.
+5. Delete any destination that is not the live one, so the list stays at one.
+
+Doing step 4 before step 3 leaves a window with no working destination.
+
+**The live destination is whichever one's secret is in the Worker — not
+whichever one is named most convincingly.** Confirm by replay or SHA-256, never
+by name.
+
 ### ⚠️ The API cannot enumerate destinations — the dashboard is the only list
 
 `notificationSettings.list()` returns `[]` under this key for **every** filter
