@@ -137,7 +137,17 @@ export function verifyPaddleSignature(rawBody, sigHeader, secret) {
   const { ts, h1 } = parts;
   if (!ts || !h1) return false;
   if (Math.abs(Date.now() / 1000 - Number(ts)) > SIGNATURE_TOLERANCE_SECONDS) return false;
-  const expected = createHmac("sha256", secret).update(`${ts}:${rawBody}`).digest("hex");
+  // Trim the secret. `wrangler secret put` reads a line from a masked prompt,
+  // where a stray trailing newline or CR is invisible and would make every
+  // signature fail with a flat 401 — indistinguishable from the wrong secret.
+  //
+  // This was not the cause of the 2026-08-16 outage (that was the secret being
+  // stored under the wrong name entirely; see WEBHOOK-RUNBOOK.md §0), and it is
+  // kept purely as hardening: Paddle secrets never carry surrounding
+  // whitespace, so trimming can only ever help. Diagnosing a whitespace variant
+  // of this costs hours, because nothing in the 401 hints at it.
+  const key = String(secret ?? "").trim();
+  const expected = createHmac("sha256", key).update(`${ts}:${rawBody}`).digest("hex");
   const a = Buffer.from(expected, "utf8");
   const b = Buffer.from(h1, "utf8");
   return a.length === b.length && timingSafeEqual(a, b);
