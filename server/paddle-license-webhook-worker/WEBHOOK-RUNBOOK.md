@@ -112,12 +112,32 @@ URL, each with a DIFFERENT signing secret.**
 | `ntfset_01kyfxsvp00xzb11tnkn9x26t0` | DUPLICATE - DO NOT USE | `01kyfxsv` | Dead duplicate. |
 | `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` | Easy-Post Desktop licence issuer (Cloudflare Worker) | `01ky3g1b` | **The worst decoy.** Original from July. Its name is the most convincing of the three. |
 
-A Paddle secret **embeds its own destination ID**:
+### Identifying a destination from its secret (verified 2026-08-16)
+
+A Paddle secret is built as **`pdl_` + the destination's own public ID + `_` +
+32 random characters** — 70 characters total. So the **first 38 characters are
+public**, derivable from the destination ID, and safe to write down, quote or
+paste into a ticket. Only the final 32 are secret.
+
+| | Full 38-character prefix | Verdict |
+|---|---|---|
+| **A** | `pdl_ntfset_01kyfxwd5ah6djw2cc3fn5wagx_` | **KEEP — live** |
+| B | `pdl_ntfset_01kyfxsvp00xzb11tnkn9x26t0_` | delete |
+| C | `pdl_ntfset_01ky3g1b29r9zvgz1vyw9n6wyh_` | delete |
+
+**Read the first 19 characters to tell them apart.** All three share
+`pdl_ntfset_01ky`, which is precisely why they get confused:
 
 ```
-pdl_ntfset_<destination-id>_<random>
-        ^^^^^^^^^^^^^^^^^^ this tells you which one you copied
+pdl_ntfset_01kyfxwd...   A  KEEP
+pdl_ntfset_01kyfxsv...   B  delete
+pdl_ntfset_01ky3g1b...   C  delete
+                ^^^^
+           characters 16-19
 ```
+
+Character 16 separates C from A/B. **Character 18 is the one that matters:
+`w` = keep, `s` = delete.**
 
 **So you can always check what you copied without revealing anything secret:**
 the correct value contains **`01kyfxwd`**. If it contains `01kyfxsv` or
