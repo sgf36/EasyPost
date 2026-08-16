@@ -64,17 +64,27 @@ if (request.method === "GET" && url.pathname === "/__secretprobe") {
   };
   return Response.json({
     len: s.length,
-    sha256_trimmed: await sha(s.trim()),
-    charset_ok: /^[A-Za-z0-9_]+$/.test(s),   // a real Paddle secret is [A-Za-z0-9_] only
-    distinct_chars: new Set(s).size,
+    sha256: await sha(s.trim()),
   });
 }
 ```
 
-Then hash Paddle's `endpoint_secret_key` and compare. **A correct value reads
-`len: 70`, `charset_ok: true`, `distinct_chars: ~41`.** The wrong value in this
-incident read `len: 70`, `charset_ok: false`, `distinct_chars: 36` — same
-length, so length alone would not have caught it.
+Then hash Paddle's `endpoint_secret_key` and compare. **Equal hashes is the
+whole test.** It is exact, needs no interpretation, and exposes nothing:
+SHA-256 of a 70-character high-entropy string is not reversible.
+
+⚠️ **Do not "validate" the secret by its character set.** An earlier version of
+this runbook claimed a real Paddle secret is `[A-Za-z0-9_]` only. **That is
+false** — secrets are base64-ish and can contain `+` (destinations
+`01m06589` and `01m00qas` both do). The check passed once by luck and then
+flagged a *correct* secret as corrupt, which nearly sent the account owner
+round a fifth pointless re-paste. A test that produces false accusations is
+worse than no test.
+
+The only two reliable structural facts:
+
+- Length is **70**.
+- It starts with `pdl_` + its own destination id + `_` (38 chars, all public).
 
 **Remove the probe endpoint and redeploy as soon as the comparison is done.**
 
@@ -103,15 +113,25 @@ That last clause is the whole problem.
 
 ## 2. THE TRAP — read this one first
 
-**At least FOUR Paddle notification destinations point at the exact same URL,
+**At least FIVE Paddle notification destinations point at the exact same URL,
 each with a DIFFERENT signing secret.**
 
-| ID | Name | Secret fragment | Role |
+> **The live one is recorded in §9 and nowhere else.** Do not trust any id
+> written elsewhere in this file, in a commit message, or in a handoff — every
+> rotation retires the previous one, so those references go stale by design.
+> §9 is the single source of truth; if it looks old, re-verify per §5.
+
+| ID | Name | Fragment | Role |
 |---|---|---|---|
-| `ntfset_01kyfxwd5ah6djw2cc3fn5wagx` | LIVE licence webhook - USE THIS ONE | `01kyfxwd` | **Canonical. Keep.** All Aug purchase history; the Worker holds this secret. |
+| `ntfset_01m06589zhh755p1xjkknt1gdx` | USE ME! | `01m06589` | **LIVE as of 2026-08-16 21:04 UTC.** See §9. |
+| `ntfset_01kyfxwd5ah6djw2cc3fn5wagx` | LIVE licence webhook - USE THIS ONE | `01kyfxwd` | **RETIRED** by the 2026-08-16 rotation. Its name is now a lie — delete it. |
 | `ntfset_01kyfxsvp00xzb11tnkn9x26t0` | DUPLICATE - DO NOT USE | `01kyfxsv` | Dead. Never received an event. |
 | `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` | Easy-Post Desktop licence issuer (Cloudflare Worker) | `01ky3g1b` | Dead since July. **The worst-named decoy** — it sounds the most correct. |
-| `ntfset_01m00qas4nz06bbqp09ffk47m2` | Easy-Post Licensing Webhook | `01m00qas` | Created 2026-08-14 and left **active**. Invisible to event-grouping because it never fired. |
+| `ntfset_01m00qas4nz06bbqp09ffk47m2` | Easy-Post Licensing Webhook | `01m00qas` | Created 2026-08-14, left active, never fired. Invisible to event-grouping. |
+
+Note what that second row demonstrates: a destination named
+**"USE THIS ONE"** is now the wrong one. **Names are not evidence.** Only §9,
+a SHA-256 match, or a verified 200 is.
 
 ### Why there are so many: Paddle cannot rotate a secret in place
 
@@ -172,30 +192,24 @@ A Paddle secret is built as **`pdl_` + the destination's own public ID + `_` +
 public**, derivable from the destination ID, and safe to write down, quote or
 paste into a ticket. Only the final 32 are secret.
 
-| | Full 38-character prefix | Verdict |
-|---|---|---|
-| **A** | `pdl_ntfset_01kyfxwd5ah6djw2cc3fn5wagx_` | **KEEP — live** |
-| B | `pdl_ntfset_01kyfxsvp00xzb11tnkn9x26t0_` | delete |
-| C | `pdl_ntfset_01ky3g1b29r9zvgz1vyw9n6wyh_` | delete |
-
-**Read the first 19 characters to tell them apart.** All three share
-`pdl_ntfset_01ky`, which is precisely why they get confused:
-
-```
-pdl_ntfset_01kyfxwd...   A  KEEP
-pdl_ntfset_01kyfxsv...   B  delete
-pdl_ntfset_01ky3g1b...   C  delete
-                ^^^^
-           characters 16-19
-```
-
-Character 16 separates C from A/B. **Character 18 is the one that matters:
-`w` = keep, `s` = delete.**
-
 **So you can always check what you copied without revealing anything secret:**
-the correct value contains **`01kyfxwd`**. If it contains `01kyfxsv` or
-`01ky3g1b`, it is the wrong one, and the Worker will return `401 invalid
-signature` no matter how many times you re-paste it.
+read the id out of the prefix and compare it with the live id in §9.
+
+As of 2026-08-16 the live prefix is:
+
+```
+pdl_ntfset_01m06589zhh755p1xjkknt1gdx_
+```
+
+and the four retired ones all begin `pdl_ntfset_01ky…` or
+`pdl_ntfset_01m00q…`.
+
+⚠️ **This prefix changes at every rotation** — it is derived from the
+destination id, and rotating mints a new destination. So treat it as a way to
+identify *which* destination a value came from, never as a permanent answer to
+*which is correct*. An earlier version of this runbook said "the correct value
+contains `01kyfxwd`"; one rotation later that instruction pointed at a dead
+destination. **Always resolve "which is live" from §9.**
 
 ### Why this keeps happening
 
@@ -250,9 +264,11 @@ await client.notifications.logs.list("<notification id>", { per_page: 10 })
 
 ## 4. The fix
 
-1. Paddle → Developer tools → Notifications → open **"LIVE licence webhook -
-   USE THIS ONE"**. Confirm the ID ends `…wagx`.
-2. Reveal the secret. **Confirm with your eyes that it contains `01kyfxwd`.**
+1. Paddle → Developer tools → Notifications → open **the live destination whose
+   id is recorded in §9**. Match it by **id, not by name** — a destination
+   called "LIVE licence webhook - USE THIS ONE" is, as of 2026-08-16, the
+   *retired* one.
+2. Reveal the secret. **Confirm with your eyes that it contains the §9 id.**
    Use the copy button if there is one — a dragged selection can pick up
    trailing whitespace, which is invisible at a masked prompt.
 3. In an interactive terminal — **never as a command-line argument**, which
@@ -297,9 +313,33 @@ const r = await client.notifications.replay("ntf_01m00k7bdjfz0qqh91wg6efdvt");
 **200 = fixed. Anything else = not fixed.**
 
 ⚠️ **A replay only ever goes to the destination the original notification
-belonged to.** You cannot use a replay to test a *different* destination. To
-test another one you need a simulation (`client.simulations.create` with that
-`notification_setting_id`) or a real event.
+belonged to.** So a replay cannot test a *different* destination — and it can
+never test a **newly created** one, which by definition has no notifications to
+replay. That is the exact situation after every rotation.
+
+### Verifying a brand-new destination: use a simulation
+
+This is the missing tool that makes a rotation verifiable before a real
+purchase. Note the **positional** argument on `runs.create` — passing
+`{ simulation_id }` as an object fails with `URL called is invalid`:
+
+```js
+const sim = await client.simulations.create({
+  notification_setting_id: "<ntfset_...>",
+  name: "Webhook verification (transaction.updated no-op)",
+  type: "transaction.updated",              // no-op: mints nothing, emails nothing
+});
+const run = await client.simulations.runs.create(sim.id);   // positional!
+// then read the actual HTTP response:
+const evs = await client.simulations.runsEvents.list(sim.id, run.id, { per_page: 20 });
+// evs.data[0].response.status === 200  ->  verified
+```
+
+A pass reads `status: "success"`, `response.status: 200`, body
+`{"ignored":"transaction.updated"}`.
+
+The destination must have `traffic_source` of `all` or `simulation` to receive
+simulated traffic — `platform` alone will not.
 
 The genuine end-to-end proof is buying one real licence and confirming the key
 arrives by email. Until that has happened, the money path is unproven.
@@ -363,16 +403,26 @@ was recoverable from any of the above. Verify with §5.
 
 ---
 
-## 9. Known-good state (2026-08-16, verified)
+## 9. Known-good state (2026-08-16 21:04 UTC, verified)
 
-- Worker holds destination A's secret — confirmed by SHA-256 comparison.
-- Replay of `transaction.updated` returns **200** `{"ignored":"transaction.updated"}`.
+The live destination is **`ntfset_01m06589zhh755p1xjkknt1gdx`** ("USE ME!"),
+created during the 2026-08-16 rotation.
+
+- Active, correct URL, `traffic_source: all`, 56 events including
+  `transaction.completed`, `adjustment.created` and 9 `subscription.*`.
+- Worker's `PADDLE_WEBHOOK_SECRET` **matches it by SHA-256**.
+- **Verified by simulation: HTTP 200**, `{"ignored":"transaction.updated"}`.
+- Its secret contains a `+` — see the charset warning in §0.
+
+**All four earlier destinations are inactive** and should be deleted:
+`01kyfxwd` (previous live), `01kyfxsv`, `01ky3g1b`, `01m00qas`.
+
+- Seven Worker secrets, all correctly named. No probe endpoint deployed.
 - The original purchase `txn_01m00k1xjf81rzm2rxah3hn27y` issued
   `license_issued`, tier `personal`, at 2026-08-14T17:28:39Z.
-- Seven secrets, all correctly named. No probe endpoint deployed.
-- **Outstanding:** destination C is still `active` while holding a secret the
-  Worker does not have, so it 401s on every real event and generates retry
-  noise. Deactivate or delete C and B, leaving only A.
+- **Still unproven:** a real end-to-end purchase. A simulation exercises
+  signature verification; it does not exercise checkout, minting, Resend, or
+  actual inbox delivery.
 
 ---
 
