@@ -90,6 +90,45 @@ async function handleClaim(request, env) {
   const { pairing_token, platform } = body || {};
   if (!pairing_token) return json({ error: "missing_fields" }, 400);
 
+  // Scannable reviewer pairing.
+  //
+  // App Review asked for "a demo QR code ... to fully assess the app features"
+  // (guideline 2.1(a), submission 74049fb7). A real pairing QR cannot be handed
+  // over: each token is single-use, expires after PAIR_TTL_SECONDS, and is bound
+  // to a paying customer's own production EasyPost key.
+  //
+  // So a QR carrying "demo:<REVIEW_CODE>" is routed to exactly the same demo
+  // path as /pair/demo — the TEST-mode demo key, tier "demo". It reuses the
+  // review code as its only credential, so there is no new secret to manage, no
+  // pending_pairs row, and no new trust boundary: anyone who can scan the image
+  // could equally have typed the code, which is already printed in the App Store
+  // Connect reviewer notes.
+  //
+  // Deliberately NOT single-use and NOT time-limited: a reviewer may scan it
+  // more than once, or on more than one device, and a code that works once and
+  // then silently fails is worse than none at all.
+  const DEMO_PREFIX = "demo:";
+  if (String(pairing_token).startsWith(DEMO_PREFIX)) {
+    if (!env.REVIEW_CODE || !env.DEMO_EASYPOST_TEST_KEY) {
+      return json({ error: "demo_disabled" }, 403);
+    }
+    const supplied = String(pairing_token).slice(DEMO_PREFIX.length);
+    if (!safeEqual(supplied, env.REVIEW_CODE)) {
+      return json({ error: "invalid_review_code" }, 403);
+    }
+    const demo = await encryptWithNewKek(String(env.DEMO_EASYPOST_TEST_KEY));
+    const demoToken = randomToken(32);
+    const demoPlat = platform === "ios" || platform === "android" ? platform : null;
+    await env.PAIRING.prepare(
+      `INSERT INTO devices
+         (device_token, ciphertext, iv, license_order, license_tier, platform, created_at, last_seen, revoked)
+       VALUES (?, ?, ?, 'REVIEW', 'demo', ?, ?, ?, 0)`,
+    )
+      .bind(demoToken, demo.ciphertext, demo.iv, demoPlat, now(), now())
+      .run();
+    return json({ device_token: demoToken, kek: demo.kek, tier: "demo", demo: true });
+  }
+
   const row = await env.PAIRING.prepare(
     `SELECT ciphertext, iv, kek, license_order, license_tier, created_at
        FROM pending_pairs WHERE pairing_token = ?`,
