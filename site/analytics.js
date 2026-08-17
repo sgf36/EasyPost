@@ -38,6 +38,83 @@
     document.head.appendChild(s);
     gtag("js", new Date());
     gtag("config", GA_ID);
+    trackConversions();
+  }
+
+  /* Conversion events.
+   *
+   * Page views alone say how many people arrived. These say what they did once
+   * they were here, which is the only thing that explains a flat sales line.
+   *
+   * Wired by delegation on document, so this runs once and needs no markup on
+   * the pages and no re-binding when a page changes. It is called only from
+   * enableAnalytics(), so nothing is sent without consent.
+   *
+   * Nothing here calls preventDefault. GA4 sends via navigator.sendBeacon,
+   * which survives the page unloading, so a tracked link still navigates
+   * normally — and if the beacon fails the visitor still gets their download.
+   * Breaking a download to record that it happened would be the wrong trade.
+   */
+  function trackConversions() {
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest ? e.target.closest("a, button") : null;
+      if (!a) return;
+
+      var href = a.getAttribute("href") || "";
+
+      // Paddle checkout. checkout.js upgrades these into an overlay; this
+      // records the intent either way, including the mailto fallback.
+      var priceId = a.getAttribute("data-paddle-price");
+      if (priceId) {
+        gtag("event", "begin_checkout", { price_id: priceId });
+        return;
+      }
+
+      // Application downloads, split by what the visitor actually runs.
+      if (href.indexOf("releases/download") > -1) {
+        gtag("event", "download_click", {
+          platform: /macOS|\.dmg/i.test(href) ? "macos" : "windows",
+          file: href.split("/").pop()
+        });
+        return;
+      }
+      if (href.indexOf("microsoft.com/store") > -1) {
+        gtag("event", "download_click", { platform: "microsoft_store" });
+        return;
+      }
+
+      // Everything else leaving the site. Worth knowing how many people go
+      // looking at the source before they buy.
+      if (/^https?:/i.test(href) && href.indexOf(location.host) === -1) {
+        gtag("event", "outbound_click", { link_domain: hostOf(href), link_url: href });
+      }
+    });
+
+    // Support enquiries. The form posts to contact.php, so submit is the last
+    // moment we see it.
+    var form = document.getElementById("contact-form");
+    if (form) {
+      form.addEventListener("submit", function () {
+        gtag("event", "contact_submit");
+      });
+    }
+
+    // A completed purchase. thank-you.html is reached only from Paddle's
+    // successUrl, so arriving here IS the conversion.
+    //
+    // Deliberately not GA4's reserved `purchase` event: that one is defined to
+    // carry transaction_id, value and currency, and Paddle's overlay hands the
+    // success page none of them. A reserved event filled with blanks reports
+    // £0 revenue forever, which is worse than a custom event that is honest
+    // about what it knows. Revenue belongs in Paddle, which has the real
+    // numbers; mark this as a key event in GA4 to count conversions.
+    if (/\/thank-you\.html$/.test(location.pathname)) {
+      gtag("event", "purchase_success");
+    }
+  }
+
+  function hostOf(url) {
+    try { return new URL(url).hostname; } catch (e) { return "unknown"; }
   }
 
   function remember(value) {
