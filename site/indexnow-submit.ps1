@@ -36,8 +36,12 @@ if (-not $Urls -or $Urls.Count -eq 0) {
         "https://$host_/pricing.html",
         "https://$host_/download.html",
         "https://$host_/faq.html",
+        "https://$host_/mobile.html",
+        "https://$host_/easypost-desktop-app.html",
+        "https://$host_/easypost-without-code.html",
         "https://$host_/terms.html",
         "https://$host_/privacy.html",
+        "https://$host_/mobile-privacy.html",
         "https://$host_/refunds.html"
     )
 }
