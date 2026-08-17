@@ -1,38 +1,79 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Something in Easy-Post Desktop does not work as expected
 title: ''
-labels: ''
+labels: bug
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+<!--
+NEVER PASTE AN API KEY, A LICENCE KEY OR A TRACKING NUMBER YOU CARE ABOUT.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+This repository is public. An EasyPost production key posted here can buy
+postage on your account. If a key has already been pasted anywhere public,
+revoke it in the EasyPost dashboard first, then edit it out.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+Screenshots often contain a key, an address or a customer name. Check before
+attaching one.
+-->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## What happened
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+<!-- What the application did. -->
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+## What was expected instead
 
-**Additional context**
-Add any other context about the problem here.
+## Steps to reproduce
+
+1.
+2.
+3.
+
+## Environment
+
+| | |
+|---|---|
+| **Easy-Post Desktop version** | <!-- e.g. 1.2.5 --> |
+| **Operating system** | <!-- e.g. Windows 11 24H2, or macOS 15.5 --> |
+| **Installed from** | <!-- direct download, Microsoft Store, or Mac App Store --> |
+| **Mode** | <!-- test or production --> |
+
+**Mode matters more than anything else here.** A great many differences between
+test and production are the API behaving differently, not the application, so a
+report without it usually cannot be acted on.
+
+## Where in the application
+
+<!-- Delete those that do not apply. -->
+
+Dashboard · Create shipment · Address book · Batch · Tracking · History ·
+Reports · Claims · Insurance · Pickups · HTS lookup · Customs · Settings ·
+Mobile pairing · Licence or activation · Installation or update
+
+## Was postage bought
+
+<!--
+Answer this even when it seems irrelevant. Anything that may have charged a
+carrier account is triaged first.
+-->
+
+- [ ] No money changed hands
+- [ ] A label was bought
+- [ ] Unsure
+
+If a label was bought, give the **carrier and service** and say whether the
+charge appeared in the EasyPost dashboard. A shipment identifier beginning
+`shp_` is useful and safe to share. A tracking number is not, since it exposes
+the recipient.
+
+## Anything else
+
+<!--
+An error message, copied as text rather than a screenshot where possible.
+
+The application keeps its database and settings in the per-user application
+data directory. Do not attach `easypost_desktop.sqlite3`, which contains the
+whole address book, and do not attach `settings.json` without removing any key
+from it first.
+-->
