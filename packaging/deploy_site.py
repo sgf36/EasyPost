@@ -50,6 +50,7 @@ KEYRING_SERVICE = "cpanel-easypost-site"
 # Suffixes the web server runs instead of serving verbatim. A GET on one of
 # these returns the script's output, never its source, so the public URL cannot
 # verify it. Anything not listed here is assumed to be served as written.
+BINARY_SUFFIXES = {".ico", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".woff", ".woff2", ".pdf"}
 EXECUTED_SUFFIXES = {".php", ".php5", ".php7", ".php8", ".phtml", ".cgi", ".pl"}
 
 
@@ -90,6 +91,12 @@ def upload(token: str, name: str, dry_run: bool = False) -> bool:
         print(f"  MISSING  {name} — not in site/")
         return False
 
+    # Binary assets cannot go through save_file_content: that endpoint takes a
+    # text body and performs a charset conversion, which mangles image bytes.
+    # They go up as a multipart upload instead and are verified byte-for-byte.
+    if Path(name).suffix.lower() in BINARY_SUFFIXES:
+        return _upload_binary(token, name, local, dry_run)
+
     content = local.read_text(encoding="utf-8")
     if dry_run:
         print(f"  would send  {name}  ({len(content.encode()):,} bytes)")
@@ -117,6 +124,46 @@ def upload(token: str, name: str, dry_run: bool = False) -> bool:
     # Plain ASCII: this runs in a cp1252 console, which cannot encode an arrow.
     print(f"  {'ok      ' if ok else 'MISMATCH'} {name}  "
           f"sent {len(content.encode()):,} -> {read_back}")
+    return ok
+
+
+def _upload_binary(token: str, name: str, local: Path, dry_run: bool) -> bool:
+    """Send an image or font as bytes, then compare the served bytes exactly.
+
+    save_file_content is a text API. Handing it a PNG produces a file that is
+    the right length and the wrong content, and the failure only shows up as a
+    broken image in a browser, so this path never touches it.
+    """
+    raw = local.read_bytes()
+    if dry_run:
+        print(f"  would send  {name}  ({len(raw):,} bytes, binary)")
+        return True
+
+    with local.open("rb") as fh:
+        response = requests.post(
+            f"{HOST}/execute/Fileman/upload_files",
+            headers={"Authorization": f"cpanel {CPANEL_USER}:{token}"},
+            data={"dir": REMOTE_DIR, "overwrite": 1},
+            files={"file-1": (name, fh, "application/octet-stream")},
+            timeout=120,
+        )
+    response.raise_for_status()
+    payload = response.json()
+    # upload_files reports per-file success separately from the envelope.
+    for entry in (payload.get("data", {}) or {}).get("uploads", []) or []:
+        if not entry.get("status"):
+            print(f"  REJECTED {name} — {entry.get('reason')}")
+            return False
+
+    served = requests.get(
+        f"{PUBLIC_BASE}/{name}",
+        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"},
+        timeout=60,
+    )
+    served.raise_for_status()
+    ok = served.content == raw
+    print(f"  {'ok      ' if ok else 'MISMATCH'} {name}  "
+          f"sent {len(raw):,} -> served {len(served.content):,} (binary)")
     return ok
 
 
