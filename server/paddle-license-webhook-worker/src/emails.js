@@ -64,7 +64,9 @@ const BRANDS = {
     rule: "#e0dad0",
     white: WHITE,
     footerKey: "footer_business",
-    wordmark: "Spencer Fields",
+    wordmark: "Software - Spencer Fields",
+    // Deliberately not the wordmark: the footer sentence is about the legal
+    // entity, and the entity is Spencer Fields, not the software.
     footerName: "Spencer Fields",
     site: "https://software.spencerfields.com",
     links: [["link_software", "/#software"], ["link_business", "/#business"]],

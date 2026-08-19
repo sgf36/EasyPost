@@ -244,10 +244,11 @@ const PRODUCTS = {
   },
   software: {
     id: "software",
-    name: "Spencer Fields",
-    // Used verbatim as the From display name, in place of name + suffix.
-    // "Software - Spencer Fields Support" would read as a third entity, so the
-    // suffix is skipped rather than appended.
+    // Names what the reader is dealing with, which is the software rather than
+    // the person. Drives the subject line and the owner-forward heading.
+    name: "Software - Spencer Fields",
+    // Used verbatim as the From display name, in place of name + suffix:
+    // "Software - Spencer Fields Support" would read as a third entity.
     senderName: "Software - Spencer Fields",
     // Its own Resend account, so its own key, sender and inbound webhook. Each
     // degrades independently: an unset key or sender falls back to the
