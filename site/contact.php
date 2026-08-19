@@ -290,10 +290,17 @@ function relay_via_worker(array $payload, ?string &$error): bool
 }
 
 $relayError = null;
+/*
+ * `product` tells the shared Worker which of the two products this is. Wren
+ * posts to the same endpoint, and the two topic lists overlap on "Bug report"
+ * and "Something else", so topic alone cannot separate them. The value must
+ * match a key in the Worker's PRODUCTS registry.
+ */
 $sent = relay_via_worker([
     'name' => $name,
     'email' => $email,
     'topic' => $topic,
+    'product' => 'easy-post',
     'message' => $message,
     'ip' => $ip,
 ], $relayError);
