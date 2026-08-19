@@ -34,6 +34,17 @@ PRICE_TIERS = '{"pri_01ky2hekjfm1c9nspf5pnqv0jv":"personal","pri_01ky3fxcf519vwq
 PADDLE_PRICE_ID = "pri_01ky2hekjfm1c9nspf5pnqv0jv"
 LICENSE_FROM_EMAIL = "licenses@easy-post.spencerfields.com"
 CONTACT_TO_EMAIL = "Apps@spencerfields.com"
+# Wren runs on its OWN Resend account, so its support mail needs its own key
+# (secret RESEND_API_KEY_WREN) and its own verified sender.
+#
+# Live since 2026-08-18: Resend reports wren.spencerfields.com verified (DKIM,
+# SPF MX and SPF TXT all green) on domain fd42c8cc-5111-48e5-a7f1-a09505e0c685.
+#
+# To roll back, comment this line out and redeploy: resolveSender() requires
+# BOTH the key and the address, so Wren mail falls straight back to the
+# Easy-Post account under a "Wren Support" display name with nothing else
+# changing.
+WREN_FROM_EMAIL = "support@wren.spencerfields.com"
 # PADDLE_API_BASE = "https://api.paddle.com"      # sandbox: https://sandbox-api.paddle.com
 # LICENSE_PRODUCT_ID = "easypost-desktop"
 

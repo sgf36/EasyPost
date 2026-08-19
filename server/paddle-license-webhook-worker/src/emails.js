@@ -1,5 +1,6 @@
 /**
- * Email presentation for the Easy-Post Desktop licence Worker.
+ * Email presentation for the licence and support Worker, which serves two
+ * products: Easy-Post Desktop and Wren.
  *
  * Pure, dependency-free builders so they can be unit-tested and previewed
  * outside the Worker. Each `*Email(...)` returns { subject, text, html }:
@@ -7,25 +8,80 @@
  * meaningful proportion of clients (and every plain-text reader) never render
  * the HTML.
  *
- * Design mirrors the product site: green #1f5c54 on warm cream #f7f4ed, serif
- * (Georgia, standing in for the site's Cormorant Garamond) headings over a
- * system sans body. Image-free and table-based on purpose — remote images are
- * blocked by default in most inboxes and hurt deliverability, and a wordmark in
- * an accent bar reads as "designed" without any of that risk.
+ * Each design mirrors its own product site: serif (Georgia) headings over a
+ * system sans body, on a warm light ground with the product's accent in the
+ * header bar. Image-free and table-based on purpose — remote images are blocked
+ * by default in most inboxes and hurt deliverability, and a wordmark in an
+ * accent bar reads as "designed" without any of that risk.
+ *
+ * Wren's SITE is dark (#12332F ground, gold on deep green). The email is
+ * deliberately NOT: a dark-background HTML email is mangled by several clients,
+ * fights their own dark-mode handling, and prints badly. Wren's identity is
+ * carried instead by its deep green header bar with the wordmark in gold —
+ * which is the logo — over the same light, well-behaved shell Easy-Post uses.
+ * The light ground is a derived tone: Wren's palette has no light value.
  */
 
-const B = {
-  green: "#1f5c54",
-  greenDark: "#17443e",
-  ink: "#191a1c",
-  body: "#404040",
-  muted: "#6b6b6b",
-  cream: "#f7f4ed",
-  rule: "#e2ded4",
-  white: "#ffffff",
-  site: "https://easy-post.spencerfields.com",
-  support: "Apps@spencerfields.com",
+// Tones shared by both brands: text colours and white, which carry no identity.
+const INK = "#191a1c";
+const BODY = "#404040";
+const MUTED = "#6b6b6b";
+const WHITE = "#ffffff";
+
+const BRANDS = {
+  "easy-post": {
+    green: "#1f5c54",
+    greenDark: "#17443e",
+    // Colour of the wordmark sitting on the header bar.
+    wordmarkColor: "#ffffff",
+    ink: INK,
+    body: BODY,
+    muted: MUTED,
+    cream: "#f7f4ed",
+    rule: "#e2ded4",
+    white: WHITE,
+    wordmark: "Easy&#8209;Post Desktop",
+    footerName: "Easy&#8209;Post Desktop",
+    site: "https://easy-post.spencerfields.com",
+    links: [
+      ["Website", ""],
+      ["FAQ", "/faq.html"],
+      ["Privacy", "/privacy.html"],
+    ],
+    support: "Apps@spencerfields.com",
+  },
+  wren: {
+    green: "#1E4B45",      // --raised on the Wren site
+    greenDark: "#12332F",  // --ground
+    wordmarkColor: "#F2C879", // --gold: green bar + gold wordmark is the logo
+    ink: INK,
+    body: BODY,
+    muted: MUTED,
+    cream: "#f5f1e8",
+    rule: "#e4ddcd",
+    white: WHITE,
+    wordmark: "Wren",
+    footerName: "Wren",
+    site: "https://wren.spencerfields.com",
+    // No FAQ page on the Wren site; the support page carries that content.
+    links: [
+      ["Website", ""],
+      ["Support", "/support.html"],
+      ["Privacy", "/privacy.html"],
+    ],
+    support: "Apps@spencerfields.com",
+  },
 };
+
+// Every pre-existing builder — the licence email above all — was written
+// against `B` and is Easy-Post-only, so `B` stays exactly what it was.
+const B = BRANDS["easy-post"];
+
+// Unknown ids fall back to Easy-Post, matching the Worker's own product
+// fallback so a typo degrades to the old behaviour rather than a crash.
+export function brandFor(productId) {
+  return BRANDS[productId] || B;
+}
 
 export function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) =>
@@ -50,26 +106,35 @@ export function paraFromText(text) {
     .join("");
 }
 
-function heading(text) {
-  return `<h1 style="margin:0 0 16px;font-family:${SERIF};font-size:22px;font-weight:700;color:${B.ink};line-height:1.25;">${escapeHtml(
+// Every helper below takes the brand as a trailing optional argument defaulting
+// to Easy-Post, so the licence-email builders keep working untouched.
+function heading(text, br = B) {
+  return `<h1 style="margin:0 0 16px;font-family:${SERIF};font-size:22px;font-weight:700;color:${br.ink};line-height:1.25;">${escapeHtml(
     text
   )}</h1>`;
 }
 
 // A highlighted reference block (support case number, licence key, etc.).
-function refBox(label, value, note) {
+function refBox(label, value, note, br = B) {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;"><tr>
-    <td style="background:${B.cream};border-left:3px solid ${B.green};padding:14px 16px;font-family:${SANS};font-size:13px;color:${B.body};">
+    <td style="background:${br.cream};border-left:3px solid ${br.green};padding:14px 16px;font-family:${SANS};font-size:13px;color:${br.body};">
       ${escapeHtml(label)}<br>
-      <span style="font-family:${MONO};font-size:16px;font-weight:700;color:${B.ink};letter-spacing:.5px;">${escapeHtml(
+      <span style="font-family:${MONO};font-size:16px;font-weight:700;color:${br.ink};letter-spacing:.5px;">${escapeHtml(
     value
   )}</span>
-      ${note ? `<br><span style="color:${B.muted};font-size:12px;">${escapeHtml(note)}</span>` : ""}
+      ${note ? `<br><span style="color:${br.muted};font-size:12px;">${escapeHtml(note)}</span>` : ""}
     </td></tr></table>`;
 }
 
 // The branded outer shell. `preheader` is the hidden inbox-preview snippet.
-export function emailShell({ title, preheader, bodyHtml }) {
+export function emailShell({ title, preheader, bodyHtml, brand = B }) {
+  const br = brand;
+  const nav = br.links
+    .map(
+      ([label, path]) =>
+        `<a href="${br.site}${path}" style="color:${br.green};text-decoration:none;">${label}</a>`
+    )
+    .join(" &nbsp;·&nbsp;\n      ");
   return `<!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8">
@@ -77,33 +142,31 @@ export function emailShell({ title, preheader, bodyHtml }) {
 <meta name="color-scheme" content="light only">
 <title>${escapeHtml(title)}</title>
 </head>
-<body style="margin:0;padding:0;background:${B.cream};">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${B.cream};">${escapeHtml(
+<body style="margin:0;padding:0;background:${br.cream};">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:${br.cream};">${escapeHtml(
     preheader || ""
   )}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${B.cream};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${br.cream};">
 <tr><td align="center" style="padding:32px 16px;">
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:${B.white};border:1px solid ${B.rule};border-radius:10px;overflow:hidden;">
-    <tr><td style="background:${B.green};padding:20px 28px;">
-      <span style="font-family:${SERIF};font-size:20px;font-weight:700;color:${B.white};letter-spacing:.3px;">Easy&#8209;Post Desktop</span>
+  <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:${br.white};border:1px solid ${br.rule};border-radius:10px;overflow:hidden;">
+    <tr><td style="background:${br.green};padding:20px 28px;">
+      <span style="font-family:${SERIF};font-size:20px;font-weight:700;color:${br.wordmarkColor};letter-spacing:.3px;">${br.wordmark}</span>
     </td></tr>
-    <tr><td style="padding:28px;font-family:${SANS};font-size:15px;line-height:1.6;color:${B.body};">
+    <tr><td style="padding:28px;font-family:${SANS};font-size:15px;line-height:1.6;color:${br.body};">
       ${bodyHtml}
     </td></tr>
-    <tr><td style="padding:18px 28px;border-top:1px solid ${B.rule};font-family:${SANS};font-size:12px;line-height:1.7;color:${B.muted};">
-      Easy&#8209;Post Desktop — a product of Spencer Fields, London, United Kingdom.<br>
-      <a href="${B.site}" style="color:${B.green};text-decoration:none;">Website</a> &nbsp;·&nbsp;
-      <a href="${B.site}/faq.html" style="color:${B.green};text-decoration:none;">FAQ</a> &nbsp;·&nbsp;
-      <a href="${B.site}/privacy.html" style="color:${B.green};text-decoration:none;">Privacy</a> &nbsp;·&nbsp;
-      <a href="mailto:${B.support}" style="color:${B.green};text-decoration:none;">${B.support}</a>
+    <tr><td style="padding:18px 28px;border-top:1px solid ${br.rule};font-family:${SANS};font-size:12px;line-height:1.7;color:${br.muted};">
+      ${br.footerName} — a product of Spencer Fields, London, United Kingdom.<br>
+      ${nav} &nbsp;·&nbsp;
+      <a href="mailto:${br.support}" style="color:${br.green};text-decoration:none;">${br.support}</a>
     </td></tr>
   </table>
 </td></tr></table>
 </body></html>`;
 }
 
-function signoff(line) {
-  return `<p style="margin:18px 0 0;color:${B.body};">— ${escapeHtml(line)}</p>`;
+function signoff(line, br = B) {
+  return `<p style="margin:18px 0 0;color:${br.body};">— ${escapeHtml(line)}</p>`;
 }
 
 // EPD-YYMMDD-XXXX, with a 4-char non-ambiguous suffix (no I/O/0/1).
@@ -205,52 +268,77 @@ export function licenseEmail({ licenseKey, seats = 3, annual = false }) {
 }
 
 // ---- Contact form: reply to the customer -----------------------------------
-export function contactCustomerEmail({ name, topic, caseId, aiReply }) {
+// productName defaults to Easy-Post Desktop so that any caller predating the
+// two-product split keeps its existing wording.
+export function contactCustomerEmail({
+  name,
+  topic,
+  caseId,
+  aiReply,
+  productName = "Easy-Post Desktop",
+  productId = "easy-post",
+  // An acknowledgement in the language the customer wrote in, placed above the
+  // English. Only the plain acknowledgement uses this; when there is an AI
+  // answer, the caller has already composed a bilingual body.
+  translatedLead = null,
+}) {
+  const br = brandFor(productId);
   const ref = `Your support reference: ${caseId}`;
+  // A hyphen in a product name is held together in HTML: "Easy-Post" wrapping
+  // across two lines mid-name looks like a typesetting fault. Applied to the
+  // name generally rather than to that one product.
+  const htmlName = escapeHtml(productName).replace(/-/g, "&#8209;");
   if (aiReply) {
     const text =
       aiReply +
-      `\n\n${ref}\n\n— Easy-Post Desktop support\n\n` +
+      `\n\n${ref}\n\n— ${productName} support\n\n` +
       "This is an automated first reply. If it does not fully answer your " +
       "question, just reply to this email and a member of the team will pick it " +
       "up personally.";
     const bodyHtml =
-      heading(`Re: ${topic}`) +
-      refBox("Your support reference", caseId, "Please quote this in any reply.") +
+      heading(`Re: ${topic}`, br) +
+      refBox("Your support reference", caseId, "Please quote this in any reply.", br) +
       paraFromText(aiReply) +
-      signoff("Easy-Post Desktop support") +
-      `<p style="margin:16px 0 0;padding:12px 16px;background:${B.cream};border-radius:6px;color:${B.muted};font-size:13px;">This is an automated first reply. If it doesn’t fully answer your question, just reply to this email and a member of the team will pick it up personally.</p>`;
+      signoff(`${productName} support`, br) +
+      `<p style="margin:16px 0 0;padding:12px 16px;background:${br.cream};border-radius:6px;color:${br.muted};font-size:13px;">This is an automated first reply. If it doesn’t fully answer your question, just reply to this email and a member of the team will pick it up personally.</p>`;
     return {
-      subject: `Re: ${topic} — Easy-Post Desktop [${caseId}]`,
+      subject: `Re: ${topic} — ${productName} [${caseId}]`,
       text,
       html: emailShell({
         title: `Re: ${topic}`,
         preheader: `${ref} — a first answer to your enquiry.`,
         bodyHtml,
+        brand: br,
       }),
     };
   }
   const text =
     `Hello ${name},\n\n` +
-    "Thank you for contacting Easy-Post Desktop support. We have received your " +
+    (translatedLead ? `${translatedLead}\n\n${"-".repeat(41)}\n\n` : "") +
+    `Thank you for contacting ${productName} support. We have received your ` +
     `message${topic ? ` about "${topic}"` : ""} and a member of the team will ` +
     "reply personally, usually within one business day.\n\n" +
-    `${ref}\n\n— Easy-Post Desktop support`;
+    `${ref}\n\n— ${productName} support`;
   const bodyHtml =
-    heading("We’ve received your message") +
+    heading("We’ve received your message", br) +
     `<p style="margin:0 0 16px;">Hello ${escapeHtml(name)},</p>` +
-    `<p style="margin:0 0 16px;">Thank you for contacting Easy&#8209;Post Desktop support. We’ve received your message${
+    (translatedLead
+      ? `<p style="margin:0 0 16px;">${escapeHtml(translatedLead)}</p>` +
+        `<div style="border-top:1px solid ${br.rule};margin:16px 0;"></div>`
+      : "") +
+    `<p style="margin:0 0 16px;">Thank you for contacting ${htmlName} support. We’ve received your message${
       topic ? ` about “${escapeHtml(topic)}”` : ""
     } and a member of the team will reply personally, usually within one business day.</p>` +
-    refBox("Your support reference", caseId, "Please quote this in any reply.") +
-    signoff("Easy-Post Desktop support");
+    refBox("Your support reference", caseId, "Please quote this in any reply.", br) +
+    signoff(`${productName} support`, br);
   return {
-    subject: `Re: ${topic} — Easy-Post Desktop [${caseId}]`,
+    subject: `Re: ${topic} — ${productName} [${caseId}]`,
     text,
     html: emailShell({
       title: "We’ve received your message",
       preheader: `${ref} — we’ll reply within one business day.`,
       bodyHtml,
+      brand: br,
     }),
   };
 }
@@ -266,9 +354,12 @@ export function contactOwnerEmail({
   message,
   autoReplied,
   spam = false,
+  productName = "Easy-Post Desktop",
+  productId = "easy-post",
 }) {
+  const br = brandFor(productId);
   const text =
-    "A message was sent from the Easy-Post Desktop contact form.\n\n" +
+    `A message was sent from the ${productName} contact form.\n\n` +
     `Case:  ${caseId}\nName:  ${name}\nEmail: ${email}\nTopic: ${topic}\nIP:    ${ip}\n\n` +
     `Triage: ${triageNote}\n\n` +
     "-----------------------------------------\n\n" +
@@ -276,36 +367,39 @@ export function contactOwnerEmail({
     "\n";
   const row = (k, v, mono) =>
     `<tr>
-      <td style="padding:3px 12px 3px 0;color:${B.muted};font-size:13px;white-space:nowrap;vertical-align:top;">${escapeHtml(
+      <td style="padding:3px 12px 3px 0;color:${br.muted};font-size:13px;white-space:nowrap;vertical-align:top;">${escapeHtml(
       k
     )}</td>
-      <td style="padding:3px 0;color:${B.ink};font-size:13px;${
+      <td style="padding:3px 0;color:${br.ink};font-size:13px;${
       mono ? `font-family:${MONO};` : ""
     }">${escapeHtml(v)}</td>
     </tr>`;
   const bodyHtml =
-    heading("New support enquiry") +
-    refBox("Case", caseId, spam ? "Likely spam — no acknowledgement sent." : autoReplied ? "Customer already received an automated first reply." : "Awaiting your reply.") +
+    heading(`New ${productName} enquiry`, br) +
+    refBox("Case", caseId, spam ? "Likely spam — no acknowledgement sent." : autoReplied ? "Customer already received an automated first reply." : "Awaiting your reply.", br) +
     `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
       ${row("Name", name)}
       ${row("Email", email, true)}
       ${row("Topic", topic)}
       ${row("IP", ip, true)}
     </table>` +
-    `<p style="margin:0 0 8px;color:${B.muted};font-size:13px;"><strong>Triage:</strong> ${escapeHtml(
+    `<p style="margin:0 0 8px;color:${br.muted};font-size:13px;"><strong>Triage:</strong> ${escapeHtml(
       triageNote
     )}</p>` +
-    `<div style="border-top:1px solid ${B.rule};margin:16px 0;"></div>` +
-    `<div style="color:${B.body};">${paraFromText(message)}</div>`;
+    `<div style="border-top:1px solid ${br.rule};margin:16px 0;"></div>` +
+    `<div style="color:${br.body};">${paraFromText(message)}</div>`;
   return {
+    // Product goes in the subject because two products now land in the same
+    // inbox and the case reference does not distinguish them.
     subject:
       (spam ? "[spam?] " : autoReplied ? "[auto-replied] " : "[needs reply] ") +
-      `[${caseId}] ${topic} — ${name}`,
+      `[${productName}] [${caseId}] ${topic} — ${name}`,
     text,
     html: emailShell({
-      title: "New support enquiry",
-      preheader: `${caseId} · ${topic} · ${name}`,
+      title: `New ${productName} enquiry`,
+      preheader: `${caseId} · ${productName} · ${topic} · ${name}`,
       bodyHtml,
+      brand: br,
     }),
   };
 }
