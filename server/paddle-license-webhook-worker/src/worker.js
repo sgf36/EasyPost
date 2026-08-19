@@ -245,6 +245,10 @@ const PRODUCTS = {
   software: {
     id: "software",
     name: "Spencer Fields",
+    // Used verbatim as the From display name, in place of name + suffix.
+    // "Software - Spencer Fields Support" would read as a third entity, so the
+    // suffix is skipped rather than appended.
+    senderName: "Software - Spencer Fields",
     // Its own Resend account, so its own key, sender and inbound webhook. Each
     // degrades independently: an unset key or sender falls back to the
     // Easy-Post account under a "Spencer Fields Support" display name, and an
@@ -309,9 +313,10 @@ function resolveSender(env, product, displaySuffix) {
   const own = env[product.keyVar] && env[product.fromVar];
   const address = own ? env[product.fromVar] : env[PRODUCTS[DEFAULT_PRODUCT].fromVar];
   const apiKey = own ? env[product.keyVar] : env[PRODUCTS[DEFAULT_PRODUCT].keyVar];
+  const display = product.senderName || `${product.name}${displaySuffix}`;
   return {
     apiKey,
-    from: `${product.name}${displaySuffix} <${address}>`,
+    from: `${display} <${address}>`,
     usingOwnAccount: Boolean(own),
   };
 }
