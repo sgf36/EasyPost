@@ -40,6 +40,7 @@ const BRANDS = {
     cream: "#f7f4ed",
     rule: "#e2ded4",
     white: WHITE,
+    footerLine: "Easy&#8209;Post Desktop — software by Spencer Fields, a sole trader established in the United Kingdom.",
     wordmark: "Easy&#8209;Post Desktop",
     footerName: "Easy&#8209;Post Desktop",
     site: "https://easy-post.spencerfields.com",
@@ -48,6 +49,23 @@ const BRANDS = {
       ["FAQ", "/faq.html"],
       ["Privacy", "/privacy.html"],
     ],
+    support: "Apps@spencerfields.com",
+  },
+  software: {
+    green: "#1b2a33",
+    greenDark: "#16212a",
+    wordmarkColor: "#e8dcc8",
+    ink: INK,
+    body: BODY,
+    muted: MUTED,
+    cream: "#f7f5f1",
+    rule: "#e0dad0",
+    white: WHITE,
+    footerLine: "Spencer Fields — a sole trader established in the United Kingdom.",
+    wordmark: "Spencer Fields",
+    footerName: "Spencer Fields",
+    site: "https://software.spencerfields.com",
+    links: [["Software", "/#software"], ["Business", "/#business"]],
     support: "Apps@spencerfields.com",
   },
   wren: {
@@ -60,6 +78,7 @@ const BRANDS = {
     cream: "#f5f1e8",
     rule: "#e4ddcd",
     white: WHITE,
+    footerLine: "Wren — software by Spencer Fields, a sole trader established in the United Kingdom.",
     wordmark: "Wren",
     footerName: "Wren",
     site: "https://wren.spencerfields.com",
@@ -156,7 +175,7 @@ export function emailShell({ title, preheader, bodyHtml, brand = B }) {
       ${bodyHtml}
     </td></tr>
     <tr><td style="padding:18px 28px;border-top:1px solid ${br.rule};font-family:${SANS};font-size:12px;line-height:1.7;color:${br.muted};">
-      ${br.footerName} — a product of Spencer Fields, London, United Kingdom.<br>
+      ${br.footerLine}<br>
       ${nav} &nbsp;·&nbsp;
       <a href="mailto:${br.support}" style="color:${br.green};text-decoration:none;">${br.support}</a>
     </td></tr>

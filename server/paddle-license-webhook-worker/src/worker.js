@@ -240,6 +240,25 @@ const PRODUCTS = {
     // adjudicated by a model.
     aiAutoTopics: new Set(["Question before buying", "Something else"]),
   },
+  software: {
+    id: "software",
+    name: "Spencer Fields",
+    // No Resend domain of its own: software.spencerfields.com is not verified,
+    // and each Resend account allows one domain. Mail therefore goes out on the
+    // Easy-Post account under a "Spencer Fields Support" display name, and
+    // replies are received on the Easy-Post domain, which is the one carrying
+    // an inbound MX. Set SOFTWARE_FROM_EMAIL if the domain is ever verified;
+    // nothing else needs changing.
+    keyVar: "RESEND_API_KEY",
+    fromVar: "SOFTWARE_FROM_EMAIL",
+    replyDomain: "easy-post.spencerfields.com",
+    webhookSecretVar: "RESEND_WEBHOOK_SECRET",
+    // Deliberately empty. This is the business address of the whole operation:
+    // licensing, press and partnership enquiries are not things to answer with
+    // a model, and a general question about the software is better answered by
+    // the product site that owns the detail. Everything reaches a person.
+    aiAutoTopics: new Set(),
+  },
   wren: {
     id: "wren",
     name: "Wren",
@@ -329,8 +348,15 @@ const WREN_FACTS = `- Wren is an independent iPhone app that turns places someon
 // Attached after definition rather than inside the literal above: a const is in
 // its temporal dead zone until its own declaration runs, so referencing these
 // from the PRODUCTS literal would throw at module load.
+const SOFTWARE_FACTS = `- Spencer Fields is a sole trader established in the United Kingdom, publishing software under its own name. Registered address: Lytchett House, 13 Freeland Park, Wareham Road, Lytchett Matravers, Poole, BH16 6FA.
+- Three applications: Easy-Post Desktop (Windows and macOS, available), Easy-Post Mobile Companion (Android as a direct download, iPhone edition heading to the App Store), and Wren (iPhone, submitted to the App Store and awaiting review).
+- Each application has its own website carrying its own pricing, terms and privacy policy. Direct any question about a specific application to that site rather than answering it here.
+- Purchases are handled by the store or merchant of record -- Paddle for Easy-Post Desktop, Apple for App Store purchases -- so this business never sees payment details.
+- Contact: Apps@spencerfields.com .`;
+
 PRODUCTS["easy-post"].facts = EASY_POST_FACTS;
 PRODUCTS.wren.facts = WREN_FACTS;
+PRODUCTS.software.facts = SOFTWARE_FACTS;
 
 async function resendSend(env, { from, to, replyTo, subject, text, html, apiKey }) {
   const payload = { from, to: [to], reply_to: replyTo, subject, text };
