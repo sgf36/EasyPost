@@ -124,7 +124,7 @@
     <p class="section-lede">تواصل معنا مباشرةً للاستفسار قبل الشراء، أو عند مواجهة مشكلة في تفعيل الترخيص، أو لطلب استرداد الأموال.</p>
 
     <div class="support-grid">
-      <form method="post" action="contact.php" id="contact-form" novalidate>
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
         <div class="field"><label for="cf-name">اسمك</label>
           <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
         <div class="field"><label for="cf-email">بريدك الإلكتروني</label>
@@ -149,6 +149,7 @@
         <!-- Filled in by script on load. A form posted with no timestamp, or
              submitted implausibly fast, did not come from a person. -->
         <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="ar">
 
         <button class="btn" type="submit">إرسال الرسالة</button>
         <p class="form-note">تصلك الردود من Spencer Fields، عادةً خلال يوم عمل واحد. لن يُستخدم عنوانك إلا للرد عليك.</p>

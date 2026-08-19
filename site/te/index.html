@@ -124,7 +124,7 @@
     <p class="section-lede">కొనుగోలు చేయడానికి ముందు ప్రశ్నలు, లైసెన్స్ యాక్టివేషన్‌లో సమస్య లేదా వాపసు అభ్యర్థన కోసం నేరుగా సంప్రదించండి.</p>
 
     <div class="support-grid">
-      <form method="post" action="contact.php" id="contact-form" novalidate>
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
         <div class="field"><label for="cf-name">మీ పేరు</label>
           <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
         <div class="field"><label for="cf-email">మీ ఇమెయిల్</label>
@@ -149,6 +149,7 @@
         <!-- Filled in by script on load. A form posted with no timestamp, or
              submitted implausibly fast, did not come from a person. -->
         <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="te">
 
         <button class="btn" type="submit">సందేశం పంపండి</button>
         <p class="form-note">సమాధానాలు Spencer Fields నుండి వస్తాయి, సాధారణంగా ఒక పనిదినంలో. మీ చిరునామాను మీకు సమాధానం ఇవ్వడానికి మాత్రమే ఉపయోగిస్తారు.</p>

@@ -124,7 +124,7 @@
     <p class="section-lede">खरेदी करण्यापूर्वीच्या प्रश्नांसाठी, लायसन्स सक्रिय करण्यात अडचण असल्यास किंवा परतावा मागण्यासाठी थेट संपर्क साधा.</p>
 
     <div class="support-grid">
-      <form method="post" action="contact.php" id="contact-form" novalidate>
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
         <div class="field"><label for="cf-name">तुमचे नाव</label>
           <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
         <div class="field"><label for="cf-email">तुमचा ईमेल</label>
@@ -149,6 +149,7 @@
         <!-- Filled in by script on load. A form posted with no timestamp, or
              submitted implausibly fast, did not come from a person. -->
         <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="mr">
 
         <button class="btn" type="submit">संदेश पाठवा</button>
         <p class="form-note">उत्तरे Spencer Fields कडून येतात, सहसा एका कामकाजाच्या दिवसात. तुमचा पत्ता फक्त तुम्हाला उत्तर देण्यासाठी वापरला जातो.</p>

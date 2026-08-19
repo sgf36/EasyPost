@@ -124,7 +124,7 @@
     <p class="section-lede">खरीदने से पहले सवालों, लाइसेंस सक्रिय करने में समस्या या रिफंड अनुरोध के लिए सीधे संपर्क करें।</p>
 
     <div class="support-grid">
-      <form method="post" action="contact.php" id="contact-form" novalidate>
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
         <div class="field"><label for="cf-name">आपका नाम</label>
           <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
         <div class="field"><label for="cf-email">आपका ईमेल</label>
@@ -149,6 +149,7 @@
         <!-- Filled in by script on load. A form posted with no timestamp, or
              submitted implausibly fast, did not come from a person. -->
         <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="hi">
 
         <button class="btn" type="submit">संदेश भेजें</button>
         <p class="form-note">जवाब Spencer Fields की ओर से आते हैं, आमतौर पर एक कार्यदिवस के भीतर। आपके पते का उपयोग केवल आपको जवाब देने के लिए किया जाता है।</p>

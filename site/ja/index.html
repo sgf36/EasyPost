@@ -124,7 +124,7 @@
     <p class="section-lede">購入前のご質問、ライセンスの有効化トラブル、返金のご依頼などは、直接お問い合わせください。</p>
 
     <div class="support-grid">
-      <form method="post" action="contact.php" id="contact-form" novalidate>
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
         <div class="field"><label for="cf-name">お名前</label>
           <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
         <div class="field"><label for="cf-email">メールアドレス</label>
@@ -149,6 +149,7 @@
         <!-- Filled in by script on load. A form posted with no timestamp, or
              submitted implausibly fast, did not come from a person. -->
         <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="ja">
 
         <button class="btn" type="submit">メッセージを送信</button>
         <p class="form-note">返信はSpencer Fieldsから送られ、通常は1営業日以内にお届けします。ご入力いただいたアドレスは、ご返信のためだけに使用します。</p>

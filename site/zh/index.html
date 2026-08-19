@@ -124,7 +124,7 @@
     <p class="section-lede">在购买前咨询问题、许可证激活遇到困难，或申请退款，请直接与我们联系。</p>
 
     <div class="support-grid">
-      <form method="post" action="contact.php" id="contact-form" novalidate>
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
         <div class="field"><label for="cf-name">您的姓名</label>
           <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
         <div class="field"><label for="cf-email">您的邮箱</label>
@@ -149,6 +149,7 @@
         <!-- Filled in by script on load. A form posted with no timestamp, or
              submitted implausibly fast, did not come from a person. -->
         <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="zh">
 
         <button class="btn" type="submit">发送消息</button>
         <p class="form-note">回复来自 Spencer Fields，通常在一个工作日内送达。您的地址仅用于回复您。</p>

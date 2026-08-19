@@ -124,7 +124,7 @@
     <p class="section-lede">Póngase en contacto directamente si tiene preguntas antes de comprar, problemas para activar una licencia o una solicitud de reembolso.</p>
 
     <div class="support-grid">
-      <form method="post" action="contact.php" id="contact-form" novalidate>
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
         <div class="field"><label for="cf-name">Su nombre</label>
           <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
         <div class="field"><label for="cf-email">Su correo electrónico</label>
@@ -149,6 +149,7 @@
         <!-- Filled in by script on load. A form posted with no timestamp, or
              submitted implausibly fast, did not come from a person. -->
         <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="es">
 
         <button class="btn" type="submit">Enviar mensaje</button>
         <p class="form-note">Las respuestas las envía Spencer Fields, normalmente dentro de un día hábil. Su dirección solo se utiliza para responderle.</p>
