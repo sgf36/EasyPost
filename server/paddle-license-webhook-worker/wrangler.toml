@@ -45,6 +45,9 @@ CONTACT_TO_EMAIL = "Apps@spencerfields.com"
 # Easy-Post account under a "Wren Support" display name with nothing else
 # changing.
 WREN_FROM_EMAIL = "support@wren.spencerfields.com"
+# The business site has its own Resend account and verified domain, so its mail
+# goes out under its own name rather than borrowing the Easy-Post sender.
+SOFTWARE_FROM_EMAIL = "support@software.spencerfields.com"
 # PADDLE_API_BASE = "https://api.paddle.com"      # sandbox: https://sandbox-api.paddle.com
 # LICENSE_PRODUCT_ID = "easypost-desktop"
 

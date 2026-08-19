@@ -17,6 +17,8 @@
  *   PADDLE_API_KEY           Paddle API key (to look up the buyer email)
  *   RESEND_API_KEY           Resend API key (to send the email)
  *   RESEND_API_KEY_WREN      Resend API key for Wren's SEPARATE Resend account
+ *   RESEND_API_KEY_SOFTWARE  Resend API key for the business site's own account
+ *   RESEND_WEBHOOK_SECRET_SOFTWARE  Svix signing secret, business-site webhook
  *   REPLY_TOKEN_SECRET       HMAC key for per-thread reply addresses. UNSET =
  *                            the translating reply relay is off and replies go
  *                            direct to the customer, as before it existed.
@@ -243,16 +245,15 @@ const PRODUCTS = {
   software: {
     id: "software",
     name: "Spencer Fields",
-    // No Resend domain of its own: software.spencerfields.com is not verified,
-    // and each Resend account allows one domain. Mail therefore goes out on the
-    // Easy-Post account under a "Spencer Fields Support" display name, and
-    // replies are received on the Easy-Post domain, which is the one carrying
-    // an inbound MX. Set SOFTWARE_FROM_EMAIL if the domain is ever verified;
-    // nothing else needs changing.
-    keyVar: "RESEND_API_KEY",
+    // Its own Resend account, so its own key, sender and inbound webhook. Each
+    // degrades independently: an unset key or sender falls back to the
+    // Easy-Post account under a "Spencer Fields Support" display name, and an
+    // unset webhook secret keeps replies routing through the Easy-Post domain.
+    // See resolveSender() and replyDomainFor().
+    keyVar: "RESEND_API_KEY_SOFTWARE",
     fromVar: "SOFTWARE_FROM_EMAIL",
-    replyDomain: "easy-post.spencerfields.com",
-    webhookSecretVar: "RESEND_WEBHOOK_SECRET",
+    replyDomain: "software.spencerfields.com",
+    webhookSecretVar: "RESEND_WEBHOOK_SECRET_SOFTWARE",
     // Deliberately empty. This is the business address of the whole operation:
     // licensing, press and partnership enquiries are not things to answer with
     // a model, and a general question about the software is better answered by
@@ -279,6 +280,20 @@ const PRODUCTS = {
 };
 
 const DEFAULT_PRODUCT = "easy-post";
+
+/**
+ * Which domain a product issues reply addresses on.
+ *
+ * Its own, but only once that domain's inbound webhook secret is configured.
+ * Handing out an address on a domain nothing is listening to would have Resend
+ * accept the reply and then drop it: worse than not offering the relay, because
+ * the owner would believe they had replied.
+ */
+function replyDomainFor(env, product) {
+  return env[product.webhookSecretVar]
+    ? product.replyDomain
+    : PRODUCTS[DEFAULT_PRODUCT].replyDomain;
+}
 
 /*
  * Pick the Resend account and From address for a product.
@@ -616,7 +631,7 @@ async function handleContact(request, env) {
   // relay existed -- an unset secret degrades to "reply goes direct", not to
   // "reply goes nowhere".
   const ownerReplyTo = env.REPLY_TOKEN_SECRET
-    ? replyAddress(caseId, product.replyDomain, env.REPLY_TOKEN_SECRET)
+    ? replyAddress(caseId, replyDomainFor(env, product), env.REPLY_TOKEN_SECRET)
     : email;
 
   // 2) Reply to the customer — the AI answer if we have one, otherwise a plain
@@ -798,7 +813,7 @@ async function handleInbound(request, env, productId) {
     return json({ status: "ignored", reason: "sender not party to this case", case_id: caseId });
   }
   // Our own outbound must never be treated as an inbound reply.
-  if (from.endsWith("@" + product.replyDomain)) {
+  if (from.endsWith("@" + replyDomainFor(env, product))) {
     return json({ status: "ignored", reason: "loop: sent by the relay", case_id: caseId });
   }
 
@@ -828,7 +843,7 @@ async function handleInbound(request, env, productId) {
       to: record.email,
       // Their reply comes back through the relay, so the thread keeps working
       // in both directions rather than dead-ending in an unmonitored inbox.
-      replyTo: replyAddress(caseId, product.replyDomain, env.REPLY_TOKEN_SECRET),
+      replyTo: replyAddress(caseId, replyDomainFor(env, product), env.REPLY_TOKEN_SECRET),
       subject,
       text: composed.text,
     });
@@ -856,7 +871,7 @@ async function handleInbound(request, env, productId) {
     apiKey: sender.apiKey,
     from: sender.from,
     to: env.CONTACT_TO_EMAIL,
-    replyTo: replyAddress(caseId, product.replyDomain, env.REPLY_TOKEN_SECRET),
+    replyTo: replyAddress(caseId, replyDomainFor(env, product), env.REPLY_TOKEN_SECRET),
     subject: "[reply] " + subject,
     text,
   });
