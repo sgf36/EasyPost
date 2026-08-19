@@ -639,38 +639,26 @@ async function handleContact(request, env) {
   //    Skipped entirely for spam: acknowledging unsolicited outreach only
   //    confirms the address and invites more, and the owner still gets it below.
   if (!isSpam) {
-    // Answer in the language they wrote in, with the English beneath. The
-    // English is not decoration: it is the only text guaranteed to say what was
-    // meant, and it is what makes sending a machine translation defensible.
-    let customerBody = aiReply;
-    let translatedLead = null;
-    if (detected.translated) {
-      if (aiReply) {
-        const rendered = await fromEnglish(env, aiReply, detected.lang, detected.langName);
-        if (rendered) {
-          customerBody =
-            rendered +
-            "\n\n-----------------------------------------\n" +
-            "The original English of this reply follows, in case anything " +
-            "above is unclear.\n\n" +
-            aiReply;
-        }
-      } else {
-        translatedLead = await fromEnglish(
-          env,
-          "Thank you for contacting " + product.name + " support. We have " +
-            "received your message and a member of the team will reply " +
-            "personally, usually within one business day.",
-          detected.lang,
-          detected.langName
-        );
-      }
-    }
+    // The template builds both halves and labels each with its language. Only
+    // a real AI answer needs translating here; the standard acknowledgement is
+    // already in the email string table.
+    const translatedAnswer =
+      detected.translated && aiReply
+        ? await fromEnglish(env, aiReply, detected.lang, detected.langName)
+        : null;
 
     const customer = contactCustomerEmail({
-      name, topic, caseId, aiReply: customerBody, translatedLead,
-      productName: product.name, productId: product.id,
+      name,
+      topic,
+      caseId,
+      english: aiReply,
+      translated: translatedAnswer,
+      lang: detected.translated ? detected.lang : "en",
+      productName: product.name,
+      productId: product.id,
+      isAutoReply: Boolean(aiReply),
     });
+
     try {
       await resendSend(env, {
         apiKey: customerSender.apiKey,

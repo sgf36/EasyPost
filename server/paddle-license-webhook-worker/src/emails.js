@@ -1,3 +1,5 @@
+import { strings, AVAILABLE } from "./email-strings.js";
+
 /**
  * Email presentation for the licence and support Worker, which serves two
  * products: Easy-Post Desktop and Wren.
@@ -40,14 +42,14 @@ const BRANDS = {
     cream: "#f7f4ed",
     rule: "#e2ded4",
     white: WHITE,
-    footerLine: "Easy&#8209;Post Desktop — software by Spencer Fields, a sole trader established in the United Kingdom.",
+    footerKey: "footer_product",
     wordmark: "Easy&#8209;Post Desktop",
     footerName: "Easy&#8209;Post Desktop",
     site: "https://easy-post.spencerfields.com",
     links: [
-      ["Website", ""],
-      ["FAQ", "/faq.html"],
-      ["Privacy", "/privacy.html"],
+      ["link_website", ""],
+      ["link_faq", "/faq.html"],
+      ["link_privacy", "/privacy.html"],
     ],
     support: "Apps@spencerfields.com",
   },
@@ -61,11 +63,11 @@ const BRANDS = {
     cream: "#f7f5f1",
     rule: "#e0dad0",
     white: WHITE,
-    footerLine: "Spencer Fields — a sole trader established in the United Kingdom.",
+    footerKey: "footer_business",
     wordmark: "Spencer Fields",
     footerName: "Spencer Fields",
     site: "https://software.spencerfields.com",
-    links: [["Software", "/#software"], ["Business", "/#business"]],
+    links: [["link_software", "/#software"], ["link_business", "/#business"]],
     support: "Apps@spencerfields.com",
   },
   wren: {
@@ -78,15 +80,15 @@ const BRANDS = {
     cream: "#f5f1e8",
     rule: "#e4ddcd",
     white: WHITE,
-    footerLine: "Wren — software by Spencer Fields, a sole trader established in the United Kingdom.",
+    footerKey: "footer_product",
     wordmark: "Wren",
     footerName: "Wren",
     site: "https://wren.spencerfields.com",
     // No FAQ page on the Wren site; the support page carries that content.
     links: [
-      ["Website", ""],
-      ["Support", "/support.html"],
-      ["Privacy", "/privacy.html"],
+      ["link_website", ""],
+      ["link_support", "/support.html"],
+      ["link_privacy", "/privacy.html"],
     ],
     support: "Apps@spencerfields.com",
   },
@@ -145,17 +147,58 @@ function refBox(label, value, note, br = B) {
     </td></tr></table>`;
 }
 
+// RTL scripts. Only the translated block is flipped, never the whole document:
+// the English half sits beside it and must stay left-to-right.
+const RTL = new Set(["ar", "he", "fa", "ur"]);
+
+/**
+ * A small coloured chip naming the language of the block beneath it.
+ *
+ * A bilingual message is confusing without one -- the reader cannot tell at a
+ * glance which half is theirs, and the second half looks like a mistake.
+ */
+export function langTag(code, br = B) {
+  return (
+    `<span style="display:inline-block;font-family:${SANS};font-size:11px;` +
+    `font-weight:700;letter-spacing:.09em;background:${br.green};color:${br.white};` +
+    `border-radius:4px;padding:3px 8px;margin:0 0 12px;">` +
+    escapeHtml(String(code).toUpperCase().replace("_", "-")) +
+    "</span>"
+  );
+}
+
+/**
+ * Where a footer link should point for this reader.
+ *
+ * A translated email whose footer links land on English pages undoes the point
+ * of translating it, so links go to the reader's own language when that
+ * language has published pages, and to English when it does not.
+ */
+function siteHref(br, path, lang) {
+  if (lang === "en" || !AVAILABLE.has(lang)) return br.site + (path || "/");
+  // An empty path means the home page. The file is named explicitly rather
+  // than trusting a bare /de/ to hit a directory index.
+  if (!path) return `${br.site}/${lang}/index.html`;
+  // "/#software" is an anchor on the home page, not a page of its own.
+  if (path.startsWith("/#")) return `${br.site}/${lang}/index.html${path.slice(1)}`;
+  return `${br.site}/${lang}${path}`;
+}
+
 // The branded outer shell. `preheader` is the hidden inbox-preview snippet.
-export function emailShell({ title, preheader, bodyHtml, brand = B }) {
+export function emailShell({ title, preheader, bodyHtml, brand = B, lang = "en" }) {
   const br = brand;
+  const t = strings(lang);
   const nav = br.links
     .map(
-      ([label, path]) =>
-        `<a href="${br.site}${path}" style="color:${br.green};text-decoration:none;">${label}</a>`
+      ([key, path]) =>
+        `<a href="${siteHref(br, path, lang)}" style="color:${br.green};text-decoration:none;">${escapeHtml(
+          t[key] || key
+        )}</a>`
     )
-    .join(" &nbsp;·&nbsp;\n      ");
+    .join(" &nbsp;·&nbsp; ");
+  const footerText = escapeHtml(t[br.footerKey] || t.footer_business);
   return `<!DOCTYPE html>
-<html lang="en"><head>
+<html lang="${escapeHtml(lang.replace("_", "-"))}"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
@@ -175,7 +218,7 @@ export function emailShell({ title, preheader, bodyHtml, brand = B }) {
       ${bodyHtml}
     </td></tr>
     <tr><td style="padding:18px 28px;border-top:1px solid ${br.rule};font-family:${SANS};font-size:12px;line-height:1.7;color:${br.muted};">
-      ${br.footerLine}<br>
+      ${br.footerName} — ${footerText}<br>
       ${nav} &nbsp;·&nbsp;
       <a href="mailto:${br.support}" style="color:${br.green};text-decoration:none;">${br.support}</a>
     </td></tr>
@@ -287,77 +330,104 @@ export function licenseEmail({ licenseKey, seats = 3, annual = false }) {
 }
 
 // ---- Contact form: reply to the customer -----------------------------------
-// productName defaults to Easy-Post Desktop so that any caller predating the
-// two-product split keeps its existing wording.
+
+/**
+ * One language's worth of the message: chip, heading, greeting, body,
+ * reference and sign-off, all in that language.
+ *
+ * Everything except the customer's name and the case reference is translated.
+ * A reply whose answer is in Spanish but whose greeting, reference label and
+ * sign-off are in English reads as half-finished, which is what prompted this.
+ */
+function section({ code, name, body, caseId, br, isLast }) {
+  const t = strings(code);
+  const rtl = RTL.has(code) ? ' dir="rtl"' : "";
+  return (
+    `<div${rtl}>` +
+    langTag(code, br) +
+    heading(t.received, br) +
+    `<p style="margin:0 0 16px;">${escapeHtml(t.hello)} ${escapeHtml(name)},</p>` +
+    paraFromText(body) +
+    refBox(t.ref_label, caseId, t.ref_note, br) +
+    signoff(t.signoff, br) +
+    (isLast
+      ? ""
+      : `<p style="margin:14px 0 0;color:${br.muted};font-size:12px;">${escapeHtml(
+          t.in_english
+        )}</p>`) +
+    "</div>"
+  );
+}
+
+/**
+ * The acknowledgement or first answer.
+ *
+ * When the enquiry arrived in another language the message is built twice:
+ * their language first, English beneath, each block labelled with a coloured
+ * chip so it is obvious at a glance which half is which. The English is not a
+ * courtesy -- it is the only text guaranteed to say what was meant.
+ */
 export function contactCustomerEmail({
   name,
   topic,
   caseId,
-  aiReply,
+  english = null,
+  translated = null,
+  lang = "en",
   productName = "Easy-Post Desktop",
   productId = "easy-post",
-  // An acknowledgement in the language the customer wrote in, placed above the
-  // English. Only the plain acknowledgement uses this; when there is an AI
-  // answer, the caller has already composed a bilingual body.
-  translatedLead = null,
+  isAutoReply = false,
 }) {
   const br = brandFor(productId);
-  const ref = `Your support reference: ${caseId}`;
-  // A hyphen in a product name is held together in HTML: "Easy-Post" wrapping
-  // across two lines mid-name looks like a typesetting fault. Applied to the
-  // name generally rather than to that one product.
-  const htmlName = escapeHtml(productName).replace(/-/g, "&#8209;");
-  if (aiReply) {
-    const text =
-      aiReply +
-      `\n\n${ref}\n\n— ${productName} support\n\n` +
-      "This is an automated first reply. If it does not fully answer your " +
-      "question, just reply to this email and a member of the team will pick it " +
-      "up personally.";
-    const bodyHtml =
-      heading(`Re: ${topic}`, br) +
-      refBox("Your support reference", caseId, "Please quote this in any reply.", br) +
-      paraFromText(aiReply) +
-      signoff(`${productName} support`, br) +
-      `<p style="margin:16px 0 0;padding:12px 16px;background:${br.cream};border-radius:6px;color:${br.muted};font-size:13px;">This is an automated first reply. If it doesn’t fully answer your question, just reply to this email and a member of the team will pick it up personally.</p>`;
-    return {
-      subject: `Re: ${topic} — ${productName} [${caseId}]`,
-      text,
-      html: emailShell({
-        title: `Re: ${topic}`,
-        preheader: `${ref} — a first answer to your enquiry.`,
-        bodyHtml,
-        brand: br,
-      }),
-    };
+  const en = strings("en");
+  const englishBody = english || en.thanks;
+  // The standard acknowledgement is in the table already, so translating it
+  // costs nothing. Only a real answer needs the model.
+  const otherBody =
+    translated || (lang !== "en" && !english ? strings(lang).thanks : null);
+  const NL = String.fromCharCode(10);
+  const RULE = "-".repeat(41);
+
+  const plain = (code, body) => {
+    const t = strings(code);
+    return (
+      t.hello + " " + name + "," + NL + NL +
+      body + NL + NL +
+      t.ref_label + ": " + caseId + NL +
+      t.ref_note + NL + NL +
+      "— " + t.signoff
+    );
+  };
+
+  const blocks = [];
+  const textParts = [];
+
+  if (otherBody && lang !== "en") {
+    blocks.push(section({ code: lang, name, body: otherBody, caseId, br, isLast: false }));
+    textParts.push(plain(lang, otherBody) + NL + NL + strings(lang).in_english);
+    blocks.push(`<div style="border-top:1px solid ${br.rule};margin:22px 0;"></div>`);
   }
-  const text =
-    `Hello ${name},\n\n` +
-    (translatedLead ? `${translatedLead}\n\n${"-".repeat(41)}\n\n` : "") +
-    `Thank you for contacting ${productName} support. We have received your ` +
-    `message${topic ? ` about "${topic}"` : ""} and a member of the team will ` +
-    "reply personally, usually within one business day.\n\n" +
-    `${ref}\n\n— ${productName} support`;
-  const bodyHtml =
-    heading("We’ve received your message", br) +
-    `<p style="margin:0 0 16px;">Hello ${escapeHtml(name)},</p>` +
-    (translatedLead
-      ? `<p style="margin:0 0 16px;">${escapeHtml(translatedLead)}</p>` +
-        `<div style="border-top:1px solid ${br.rule};margin:16px 0;"></div>`
-      : "") +
-    `<p style="margin:0 0 16px;">Thank you for contacting ${htmlName} support. We’ve received your message${
-      topic ? ` about “${escapeHtml(topic)}”` : ""
-    } and a member of the team will reply personally, usually within one business day.</p>` +
-    refBox("Your support reference", caseId, "Please quote this in any reply.", br) +
-    signoff(`${productName} support`, br);
+
+  blocks.push(section({ code: "en", name, body: englishBody, caseId, br, isLast: true }));
+  textParts.push(plain("en", englishBody));
+
+  if (isAutoReply) {
+    blocks.push(
+      `<p style="margin:18px 0 0;padding:12px 16px;background:${br.cream};` +
+        `border-radius:6px;color:${br.muted};font-size:13px;">${escapeHtml(en.auto_note)}</p>`
+    );
+    textParts.push(en.auto_note);
+  }
+
   return {
     subject: `Re: ${topic} — ${productName} [${caseId}]`,
-    text,
+    text: textParts.join(NL + NL + RULE + NL + NL),
     html: emailShell({
-      title: "We’ve received your message",
-      preheader: `${ref} — we’ll reply within one business day.`,
-      bodyHtml,
+      title: strings(lang).received,
+      preheader: strings(lang).ref_label + ": " + caseId,
+      bodyHtml: blocks.join(""),
       brand: br,
+      lang,
     }),
   };
 }
