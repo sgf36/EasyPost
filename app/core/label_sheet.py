@@ -440,3 +440,58 @@ def _draw_crop_marks(draw, x0: int, y0: int, cell_w: int, cell_h: int, tick: int
     for cx, cy, sx, sy in corners:
         draw.line([(cx, cy), (cx + sx * tick, cy)], fill="black", width=1)
         draw.line([(cx, cy), (cx, cy + sy * tick)], fill="black", width=1)
+
+
+# Default resolution assumed for a label image that carries no DPI metadata.
+# EasyPost's Royal Mail PNGs declare 600; a bare PNG is most often 300.
+_ASSUMED_LABEL_DPI = 300
+
+
+def compose_label_pages(label_images: list[bytes]) -> bytes:
+    """One label per page, at the label's own physical size, as a PDF.
+
+    This is the local replacement for EasyPost's server-side batch label merge
+    (``batch.label()``), which cannot be trusted with raster labels: on
+    2026-08-20 a five-shipment Royal Mail batch came back as five *landscape US
+    Letter* pages, each drawing the same label twice at different offsets, so
+    the address block sat on top of the 1D barcode and nothing scanned. The
+    labels themselves were fine — recomposing those identical PNGs here
+    produced a clean sheet — so the corruption is in the merge, not the source.
+
+    Unlike ``compose_sheets`` this does not scale, rotate or lay out anything:
+    each page is exactly one label at its native size, which is what a 4x6
+    thermal printer expects. Page size is derived from the image's embedded DPI
+    so a 600-DPI 2358x3542 PNG becomes a 3.93x5.9 inch page rather than a
+    32-inch one.
+
+    Raises ``ValueError`` if no label images are given.
+    """
+    from PIL import Image
+
+    if not label_images:
+        raise ValueError("no label images to combine")
+
+    pages: list = []
+    for raw in label_images:
+        label = Image.open(io.BytesIO(raw))
+        dpi = label.info.get("dpi")
+        # Pillow reports DPI as a float pair and rounds oddly (599.9988); a
+        # missing, zero or absurd value falls back rather than producing a page
+        # measured in feet.
+        x_dpi = float(dpi[0]) if dpi and dpi[0] else _ASSUMED_LABEL_DPI
+        if not 72 <= x_dpi <= 2400:
+            x_dpi = _ASSUMED_LABEL_DPI
+        if label.mode != "RGB":
+            label = label.convert("RGB")
+        label.info["dpi"] = (x_dpi, x_dpi)
+        pages.append(label)
+
+    buf = io.BytesIO()
+    pages[0].save(
+        buf,
+        format="PDF",
+        resolution=float(pages[0].info["dpi"][0]),
+        save_all=True,
+        append_images=pages[1:],
+    )
+    return buf.getvalue()
