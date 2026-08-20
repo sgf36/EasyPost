@@ -7,6 +7,7 @@ carrier and service are declared up front through the ServicePicker instead.
 """
 
 import webbrowser
+from pathlib import Path
 
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
@@ -46,10 +47,11 @@ from app.services.batches import (
     retrieve_batch,
     revalidate,
     save_batch_locally,
-    track_batch_shipments,
+    record_batch_shipments,
     write_csv_template,
     write_xlsx_template,
 )
+from app.services.label_sheets import build_combined_labels
 from app.services.packages import predefined_package_choices
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
@@ -652,10 +654,16 @@ class BatchView(QWidget):
             )
             return
 
-        if getattr(self, "_selection", None) and self._selection.auto_track:
-            # Best effort: the labels are already bought, so failing to record
-            # them locally must not be reported as a failed purchase.
-            self._pending_task = run_async(lambda: track_batch_shipments(batch), self)
+        # Always record the shipments so a bulk purchase appears in History
+        # like any other; the auto-track choice governs only the trackers.
+        # Best effort: the labels are already bought, so failing to record
+        # them locally must not be reported as a failed purchase.
+        track = bool(getattr(self, "_selection", None) and self._selection.auto_track)
+        # History refreshes when navigated to, as it does after a single
+        # purchase, so there is nothing to signal here.
+        self._pending_task = run_async(
+            lambda: record_batch_shipments(batch, track=track), self
+        )
 
         QMessageBox.information(
             self, tr("batch_shipments.purchased_title"), tr("batch_shipments.purchased_body")
@@ -688,6 +696,61 @@ class BatchView(QWidget):
         PrintSheetDialog(urls, self).exec()
 
     def _on_generate_labels(self) -> None:
+        """Combine the batch's labels into one PDF, one label per page.
+
+        Composed locally from the per-shipment labels rather than through
+        EasyPost's ``batch.label()`` merge, which corrupts raster labels: a
+        real five-shipment Royal Mail batch came back as landscape US Letter
+        pages each drawing the label twice, the address block covering the 1D
+        barcode. See ``label_sheet.compose_label_pages``.
+
+        The hosted merge is still the fallback for PDF/ZPL labels, which the
+        local compositor cannot open.
+        """
+        if not self._current_batch:
+            return
+        if not self._label_urls:
+            self._generate_labels_remote()
+            return
+
+        path, _ = QFileDialog.getSaveFileName(
+            self,
+            tr("batch_shipments.generate_labels_button"),
+            "combined-labels.pdf",
+            tr("print_sheet.pdf_filter"),
+        )
+        if not path:
+            return
+
+        urls = list(self._label_urls)
+        self._pending_task = run_async(lambda: build_combined_labels(urls), self)
+        self._pending_task.succeeded.connect(lambda result: self._on_labels_combined(result, path))
+        # A non-raster label set raises ValueError rather than returning
+        # nothing, which is the signal to let EasyPost do the merge instead.
+        self._pending_task.failed.connect(lambda _exc: self._generate_labels_remote())
+
+    def _on_labels_combined(self, result, path: str) -> None:
+        self._pending_task = None
+        try:
+            with open(path, "wb") as handle:
+                handle.write(result.pdf)
+        except OSError as exc:
+            QMessageBox.critical(
+                self,
+                tr("common.error"),
+                tr("batch_shipments.generate_labels_failed_body", error=str(exc)),
+            )
+            return
+        if result.failed:
+            QMessageBox.warning(
+                self,
+                tr("batch_shipments.export_sheet_title"),
+                tr("print_sheet.some_failed", failed=len(result.failed)),
+            )
+        webbrowser.open(Path(path).as_uri())
+
+    def _generate_labels_remote(self) -> None:
+        """Ask EasyPost to merge the labels — the fallback path."""
         if not self._current_batch:
             return
         batch_id = self._current_batch.id

@@ -121,3 +121,67 @@ def test_printer_margins_default_is_laser():
     assert ls.printable_margins("nonsense") == ls.printable_margins("laser")
     # Inkjet bottom margin is the large one (12.7mm vs laser's small even margin).
     assert ls.printable_margins("inkjet")[2] > ls.printable_margins("laser")[2]
+
+
+# ---------------------------------------------------------------------------
+# One-label-per-page merge (the local replacement for EasyPost batch.label)
+# ---------------------------------------------------------------------------
+
+
+def _png_with_dpi(width: int, height: int, dpi) -> bytes:
+    from PIL import Image
+
+    buf = io.BytesIO()
+    Image.new("RGB", (width, height), (0, 0, 0)).save(buf, format="PNG", dpi=dpi)
+    return buf.getvalue()
+
+
+def _page_sizes_pt(pdf: bytes) -> list[tuple[float, float]]:
+    """Page sizes in points, read straight out of the PDF's MediaBox entries.
+
+    Parsed by regex rather than with a PDF library so the test suite keeps its
+    current dependencies; Pillow writes one plain ``/MediaBox [ 0 0 w h ]`` per
+    page and nothing here needs more than that.
+    """
+    import re
+
+    return [
+        (float(w), float(h))
+        for w, h in re.findall(
+            rb"/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)", pdf
+        )
+    ]
+
+
+def test_one_page_per_label():
+    pdf = ls.compose_label_pages([_png(), _png(), _png()])
+    assert pdf.startswith(b"%PDF")
+    assert len(_page_sizes_pt(pdf)) == 3
+
+
+def test_page_is_the_labels_own_physical_size():
+    """A 600-DPI 2358x3542 Royal Mail PNG is a 3.93x5.9 inch label, not a
+    32-inch page. Honouring the embedded DPI is the whole point: EasyPost's own
+    merge put these on landscape US Letter and drew each one twice."""
+    pdf = ls.compose_label_pages([_png_with_dpi(2358, 3542, (600, 600))])
+    (width, height), = _page_sizes_pt(pdf)
+    assert width / 72 == pytest.approx(3.93, abs=0.02)
+    assert height / 72 == pytest.approx(5.90, abs=0.02)
+
+
+def test_a_label_without_dpi_metadata_falls_back_to_300():
+    pdf = ls.compose_label_pages([_png(1200, 1800)])
+    (width, height), = _page_sizes_pt(pdf)
+    assert width / 72 == pytest.approx(4.0, abs=0.02)
+    assert height / 72 == pytest.approx(6.0, abs=0.02)
+
+
+def test_an_absurd_dpi_is_ignored_rather_than_making_a_page_measured_in_feet():
+    pdf = ls.compose_label_pages([_png_with_dpi(1200, 1800, (1, 1))])
+    (width, _), = _page_sizes_pt(pdf)
+    assert width / 72 == pytest.approx(4.0, abs=0.02)
+
+
+def test_no_labels_is_an_error_not_an_empty_pdf():
+    with pytest.raises(ValueError):
+        ls.compose_label_pages([])
