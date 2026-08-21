@@ -251,3 +251,13 @@ section + section { border-top: 1px solid var(--rule); }
   font-weight: 600; letter-spacing: .05em; white-space: nowrap;
 }
 .hero .promo { margin-top: 1.8rem; margin-bottom: 0; }
+
+/* ── screenshots ─────────────────────────────────────────────────────── */
+.shots { display: grid; gap: 1.75rem; grid-template-columns: 1fr; margin: 1.5rem 0 0; }
+@media (min-width: 60rem) { .shots { grid-template-columns: 1fr 1fr; } }
+.shots figure { margin: 0; }
+/* width and height sit on the img so the browser reserves the space before the
+   file arrives; without them every screenshot shoves the page down as it loads. */
+.shots img { width: 100%; height: auto; display: block; border: 1px solid #e2ded4;
+             border-radius: 8px; background: #fff; }
+.shots figcaption { margin: .6rem 0 0; font-size: .9rem; color: #6b6b6b; }

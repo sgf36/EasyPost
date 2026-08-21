@@ -16,9 +16,20 @@
  *   PADDLE_WEBHOOK_SECRET    signing secret of the Paddle notification destination
  *   PADDLE_API_KEY           Paddle API key (to look up the buyer email)
  *   RESEND_API_KEY           Resend API key (to send the email)
+ *   RESEND_API_KEY_WREN      Resend API key for Wren's SEPARATE Resend account
+ *   RESEND_API_KEY_SOFTWARE  Resend API key for the business site's own account
+ *   RESEND_WEBHOOK_SECRET_SOFTWARE  Svix signing secret, business-site webhook
+ *   REPLY_TOKEN_SECRET       HMAC key for per-thread reply addresses. UNSET =
+ *                            the translating reply relay is off and replies go
+ *                            direct to the customer, as before it existed.
+ *   RESEND_WEBHOOK_SECRET       Svix signing secret, Easy-Post inbound webhook
+ *   RESEND_WEBHOOK_SECRET_WREN  Svix signing secret, Wren inbound webhook
  * Vars (wrangler.toml [vars]):
  *   PADDLE_PRICE_ID          only mint for this price
  *   LICENSE_FROM_EMAIL       verified Resend "from" address
+ *   WREN_FROM_EMAIL          optional; verified "from" on wren.spencerfields.com.
+ *                            Until it is set, Wren mail goes out on the Easy-Post
+ *                            account under a "Wren Support" display name.
  *   PADDLE_API_BASE          optional, default https://api.paddle.com
  *   LICENSE_PRODUCT_ID       optional, default "easypost-desktop"
  */
@@ -42,6 +53,18 @@ import {
   licenseEmail,
   newCaseId,
 } from "./emails.js";
+
+import {
+  bilingual,
+  fetchReceived,
+  fromEnglish,
+  isAutomated,
+  parseReplyAddress,
+  replyAddress,
+  stripQuoted,
+  toEnglish,
+  verifyWebhook,
+} from "./relay.js";
 
 const SIGNATURE_TOLERANCE_SECONDS = 300;
 
@@ -188,12 +211,118 @@ async function getCustomerEmail(base, apiKey, customerId) {
 // always forwarded the original regardless of what the AI does.
 const AI_MODEL = "claude-haiku-4-5-20251001";
 const AI_TRIAGE_DAILY_CAP = 50;
-// Only these topics are auto-answered. Activation, refunds and bug reports need
-// account-specific action or judgement, so they are acknowledged and routed to
-// a human rather than adjudicated by a model.
-const AI_AUTO_TOPICS = new Set(["Question before buying", "Something else"]);
+/*
+ * Two products share this Worker and this contact endpoint, and until now it
+ * could not tell them apart: both sites posted the same five fields, and the
+ * two topic lists overlap on "Bug report" and "Something else". The result was
+ * that a Wren customer choosing "Something else" was auto-answered from
+ * Easy-Post's facts and acknowledged as "Easy-Post Desktop Support".
+ *
+ * Everything product-specific therefore lives in one registry, keyed by the
+ * `product` field the sites now send. Adding a third product means adding an
+ * entry here, not hunting for hardcoded strings.
+ *
+ * fromVar / keyVar name the env entries rather than holding values, so a
+ * product whose Resend domain is not verified yet degrades to the Easy-Post
+ * sender instead of failing to send at all. See resolveSender().
+ */
+const PRODUCTS = {
+  "easy-post": {
+    id: "easy-post",
+    name: "Easy-Post Desktop",
+    keyVar: "RESEND_API_KEY",
+    fromVar: "LICENSE_FROM_EMAIL",
+    // Domain that receives replies. Both domains carry an inbound MX pointing
+    // at Resend; each product receives on its own so the relay address matches
+    // the brand the customer was written to by.
+    replyDomain: "easy-post.spencerfields.com",
+    webhookSecretVar: "RESEND_WEBHOOK_SECRET",
+    // Activation, refunds and bug reports need account-specific action or
+    // judgement, so they are acknowledged and routed to a human rather than
+    // adjudicated by a model.
+    aiAutoTopics: new Set(["Question before buying", "Something else"]),
+  },
+  software: {
+    id: "software",
+    // Names what the reader is dealing with, which is the software rather than
+    // the person. Drives the subject line and the owner-forward heading.
+    name: "Software - Spencer Fields",
+    // Used verbatim as the From display name, in place of name + suffix:
+    // "Software - Spencer Fields Support" would read as a third entity.
+    senderName: "Software - Spencer Fields",
+    // Its own Resend account, so its own key, sender and inbound webhook. Each
+    // degrades independently: an unset key or sender falls back to the
+    // Easy-Post account under a "Spencer Fields Support" display name, and an
+    // unset webhook secret keeps replies routing through the Easy-Post domain.
+    // See resolveSender() and replyDomainFor().
+    keyVar: "RESEND_API_KEY_SOFTWARE",
+    fromVar: "SOFTWARE_FROM_EMAIL",
+    replyDomain: "software.spencerfields.com",
+    webhookSecretVar: "RESEND_WEBHOOK_SECRET_SOFTWARE",
+    // Deliberately empty. This is the business address of the whole operation:
+    // licensing, press and partnership enquiries are not things to answer with
+    // a model, and a general question about the software is better answered by
+    // the product site that owns the detail. Everything reaches a person.
+    aiAutoTopics: new Set(),
+  },
+  wren: {
+    id: "wren",
+    name: "Wren",
+    keyVar: "RESEND_API_KEY_WREN",
+    fromVar: "WREN_FROM_EMAIL",
+    replyDomain: "wren.spencerfields.com",
+    webhookSecretVar: "RESEND_WEBHOOK_SECRET_WREN",
+    // Same rule as above: "Purchase or restore" is money-adjacent and "Bug
+    // report" needs judgement, so both go to a human. The three place-matching
+    // topics have documented answers on the support page and are safe to draft.
+    aiAutoTopics: new Set([
+      "A place was matched wrongly",
+      "A place was not found",
+      "Guides and Apple Maps",
+      "Something else",
+    ]),
+  },
+};
 
-const TRIAGE_FACTS = `- Easy-Post Desktop is an independent, open-source desktop app for Windows and macOS that drives the customer's OWN EasyPost account. It does not sell postage; labels are bought through the customer's EasyPost account and EasyPost bills them directly.
+const DEFAULT_PRODUCT = "easy-post";
+
+/**
+ * Which domain a product issues reply addresses on.
+ *
+ * Its own, but only once that domain's inbound webhook secret is configured.
+ * Handing out an address on a domain nothing is listening to would have Resend
+ * accept the reply and then drop it: worse than not offering the relay, because
+ * the owner would believe they had replied.
+ */
+function replyDomainFor(env, product) {
+  return env[product.webhookSecretVar]
+    ? product.replyDomain
+    : PRODUCTS[DEFAULT_PRODUCT].replyDomain;
+}
+
+/*
+ * Pick the Resend account and From address for a product.
+ *
+ * A product uses its own account only when BOTH its key and its verified From
+ * address are configured. Wren's key is set but WREN_FROM_EMAIL stays commented
+ * out in wrangler.toml until Resend has verified wren.spencerfields.com --
+ * until then Wren mail goes out on the Easy-Post account, correctly branded
+ * "Wren Support" in the display name. A display name is free text; only the
+ * address behind it has to be verified.
+ */
+function resolveSender(env, product, displaySuffix) {
+  const own = env[product.keyVar] && env[product.fromVar];
+  const address = own ? env[product.fromVar] : env[PRODUCTS[DEFAULT_PRODUCT].fromVar];
+  const apiKey = own ? env[product.keyVar] : env[PRODUCTS[DEFAULT_PRODUCT].keyVar];
+  const display = product.senderName || `${product.name}${displaySuffix}`;
+  return {
+    apiKey,
+    from: `${display} <${address}>`,
+    usingOwnAccount: Boolean(own),
+  };
+}
+
+const EASY_POST_FACTS = `- Easy-Post Desktop is an independent, open-source desktop app for Windows and macOS that drives the customer's OWN EasyPost account. It does not sell postage; labels are bought through the customer's EasyPost account and EasyPost bills them directly.
 - An EasyPost account (free at easypost.com) and API key are required. A test-mode key lets them try everything with no real charges.
 - Pricing: Personal is $29 one-time for up to 3 computers and never expires. Business is $149/year for up to 10 computers. Organisation is $349/year for up to 30. Both annual tiers are subscriptions, cancellable at any time. Enterprise (more than 30 computers) is by enquiry.
 - Summer 2026 offer: 26% off Personal for the first 26 customers with code SUMMER26 at checkout, bringing it to $21.46.
@@ -206,13 +335,59 @@ const TRIAGE_FACTS = `- Easy-Post Desktop is an independent, open-source desktop
 - The application stores data locally and has no analytics or telemetry; activation sends only a one-way fingerprint. Details: https://easy-post.spencerfields.com/privacy.html .
 - Contact: Apps@spencerfields.com or +44 20 8132 5790.`;
 
-async function resendSend(env, { from, to, replyTo, subject, text, html }) {
+/*
+ * Wren's facts. Every line here is drawn from wren.spencerfields.com -- the
+ * overview and the support page -- and nothing else. The model is told to
+ * answer from these and refuse otherwise, so a fact invented here becomes a
+ * fact asserted to a customer.
+ *
+ * The release-status line goes stale the moment Apple approves the app. Update
+ * it then, or someone asking where to download Wren will be told it is not out.
+ */
+const WREN_FACTS = `- Wren is an independent iPhone app that turns places someone has recommended into a guide in Apple Maps. It has no account and no sign-in, and reads nothing from the customer's.
+- Places arrive three ways: from screenshots (text recognition runs on the device, so screenshots are never uploaded), from a file another app exported (CSV, KML, KMZ, GPX, GeoJSON, or a Google Takeout export of saved places), or from a guide already in Apple Maps, shared into Wren as a link.
+- Wren requires iOS 18 or later. That is not a preference: the identifier Apple Maps needs for each place only exists from iOS 18, and without it nothing can be found.
+- Pricing: guides of up to three places are free, permanently. A single one-time purchase unlocks both saving a guide with more than three places and adding to a guide the customer already has. There is no subscription and nothing renews.
+- A purchase restores at no further cost on any device signed in to the same Apple Account: the menu in the top-right, then "Restore purchase". If it still does not restore, ask for the Apple Account email used to buy it.
+- Purchases go through Apple, so refunds do too, at https://reportaproblem.apple.com/ . Wren never receives the payment and cannot refund it directly.
+- Apple offers no way to add places to an existing guide from outside Maps. Wren therefore reads the places out of the guide shared with it and makes ONE new guide holding both the old and the new, which the customer keeps instead of the old one. Wren keeps the places afterwards, so a guide deleted by mistake can be remade in a tap. A single place is the exception: Maps itself offers to add one to a guide that already exists.
+- About one hundred and fifty places fit in one guide. Beyond that Wren splits them into numbered guides and says so first rather than dropping any. Maps takes one guide at a time, so the button is tapped again for each.
+- A place matched to the wrong one is fixed by tapping it in the list: the search opens with what Apple chose, and what the screenshot actually said shown above it. This happens most with chains, and with places sharing a name in another city.
+- A place that was not found stays in the list, outlined, with the text that was read, and can be searched by hand. The street name often works better than the business name. Confirming the right city when Wren asks makes it much rarer.
+- Wren reads the city out of the screenshot caption and asks for confirmation; if it guesses wrongly the customer types over it, or chooses to search anywhere.
+- A pasted guide link must be the one Apple Maps gives when sharing a guide: open the guide, share, then Copy Link. If a correct link is still refused, Wren could not reach Apple to expand it, because Apple's short links carry nothing readable without asking.
+- Places imported from an existing guide can arrive without names: Apple's shared link carries each place's identifier and no name, so Wren asks Apple separately. If that lookup does not answer, the group stays a count rather than showing a list of blanks. The places are still there and still publish correctly.
+- A guide can come back with fewer places than it had. Apple silently drops a place whose record it no longer holds -- somewhere that closed, or two entries it has merged. Nothing Wren can do: those places were already unreachable if tapped in Maps.
+- Files are read by their contents rather than their extension, so a renamed file is usually fine. A row holding nothing that looks like a place name is skipped, and Wren says how many were.
+- Nothing is written to Apple Maps until the customer says so, and every place shows what was read beside what was matched, so a wrong match is obvious rather than confident.
+- In normal use only two things leave the device: a place name sent to Apple Maps so it can be found, exactly as the Maps app does, and a shared guide link sent to Apple to be expanded. Entering a complimentary access code is the only time Wren contacts a server of its own.
+- Status: Wren has been submitted to the App Store and is awaiting review. There is nothing to download yet.
+- The app is translated into 47 languages.
+- Source code: https://github.com/sgf36/wren . Bug reports are also welcome at https://github.com/sgf36/wren/issues .
+- Contact: Apps@spencerfields.com . Replies come from Spencer Fields, usually within one business day.`;
+
+// Attached after definition rather than inside the literal above: a const is in
+// its temporal dead zone until its own declaration runs, so referencing these
+// from the PRODUCTS literal would throw at module load.
+const SOFTWARE_FACTS = `- Spencer Fields is a sole trader established in the United Kingdom, publishing software under its own name. Registered address: Lytchett House, 13 Freeland Park, Wareham Road, Lytchett Matravers, Poole, BH16 6FA.
+- Three applications: Easy-Post Desktop (Windows and macOS, available), Easy-Post Mobile Companion (Android as a direct download, iPhone edition heading to the App Store), and Wren (iPhone, submitted to the App Store and awaiting review).
+- Each application has its own website carrying its own pricing, terms and privacy policy. Direct any question about a specific application to that site rather than answering it here.
+- Purchases are handled by the store or merchant of record -- Paddle for Easy-Post Desktop, Apple for App Store purchases -- so this business never sees payment details.
+- Contact: Apps@spencerfields.com .`;
+
+PRODUCTS["easy-post"].facts = EASY_POST_FACTS;
+PRODUCTS.wren.facts = WREN_FACTS;
+PRODUCTS.software.facts = SOFTWARE_FACTS;
+
+async function resendSend(env, { from, to, replyTo, subject, text, html, apiKey }) {
   const payload = { from, to: [to], reply_to: replyTo, subject, text };
   if (html) payload.html = html;
   return fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      Authorization: "Bearer " + env.RESEND_API_KEY,
+      // Falls back to the Easy-Post account so the licence path, which has no
+      // product context, keeps working unchanged.
+      Authorization: "Bearer " + (apiKey || env.RESEND_API_KEY),
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
@@ -222,21 +397,72 @@ async function resendSend(env, { from, to, replyTo, subject, text, html }) {
 // Best-effort record of a contact case so a support reference (EPD-YYMMDD-XXXX)
 // can be traced back to the original enquiry later. Never blocks a reply: the
 // table is created on demand and any failure is swallowed.
-async function logContactCase(db, { caseId, name, email, topic, autoReplied }) {
+async function logContactCase(db, { caseId, name, email, topic, product, lang, langName, autoReplied }) {
   if (!db) return;
   try {
     await db
       .prepare(
-        "CREATE TABLE IF NOT EXISTS contact_cases (case_id TEXT PRIMARY KEY, at TEXT, name TEXT, email TEXT, topic TEXT, auto_replied INTEGER)"
+        "CREATE TABLE IF NOT EXISTS contact_cases (case_id TEXT PRIMARY KEY, at TEXT, name TEXT, email TEXT, topic TEXT, product TEXT, lang TEXT, lang_name TEXT, auto_replied INTEGER)"
       )
       .run();
+
+    // CREATE TABLE IF NOT EXISTS does nothing to a table that already exists,
+    // and this one does -- it has been recording Easy-Post cases since launch.
+    // Its own try/catch because ALTER throws once the column is there, and the
+    // outer catch would take the INSERT down with it every call thereafter.
+    for (const column of ["product TEXT", "lang TEXT", "lang_name TEXT"]) {
+      try {
+        await db.prepare("ALTER TABLE contact_cases ADD COLUMN " + column).run();
+      } catch {}
+    }
+
     await db
       .prepare(
-        "INSERT OR IGNORE INTO contact_cases (case_id, at, name, email, topic, auto_replied) VALUES (?,?,?,?,?,?)"
+        "INSERT OR IGNORE INTO contact_cases (case_id, at, name, email, topic, product, lang, lang_name, auto_replied) VALUES (?,?,?,?,?,?,?,?,?)"
       )
-      .bind(caseId, new Date().toISOString(), name, email, topic, autoReplied ? 1 : 0)
+      .bind(caseId, new Date().toISOString(), name, email, topic, product,
+            lang || "en", langName || "English", autoReplied ? 1 : 0)
       .run();
   } catch {}
+}
+
+/** Look a case up for the reply relay. Null if it is not known. */
+async function loadContactCase(db, caseId) {
+  if (!db) return null;
+  try {
+    const row = await db
+      .prepare("SELECT case_id, name, email, topic, product, lang, lang_name FROM contact_cases WHERE case_id = ?")
+      .bind(caseId)
+      .first();
+    return row || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Count relayed messages per case, and refuse past a ceiling.
+ *
+ * The loop guards in relay.js catch well-behaved auto-responders. This catches
+ * the badly-behaved ones: a counter is the only defence that holds when the
+ * other end sends no headers admitting it is a machine.
+ */
+async function relayCount(db, caseId, increment) {
+  if (!db) return 0;
+  try {
+    await db.prepare("CREATE TABLE IF NOT EXISTS relay_log (case_id TEXT, at TEXT)").run();
+    if (increment) {
+      await db.prepare("INSERT INTO relay_log (case_id, at) VALUES (?,?)")
+        .bind(caseId, new Date().toISOString()).run();
+    }
+    const row = await db
+      .prepare("SELECT COUNT(*) AS n FROM relay_log WHERE case_id = ?")
+      .bind(caseId)
+      .first();
+    return row?.n ?? 0;
+  } catch {
+    return 0;
+  }
 }
 
 async function underAiCap(db) {
@@ -261,12 +487,12 @@ async function logAiUse(db) {
 }
 
 // Returns { confident: boolean, reply: string } or null if the call or parse
-// fails. The model is told to answer only from TRIAGE_FACTS and to set
+// fails. The model is told to answer only from the product's facts and to set
 // confident=false whenever it cannot, which is the gate that keeps a guessed
 // answer from ever reaching a customer.
-async function aiAnswer(env, { topic, message }) {
+async function aiAnswer(env, { product, topic, message }) {
   const system =
-    "You are the automated first-response assistant for Easy-Post Desktop customer support. " +
+    `You are the automated first-response assistant for ${product.name} customer support. ` +
     "Answer the customer's question using ONLY the facts below. Write in British English, warm and concise " +
     "(a short paragraph or two). Do not add a greeting with the customer's name, a signature, or any note that " +
     "the reply is automated — those are added around your text. If the question cannot be fully and confidently " +
@@ -277,10 +503,10 @@ async function aiAnswer(env, { topic, message }) {
     "business outreach — a marketing pitch, SEO or link-building offer, guest-post or backlink request, directory " +
     "or listing solicitation, agency or freelancer touting services, partnership or investment approach, or any " +
     "message whose real aim is to sell the reader something or get them to visit or sign up to the sender's own " +
-    "site rather than to buy or use Easy-Post Desktop. If so, set spam to true; otherwise set spam to false. A " +
+    `site rather than to buy or use ${product.name}. If so, set spam to true; otherwise set spam to false. A ` +
     "product-related question dressed up as small talk is NOT spam; be conservative and only flag clear outreach. " +
     "When spam is true, also set confident to false and leave reply empty.\n\nFACTS:\n" +
-    TRIAGE_FACTS +
+    product.facts +
     '\n\nRespond with STRICT JSON only — no prose, no code fences: {"confident": true|false, "spam": true|false, "reply": "..."}';
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -343,8 +569,23 @@ async function handleContact(request, env) {
     return json({ error: "missing fields" }, 400);
   }
 
+  // An unknown or absent product falls back to Easy-Post rather than 400ing.
+  // The two sites deploy independently of this Worker, so for a window after
+  // release one of them is still posting the old five-field payload; rejecting
+  // it would drop real support mail to fix a cosmetic problem.
+  const productId = String(body.product || "").slice(0, 20).trim().toLowerCase();
+  const product = PRODUCTS[productId] || PRODUCTS[DEFAULT_PRODUCT];
+
   const to = env.CONTACT_TO_EMAIL;
   const ip = String(body.ip || "unknown").slice(0, 45);
+
+  // Detect the language and render the message in English. Everything
+  // downstream reads the English: the triage model is grounded in English
+  // facts, and the owner forward has to be readable on sight. The original is
+  // never discarded -- it travels with the forward, because a translation can
+  // lose the thing that actually mattered.
+  const detected = await toEnglish(env, message);
+  const englishMessage = detected.english || message;
 
   // 1) Triage. Try an AI first-reply for general enquiries only, with a key
   //    present and under the daily cap. Anything unexpected here degrades to
@@ -352,10 +593,10 @@ async function handleContact(request, env) {
   let aiReply = null;
   let isSpam = false;
   let triageNote = "Not eligible for auto-reply; routed to you.";
-  const eligible = AI_AUTO_TOPICS.has(topic) && env.ANTHROPIC_API_KEY;
+  const eligible = product.aiAutoTopics.has(topic) && env.ANTHROPIC_API_KEY;
   if (eligible && (await underAiCap(env.LICENSES))) {
     try {
-      const res = await aiAnswer(env, { topic, message });
+      const res = await aiAnswer(env, { product, topic, message: englishMessage });
       await logAiUse(env.LICENSES);
       if (res && res.spam) {
         // Unsolicited business outreach (directory listing, SEO/link-building,
@@ -383,17 +624,51 @@ async function handleContact(request, env) {
   // and both subject lines.
   const caseId = newCaseId();
   const autoReplied = Boolean(aiReply);
-  await logContactCase(env.LICENSES, { caseId, name, email, topic, autoReplied });
+  await logContactCase(env.LICENSES, {
+    caseId, name, email, topic, product: product.id,
+    lang: detected.lang, langName: detected.langName, autoReplied,
+  });
+
+  const customerSender = resolveSender(env, product, " Support");
+  const ownerSender = resolveSender(env, product, "");
+
+  // Where a reply from the owner should land. Without the token secret this
+  // stays the customer address, which is exactly the behaviour before the
+  // relay existed -- an unset secret degrades to "reply goes direct", not to
+  // "reply goes nowhere".
+  const ownerReplyTo = env.REPLY_TOKEN_SECRET
+    ? replyAddress(caseId, replyDomainFor(env, product), env.REPLY_TOKEN_SECRET)
+    : email;
 
   // 2) Reply to the customer — the AI answer if we have one, otherwise a plain
   //    acknowledgement. Best-effort: a failure here must not lose the message.
   //    Skipped entirely for spam: acknowledging unsolicited outreach only
   //    confirms the address and invites more, and the owner still gets it below.
   if (!isSpam) {
-    const customer = contactCustomerEmail({ name, topic, caseId, aiReply });
+    // The template builds both halves and labels each with its language. Only
+    // a real AI answer needs translating here; the standard acknowledgement is
+    // already in the email string table.
+    const translatedAnswer =
+      detected.translated && aiReply
+        ? await fromEnglish(env, aiReply, detected.lang, detected.langName)
+        : null;
+
+    const customer = contactCustomerEmail({
+      name,
+      topic,
+      caseId,
+      english: aiReply,
+      translated: translatedAnswer,
+      lang: detected.translated ? detected.lang : "en",
+      productName: product.name,
+      productId: product.id,
+      isAutoReply: Boolean(aiReply),
+    });
+
     try {
       await resendSend(env, {
-        from: "Easy-Post Desktop Support <" + env.LICENSE_FROM_EMAIL + ">",
+        apiKey: customerSender.apiKey,
+        from: customerSender.from,
         to: email,
         replyTo: to,
         subject: customer.subject,
@@ -405,13 +680,35 @@ async function handleContact(request, env) {
 
   // 3) Forward the original to the owner. This is the safety net, so its success
   //    is what the endpoint reports — the customer reply above is a bonus.
+  // English first so it is readable on sight; the original beneath, because a
+  // translation can lose the detail that actually mattered.
+  const ownerMessage = detected.translated
+    ? englishMessage +
+      "\n\n-----------------------------------------\n" +
+      "Original (" + detected.langName + "), as the customer wrote it:\n\n" +
+      message
+    : message;
+
+  const languageNote = detected.translated
+    ? "Written in " + detected.langName + "; translated to English above. " +
+      (env.REPLY_TOKEN_SECRET
+        ? "Reply normally — your reply is translated back into " +
+          detected.langName + " before it reaches them."
+        : "REPLY RELAY IS OFF (REPLY_TOKEN_SECRET unset): your reply goes " +
+          "direct, in English.")
+    : "Written in English.";
+
   const owner = contactOwnerEmail({
-    name, email, topic, ip, caseId, triageNote, message, autoReplied, spam: isSpam,
+    name, email, topic, ip, caseId,
+    triageNote: triageNote + "\n" + languageNote,
+    message: ownerMessage, autoReplied,
+    spam: isSpam, productName: product.name, productId: product.id,
   });
   const r = await resendSend(env, {
-    from: "Easy-Post Desktop <" + env.LICENSE_FROM_EMAIL + ">",
+    apiKey: ownerSender.apiKey,
+    from: ownerSender.from,
     to,
-    replyTo: email,
+    replyTo: ownerReplyTo,
     subject: owner.subject,
     text: owner.text,
     html: owner.html,
@@ -421,7 +718,162 @@ async function handleContact(request, env) {
     const detail = await r.text().catch(() => "");
     return json({ error: "resend", status: r.status, detail: detail.slice(0, 300) }, 502);
   }
-  return json({ status: "sent", auto_replied: autoReplied, case_id: caseId });
+  // product is echoed so the PHP side can log which registry entry matched --
+  // a site posting a typo'd product would otherwise silently get Easy-Post
+  // branding and nothing would say so.
+  return json({
+    status: "sent",
+    auto_replied: autoReplied,
+    case_id: caseId,
+    product: product.id,
+    own_account: customerSender.usingOwnAccount,
+  });
+}
+
+/**
+ * Relay a reply, translating it, in whichever direction it is going.
+ *
+ * Resend delivers inbound mail here as a webhook. The recipient address
+ * carries the case id and a MAC; everything else is derived from the case.
+ *
+ * Two directions, because a support thread is a conversation:
+ *   owner -> customer   translate English into the customer language
+ *   customer -> owner   translate their language into English
+ *
+ * The webhook carries metadata only, so the body is fetched separately. Every
+ * refusal returns 200 with a reason: a non-2xx makes Resend retry, and
+ * retrying a message we have decided not to relay just repeats the decision.
+ */
+async function handleInbound(request, env, productId) {
+  const product = PRODUCTS[productId];
+  if (!product) return new Response("unknown product", { status: 404 });
+  if (!env.REPLY_TOKEN_SECRET) return json({ status: "ignored", reason: "relay disabled" });
+
+  // The signature is over the exact bytes received, so the raw body must be
+  // read before anything parses it.
+  const raw = await request.text();
+  if (!verifyWebhook(env[product.webhookSecretVar], request.headers, raw)) {
+    return new Response("bad signature", { status: 401 });
+  }
+
+  let event;
+  try {
+    event = JSON.parse(raw);
+  } catch {
+    return json({ error: "bad json" }, 400);
+  }
+  if (event.type !== "email.received") {
+    return json({ status: "ignored", reason: "type " + event.type });
+  }
+
+  const data = event.data || {};
+  const emailId = data.email_id || data.id;
+  if (!emailId) return json({ status: "ignored", reason: "no email id" });
+
+  const sender = resolveSender(env, product, " Support");
+
+  let full;
+  try {
+    full = await fetchReceived(sender.apiKey, emailId);
+  } catch (e) {
+    // Worth retrying: the body may not be readable yet.
+    return json({ error: "fetch failed", detail: String(e).slice(0, 80) }, 503);
+  }
+
+  const addressOf = (v) => (typeof v === "string" ? v : v && (v.address || v.email)) || "";
+  const recipients = [].concat(full.to || [], full.cc || [], full.received_for || []);
+  let caseId = null;
+  for (const r of recipients) {
+    caseId = parseReplyAddress(addressOf(r), env.REPLY_TOKEN_SECRET);
+    if (caseId) break;
+  }
+  // Bounces and stray mail to the sending domain land here too. Anything whose
+  // local part is not a valid relay token is simply not ours.
+  if (!caseId) return json({ status: "ignored", reason: "not a relay address" });
+
+  if (isAutomated(full.headers)) {
+    return json({ status: "ignored", reason: "automated message", case_id: caseId });
+  }
+
+  const record = await loadContactCase(env.LICENSES, caseId);
+  if (!record) return json({ status: "ignored", reason: "unknown case", case_id: caseId });
+
+  const from = addressOf(full.from).toLowerCase();
+  const ownerDomain = String(env.CONTACT_TO_EMAIL || "").split("@")[1] || "";
+  const isOwner = Boolean(ownerDomain) && from.endsWith("@" + ownerDomain);
+  const isCustomer = from === String(record.email || "").toLowerCase();
+
+  if (!isOwner && !isCustomer) {
+    return json({ status: "ignored", reason: "sender not party to this case", case_id: caseId });
+  }
+  // Our own outbound must never be treated as an inbound reply.
+  if (from.endsWith("@" + replyDomainFor(env, product))) {
+    return json({ status: "ignored", reason: "loop: sent by the relay", case_id: caseId });
+  }
+
+  const count = await relayCount(env.LICENSES, caseId, true);
+  if (count > 30) {
+    return json({ status: "ignored", reason: "relay cap reached", case_id: caseId });
+  }
+
+  const body = stripQuoted(full.text || String(full.html || "").replace(/<[^>]+>/g, " "));
+  if (!body || body.length < 2) {
+    return json({ status: "ignored", reason: "nothing to relay", case_id: caseId });
+  }
+
+  const lang = record.lang || "en";
+  const langName = record.lang_name || "their language";
+  const subject = "Re: " + (record.topic || "your enquiry") +
+    " — " + product.name + " [" + caseId + "]";
+
+  if (isOwner) {
+    const rendered = lang === "en" ? null : await fromEnglish(env, body, lang, langName);
+    const composed = bilingual({
+      translated: rendered, english: body, langName, caseId,
+    });
+    const r = await resendSend(env, {
+      apiKey: sender.apiKey,
+      from: sender.from,
+      to: record.email,
+      // Their reply comes back through the relay, so the thread keeps working
+      // in both directions rather than dead-ending in an unmonitored inbox.
+      replyTo: replyAddress(caseId, replyDomainFor(env, product), env.REPLY_TOKEN_SECRET),
+      subject,
+      text: composed.text,
+    });
+    if (!r.ok) {
+      const detail = await r.text().catch(() => "");
+      return json({ error: "resend", detail: detail.slice(0, 200) }, 502);
+    }
+    return json({ status: "relayed", direction: "to-customer", case_id: caseId, note: composed.note });
+  }
+
+  // Customer -> owner. Translate to English so it is readable on sight, and
+  // keep the original beneath for the same reason as the first forward.
+  const asEnglish = await toEnglish(env, body);
+  const text =
+    (asEnglish.translated
+      ? asEnglish.english +
+        "\n\n-----------------------------------------\n" +
+        "Original (" + asEnglish.langName + "):\n\n" + body
+      : body) +
+    "\n\n-----------------------------------------\n" +
+    "Reply to this email; it is translated back into " + langName +
+    " before it reaches " + (record.name || "the customer") + ".";
+
+  const r = await resendSend(env, {
+    apiKey: sender.apiKey,
+    from: sender.from,
+    to: env.CONTACT_TO_EMAIL,
+    replyTo: replyAddress(caseId, replyDomainFor(env, product), env.REPLY_TOKEN_SECRET),
+    subject: "[reply] " + subject,
+    text,
+  });
+  if (!r.ok) {
+    const detail = await r.text().catch(() => "");
+    return json({ error: "resend", detail: detail.slice(0, 200) }, 502);
+  }
+  return json({ status: "relayed", direction: "to-owner", case_id: caseId });
 }
 
 async function sendLicenseEmail(apiKey, from, to, licenseKey, tier = "personal") {
@@ -473,6 +925,11 @@ export default {
     }
     if (request.method === "POST" && url.pathname === "/contact") {
       return handleContact(request, env);
+    }
+    // Resend inbound webhook, one route per product because each account signs
+    // with its own secret: /inbound/wren, /inbound/easy-post.
+    if (request.method === "POST" && url.pathname.startsWith("/inbound/")) {
+      return handleInbound(request, env, url.pathname.slice("/inbound/".length));
     }
     // Seat activation. Each verifies the licence signature and a proof of key
     // possession itself, so none of them needs a shared secret with the app.

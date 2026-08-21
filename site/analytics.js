@@ -14,6 +14,7 @@
   "use strict";
 
   var GA_ID = "G-M84XMVB826";
+  var CLARITY_ID = "y49v1x7kti";
   var KEY = "epd-analytics-consent";
 
   var choice = null;
@@ -38,7 +39,31 @@
     document.head.appendChild(s);
     gtag("js", new Date());
     gtag("config", GA_ID);
+    enableClarity();
     trackConversions();
+  }
+
+  /* Microsoft Clarity — heatmaps and session replay.
+   *
+   * Called only from enableAnalytics(), so it is behind the same consent as
+   * GA and nothing loads on a decline. Clarity sets its own cookies and
+   * records what a visitor does on the page, which is why it cannot ride the
+   * PECR "statistical purposes" exception the way an aggregate-only tool
+   * could: a session recording is not aggregate information, and it is not
+   * information that cannot identify people. Consent is the only lawful route
+   * for it, so the banner stays.
+   *
+   * Leaving CLARITY_ID empty or at PLACEHOLDER disables it cleanly, matching
+   * the pattern checkout.js uses for the Paddle token.
+   */
+  function enableClarity() {
+    if (!CLARITY_ID || CLARITY_ID === "PLACEHOLDER") return;
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+      t = l.createElement(r); t.async = 1;
+      t.src = "https://www.clarity.ms/tag/" + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, "clarity", "script", CLARITY_ID);
   }
 
   /* Conversion events.
@@ -141,8 +166,9 @@
     var msg = document.createElement("span");
     msg.style.maxWidth = "46rem";
     msg.innerHTML =
-      "This site uses Google Analytics to understand how it is used. " +
-      "Analytics cookies load only if you accept. See the " +
+      "This site uses Google Analytics and Microsoft Clarity to understand how " +
+      "it is used, which includes recording how pages are viewed and clicked. " +
+      "Nothing loads unless you accept. See the " +
       '<a href="privacy.html" style="color:#8fd0c4;text-decoration:underline">privacy policy</a>.';
 
     function button(label, primary) {

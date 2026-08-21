@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>কোড ছাড়াই EasyPost ব্যবহার করুন — একটি ডেস্কটপ অ্যাপ থেকে শিপিং লেবেল প্রিন্ট করুন</title>
+<meta name="description" content="কোড লেখা ছাড়াই EasyPost ব্যবহার করুন। Easy-Post Desktop একটি নেটিভ অ্যাপ যা আপনার নিজের EasyPost অ্যাকাউন্টে লেবেল প্রিন্ট করে, ক্যারিয়ার রেট তুলনা করে এবং পার্সেল ট্র্যাক করে — কোনো API নেই, কোনো ড্যাশবোর্ড নেই। বিনামূল্যে চেষ্টা করার সুযোগ আছে।">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<link rel="canonical" href="https://easy-post.spencerfields.com/bn/easypost-without-code.html"><!-- i18n:begin --><link rel="alternate" hreflang="x-default" href="https://easy-post.spencerfields.com/easypost-without-code.html"><link rel="alternate" hreflang="en" href="https://easy-post.spencerfields.com/easypost-without-code.html"><link rel="alternate" hreflang="zh" href="https://easy-post.spencerfields.com/zh/easypost-without-code.html"><link rel="alternate" hreflang="hi" href="https://easy-post.spencerfields.com/hi/easypost-without-code.html"><link rel="alternate" hreflang="es" href="https://easy-post.spencerfields.com/es/easypost-without-code.html"><link rel="alternate" hreflang="ar" href="https://easy-post.spencerfields.com/ar/easypost-without-code.html"><link rel="alternate" hreflang="fr" href="https://easy-post.spencerfields.com/fr/easypost-without-code.html"><link rel="alternate" hreflang="bn" href="https://easy-post.spencerfields.com/bn/easypost-without-code.html"><link rel="alternate" hreflang="pt" href="https://easy-post.spencerfields.com/pt/easypost-without-code.html"><link rel="alternate" hreflang="id" href="https://easy-post.spencerfields.com/id/easypost-without-code.html"><link rel="alternate" hreflang="ur" href="https://easy-post.spencerfields.com/ur/easypost-without-code.html"><link rel="alternate" hreflang="ru" href="https://easy-post.spencerfields.com/ru/easypost-without-code.html"><link rel="alternate" hreflang="de" href="https://easy-post.spencerfields.com/de/easypost-without-code.html"><link rel="alternate" hreflang="ja" href="https://easy-post.spencerfields.com/ja/easypost-without-code.html"><link rel="alternate" hreflang="mr" href="https://easy-post.spencerfields.com/mr/easypost-without-code.html"><link rel="alternate" hreflang="te" href="https://easy-post.spencerfields.com/te/easypost-without-code.html"><link rel="alternate" hreflang="sv" href="https://easy-post.spencerfields.com/sv/easypost-without-code.html"><!-- i18n:end --></head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html">Easy-Post Desktop</a>
+    <nav class="site-nav"><a href="index.html">সংক্ষিপ্ত বিবরণ</a>
+      <a href="pricing.html">মূল্য</a>
+      <a href="download.html">ডাউনলোড</a>
+      <a href="faq.html">প্রশ্নোত্তর</a>
+      <a href="terms.html">শর্তাবলী</a>
+      <a href="privacy.html">গোপনীয়তা</a>
+      <a href="refunds.html">রিফান্ড</a>
+      <a href="#support">সহায়তা</a></nav>
+  <!-- i18n:begin --><details class="i18n-picker"><summary><span aria-hidden="true">🌐</span> বাংলা</summary><ul><li><a href="../easypost-without-code.html" lang="en" hreflang="en">English</a></li><li><a href="../zh/easypost-without-code.html" lang="zh" hreflang="zh">简体中文</a></li><li><a href="../hi/easypost-without-code.html" lang="hi" hreflang="hi">हिन्दी</a></li><li><a href="../es/easypost-without-code.html" lang="es" hreflang="es">Español</a></li><li><a href="../ar/easypost-without-code.html" lang="ar" hreflang="ar">العربية</a></li><li><a href="../fr/easypost-without-code.html" lang="fr" hreflang="fr">Français</a></li><li><span aria-current="true" class="i18n-current">বাংলা</span></li><li><a href="../pt/easypost-without-code.html" lang="pt" hreflang="pt">Português</a></li><li><a href="../id/easypost-without-code.html" lang="id" hreflang="id">Bahasa Indonesia</a></li><li><a href="../ur/easypost-without-code.html" lang="ur" hreflang="ur">اردو</a></li><li><a href="../ru/easypost-without-code.html" lang="ru" hreflang="ru">Русский</a></li><li><a href="../de/easypost-without-code.html" lang="de" hreflang="de">Deutsch</a></li><li><a href="../ja/easypost-without-code.html" lang="ja" hreflang="ja">日本語</a></li><li><a href="../mr/easypost-without-code.html" lang="mr" hreflang="mr">मराठी</a></li><li><a href="../te/easypost-without-code.html" lang="te" hreflang="te">తెలుగు</a></li><li><a href="../sv/easypost-without-code.html" lang="sv" hreflang="sv">Svenska</a></li></ul></details><style>.i18n-picker{margin:.75rem 0 1.25rem;font-size:.9rem;border:1px solid currentColor;border-radius:6px;padding:.4rem .7rem;display:inline-block;opacity:.75}.i18n-picker[open]{display:block}.i18n-picker:hover{opacity:1}.i18n-picker summary{cursor:pointer;list-style:none}.i18n-picker summary::-webkit-details-marker{display:none}.i18n-picker summary::after{content:' \25BE'}.i18n-picker[open] summary::after{content:' \25B4'}.i18n-picker ul{list-style:none;padding:.75rem 0 .15rem;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(10rem,1fr));gap:.4rem .9rem}.i18n-picker li{margin:0}.i18n-picker a{text-decoration:none}.i18n-picker a:hover{text-decoration:underline}.i18n-current{font-weight:700}</style><!-- i18n:end --></div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">কোনো API নেই · কোনো ড্যাশবোর্ড নেই · আপনার নিজের অ্যাকাউন্ট</p>
+    <h1>কোড লেখা ছাড়াই EasyPost ব্যবহার করুন</h1>
+    <p class="lede">EasyPost ডেভেলপারদের জন্য তৈরি — কিন্তু এটি ব্যবহার করার জন্য আপনার ডেভেলপার হওয়ার প্রয়োজন নেই। Easy-Post Desktop আপনাকে একটি সাধারণ ডেস্কটপ অ্যাপ থেকে আপনার নিজের EasyPost অ্যাকাউন্টে লেবেল প্রিন্ট করতে, ক্যারিয়ার রেট তুলনা করতে এবং পার্সেল ট্র্যাক করতে দেয়। কোনো কোড নেই, ওয়েব ড্যাশবোর্ডে সারাদিন থাকার প্রয়োজন নেই।</p>
+    <div class="btn-row"><a class="btn" href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">Microsoft Store-এ বিনামূল্যে চেষ্টা করুন</a>
+      <a class="btn btn-secondary" href="faq.html">FAQ পড়ুন</a></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <h2>সমস্যা: EasyPost ধরে নেয় আপনি কোড করতে জানেন</h2>
+  <p>EasyPost-এর মাল্টি-ক্যারিয়ার রেট এবং লেবেল অসাধারণ, কিন্তু এতে প্রবেশের দুটি উপায় হল একটি ডেভেলপার API এবং একটি ওয়েব ড্যাশবোর্ড। আপনি যদি শুধু একটি লেবেল কিনতে চান, বা আপনার টিম দিনভর শিপ করে, তাহলে API-এর বিপরীতে কোড লেখা বাস্তবসম্মত নয় এবং ড্যাশবোর্ড বেশি পরিমাণ কাজের জন্য তৈরি নয়। ঠিক এই কারণেই অনেক EasyPost অ্যাকাউন্ট অর্ধেক-ব্যবহৃত অবস্থায় থেকে যায়।</p>
+
+  <h2>সমাধান: আপনার নিজের অ্যাকাউন্টে একটি ডেস্কটপ অ্যাপ</h2>
+  <p>Easy-Post Desktop <strong>আপনার নিজের EasyPost API কী</strong>-এর সাথে সংযুক্ত হয় এবং এটিকে একটি পয়েন্ট-অ্যান্ড-ক্লিক অ্যাপ্লিকেশনে রূপান্তরিত করে:</p>
+  <ul>
+    <li>একটি ঠিকানা লিখুন, একটি প্যাকেজ বেছে নিন, এবং আপনার অ্যাকাউন্টের <strong>প্রতিটি ক্যারিয়ার থেকে রেট পান</strong>, সবচেয়ে সাশ্রয়ী রেট আগে।</li>
+    <li>কয়েক ক্লিকেই <strong>একটি লেবেল কিনুন এবং প্রিন্ট করুন</strong> — PNG, PDF, ZPL বা EPL, আপনার প্রিন্টারের জন্য উপযুক্ত আকারে।</li>
+    <li>পার্সেল <strong>ট্র্যাক</strong> করুন, ঠিকানা যাচাই করুন, কাস্টমস তথ্য সংগ্রহ করুন এবং HTS ট্যারিফ কোড খুঁজুন।</li>
+    <li>অর্ডারের একটি সম্পূর্ণ CSV <strong>বাল্ক-শিপ</strong> করুন: ইমপোর্ট করুন, যাচাই করুন, রেট নির্ধারণ করুন এবং কিনুন।</li>
+    <li>রিফান্ড, ইনস্যুরেন্স, পিকআপ এবং ক্লেইম — টার্মিনাল বা ড্যাশবোর্ড কখনো না খুলেই।</li>
+  </ul>
+  <p>পোস্টেজ সরাসরি EasyPost দ্বারা বিল করা হয়, তাই অ্যাপটি কখনো আপনার টাকা স্পর্শ করে না বা কোনো মার্কআপ যোগ করে না।</p>
+
+  <h2>আমি কোথায় একটি EasyPost API কী পাব?</h2>
+  <p><a href="https://www.easypost.com/">easypost.com</a>-এ বিনামূল্যে সাইন আপ করুন, তারপর আপনার অ্যাকাউন্টের API Keys পেজ থেকে আপনার API কী কপি করুন। প্রথম চালুর সময় এটি Easy-Post Desktop-এ পেস্ট করুন। কোনো বাস্তব ক্যারিয়ার চার্জ ছাড়াই সবকিছু চেষ্টা করার জন্য একটি <strong>টেস্ট-মোড</strong> কী ব্যবহার করুন — অ্যাপটি টেস্ট মোডে বিনামূল্যে, এবং আপনি প্রস্তুত হলে একবারের $29.99 আনলক প্রোডাকশন (বাস্তব) লেবেল সক্রিয় করে।</p>
+
+  <h2>এটি করার জন্য একটি AI সহায়ক পছন্দ করেন?</h2>
+  <p>অ্যাপটি Model Context Protocol (MCP)-ও বোঝে, তাই আপনি একটি AI এজেন্ট — Claude, Cursor, VS Code — কে আপনার শিপিং ডেটার সাথে সংযুক্ত করে রেট তুলনা করতে এবং প্রশ্নের উত্তর দিতে পারেন। কোনো আসল ক্রয় এখনও অ্যাপের ভিতরে একটি মানব অনুমোদনের পর্যায়ের মধ্য দিয়ে যায়, তাই আপনার অনুমতি ছাড়া কিছুই কেনা হয় না।</p>
+
+  <div class="btn-row"><a class="btn" href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">Easy-Post Desktop নিন</a>
+    <a class="btn btn-secondary" href="easypost-desktop-app.html">Easy-Post Desktop কী?</a></div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p class="legal-line">Easy-Post Desktop হল Spencer Fields-এর একটি পণ্য, যিনি যুক্তরাজ্যে প্রতিষ্ঠিত একজন একক ব্যবসায়ী (sole trader)। এটি একটি স্বাধীন, অনানুষ্ঠানিক ক্লায়েন্ট এবং EasyPost-এর সাথে সংশ্লিষ্ট, অনুমোদিত বা পৃষ্ঠপোষকতাপ্রাপ্ত নয়। একটি EasyPost অ্যাকাউন্ট এবং API কী প্রয়োজন।</p>
+    <p class="copyright">© 2026 Spencer Fields.</p>
+  </div>
+</footer>
+
+<script src="../analytics.js" defer></script>
+</body>
+</html>
