@@ -42,6 +42,12 @@ def main() -> int:
 
     texts = json.loads(Path(args.translations).read_text(encoding="utf-8"))
 
+    # The expected bullet count is taken from en-US rather than hard-coded: it
+    # was 9 for 1.2.0, 5 for 1.2.4 and 3 for 1.2.6, so a fixed number silently
+    # blocks every later release. What matters is that no translation quietly
+    # gained or dropped a bullet against the English master.
+    expected_bullets = texts.get("en-us", "").count('•')
+
     problems = []
     missing = [code for code in languages if code not in texts]
     if missing:
@@ -49,8 +55,10 @@ def main() -> int:
     for code, value in texts.items():
         if len(value) > MAX_CHARS:
             problems.append(f"{code}: {len(value)} chars, over the {MAX_CHARS} cap")
-        if value.count("•") != 9:
-            problems.append(f"{code}: {value.count(chr(0x2022))} bullets, expected 9")
+        if expected_bullets and value.count("•") != expected_bullets:
+            problems.append(
+                f"{code}: {value.count(chr(0x2022))} bullets, expected {expected_bullets} from en-us"
+            )
     extra = sorted(set(texts) - set(languages))
     if extra:
         problems.append(f"NOTE translations not in this export, ignored: {extra}")
