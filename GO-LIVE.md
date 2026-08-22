@@ -18,9 +18,9 @@ helper exposed as an App Execution Alias). The 47-language free-model Store list
 
 **Website + direct download — still pending the signed release.** The public site
 copy below describes behaviour only the new signed direct build has, so it must be
-deployed **at the moment the new direct-download build is released** (itself gated
-on the Certum Standard Code Signing) — not before, or it would misdescribe the
-currently downloadable v1.0.4.
+deployed **at the moment the new direct-download build is released** — not
+before, or it would misdescribe whatever is currently downloadable. The signing
+half of that gate has cleared; see "Windows code signing" below.
 
 To deploy at the direct release (all drafted, none live yet):
 
@@ -39,18 +39,37 @@ To deploy at the direct release (all drafted, none live yet):
 
 Deploy path for the site is the usual cPanel UAPI (see "Site" section below).
 
-## Windows code signing — switched to Standard Code Signing (2026-07-27)
+## Windows code signing — DONE (Azure Artifact Signing, 2026-08-22)
 
-Certum **rejected the Open Source Code Signing** application (order
-ZoZE/001522/US/24/07/2026): their reviewer judged the website presents a
-**company/commercial product**, and Open Source Code Signing is for individuals
-only. They instructed: cancel it, contact `reklamacje@certum.pl`, and switch to
-**Standard Code Signing**. That is the correct product for commercial software
-(the app is sold, even though the source is open), delivers the same SmartScreen
-benefit, and works with the same local `sign_windows_local.ps1` flow once issued.
-A switch email is drafted in Outlook. Until the Standard cert issues, the Windows
-**direct-download** build stays unsigned (SmartScreen warning). The **Microsoft
-Store** build is unaffected — Microsoft signs it on publish.
+**Identity validation completed on 2026-08-22.** The certificate profile
+`SpencerFieldsSoftware` is Active — Public Trust, issued to `CN=Spencer Fields,
+O=Spencer Fields, L=Poole, S=Dorset, C=GB`. CI signs the direct-download Windows
+build on the `main` branch through an OIDC federated credential, with no stored
+key or secret. Configuration and traps: `CI-AZURE-SIGNING-SETUP.md`.
+
+Three things are worth keeping straight:
+
+- **The signing account and the certificate profile have different names.** The
+  account is `EasyPostDesktop`; the profile is `SpencerFieldsSoftware`. An
+  earlier version of the setup document said to name them alike, and the
+  workflow was written to that instruction.
+- **A release cut before signing was enabled still carries unsigned binaries.**
+  The certificate existing is not the same as the download being signed. The
+  first signed artifacts come from the first `main` build after
+  `AZURE_SIGNING_READY` is set to `true`.
+- **Signing changes the archive**, so the SHA-256 published on the GitHub release
+  asset and in `site/download.html` must be taken from the signed build.
+
+Once a signed build is actually published, the "a certificate is being arranged"
+copy in `site/download.html`, `site/faq.html` and the README becomes untrue and
+should be replaced — in every language, not only English. Not before: promising
+no warning while the download still triggers one is worse than the warning.
+
+**Certum is dead. Do not restart it.** It rejected the Open Source Code Signing
+application (order ZoZE/001522/US/24/07/2026) on the grounds that the site
+presents a commercial product, instructed a switch to Standard Code Signing, then
+went silent; the route was abandoned on 2026-08-05 on cost and responsiveness.
+`packaging/sign_windows_local.ps1`, which existed only to drive it, is deleted.
 
 ## Done
 
