@@ -552,12 +552,12 @@ GitHub-hosted runner cannot reach. Azure sidesteps that entirely. Do not restart
 the Certum process, and note that `packaging\sign_windows_local.ps1` was removed
 with it.
 
-**Published downloads are signed from the next release onward.** The certificate
-and the workflow exist, but a release cut before signing was enabled still
-carries unsigned binaries; the release notes say which is which. Signing also
-changes the archive, so the SHA-256 on the GitHub release asset and in
-`site\download.html` has to be taken from the signed build, not the build that
-preceded it.
+**Published downloads are signed from v1.2.7 onward.** Every release up to and
+including v1.2.6 carries unsigned Windows binaries, because they were cut before
+signing was switched on — re-downloading an older tag will still raise the
+SmartScreen prompt. Signing also changes the archive, so the SHA-256 on the
+GitHub release asset and in `site\download.html` has to be taken from the signed
+build, not the build that preceded it.
 
 **A caveat worth setting expectations on:** an OV certificate does not clear
 SmartScreen instantly. Reputation accrues with download volume, so the
