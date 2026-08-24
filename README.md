@@ -530,39 +530,43 @@ it isn't specific to this app, and it isn't a sign the build is unsafe.
 
 **What actually fixes it:** a code-signing certificate applied to every
 release, which lets Windows attribute the build to a verified publisher and
-accrue reputation over time. This project uses a **Certum Open Source Code
-Signing** certificate.
+accrue reputation over time. This project signs through **Azure Artifact
+Signing** (formerly Trusted Signing), with a Microsoft-managed **Public Trust**
+certificate issued to `CN=Spencer Fields, O=Spencer Fields, L=Poole, S=Dorset,
+C=GB`. Identity validation completed on 2026-08-22.
 
-Signing happens **locally, not in CI**, and this is not a shortcut — it is
-forced by how modern certificates work. Since June 2023 the CA/Browser Forum
-baseline requires standard/OV code-signing private keys to live on
-FIPS-certified hardware: Certum's SimplySign cloud HSM, or a physical
-cryptographic card. The key cannot be exported to a `.pfx`, and a
-GitHub-hosted runner cannot reach it. So the old plan of a `.pfx` in a repo
-secret is a dead end; `packaging\sign_windows_local.ps1` signs the build on
-the machine where the key lives:
+Signing happens **in CI, on the Windows leg of `build.yml`**, and it does not
+need a stored credential: the runner exchanges a GitHub OIDC token for an Azure
+one through a federated credential bound to `refs/heads/main`. There is no
+private key to protect, because there is no exportable key — Azure holds it and
+mints a short-lived certificate per request. `CI-AZURE-SIGNING-SETUP.md` records
+the account, endpoint, profile and identity plumbing.
 
-```
-# SimplySign: open SimplySign Desktop and log in first (approve on your phone).
-# Card: insert it and start proCertum CardManager.
-.\packaging\sign_windows_local.ps1
-```
+**A predecessor route is worth not re-deriving.** Certum's Open Source Code
+Signing application was rejected — the site presents a commercial product, and
+that certificate is for individuals — and the Standard alternative went
+unanswered, so the route was abandoned on 2026-08-05. It would have forced local
+signing anyway: since June 2023 the CA/Browser Forum baseline requires
+standard/OV private keys to live on FIPS-certified hardware, which a
+GitHub-hosted runner cannot reach. Azure sidesteps that entirely. Do not restart
+the Certum process, and note that `packaging\sign_windows_local.ps1` was removed
+with it.
 
-It signs every `.exe` in the build with an RFC3161 timestamp, verifies the
-result, repackages the `.zip`, and prints the new SHA-256 — which then has to
-be updated on the GitHub release asset and in `site\download.html`, since
-signing changes the archive. The stale `WINDOWS_CODE_SIGNING_CERT_*` step in
-`.github/workflows/build.yml` is left inert (gated off) because it cannot work
-with a hardware key; it is not the signing path.
+**Published downloads are signed from the next release onward.** The certificate
+and the workflow exist, but a release cut before signing was enabled still
+carries unsigned binaries; the release notes say which is which. Signing also
+changes the archive, so the SHA-256 on the GitHub release asset and in
+`site\download.html` has to be taken from the signed build, not the build that
+preceded it.
 
-**A caveat worth setting expectations on:** a standard (OV) certificate does
-not clear SmartScreen instantly. Reputation accrues with download volume, so
-the "unrecognized publisher" warning can persist for weeks on a brand-new
-certificate before Microsoft's reputation service trusts it. EV certificates
-historically earned instant reputation, at roughly 2–3× the cost. The
-Microsoft Store build, which Microsoft signs itself, never shows the warning.
+**A caveat worth setting expectations on:** an OV certificate does not clear
+SmartScreen instantly. Reputation accrues with download volume, so the
+"unrecognized publisher" warning can persist on a brand-new certificate before
+Microsoft's reputation service trusts it, and Smart App Control may block a very
+fresh one outright on locked-down machines. The Microsoft Store build, which
+Microsoft signs itself, never shows the warning.
 
-**What this repo does to reduce false positives in the meantime:**
+**What this repo does to reduce false positives regardless:**
 - The build uses PyInstaller's `--onedir` mode rather than `--onefile`.
   Onefile builds self-extract into a temp folder on every launch, which is a
   strong heuristic signal antivirus engines and SmartScreen associate with

@@ -358,33 +358,23 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File packaging\sign_msix.ps1
 
-      # Unsigned builds still trigger SmartScreen/Gatekeeper warnings on first
-      # run regardless of this step — only a paid code-signing certificate
-      # (see README) actually removes that. This just gives users a way to
-      # verify the download wasn't tampered with in transit.
-      - name: Generate SHA256 checksums
-        shell: python
-        run: |
-          import hashlib
-          from pathlib import Path
-
-          dist = Path("dist")
-          lines = []
-          for path in sorted(dist.rglob("*")):
-              if path.is_file():
-                  digest = hashlib.sha256(path.read_bytes()).hexdigest()
-                  lines.append(f"{digest}  {path.relative_to(dist)}")
-          Path("dist/SHA256SUMS.txt").write_text("\n".join(lines) + "\n")
-
       # Sign the direct-download Windows .exe via Azure Artifact Signing
-      # (Microsoft-managed cert — removes the SmartScreen "unknown publisher"
-      # warning). No-op until the repo variable AZURE_SIGNING_READY is set to
-      # 'true', which you flip on ONCE the Artifact Signing account's identity
-      # validation is approved and its certificate profile exists (see
-      # CI-AZURE-SIGNING-SETUP.md). AZURE_CLIENT_ID / TENANT_ID / SUBSCRIPTION_ID
-      # (repo secrets) authenticate via an OIDC federated credential — no client
-      # secret is stored anywhere. The Store MSIX is re-signed by Microsoft on
-      # publish, so only the direct-download .exe needs this.
+      # (formerly Trusted Signing) — a Microsoft-managed, Public Trust
+      # certificate, which is what removes the SmartScreen "unknown publisher"
+      # warning. The Store MSIX is re-signed by Microsoft on publish, so only
+      # the direct-download build needs this.
+      #
+      # No-op until the repo variable AZURE_SIGNING_READY is 'true'. The
+      # AZURE_CLIENT_ID / TENANT_ID / SUBSCRIPTION_ID repo secrets authenticate
+      # through an OIDC federated credential (app registration
+      # EasyPostDesktop-GitHubActions, subject repo:sgf36/EasyPost:ref:refs/heads/main)
+      # — no client secret exists to leak. Because the credential is bound to
+      # that subject, signing can only ever happen on main.
+      #
+      # The signing action picks the Azure credential up from the CLI session
+      # azure/login leaves behind, so the login step is not optional.
+      # Account, endpoint and profile are read from the resource itself; see
+      # CI-AZURE-SIGNING-SETUP.md before changing any of the three.
       - name: Azure login (OIDC) for signing
         if: matrix.os == 'windows-latest' && vars.AZURE_SIGNING_READY == 'true' && github.event_name != 'pull_request'
         uses: azure/login@v2
@@ -399,12 +389,63 @@ jobs:
         with:
           endpoint: https://weu.codesigning.azure.net/
           signing-account-name: EasyPostDesktop
-          certificate-profile-name: EasyPostDesktop
+          # The profile is named for the publisher, not the product — one
+          # profile signs everything the business ships. It is NOT named
+          # EasyPostDesktop, which is the signing *account*.
+          certificate-profile-name: SpencerFieldsSoftware
+          # Both executables sit at the top of the folder, so no recursion:
+          # EasyPostDesktop.exe is what people launch, easypost-mcp.exe ships
+          # beside it in the direct-download variant. Leaving either unsigned
+          # would leave a SmartScreen prompt on the build.
           files-folder: ${{ github.workspace }}\dist\EasyPostDesktop
           files-folder-filter: exe
           file-digest: SHA256
           timestamp-rfc3161: http://timestamp.acs.microsoft.com
           timestamp-digest: SHA256
+
+      # A signing step that silently signs nothing looks exactly like one that
+      # worked, and the failure would only surface as a SmartScreen prompt on
+      # someone else's machine. Prove the chain and the timestamp validate
+      # before the build is allowed to publish anything.
+      - name: Verify Windows signature
+        if: matrix.os == 'windows-latest' && vars.AZURE_SIGNING_READY == 'true' && github.event_name != 'pull_request'
+        shell: pwsh
+        run: |
+          $signtool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe" |
+              Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw "signtool.exe not found on the runner." }
+
+          $exes = Get-ChildItem "dist\EasyPostDesktop" -Filter *.exe
+          if ($exes.Count -lt 2) { throw "Expected both EasyPostDesktop.exe and easypost-mcp.exe; found $($exes.Count)." }
+
+          foreach ($exe in $exes) {
+              & $signtool.FullName verify /pa /v $exe.FullName
+              if ($LASTEXITCODE -ne 0) { throw "Signature verification failed on $($exe.Name)." }
+          }
+          Write-Host "Both executables carry a valid, timestamped Authenticode signature."
+
+      # Runs AFTER the Azure signing steps above, deliberately. Signing
+      # rewrites EasyPostDesktop.exe and easypost-mcp.exe in place, so a
+      # checksum taken before it describes a file nobody will ever download —
+      # and SHA256SUMS.txt is published on the download page as the thing
+      # people verify against. Never move this above the signing steps.
+      #
+      # The macOS leg is still covered by Developer ID signing + notarization;
+      # this list is what lets someone confirm the download was not tampered
+      # with in transit.
+      - name: Generate SHA256 checksums
+        shell: python
+        run: |
+          import hashlib
+          from pathlib import Path
+
+          dist = Path("dist")
+          lines = []
+          for path in sorted(dist.rglob("*")):
+              if path.is_file():
+                  digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                  lines.append(f"{digest}  {path.relative_to(dist)}")
+          Path("dist/SHA256SUMS.txt").write_text("\n".join(lines) + "\n")
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
