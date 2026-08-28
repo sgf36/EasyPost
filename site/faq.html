@@ -72,8 +72,9 @@
 
     <h2>Installing and running</h2>
 
-    <h3>Windows shows “Windows protected your PC”. Is something wrong?</h3>
-    <p>No. That blue SmartScreen prompt appears for any application whose publisher Windows does not yet recognise; it is not a sign the build is unsafe. Click <strong>More info</strong>, then <strong>Run anyway</strong>. A code-signing certificate is being arranged, after which the warning goes away. The <a href="download.html">download page</a> lists checksums if you would like to verify the file first, and the Microsoft Store build — signed by Microsoft — never shows the warning.</p>
+    <h3>Is the Windows download code-signed?</h3>
+    <p>Yes, from version 1.2.7 onwards. Both executables carry a Microsoft-issued Public Trust signature in the name <strong>Spencer Fields</strong>; right-click the file, choose <strong>Properties</strong>, then <strong>Digital Signatures</strong> to see it. Earlier versions were unsigned, which is why they raised the blue &ldquo;Windows protected your PC&rdquo; prompt.</p>
+    <p>SmartScreen builds a certificate&rsquo;s reputation from how often a signed application is downloaded and run, so on a machine with <strong>Smart App Control</strong> switched on a signature this recent may still be held back. If that happens, click <strong>More info</strong>, then <strong>Run anyway</strong>, or use the Microsoft Store build, which carries Microsoft&rsquo;s own signature. The <a href="download.html">download page</a> lists checksums if you would rather verify the file first.</p>
 
     <h3>Is the macOS build safe to open?</h3>
     <p>Yes. The macOS build is signed with an Apple Developer ID and notarized by Apple, so it opens without warnings.</p>

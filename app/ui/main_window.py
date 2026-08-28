@@ -30,7 +30,6 @@ from app.core.settings import load_settings
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
 from app.ui.views.address_book_view import AddressBookView
-from app.ui.views.android_app_view import AndroidAppView
 from app.ui.views.batch_view import BatchView
 from app.ui.views.claims_view import ClaimsView
 from app.ui.views.connect_agents_view import ConnectAgentsView
@@ -149,7 +148,6 @@ class MainWindow(QMainWindow):
         self._reports_view = ReportsView()
         self._hts_lookup_view = HtsLookupView()
         self._pair_mobile_view = PairMobileView()
-        self._android_app_view = AndroidAppView()
         self._connect_agents_view = ConnectAgentsView()
         self._settings_view = SettingsView()
 
@@ -181,14 +179,6 @@ class MainWindow(QMainWindow):
             ("main_window.nav_hts_lookup", self._hts_lookup_view, None),
             ("main_window.nav_pair_mobile", self._pair_mobile_view, self._pair_mobile_view.refresh),
         ]
-        # Direct Android APK download: a stopgap while the Play listing is pending.
-        # Never shown on store builds (linking to off-store downloads breaks the
-        # Microsoft Store / Mac App Store rules), and only to production-licence
-        # holders, since the companion pairs with the production account.
-        if not (STORE_BUILD or MAS_BUILD) and production_allowed():
-            tools_entries.append(
-                ("main_window.nav_android_app", self._android_app_view, self._android_app_view.refresh)
-            )
         tools_entries += [
             (
                 "main_window.nav_connect_agents",

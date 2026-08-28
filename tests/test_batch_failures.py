@@ -14,7 +14,7 @@ from app.services.batches import (
     batch_failure_messages,
     batch_label_urls,
     bought_shipment_ids,
-    track_batch_shipments,
+    record_batch_shipments,
 )
 
 # The exact message a missing signature option produces: the batch is created
@@ -137,8 +137,9 @@ def test_bought_shipments_are_recorded_for_tracking():
     })
     saved = []
     with patch("app.services.batches.client_manager", manager), \
+            patch("app.services.shipments.save_shipment_locally"), \
             patch("app.services.tracking.save_tracker_locally", side_effect=saved.append):
-        assert track_batch_shipments(BOUGHT_BATCH) == 2
+        assert record_batch_shipments(BOUGHT_BATCH) == (2, 2)
     assert [t.id for t in saved] == ["trk_1", "trk_2"]
 
 
@@ -151,8 +152,9 @@ def test_the_tracker_is_taken_from_the_shipment_not_created_afresh():
         "shp_2": _full("shp_2", tracker_id="trk_2"),
     })
     with patch("app.services.batches.client_manager", manager), \
+            patch("app.services.shipments.save_shipment_locally"), \
             patch("app.services.tracking.save_tracker_locally"):
-        track_batch_shipments(BOUGHT_BATCH)
+        record_batch_shipments(BOUGHT_BATCH)
     client.tracker.create.assert_not_called()
 
 
@@ -169,9 +171,10 @@ def test_a_tracking_failure_never_fails_the_purchase():
             raise RuntimeError("database is locked")
 
     with patch("app.services.batches.client_manager", manager), \
+            patch("app.services.shipments.save_shipment_locally"), \
             patch("app.services.tracking.save_tracker_locally", side_effect=_explode_on_first):
         # Does not raise, and the second shipment is still recorded.
-        assert track_batch_shipments(BOUGHT_BATCH) == 1
+        assert record_batch_shipments(BOUGHT_BATCH)[1] == 1
 
 
 def test_an_unretrievable_shipment_does_not_stop_the_others():
@@ -186,8 +189,61 @@ def test_an_unretrievable_shipment_does_not_stop_the_others():
     manager = Mock()
     manager.get_client.return_value = client
     with patch("app.services.batches.client_manager", manager), \
+            patch("app.services.shipments.save_shipment_locally"), \
             patch("app.services.tracking.save_tracker_locally"):
-        assert track_batch_shipments(BOUGHT_BATCH) == 1
+        assert record_batch_shipments(BOUGHT_BATCH)[1] == 1
+
+
+def test_bought_shipments_reach_the_history_table():
+    """The regression this function exists for.
+
+    A batch purchase used to write only the ``batches`` row and its trackers,
+    so bulk-bought labels never reached the ``shipments`` table History reads.
+    Confirmed against a real account on 2026-08-20: six production labels
+    bought, and the local shipments table still held only two unrelated test
+    rows, so they could not be listed or ticked for a combined print sheet.
+    """
+    manager, _ = _retrieving_manager({
+        "shp_1": _full("shp_1", tracker_id="trk_1"),
+        "shp_2": _full("shp_2", tracker_id="trk_2"),
+    })
+    saved = []
+    with patch("app.services.batches.client_manager", manager), \
+            patch("app.services.shipments.save_shipment_locally", side_effect=saved.append), \
+            patch("app.services.tracking.save_tracker_locally"):
+        assert record_batch_shipments(BOUGHT_BATCH) == (2, 2)
+    assert [item.id for item in saved] == ["shp_1", "shp_2"]
+
+
+def test_declining_auto_track_still_records_history():
+    """``track=False`` is the tracking opt-out, not a History opt-out."""
+    manager, _ = _retrieving_manager({
+        "shp_1": _full("shp_1", tracker_id="trk_1"),
+        "shp_2": _full("shp_2", tracker_id="trk_2"),
+    })
+    trackers = []
+    with patch("app.services.batches.client_manager", manager), \
+            patch("app.services.shipments.save_shipment_locally"), \
+            patch("app.services.tracking.save_tracker_locally", side_effect=trackers.append):
+        assert record_batch_shipments(BOUGHT_BATCH, track=False) == (2, 0)
+    assert trackers == []
+
+
+def test_a_history_failure_never_fails_the_purchase():
+    """As with trackers: the labels are already paid for by this point."""
+    manager, _ = _retrieving_manager({
+        "shp_1": _full("shp_1", tracker_id="trk_1"),
+        "shp_2": _full("shp_2", tracker_id="trk_2"),
+    })
+
+    def _explode_on_first(shipment):
+        if shipment.id == "shp_1":
+            raise RuntimeError("database is locked")
+
+    with patch("app.services.batches.client_manager", manager), \
+            patch("app.services.shipments.save_shipment_locally", side_effect=_explode_on_first), \
+            patch("app.services.tracking.save_tracker_locally"):
+        assert record_batch_shipments(BOUGHT_BATCH) == (1, 2)
 
 
 # ---------------------------------------------------------------------------

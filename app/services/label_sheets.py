@@ -101,3 +101,22 @@ def build_print_sheet(
         images, template, printer_type=ptype, offset_x_mm=ox, offset_y_mm=oy
     )
     return SheetResult(pdf=pdf, included=len(images), failed=failed)
+
+
+def build_combined_labels(urls: list[str]) -> SheetResult:
+    """Fetch the labels at ``urls`` and combine them one-per-page into a PDF.
+
+    The local stand-in for EasyPost's ``batch.label()`` merge — see
+    ``label_sheet.compose_label_pages`` for why that endpoint is not used.
+    Raises ``ValueError`` if no label could be fetched and read as an image, so
+    the caller can fall back to the hosted merge for non-raster (PDF/ZPL)
+    labels the compositor cannot open.
+    """
+    images, failed = fetch_label_images(urls)
+    if not images:
+        raise ValueError("none of the selected labels could be fetched as printable images")
+    return SheetResult(
+        pdf=label_sheet.compose_label_pages(images),
+        included=len(images),
+        failed=failed,
+    )

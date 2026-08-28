@@ -13,7 +13,7 @@ KEYRING_SERVICE_NAME = "EasyPostDesktop"
 # (app/core/update_check.py) compares this against the latest GitHub release
 # tag to decide whether to prompt the user to update. Keep it in step with the
 # release tag and packaging/msix/AppxManifest.xml on every release.
-APP_VERSION = "1.2.5"
+APP_VERSION = "1.2.7"
 
 ICON_PATH = Path(__file__).parent / "resources" / "icons" / "app_icon.png"
 
@@ -43,21 +43,6 @@ MULTI_SEAT_URL = "https://easy-post.spencerfields.com/pricing.html"
 # encrypted copy of the production key that it cannot read without the phone's
 # key. See server/easypost-mobile-proxy and MOBILE-COMPANION-BUILD-BRIEF.md.
 PAIR_PROXY_URL = "https://easypost-mobile-proxy.sgf36.workers.dev"
-
-# Direct Android APK download, offered from Tools > Android app while the Google
-# Play listing is still pending (organisation-account verification / DUNS). The
-# page is shown only on direct-download builds (never the Microsoft Store or Mac
-# App Store builds, which forbid linking to off-store app downloads) and only to
-# production-licence holders, since the companion pairs with the production
-# account. The "latest" URL always resolves to the newest release's asset of this
-# name, so shipping a new APK is a new GitHub release, not a code change.
-ANDROID_APK_URL = (
-    "https://github.com/sgf36/Easy-Post-Mobile-Companion/releases/latest/download/"
-    "easypost-mobile-companion.apk"
-)
-# SHA-256 of the currently published APK, shown so a sideloaded download can be
-# verified before installing. Update this whenever a new APK release is cut.
-ANDROID_APK_SHA256 = "7990f524a7b306e73eaedc429ba8afa712bc796549b5194c0d18ccecae6a907b"
 
 # The Mac App Store build gates production behind a StoreKit In-App Purchase
 # ("Production Unlock") instead of a pasted Paddle key or a Windows Store add-on.

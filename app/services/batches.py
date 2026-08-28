@@ -648,8 +648,21 @@ def batch_label_urls(batch) -> list[str]:
     return urls
 
 
-def track_batch_shipments(batch) -> int:
-    """Record every bought shipment in the local tracking table.
+def record_batch_shipments(batch, *, track: bool = True) -> tuple[int, int]:
+    """Copy a bought batch's shipments into the local History and Tracking.
+
+    Returns ``(shipments_recorded, trackers_recorded)``.
+
+    History recording is unconditional and is the point of this function: a
+    batch purchase used to write only the ``batches`` row and its trackers, so
+    the shipments it bought never reached the ``shipments`` table that the
+    History view reads. Labels bought in bulk were therefore invisible there —
+    they could not be listed, re-opened, or ticked for a combined print sheet,
+    even though History already supports multi-select. Recording them here is
+    what makes a batch behave like any other purchase.
+
+    ``track`` follows the user's auto-track choice and governs only the
+    tracker copy.
 
     Buying a label always creates a tracker on EasyPost's side — that is not
     optional and there is no way to opt out of carrier tracking. What is
@@ -665,19 +678,30 @@ def track_batch_shipments(batch) -> int:
     Best effort by design: the labels are already paid for, so a local
     bookkeeping failure must never be reported as a failed purchase.
     """
+    from app.services.shipments import save_shipment_locally
     from app.services.tracking import save_tracker_locally
 
-    recorded = 0
+    shipments_recorded = 0
+    trackers_recorded = 0
+    # One pass over the retrieved shipments: full_shipments is a request per
+    # shipment, so History and Tracking must not each fetch their own copy.
     for shipment in full_shipments(batch):
+        try:
+            save_shipment_locally(shipment)
+            shipments_recorded += 1
+        except Exception:
+            logger.exception("Could not record batch shipment %s", shipment.id)
+        if not track:
+            continue
         tracker = getattr(shipment, "tracker", None)
         if tracker is None:
             continue
         try:
             save_tracker_locally(tracker)
-            recorded += 1
+            trackers_recorded += 1
         except Exception:
             logger.exception("Could not record tracker for shipment %s", shipment.id)
-    return recorded
+    return shipments_recorded, trackers_recorded
 
 
 def save_batch_locally(batch, source_csv: str = "") -> None:
