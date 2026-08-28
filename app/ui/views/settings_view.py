@@ -1,6 +1,8 @@
 """Settings: update stored API keys, view active mode, language, labels."""
 
+import webbrowser
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -18,6 +20,7 @@ from PySide6.QtWidgets import (
 
 from app.config import MAS_BUILD
 from app.core.credential_store import load_credentials, save_credentials
+from app.core.review_prompt import review_available
 from app.core.label_options import (
     LABEL_FORMATS,
     default_size_for,
@@ -87,9 +90,37 @@ class SettingsView(QWidget):
         # section is hidden there; polling continues to keep tracking current.
         if not MAS_BUILD:
             layout.addWidget(self._build_webhook_group())
+        # Direct-download builds have no storefront to review on, so they never
+        # get the in-app review prompt (app/core/review_prompt.py). This is the
+        # honest equivalent: passive, asked once, never a dialog.
+        if not review_available():
+            layout.addWidget(self._build_support_group())
         layout.addStretch(1)
 
         self.refresh()
+
+    def _build_support_group(self) -> QGroupBox:
+        """A quiet way for direct-download users to support the project.
+
+        They cannot leave a store review — Microsoft requires ownership through
+        the Store and Mac App Store reviews require the app to have come from it
+        — so pointing them at a listing would be pointing them somewhere they
+        cannot act. A link to the repository is the one thing they genuinely can
+        do, and it is the only channel that moves the repository's star count.
+        """
+        group = QGroupBox(tr("settings.support_group_title"))
+        box = QVBoxLayout(group)
+
+        blurb = QLabel(tr("settings.support_blurb"))
+        blurb.setWordWrap(True)
+        box.addWidget(blurb)
+
+        button = QPushButton(tr("settings.support_github_button"))
+        button.clicked.connect(
+            lambda: webbrowser.open("https://github.com/sgf36/EasyPost")
+        )
+        box.addWidget(button, alignment=Qt.AlignLeft)
+        return group
 
     def _build_label_group(self) -> QGroupBox:
         """Printed-label format and size.

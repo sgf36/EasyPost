@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
 
 from app.core.customs import is_international
 from app.core.errors import format_api_error
+from app.core.review_prompt import mark_session_friction, note_successful_shipment
 from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
 from app.services.addresses import address_choice_label, list_addresses
@@ -56,6 +57,7 @@ from app.services.packages import predefined_package_choices
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
+from app.ui.widgets.review_nudge import schedule_review_prompt
 from app.ui.widgets.service_picker import ServicePicker
 
 # States EasyPost is still working through. Batch creation and purchase are both
@@ -631,6 +633,8 @@ class BatchView(QWidget):
         self._pending_task.failed.connect(
             lambda exc: (
                 self._buy_batch_btn.setEnabled(True),
+                # A failed bulk purchase sours the session; no review prompt after it.
+                mark_session_friction(),
                 QMessageBox.critical(
                     self, tr("common.error"), tr("batch_shipments.buy_failed_body", error=format_api_error(exc))
                 ),
@@ -647,6 +651,10 @@ class BatchView(QWidget):
             # Purchase is asynchronous and reports per-shipment failures in the
             # batch body rather than raising, so "submitted" alone would be a
             # misleading thing to tell the user here.
+            # Some shipments failed even though the call succeeded. That is
+            # friction whatever the rest of the batch did, so it suppresses the
+            # review prompt for the session.
+            mark_session_friction()
             QMessageBox.warning(
                 self,
                 tr("batch_shipments.purchase_problems_title"),
@@ -668,6 +676,11 @@ class BatchView(QWidget):
         QMessageBox.information(
             self, tr("batch_shipments.purchased_title"), tr("batch_shipments.purchased_body")
         )
+
+        # A clean bulk purchase is the strongest satisfaction moment the app has.
+        # No-ops on builds with no storefront; every other gate is applied inside.
+        note_successful_shipment()
+        schedule_review_prompt(self)
 
     def _fetch_label_urls(self, batch) -> None:
         """Collect the per-shipment label URLs in the background.

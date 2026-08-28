@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.core.errors import format_api_error
+from app.core.review_prompt import mark_session_friction
 from app.i18n import tr
 from app.services.formatting import (
     display_carrier,
@@ -235,6 +236,9 @@ class HistoryView(QWidget):
             self, tr("history.confirm_refund_request")
         ):
             return
+        # Refunding a label means something did not go to plan, whether or not
+        # the refund itself succeeds. Never follow that with "rate us".
+        mark_session_friction()
         self._pending_task = run_async(lambda: refund_shipment(shipment_id), self)
         self._pending_task.succeeded.connect(self._on_refund_submitted)
         self._pending_task.failed.connect(
