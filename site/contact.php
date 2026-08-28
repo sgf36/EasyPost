@@ -26,6 +26,20 @@
 declare(strict_types=1);
 
 /*
+ * Result pages in the visitor's language.
+ *
+ * The pages are published in fifteen languages but this handler answered in
+ * English, so a reader of the German page filled a German form and was thanked
+ * in English. The form carries a `lang` field set by the build; anything not in
+ * the table falls back to English rather than to blanks.
+ */
+$LANGS = require __DIR__ . '/contact-strings.php';
+$LANG  = preg_replace('/[^a-zA-Z_-]/', '', (string) ($_POST['lang'] ?? 'en'));
+$T     = $LANGS[$LANG] ?? $LANGS['en'];
+$RTL   = in_array($LANG, ['ar', 'he', 'fa', 'ur'], true);
+
+
+/*
  * Apps@ is an alias on the spencer@spencerfields.com mailbox, defined in
  * Microsoft 365 -- which is where the domain's MX points.
  *
@@ -98,13 +112,21 @@ function rate_limited(string $ip): bool
 
 function render(string $heading, string $body, bool $ok): void
 {
+    // $LANG, $RTL and $T are set at the top of this file. A function does not
+    // see globals unless it says so, and the heredoc below can interpolate a
+    // variable but cannot concatenate, so every value is prepared here first.
+    global $LANG, $RTL, $T;
+
     http_response_code($ok ? 200 : 400);
     $cls = $ok ? 'ok' : 'bad';
     $heading = htmlspecialchars($heading, ENT_QUOTES, 'UTF-8');
     $body = htmlspecialchars($body, ENT_QUOTES, 'UTF-8');
+    $langAttr = htmlspecialchars($LANG, ENT_QUOTES, 'UTF-8');
+    $dirAttr = $RTL ? ' dir="rtl"' : '';
+    $backLabel = htmlspecialchars($T['back'], ENT_QUOTES, 'UTF-8');
     echo <<<HTML
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="{$langAttr}"{$dirAttr}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -133,7 +155,7 @@ function render(string $heading, string $body, bool $ok): void
   <div class="wrap prose">
     <h1>{$heading}</h1>
     <div class="form-status {$cls}">{$body}</div>
-    <p><a href="index.html#support">Back to support</a></p>
+    <p><a href="index.html#support">{$backLabel}</a></p>
   </div>
 </section>
 </body>
@@ -152,7 +174,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 // 1. Honeypot.
 if (trim((string) ($_POST['website'] ?? '')) !== '') {
     // Answer as though it worked. A bot told it failed simply retries.
-    render('Thank you', 'Your message has been sent.', true);
+    render($T['thank_you'], $T['sent'], true);
 }
 
 // 2. Timing.
@@ -160,8 +182,8 @@ $ts = (int) ($_POST['ts'] ?? 0);           // milliseconds, set by script
 $elapsed = $ts > 0 ? (time() - intdiv($ts, 1000)) : -1;
 if ($elapsed < MIN_FILL_SECONDS || $elapsed > MAX_FILL_AGE) {
     render(
-        'Message not sent',
-        'This form could not be verified as a genuine submission. Please reload the page and try again, or write to us directly using the details on the support section.',
+        $T['not_sent'],
+        $T['unverified'],
         false
     );
 }
@@ -174,16 +196,16 @@ $message = trim((string) ($_POST['message'] ?? ''));
 
 $errors = [];
 if ($name === '' || mb_strlen($name) > 100) {
-    $errors[] = 'a name';
+    $errors[] = $T['a_name'];
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL) || mb_strlen($email) > 150) {
-    $errors[] = 'a valid email address';
+    $errors[] = $T['an_email'];
 }
 if (mb_strlen($message) < 10 || mb_strlen($message) > 4000) {
-    $errors[] = 'a message between 10 and 4000 characters';
+    $errors[] = $T['a_message'];
 }
 if ($errors !== []) {
-    render('Message not sent', 'Please provide ' . implode(', ', $errors) . '.', false);
+    render($T['not_sent'], $T['provide'] . ' ' . implode(', ', $errors) . '.', false);
 }
 
 $allowedTopics = [
@@ -197,8 +219,8 @@ if (!in_array($topic, $allowedTopics, true)) {
 // 5. Link flood.
 if (preg_match_all('~https?://~i', $message) > MAX_LINKS) {
     render(
-        'Message not sent',
-        'Your message contains too many links to be delivered. Please remove some and try again.',
+        $T['not_sent'],
+        $T['too_many_links'],
         false
     );
 }
@@ -207,8 +229,8 @@ if (preg_match_all('~https?://~i', $message) > MAX_LINKS) {
 $ip = client_ip();
 if (rate_limited($ip)) {
     render(
-        'Message not sent',
-        'Several messages have already been sent from this connection recently. Please try again later.',
+        $T['not_sent'],
+        $T['rate_limited'],
         false
     );
 }
@@ -290,10 +312,17 @@ function relay_via_worker(array $payload, ?string &$error): bool
 }
 
 $relayError = null;
+/*
+ * `product` tells the shared Worker which of the two products this is. Wren
+ * posts to the same endpoint, and the two topic lists overlap on "Bug report"
+ * and "Something else", so topic alone cannot separate them. The value must
+ * match a key in the Worker's PRODUCTS registry.
+ */
 $sent = relay_via_worker([
     'name' => $name,
     'email' => $email,
     'topic' => $topic,
+    'product' => 'easy-post',
     'message' => $message,
     'ip' => $ip,
 ], $relayError);
@@ -305,14 +334,10 @@ if (!$sent) {
 
 if (!$sent) {
     render(
-        'Message not sent',
-        'Something went wrong sending your message. Please try again shortly, or use the direct email address shown in the support section.',
+        $T['not_sent'],
+        $T['send_failed'],
         false
     );
 }
 
-render(
-    'Thank you',
-    'Your message has been sent. You will normally hear back within one business day.',
-    true
-);
+render($T['thank_you'], $T['sent'], true);

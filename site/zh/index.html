@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Easy-Post Desktop — 桌面上的运单、费率与追踪</title>
+<meta name="description" content="面向 EasyPost 的桌面运输控制台：比较各承运商的实时运费，购买并打印标签，追踪包裹，处理海关、保险、理赔与批量运单。支持 Windows 与 macOS。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" href="../icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta property="og:title" content="Easy-Post Desktop — 运输标签、费率与追踪">
+<meta property="og:description" content="一款适用于 EasyPost 的原生桌面应用。在您自己的 EasyPost 账户上比较承运商费率、购买并打印标签、追踪包裹——无需代码，无需仪表盘。可免费试用。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Easy-Post Desktop">
+<meta property="og:url" content="https://easy-post.spencerfields.com/zh/">
+<meta property="og:image" content="https://easy-post.spencerfields.com/icon-192.png">
+<link rel="stylesheet" href="../style.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Easy-Post Desktop",
+  "url": "https://easy-post.spencerfields.com/"
+}
+</script>
+<link rel="canonical" href="https://easy-post.spencerfields.com/zh/"><!-- i18n:begin --><link rel="alternate" hreflang="x-default" href="https://easy-post.spencerfields.com/"><link rel="alternate" hreflang="en" href="https://easy-post.spencerfields.com/"><link rel="alternate" hreflang="zh" href="https://easy-post.spencerfields.com/zh/"><link rel="alternate" hreflang="hi" href="https://easy-post.spencerfields.com/hi/"><link rel="alternate" hreflang="es" href="https://easy-post.spencerfields.com/es/"><link rel="alternate" hreflang="ar" href="https://easy-post.spencerfields.com/ar/"><link rel="alternate" hreflang="fr" href="https://easy-post.spencerfields.com/fr/"><link rel="alternate" hreflang="bn" href="https://easy-post.spencerfields.com/bn/"><link rel="alternate" hreflang="pt" href="https://easy-post.spencerfields.com/pt/"><link rel="alternate" hreflang="id" href="https://easy-post.spencerfields.com/id/"><link rel="alternate" hreflang="ur" href="https://easy-post.spencerfields.com/ur/"><link rel="alternate" hreflang="ru" href="https://easy-post.spencerfields.com/ru/"><link rel="alternate" hreflang="de" href="https://easy-post.spencerfields.com/de/"><link rel="alternate" hreflang="ja" href="https://easy-post.spencerfields.com/ja/"><link rel="alternate" hreflang="mr" href="https://easy-post.spencerfields.com/mr/"><link rel="alternate" hreflang="te" href="https://easy-post.spencerfields.com/te/"><link rel="alternate" hreflang="sv" href="https://easy-post.spencerfields.com/sv/"><!-- i18n:end --></head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html">Easy-Post Desktop</a>
+    <nav class="site-nav"><a href="index.html" aria-current="page">概览</a>
+      <a href="pricing.html">价格</a>
+      <a href="download.html">下载</a>
+      <a href="faq.html">常见问题</a>
+      <a href="terms.html">条款</a>
+      <a href="privacy.html">隐私</a>
+      <a href="refunds.html">退款</a>
+      <a href="#support">支持</a></nav>
+  <!-- i18n:begin --><details class="i18n-picker"><summary><span aria-hidden="true">🌐</span> 简体中文</summary><ul><li><a href="../index.html" lang="en" hreflang="en">English</a></li><li><span aria-current="true" class="i18n-current">简体中文</span></li><li><a href="../hi/index.html" lang="hi" hreflang="hi">हिन्दी</a></li><li><a href="../es/index.html" lang="es" hreflang="es">Español</a></li><li><a href="../ar/index.html" lang="ar" hreflang="ar">العربية</a></li><li><a href="../fr/index.html" lang="fr" hreflang="fr">Français</a></li><li><a href="../bn/index.html" lang="bn" hreflang="bn">বাংলা</a></li><li><a href="../pt/index.html" lang="pt" hreflang="pt">Português</a></li><li><a href="../id/index.html" lang="id" hreflang="id">Bahasa Indonesia</a></li><li><a href="../ur/index.html" lang="ur" hreflang="ur">اردو</a></li><li><a href="../ru/index.html" lang="ru" hreflang="ru">Русский</a></li><li><a href="../de/index.html" lang="de" hreflang="de">Deutsch</a></li><li><a href="../ja/index.html" lang="ja" hreflang="ja">日本語</a></li><li><a href="../mr/index.html" lang="mr" hreflang="mr">मराठी</a></li><li><a href="../te/index.html" lang="te" hreflang="te">తెలుగు</a></li><li><a href="../sv/index.html" lang="sv" hreflang="sv">Svenska</a></li></ul></details><style>.i18n-picker{margin:.75rem 0 1.25rem;font-size:.9rem;border:1px solid currentColor;border-radius:6px;padding:.4rem .7rem;display:inline-block;opacity:.75}.i18n-picker[open]{display:block}.i18n-picker:hover{opacity:1}.i18n-picker summary{cursor:pointer;list-style:none}.i18n-picker summary::-webkit-details-marker{display:none}.i18n-picker summary::after{content:' \25BE'}.i18n-picker[open] summary::after{content:' \25B4'}.i18n-picker ul{list-style:none;padding:.75rem 0 .15rem;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(10rem,1fr));gap:.4rem .9rem}.i18n-picker li{margin:0}.i18n-picker a{text-decoration:none}.i18n-picker a:hover{text-decoration:underline}.i18n-current{font-weight:700}</style><!-- i18n:end --></div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Windows 与 macOS · 由 EasyPost 提供支持</p>
+    <h1>把运输从浏览器标签页里请出来。</h1>
+    <p class="lede">比较各承运商的实时运费，购买并打印标签，追踪每一件包裹——全部在一款运行于您自己 EasyPost 账户之上的正式桌面应用中完成。</p>
+    <div class="btn-row"><a class="btn" href="pricing.html">查看价格 — 29 美元起</a>
+      <a class="btn btn-secondary" href="https://github.com/sgf36/EasyPost">查看源代码</a></div>
+    <div class="promo"><span class="promo-tag">2026 年夏季</span>
+      <span>前 26 位客户可享 <strong>个人版 26% 折扣</strong> — 结账时使用代码 <code>SUMMER26</code>，详见<a href="pricing.html">结账页面</a>。</span></div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">它的作用是什么</p>
+    <h2>一整套运输控制台，而不只是一个运费小工具。</h2>
+    <div class="grid">
+      <div>
+        <h3>比价</h3>
+        <p>获取您 EasyPost 账户下所有承运商的实时运费，按最低价优先排序，并标出最快的选项。只需两个邮政编码，就能在保存地址之前先查看某条线路的价格。</p>
+      </div>
+      <div>
+        <h3>打印机认可的标签</h3>
+        <p>选择 PNG、PDF、ZPL 或 EPL 格式，以及精确尺寸——4x6、4x7、4x8、4x5 或 8.5x11——让标签无论打印在热敏纸还是普通纸上都恰到好处。购买后的标签会在应用内直接显示。</p>
+      </div>
+      <div>
+        <h3>国际运输与海关</h3>
+        <p>引导式海关申报，可逐项列明内容物，并内置协调关税表查询功能，直接比对美国国际贸易委员会数据库。</p>
+      </div>
+      <div>
+        <h3>追踪从不掉队</h3>
+        <p>每五分钟轮询一次为标准做法，也可选择通过本地隧道接收实时 webhook 推送更新，以获得即时状态变化。</p>
+      </div>
+      <div>
+        <h3>批量发货</h3>
+        <p>导入收件人 CSV 文件,在扣费前先进行校验,再批量计费、批量购买并生成合并标签。</p>
+      </div>
+      <div>
+        <h3>标签之后</h3>
+        <p>未使用标签的退款、附加保险、快递员上门取件，以及包裹丢失或损坏的保险理赔——全部可在同一窗口完成。</p>
+      </div>
+      <div>
+        <h3>您的数据仍归您所有</h3>
+        <p>地址簿、发货记录和报表都保存在您本机的本地数据库中。除发送给 EasyPost 之外，不会发送到任何其他地方。</p>
+      </div>
+      <div>
+        <h3>支持 50 种语言</h3>
+        <p>完整界面已翻译为五十种语言，可在设置中选择。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="screenshots">
+  <div class="wrap">
+    <p class="eyebrow">内页速览</p>
+    <h2>界面一览</h2>
+    <p>以下九张截图均来自应用程序本身，并非效果图。</p>
+    <div class="shots">
+      <figure>
+        <img src="../screenshots/rate-shopping.webp" alt="运费比价界面" width="1400" height="875">
+        <figcaption>并排比较各承运商的实时运费，然后购买并打印面单。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/tracking.webp" alt="运单追踪界面" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>在一个界面追踪所有包裹，自动刷新状态。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/address-book.webp" alt="地址簿" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>保存并核验地址，支持 197 个国家的本地化字段。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/batch-shipments.webp" alt="批量发货界面" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>导入收件人 CSV 文件，即可批量计费并购买。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/history.webp" alt="面单历史界面" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>所有已购买的面单一目了然，退款也只需一键操作。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/reports.webp" alt="报表界面" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>各承运商支出与面单数量一目了然。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/hts-lookup.webp" alt="海关编码查询" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>查询实时的协调关税表编码，用于海关文件。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/dashboard.webp" alt="仪表盘" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>应用一打开就能一目了然寄件动态。</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/settings.webp" alt="设置界面" width="1400" height="875" loading="lazy" decoding="async">
+        <figcaption>标签格式、标签尺寸,以及五十种界面语言。</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">购买前须知</p>
+    <h2>您需要拥有自己的 EasyPost 账户。</h2>
+    <div class="grid">
+      <div>
+        <h3>独立客户端</h3>
+        <p>Easy-Post Desktop 是 <a href="https://www.easypost.com">EasyPost</a> 的独立桌面客户端，与 EasyPost 或任何快递公司均无关联，未获其认可，也非其分销商。</p>
+      </div>
+      <div>
+        <h3>您的账户，您的费率</h3>
+        <p>您需提供自己的 EasyPost API 密钥,邮资将按您自己的费率通过您的 EasyPost 账户购买。快递公司名称仅用于标识所报的服务,所有快递公司商标均归其各自所有者所有。</p>
+      </div>
+      <div>
+        <h3>系统要求</h3>
+        <p>Windows 10 1809 版或更高版本(64 位),或搭载 Apple Silicon 或 Intel 芯片、运行 macOS 12 Monterey 或更高版本的 Mac。需连接互联网以访问 EasyPost。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="support">
+  <div class="wrap">
+    <p class="eyebrow">支持</p>
+    <h2>联系专人</h2>
+    <p class="section-lede">在购买前咨询问题、许可证激活遇到困难，或申请退款，请直接与我们联系。</p>
+
+    <div class="support-grid">
+      <form method="post" action="../contact.php" id="contact-form" novalidate>
+        <div class="field"><label for="cf-name">您的姓名</label>
+          <input type="text" id="cf-name" name="name" maxlength="100" required autocomplete="name"></div>
+        <div class="field"><label for="cf-email">您的邮箱</label>
+          <input type="email" id="cf-email" name="email" maxlength="150" required autocomplete="email"></div>
+        <div class="field">
+          <label for="cf-topic">这是关于什么？</label>
+          <select id="cf-topic" name="topic">
+            <option>购买前的问题</option>
+            <option>许可证激活</option>
+            <option>退款申请</option>
+            <option>错误报告</option>
+            <option>其他事项</option>
+          </select>
+        </div>
+        <div class="field"><label for="cf-message">留言</label>
+          <textarea id="cf-message" name="message" maxlength="4000" required></textarea></div>
+
+        <!-- Honeypot: invisible to people, irresistible to bots. Any value
+             submitted here means the sender is automated. -->
+        <div class="hp" aria-hidden="true"><label for="cf-website">请留空此字段</label>
+          <input type="text" id="cf-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <!-- Filled in by script on load. A form posted with no timestamp, or
+             submitted implausibly fast, did not come from a person. -->
+        <input type="hidden" name="ts" id="cf-ts" value="">
+      <input type="hidden" name="lang" value="zh">
+
+        <button class="btn" type="submit">发送消息</button>
+        <p class="form-note">回复来自 Spencer Fields，通常在一个工作日内送达。您的地址仅用于回复您。</p>
+        <noscript>
+          <p class="form-note">此表单需要启用 JavaScript。若无法使用，请写信至 <strong>Apps [at] spencerfields [dot] com</strong>。</p>
+        </noscript>
+      </form>
+
+      <aside class="contact-card">
+        <h3>不想使用表单？</h3>
+        <p>此表单会发送到同一个收件箱，是最快捷的联系方式。如需直接联系方式，可在此查看。</p>
+        <details>
+          <summary>显示电子邮件和电话</summary>
+          <dl>
+            <dt>电子邮件</dt>
+            <dd data-contact="email"> </dd>
+            <dt>电话</dt>
+            <dd data-contact="phone"> </dd>
+          </dl>
+        </details>
+        <p class="form-note">也欢迎在<a href="https://github.com/sgf36/EasyPost/issues">公开问题跟踪页面</a>提交错误报告。</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Timestamp the form so the server can reject submissions filled in faster
+  // than a person could type, and those posted without ever loading the page.
+  document.getElementById('cf-ts').value = Date.now();
+
+  // Contact details are assembled here rather than written into the HTML, so
+  // they are not sitting in the page source for address harvesters. Anyone
+  // reading the page sees them normally.
+  (function () {
+    var user = 'Apps', host = 'spencerfields.com';
+    var dial = ['+44', '20', '8132', '5790'];
+    var email = user + '@' + host;
+    var phone = dial.join(' ');
+    var e = document.querySelector('[data-contact="email"]');
+    var p = document.querySelector('[data-contact="phone"]');
+    if (e) { e.innerHTML = '<a href="mai' + 'lto:' + email + '">' + email + '</a>'; }
+    if (p) { p.innerHTML = '<a href="te' + 'l:' + dial.join('') + '">' + phone + '</a>'; }
+  })();
+</script>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Easy-Post Desktop</h4>
+        <ul>
+          <li><a href="index.html">概览</a></li>
+          <li><a href="pricing.html">价格</a></li>
+          <li><a href="mobile.html">移动应用</a></li>
+          <li><a href="easypost-desktop-app.html">EasyPost 桌面应用</a></li>
+          <li><a href="easypost-without-code.html">无需代码使用 EasyPost</a></li>
+          <li><a href="https://github.com/sgf36/EasyPost">源代码</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>法律信息</h4>
+        <ul>
+          <li><a href="terms.html">服务条款</a></li>
+          <li><a href="privacy.html">隐私政策</a></li>
+          <li><a href="mobile-privacy.html">移动端隐私政策</a></li>
+          <li><a href="refunds.html">退款政策</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>联系方式</h4>
+        <ul>
+          <li><a href="index.html#support">联系表单</a></li>
+          <li><a href="index.html#support">电子邮件与电话</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="legal-line">Easy-Post Desktop 是 Spencer Fields 旗下的产品，该企业是在英国注册的个体经营者。
+      订单由我们授权的经销商及记录商家 Paddle.com Market Ltd 处理，负责账单、
+      开票以及任何适用的销售税或增值税。</p>
+    <p class="copyright">© 2026 Spencer Fields。</p>
+  </div>
+</footer>
+
+<script src="../promo.js" defer></script>
+<script src="../analytics.js" defer></script>
+</body>
+</html>
