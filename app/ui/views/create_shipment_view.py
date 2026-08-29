@@ -51,10 +51,12 @@ from app.services.shipments import (
     create_shipment,
     save_shipment_locally,
 )
+from app.core.review_prompt import mark_session_friction, note_successful_shipment
 from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.chips import badge
 from app.ui.widgets.purchase_confirm import confirm_if_production
+from app.ui.widgets.review_nudge import schedule_review_prompt
 
 # Carrier & service | Included | Rate | Delivery | Buy. Rates are shown in a
 # QTreeWidget grouped by carrier: the carrier is a top-level (header) row and
@@ -1515,10 +1517,14 @@ class CreateShipmentView(QWidget):
         rate_id = rate.id
         self._pending_task = run_async(lambda: buy_shipment(shipment_id, rate_id, insurance), self)
         self._pending_task.succeeded.connect(self._on_bought)
-        self._pending_task.failed.connect(
-            lambda exc: QMessageBox.critical(
-                self, tr("common.error"), tr("create_shipment.purchase_error_body", error=format_api_error(exc))
-            )
+        self._pending_task.failed.connect(self._on_buy_failed)
+
+    def _on_buy_failed(self, exc) -> None:
+        # A failed purchase sours the session: no review prompt afterwards,
+        # however well a later label goes.
+        mark_session_friction()
+        QMessageBox.critical(
+            self, tr("common.error"), tr("create_shipment.purchase_error_body", error=format_api_error(exc))
         )
 
     def _on_bought(self, shipment) -> None:
@@ -1552,6 +1558,12 @@ class CreateShipmentView(QWidget):
         QMessageBox.information(
             self, tr("create_shipment.purchased_title"), tr("create_shipment.purchased_body")
         )
+
+        # A bought label is the moment of satisfaction, so it is where the review
+        # prompt belongs. Both calls are no-ops on builds with no storefront, and
+        # every other gate is applied inside them.
+        note_successful_shipment()
+        schedule_review_prompt(self)
 
     def _on_open_label(self) -> None:
         if getattr(self, "_pending_label_url", None):

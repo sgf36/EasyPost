@@ -41,6 +41,14 @@ class AppSettings:
     # the "Production unlock" add-on. Trusted offline for a grace window so a
     # Store outage never revokes production (see app/core/store_entitlement.py).
     store_unlock_confirmed_at: Optional[str] = None
+    # Store/MAS builds only: the in-app review prompt (app/core/review_prompt.py).
+    # first_run_at is stamped on first read rather than at install, so an install
+    # upgrading into the feature starts its age clock at the upgrade — a null
+    # stamp must never read as "infinitely old" and prompt everyone immediately.
+    first_run_at: Optional[str] = None
+    review_success_count: int = 0
+    review_last_prompted_at: Optional[str] = None
+    review_prompt_count: int = 0
     # Preferred printed-label format/size (see app/core/label_options.py).
     # Applies to every shipment created, since EasyPost only honours
     # label_size at shipment-creation time.
