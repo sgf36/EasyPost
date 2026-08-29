@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thermal label printer software — print 4×6 shipping labels from Windows or Mac</title>
+<meta name="description" content="Print shipping labels to a thermal label printer from Windows or Mac. Native ZPL and EPL output at 4×6, plus plain-paper label sheets. Free to install, free in test mode.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="canonical" href="https://easy-post.spencerfields.com/thermal-label-printer-software.html">
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="index.html">Easy-Post Desktop</a>
+    <nav class="site-nav">
+      <a href="index.html">Overview</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="apps.html">Apps</a>
+      <a href="download.html">Download</a>
+      <a href="faq.html">FAQ</a>
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="refunds.html">Refunds</a>
+      <a href="index.html#support">Support</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">ZPL · EPL · PDF · PNG</p>
+    <h1>Thermal label printer software for Windows and Mac</h1>
+    <p class="lede">If you own a 4×6 thermal printer, the label should arrive in the format the printer speaks — not as a screenshot of a web page that you scale by hand and hope prints straight. Easy-Post Desktop asks the carrier for the right format and sends it to the printer.</p>
+    <div class="btn-row">
+      <a class="btn" href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">Get it on the Microsoft Store</a>
+      <a class="btn btn-secondary" href="https://apps.apple.com/app/id6797912453">Get it on the Mac App Store</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <h2>Why browser printing goes wrong</h2>
+  <p>A thermal printer is not a small paper printer. It has no ink, a fixed dot density — typically 203 or 300 dots per inch — and a media width it expects to fill exactly. Feed it a PDF scaled to fit inside a browser's print margins and you get the familiar results: a label three-quarters the size of the media, a barcode too fine to scan first time, or a label rotated and running off the edge.</p>
+  <p>The reliable answer is not a better print dialog. It is to <strong>never rasterise the label in the first place</strong>. Zebra and compatible printers accept ZPL, and older Eltron-lineage models accept EPL — instruction languages that describe the label in the printer's own coordinates. Send those and the printer renders it natively at full density, every time, with no scaling step to get wrong.</p>
+
+  <h2>What this application sends</h2>
+  <ul>
+    <li><strong>ZPL</strong> for Zebra and Zebra-compatible printers.</li>
+    <li><strong>EPL</strong> for older Eltron-lineage models still in service.</li>
+    <li><strong>PDF and PNG</strong> at 4×6 for label printers that take image formats, including many Brother, DYMO and Rollo setups.</li>
+    <li><strong>Plain-paper label sheets</strong> — several labels imposed on one A4 or Letter page, for when the thermal printer is not the one to hand.</li>
+  </ul>
+  <p>The format is requested from the carrier at the moment the label is bought, so what reaches the printer is the carrier's own artwork rather than a re-drawing of it. That matters for scan rates: a barcode that has been through a resize is a barcode that gets a second pass at the depot.</p>
+
+  <h2>Batches, which is where the time actually goes</h2>
+  <p>One label is a minute either way. Forty is an afternoon. Import a spreadsheet of orders, validate the addresses, rate the whole batch, buy them together and send the labels to the printer in one run — then pick up the stack in order and match it to the parcels. Failures are reported per row rather than sinking the batch, so a bad postcode on line twelve does not cost you the other thirty-nine.</p>
+
+  <h2>The rest of it</h2>
+  <p>Rate comparison across every carrier on your account, parcel tracking, customs forms, insurance, pickups, refunds and claims — the printing is one part of a shipping desk rather than the whole product. <a href="shipping-label-software.html">The overview covers the rest.</a></p>
+  <p>Postage is billed to you by <a href="https://www.easypost.com/">EasyPost</a> directly on your own account, so the rates are yours and nothing is added on top. The application never holds your money.</p>
+
+  <h2>Trying it against your own printer</h2>
+  <p>Install it free and run it in <strong>EasyPost test mode</strong>, which is free forever and generates real label files against test carrier data. Print those to your actual printer and confirm the sizing and the scan before paying for anything. Production labels — the ones a courier will collect — need a <strong>one-time unlock</strong>, with no subscription and no per-label fee.</p>
+  <p>Windows 10 version 1809 or later, 64-bit. macOS 12 Monterey or later on Apple silicon; there is no Intel build. Fifty interface languages, no telemetry, MIT licensed.</p>
+
+  <div class="btn-row">
+    <a class="btn" href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">Free to install on Windows</a>
+    <a class="btn btn-secondary" href="download.html">Direct download</a>
+  </div>
+  <p><a href="compare-carrier-shipping-rates.html">Comparing carrier rates</a> · <a href="shipping-label-software.html">Shipping label software overview</a> · <a href="faq.html">FAQ</a></p>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p class="legal-line">
+      Easy-Post Desktop is a product of Spencer Fields, a sole trader established in the United Kingdom.
+      It is an independent, unofficial client and is not affiliated with, endorsed by or sponsored by EasyPost.
+      An EasyPost account and API key are required.
+    </p>
+    <p class="copyright">© 2026 Spencer Fields.</p>
+  </div>
+</footer>
+
+<script src="analytics.js" defer></script>
+</body>
+</html>
