@@ -1,0 +1,84 @@
+{
+  "_comment": [
+    "Source of truth for App Analytics campaign tokens for both Easy-Post apps.",
+    "Never type a token by hand: run `python packaging/campaign_links.py` and copy",
+    "what it prints.",
+    "",
+    "Apple matches tokens LITERALLY. 'site-easypost-download' and",
+    "'Site-EasyPost-Download' become two rows that will never be merged, and one",
+    "typo silently mints a third. That is the whole reason this file exists.",
+    "",
+    "providerToken is shared across the ACCOUNT, not per app. Apple minted",
+    "129201947 on Wren's first campaign and returned the same value for both",
+    "Easy-Post apps afterwards, which is how we know. A new app therefore needs no",
+    "console step at all -- its links can be generated here directly.",
+    "",
+    "One token per SURFACE, not per page and not per post. These are deliberately",
+    "coarse: a campaign shows no data at all until the app has been installed by",
+    "five individual Apple Accounts, so splitting finely now buys a screen of empty",
+    "rows. Split one when its volume justifies it, never before.",
+    "",
+    "The easy-post site publishes into forty-odd language directories and every one",
+    "of them carries these App Store links. A token has to be applied across all of",
+    "them, not only the English page -- the same trap the favicon fell into."
+  ],
+  "providerToken": "129201947",
+  "apps": [
+    {
+      "appId": "6797912453",
+      "name": "Easy-Post Desktop",
+      "platform": "macOS",
+      "campaigns": [
+        {
+          "token": "site-easypost-download",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "download.html",
+          "creative": "Mac App Store button on the download page",
+          "notes": "Highest intent on the site. Created in the console first, so this is the link Apple itself returned."
+        },
+        {
+          "token": "site-easypost-home",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "index.html and apps.html",
+          "creative": "Mac App Store button in the general site furniture",
+          "notes": null
+        },
+        {
+          "token": "site-easypost-seo",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "compare-carrier-shipping-rates, shipping-label-software, thermal-label-printer-software",
+          "creative": "Mac App Store button on the three keyword landing pages",
+          "notes": "Kept together deliberately. These three are one acquisition channel and the question worth answering is whether search traffic converts at all, not which of the three does."
+        }
+      ]
+    },
+    {
+      "appId": "6798723985",
+      "name": "Easy-Post Mobile Companion",
+      "platform": "iOS",
+      "campaigns": [
+        {
+          "token": "site-easypost-mobile",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "mobile.html",
+          "creative": "App Store button on the companion's own page",
+          "notes": "Created in the console first, so this is the link Apple itself returned."
+        },
+        {
+          "token": "site-easypost-cross-sell",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "index.html, apps.html and the keyword landing pages",
+          "creative": "The \"a companion iPhone app is also available\" mentions inside desktop-facing pages",
+          "notes": "A different intent from mobile.html: these reach someone who came for the desktop app."
+        },
+        {
+          "token": "site-software-apps-page",
+          "channel": "software.spencerfields.com",
+          "surface": "index.html",
+          "creative": "App Store button in the software site listing",
+          "notes": "The software site links the companion but NOT Easy-Post Desktop, so there is deliberately no matching desktop token."
+        }
+      ]
+    }
+  ]
+}
