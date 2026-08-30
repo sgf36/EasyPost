@@ -261,3 +261,65 @@ section + section { border-top: 1px solid var(--rule); }
 .shots img { width: 100%; height: auto; display: block; border: 1px solid #e2ded4;
              border-radius: 8px; background: #fff; }
 .shots figcaption { margin: .6rem 0 0; font-size: .9rem; color: #6b6b6b; }
+
+/* ── app mark and store badges ───────────────────────────────────────── */
+/* The mark is the application's own icon at the size the store shows it, so
+   somebody who met the app on a store shelf recognises the site as the same
+   thing. Width and height sit on the element: the hero is the first paint and
+   a mark that arrives late shoves the headline down. */
+.app-mark {
+  width: 76px; height: 76px; border-radius: 18px; display: block;
+  margin: 0 0 1.4rem;
+}
+
+/* Official store artwork, never a facsimile. Apple and Microsoft both forbid
+   redrawing their badges, and a home-made one on a page that sells software
+   through those very stores is not a risk worth taking. Heights are equalised
+   at 44px and the widths differ, which is correct -- the three lockups are not
+   the same shape. */
+.store-badges {
+  display: flex; gap: .75rem; flex-wrap: wrap; align-items: center;
+  margin: 1.6rem 0 0; padding: 0; list-style: none;
+}
+.store-badges li { margin: 0; }
+.store-badges a { display: inline-block; line-height: 0; }
+.store-badges a:hover { opacity: .85; }
+.store-badges img { height: 44px; width: auto; display: block; }
+
+/* ── app banner ──────────────────────────────────────────────────────── */
+/* Drawn only for visitors Apple will not draw one for -- see appbanner.js.
+   It ships hidden so it can never flash before the script has decided whether
+   this device has a store worth pointing at. */
+.app-banner {
+  background: var(--green-dark); color: var(--white);
+  border-bottom: 1px solid var(--green-dark);
+}
+.app-banner[hidden] { display: none; }
+.app-banner-inner {
+  display: flex; align-items: center; gap: .85rem;
+  padding-top: .6rem; padding-bottom: .6rem;
+}
+.app-banner-icon {
+  width: 44px; height: 44px; border-radius: 10px; display: block; flex: none;
+  background: var(--white);
+}
+.app-banner-text { min-width: 0; line-height: 1.25; }
+.app-banner-text strong { display: block; color: var(--white); font-size: .95rem; }
+.app-banner-text span {
+  display: block; font-size: .82rem; color: rgba(255, 255, 255, .78);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.app-banner-cta {
+  margin-left: auto; flex: none;
+  background: var(--white); color: var(--green-dark);
+  padding: .42rem 1rem; border-radius: 999px;
+  font-size: .85rem; font-weight: 600; text-decoration: none;
+}
+.app-banner-cta:hover { background: var(--cream); color: var(--green-dark); }
+.app-banner-cta[hidden] { display: none; }
+.app-banner-close {
+  flex: none; background: none; border: 0; cursor: pointer;
+  color: rgba(255, 255, 255, .7); font-size: 1.3rem; line-height: 1;
+  padding: .2rem .4rem; border-radius: 6px;
+}
+.app-banner-close:hover { color: var(--white); }

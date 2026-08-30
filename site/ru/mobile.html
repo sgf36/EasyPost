@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-itunes-app" content="app-id=6798723985, affiliate-data=ct=site-easypost-smart-banner&amp;pt=129201947">
 <title>Мобильное приложение — Easy-Post Mobile Companion</title>
 <meta name="description" content="Easy-Post Mobile Companion переносит отслеживание отправлений EasyPost на iPhone и Android. Один раз выполните сопряжение с Easy-Post Desktop, а затем отслеживайте, сортируйте и фильтруйте отправления в пути, с подробным просмотром и картой маршрута для каждой посылки.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +12,26 @@
 <link rel="stylesheet" href="../style.css">
 <link rel="canonical" href="https://easy-post.spencerfields.com/ru/mobile.html"><!-- i18n:begin --><link rel="alternate" hreflang="x-default" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="en" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="ar" href="https://easy-post.spencerfields.com/ar/mobile.html"><link rel="alternate" hreflang="bn" href="https://easy-post.spencerfields.com/bn/mobile.html"><link rel="alternate" hreflang="de" href="https://easy-post.spencerfields.com/de/mobile.html"><link rel="alternate" hreflang="es" href="https://easy-post.spencerfields.com/es/mobile.html"><link rel="alternate" hreflang="fr" href="https://easy-post.spencerfields.com/fr/mobile.html"><link rel="alternate" hreflang="hi" href="https://easy-post.spencerfields.com/hi/mobile.html"><link rel="alternate" hreflang="id" href="https://easy-post.spencerfields.com/id/mobile.html"><link rel="alternate" hreflang="ja" href="https://easy-post.spencerfields.com/ja/mobile.html"><link rel="alternate" hreflang="mr" href="https://easy-post.spencerfields.com/mr/mobile.html"><link rel="alternate" hreflang="pt" href="https://easy-post.spencerfields.com/pt/mobile.html"><link rel="alternate" hreflang="ru" href="https://easy-post.spencerfields.com/ru/mobile.html"><link rel="alternate" hreflang="sv" href="https://easy-post.spencerfields.com/sv/mobile.html"><link rel="alternate" hreflang="te" href="https://easy-post.spencerfields.com/te/mobile.html"><link rel="alternate" hreflang="ur" href="https://easy-post.spencerfields.com/ur/mobile.html"><link rel="alternate" hreflang="zh" href="https://easy-post.spencerfields.com/zh/mobile.html"><!-- i18n:end --></head>
 <body>
+
+<div class="app-banner" id="app-banner" hidden>
+  <div class="wrap app-banner-inner"><img class="app-banner-icon" src="../icon-192.png" width="44" height="44" alt="">
+    <span class="app-banner-text" data-store="mac" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>Транспортные этикетки, тарифы и отслеживание — в Mac App Store</span>
+    </span>
+    <span class="app-banner-text" data-store="windows" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>Транспортные этикетки, тарифы и отслеживание — в Microsoft Store</span>
+    </span>
+    <span class="app-banner-text" data-store="ios" hidden>
+      <strong>Easy-Post Mobile Companion</strong>
+      <span>Отслеживайте каждую отправку прямо с iPhone</span>
+    </span>
+    <a class="app-banner-cta" data-store="mac" hidden href="https://apps.apple.com/app/apple-store/id6797912453?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">Посмотреть</a>
+    <a class="app-banner-cta" data-store="windows" hidden href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">Посмотреть</a>
+    <a class="app-banner-cta" data-store="ios" hidden href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">Посмотреть</a>
+    <button class="app-banner-close" type="button" aria-label="Dismiss this banner">×</button></div>
+</div>
 
 <header class="site-head">
   <div class="wrap">
@@ -40,7 +61,9 @@
   <div class="wrap prose">
     <h2>Получить приложение</h2>
     <p><strong>iPhone</strong> — в App Store, для iOS 15 и новее.</p>
-    <p class="btn-row"><a class="btn" href="https://apps.apple.com/app/id6798723985">Загрузить из App Store</a></p>
+    <ul class="store-badges">
+      <li><a href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-mobile&amp;mt=8"><img src="../badge-appstore-ru.svg" width="132" height="44" alt="Загрузить в App Store"></a></li>
+    </ul>
     <p><strong>Android</strong> — проходит тестирование перед выпуском в Google Play. Прямая загрузка, которая ранее предлагалась здесь, отозвана: приложение, установленное таким способом, не может обновляться самостоятельно, поэтому каждая новая сборка оставляла все более ранние установки без каких-либо уведомлений о том, что они устарели. Версия из Google Play будет обновляться обычным образом.</p>
     <p class="muted">Для сопряжения на любой из платформ требуется платная рабочая лицензия Easy-Post Desktop.</p>
   </div>
@@ -105,6 +128,7 @@
   </div>
 </footer>
 
+<script src="../appbanner.js" defer></script>
 <script src="../analytics.js" defer></script>
 </body>
 </html>
