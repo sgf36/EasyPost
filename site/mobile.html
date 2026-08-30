@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-itunes-app" content="app-id=6798723985, affiliate-data=ct=site-easypost-smart-banner&amp;pt=129201947">
 <title>Mobile app — Easy-Post Mobile Companion</title>
 <meta name="description" content="Easy-Post Mobile Companion brings EasyPost shipment tracking to iPhone and Android. Pair once with Easy-Post Desktop, then track, sort and filter shipments on the move, with a detailed view and journey map for each parcel.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +12,28 @@
 <link rel="stylesheet" href="style.css">
 <link rel="canonical" href="https://easy-post.spencerfields.com/mobile.html"><!-- i18n:begin --><link rel="alternate" hreflang="x-default" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="en" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="ar" href="https://easy-post.spencerfields.com/ar/mobile.html"><link rel="alternate" hreflang="bn" href="https://easy-post.spencerfields.com/bn/mobile.html"><link rel="alternate" hreflang="de" href="https://easy-post.spencerfields.com/de/mobile.html"><link rel="alternate" hreflang="es" href="https://easy-post.spencerfields.com/es/mobile.html"><link rel="alternate" hreflang="fr" href="https://easy-post.spencerfields.com/fr/mobile.html"><link rel="alternate" hreflang="hi" href="https://easy-post.spencerfields.com/hi/mobile.html"><link rel="alternate" hreflang="id" href="https://easy-post.spencerfields.com/id/mobile.html"><link rel="alternate" hreflang="ja" href="https://easy-post.spencerfields.com/ja/mobile.html"><link rel="alternate" hreflang="mr" href="https://easy-post.spencerfields.com/mr/mobile.html"><link rel="alternate" hreflang="pt" href="https://easy-post.spencerfields.com/pt/mobile.html"><link rel="alternate" hreflang="ru" href="https://easy-post.spencerfields.com/ru/mobile.html"><link rel="alternate" hreflang="sv" href="https://easy-post.spencerfields.com/sv/mobile.html"><link rel="alternate" hreflang="te" href="https://easy-post.spencerfields.com/te/mobile.html"><link rel="alternate" hreflang="ur" href="https://easy-post.spencerfields.com/ur/mobile.html"><link rel="alternate" hreflang="zh" href="https://easy-post.spencerfields.com/zh/mobile.html"><!-- i18n:end --></head>
 <body>
+
+<div class="app-banner" id="app-banner" hidden>
+  <div class="wrap app-banner-inner">
+    <img class="app-banner-icon" src="icon-192.png" width="44" height="44" alt="">
+    <span class="app-banner-text" data-store="mac" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>Shipping labels, rates and tracking, on the Mac App Store</span>
+    </span>
+    <span class="app-banner-text" data-store="windows" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>Shipping labels, rates and tracking, on the Microsoft Store</span>
+    </span>
+    <span class="app-banner-text" data-store="ios" hidden>
+      <strong>Easy-Post Mobile Companion</strong>
+      <span>Track every shipment from your iPhone</span>
+    </span>
+    <a class="app-banner-cta" data-store="mac" hidden href="https://apps.apple.com/app/apple-store/id6797912453?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">View</a>
+    <a class="app-banner-cta" data-store="windows" hidden href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">View</a>
+    <a class="app-banner-cta" data-store="ios" hidden href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">View</a>
+    <button class="app-banner-close" type="button" aria-label="Dismiss this banner">×</button>
+  </div>
+</div>
 
 <header class="site-head">
   <div class="wrap">
@@ -42,9 +65,9 @@
   <div class="wrap prose">
     <h2>Get the app</h2>
     <p><strong>iPhone</strong> — on the App Store, for iOS 15 and later.</p>
-    <p class="btn-row">
-      <a class="btn" href="https://apps.apple.com/app/id6798723985">Download on the App Store</a>
-    </p>
+    <ul class="store-badges">
+      <li><a href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-mobile&amp;mt=8"><img src="badge-appstore-en.svg" width="132" height="44" alt="Download on the App Store"></a></li>
+    </ul>
     <p><strong>Android</strong> — in testing ahead of a Google Play release. The direct download offered here previously has been withdrawn: an app installed that way cannot update itself, so each new build left every earlier install behind with no notice that it had been superseded. The Play release will update in the ordinary way.</p>
     <p class="muted">A paid Easy-Post Desktop production licence is required to pair, on either platform.</p>
   </div>
@@ -111,6 +134,7 @@
   </div>
 </footer>
 
+<script src="appbanner.js" defer></script>
 <script src="analytics.js" defer></script>
 </body>
 </html>

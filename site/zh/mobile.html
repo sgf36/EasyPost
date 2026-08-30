@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-itunes-app" content="app-id=6798723985, affiliate-data=ct=site-easypost-smart-banner&amp;pt=129201947">
 <title>移动应用 — Easy-Post Mobile Companion</title>
 <meta name="description" content="Easy-Post Mobile Companion 将 EasyPost 货件追踪带到 iPhone 和 Android 上。与 Easy-Post Desktop 配对一次后，即可随时随地追踪、排序和筛选货件，每个包裹都配有详细视图和行程地图。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +12,26 @@
 <link rel="stylesheet" href="../style.css">
 <link rel="canonical" href="https://easy-post.spencerfields.com/zh/mobile.html"><!-- i18n:begin --><link rel="alternate" hreflang="x-default" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="en" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="ar" href="https://easy-post.spencerfields.com/ar/mobile.html"><link rel="alternate" hreflang="bn" href="https://easy-post.spencerfields.com/bn/mobile.html"><link rel="alternate" hreflang="de" href="https://easy-post.spencerfields.com/de/mobile.html"><link rel="alternate" hreflang="es" href="https://easy-post.spencerfields.com/es/mobile.html"><link rel="alternate" hreflang="fr" href="https://easy-post.spencerfields.com/fr/mobile.html"><link rel="alternate" hreflang="hi" href="https://easy-post.spencerfields.com/hi/mobile.html"><link rel="alternate" hreflang="id" href="https://easy-post.spencerfields.com/id/mobile.html"><link rel="alternate" hreflang="ja" href="https://easy-post.spencerfields.com/ja/mobile.html"><link rel="alternate" hreflang="mr" href="https://easy-post.spencerfields.com/mr/mobile.html"><link rel="alternate" hreflang="pt" href="https://easy-post.spencerfields.com/pt/mobile.html"><link rel="alternate" hreflang="ru" href="https://easy-post.spencerfields.com/ru/mobile.html"><link rel="alternate" hreflang="sv" href="https://easy-post.spencerfields.com/sv/mobile.html"><link rel="alternate" hreflang="te" href="https://easy-post.spencerfields.com/te/mobile.html"><link rel="alternate" hreflang="ur" href="https://easy-post.spencerfields.com/ur/mobile.html"><link rel="alternate" hreflang="zh" href="https://easy-post.spencerfields.com/zh/mobile.html"><!-- i18n:end --></head>
 <body>
+
+<div class="app-banner" id="app-banner" hidden>
+  <div class="wrap app-banner-inner"><img class="app-banner-icon" src="../icon-192.png" width="44" height="44" alt="">
+    <span class="app-banner-text" data-store="mac" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>运单、费率与追踪，登陆 Mac App Store</span>
+    </span>
+    <span class="app-banner-text" data-store="windows" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>运单、费率与追踪，登陆 Microsoft Store</span>
+    </span>
+    <span class="app-banner-text" data-store="ios" hidden>
+      <strong>Easy-Post Mobile Companion</strong>
+      <span>用您的 iPhone 追踪每一个包裹</span>
+    </span>
+    <a class="app-banner-cta" data-store="mac" hidden href="https://apps.apple.com/app/apple-store/id6797912453?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">查看</a>
+    <a class="app-banner-cta" data-store="windows" hidden href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">查看</a>
+    <a class="app-banner-cta" data-store="ios" hidden href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">查看</a>
+    <button class="app-banner-close" type="button" aria-label="Dismiss this banner">×</button></div>
+</div>
 
 <header class="site-head">
   <div class="wrap">
@@ -40,7 +61,9 @@
   <div class="wrap prose">
     <h2>获取应用</h2>
     <p><strong>iPhone</strong> —— 已在 App Store 上架,支持 iOS 15 及以上版本。</p>
-    <p class="btn-row"><a class="btn" href="https://apps.apple.com/app/id6798723985">前往 App Store 下载</a></p>
+    <ul class="store-badges">
+      <li><a href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-mobile&amp;mt=8"><img src="../badge-appstore-zh.svg" width="120" height="44" alt="在 App Store 下载"></a></li>
+    </ul>
     <p><strong>Android</strong> —— 正在测试中,即将在 Google Play 发布。此前在本页提供的直接下载方式已下架:以该方式安装的应用无法自动更新,因此每次发布新版本,都会让之前安装的版本被搁置一旁,却毫无提示告知其已被取代。Google Play 版本将以常规方式进行更新。</p>
     <p class="muted">无论在哪个平台上,配对都需要一份已付费的 Easy-Post Desktop 生产环境许可证。</p>
   </div>
@@ -105,6 +128,7 @@
   </div>
 </footer>
 
+<script src="../appbanner.js" defer></script>
 <script src="../analytics.js" defer></script>
 </body>
 </html>

@@ -49,6 +49,13 @@
           "surface": "compare-carrier-shipping-rates, shipping-label-software, thermal-label-printer-software",
           "creative": "Mac App Store button on the three keyword landing pages",
           "notes": "Kept together deliberately. These three are one acquisition channel and the question worth answering is whether search traffic converts at all, not which of the three does."
+        },
+        {
+          "token": "site-easypost-app-banner",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "site-wide app banner, macOS visitors",
+          "creative": "The bar above the header offering the Mac App Store",
+          "notes": "A different intent from the page buttons: it reaches somebody who came for something else and was offered the app."
         }
       ]
     },
@@ -77,6 +84,20 @@
           "surface": "index.html",
           "creative": "App Store button in the software site listing",
           "notes": "The software site links the companion but NOT Easy-Post Desktop, so there is deliberately no matching desktop token."
+        },
+        {
+          "token": "site-easypost-app-banner",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "site-wide app banner, iOS visitors not using Safari",
+          "creative": "The bar above the header offering the App Store",
+          "notes": "Same token as the macOS variant deliberately. It is one surface; Apple reports the two apps separately anyway."
+        },
+        {
+          "token": "site-easypost-smart-banner",
+          "channel": "easy-post.spencerfields.com",
+          "surface": "Safari Smart App Banner, every page",
+          "creative": "Apple's own banner, drawn from the apple-itunes-app meta tag",
+          "notes": "Carried as affiliate-data on the meta tag, which is the documented form. UNVERIFIED against live data: campaigns report nothing until five Apple Accounts have installed, so this one has to be confirmed in App Analytics once volume exists."
         }
       ]
     }

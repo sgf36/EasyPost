@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-itunes-app" content="app-id=6798723985, affiliate-data=ct=site-easypost-smart-banner&amp;pt=129201947">
 <title>Mobilapp — Easy-Post Mobile Companion</title>
 <meta name="description" content="Easy-Post Mobile Companion tar EasyPost-spårning av försändelser till iPhone och Android. Para ihop den en gång med Easy-Post Desktop, och spåra, sortera och filtrera försändelser på språng, med en detaljerad vy och resekarta för varje paket.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +12,26 @@
 <link rel="stylesheet" href="../style.css">
 <link rel="canonical" href="https://easy-post.spencerfields.com/sv/mobile.html"><!-- i18n:begin --><link rel="alternate" hreflang="x-default" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="en" href="https://easy-post.spencerfields.com/mobile.html"><link rel="alternate" hreflang="ar" href="https://easy-post.spencerfields.com/ar/mobile.html"><link rel="alternate" hreflang="bn" href="https://easy-post.spencerfields.com/bn/mobile.html"><link rel="alternate" hreflang="de" href="https://easy-post.spencerfields.com/de/mobile.html"><link rel="alternate" hreflang="es" href="https://easy-post.spencerfields.com/es/mobile.html"><link rel="alternate" hreflang="fr" href="https://easy-post.spencerfields.com/fr/mobile.html"><link rel="alternate" hreflang="hi" href="https://easy-post.spencerfields.com/hi/mobile.html"><link rel="alternate" hreflang="id" href="https://easy-post.spencerfields.com/id/mobile.html"><link rel="alternate" hreflang="ja" href="https://easy-post.spencerfields.com/ja/mobile.html"><link rel="alternate" hreflang="mr" href="https://easy-post.spencerfields.com/mr/mobile.html"><link rel="alternate" hreflang="pt" href="https://easy-post.spencerfields.com/pt/mobile.html"><link rel="alternate" hreflang="ru" href="https://easy-post.spencerfields.com/ru/mobile.html"><link rel="alternate" hreflang="sv" href="https://easy-post.spencerfields.com/sv/mobile.html"><link rel="alternate" hreflang="te" href="https://easy-post.spencerfields.com/te/mobile.html"><link rel="alternate" hreflang="ur" href="https://easy-post.spencerfields.com/ur/mobile.html"><link rel="alternate" hreflang="zh" href="https://easy-post.spencerfields.com/zh/mobile.html"><!-- i18n:end --></head>
 <body>
+
+<div class="app-banner" id="app-banner" hidden>
+  <div class="wrap app-banner-inner"><img class="app-banner-icon" src="../icon-192.png" width="44" height="44" alt="">
+    <span class="app-banner-text" data-store="mac" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>Fraktetiketter, priser och spårning, på Mac App Store</span>
+    </span>
+    <span class="app-banner-text" data-store="windows" hidden>
+      <strong>Easy-Post Desktop</strong>
+      <span>Fraktetiketter, priser och spårning, på Microsoft Store</span>
+    </span>
+    <span class="app-banner-text" data-store="ios" hidden>
+      <strong>Easy-Post Mobile Companion</strong>
+      <span>Spåra varje leverans från din iPhone</span>
+    </span>
+    <a class="app-banner-cta" data-store="mac" hidden href="https://apps.apple.com/app/apple-store/id6797912453?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">Visa</a>
+    <a class="app-banner-cta" data-store="windows" hidden href="https://apps.microsoft.com/detail/9ndsdl5lv5b5">Visa</a>
+    <a class="app-banner-cta" data-store="ios" hidden href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-app-banner&amp;mt=8">Visa</a>
+    <button class="app-banner-close" type="button" aria-label="Dismiss this banner">×</button></div>
+</div>
 
 <header class="site-head">
   <div class="wrap">
@@ -40,7 +61,9 @@
   <div class="wrap prose">
     <h2>Hämta appen</h2>
     <p><strong>iPhone</strong> — på App Store, för iOS 15 och senare.</p>
-    <p class="btn-row"><a class="btn" href="https://apps.apple.com/app/id6798723985">Ladda ner från App Store</a></p>
+    <ul class="store-badges">
+      <li><a href="https://apps.apple.com/app/apple-store/id6798723985?pt=129201947&amp;ct=site-easypost-mobile&amp;mt=8"><img src="../badge-appstore-sv.svg" width="132" height="44" alt="Hämta från App Store"></a></li>
+    </ul>
     <p><strong>Android</strong> — under testning inför en lansering på Google Play. Den direktnedladdning som tidigare erbjöds här har dragits tillbaka: en app installerad på det sättet kan inte uppdatera sig själv, så varje ny version lämnade alla tidigare installationer bakom sig utan någon varning om att de blivit inaktuella. Play-utgåvan kommer att uppdateras på vanligt sätt.</p>
     <p class="muted">En betald produktionslicens för Easy-Post Desktop krävs för att parkoppla, på båda plattformarna.</p>
   </div>
@@ -105,6 +128,7 @@
   </div>
 </footer>
 
+<script src="../appbanner.js" defer></script>
 <script src="../analytics.js" defer></script>
 </body>
 </html>
