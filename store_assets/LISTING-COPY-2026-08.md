@@ -30,51 +30,83 @@ from the response proves nothing and the console is the only way to know.
 
 ---
 
-## 2. The proposed copy did not fit, and the reason generalises
+## 2. CORRECTION — the cap is 1000, not 500, and the proposed copy fits
 
-`marketing/app-store-optimisation.md` proposes a 415-character short description. **It would
-have failed**, and probably opaquely, since the Partner Center import reports language errors
-badly.
+**An earlier version of this document said the ASO pack's 415-character short
+description would fail the import. That was wrong.** The cap was taken from
+`marketing/app-store-optimisation.md`, which records the live string as
+"(172/500)". Nothing checked it.
 
-The listing carries **47 languages**. The cap is 500 characters and it applies per language,
-after translation. The expansion factor is not a guess — it was measured against this listing's
-own existing translations of the current 172-character English string:
+`store_assets/build_listing_fields.py` is the authority and has been all along:
+
+```python
+LIMITS = {
+    "ReleaseNotes": 1500,
+    "Description": 10000,
+    "ShortDescription": 1000,
+}
+```
+
+Corroborated by `feedback-partner-center-listing-import`, which records the same
+caps from a live export and a rejected import. **ShortDescription is 1000.**
+
+So the 415-character draft reaches roughly 528 characters in the worst language
+and is comfortably inside the limit. It was never at risk.
+
+### What survives from the mistake
+
+The expansion measurement is still correct and still worth keeping, because it was
+taken from this listing's own translations rather than assumed:
 
 | Language | Live length | Factor |
 |---|---|---|
-| Zulu | 219 | **×1.27** |
-| French | 210 | ×1.22 |
-| Spanish | 207 | ×1.20 |
-| Yoruba | 203 | ×1.18 |
-| Italian | 202 | ×1.17 |
-| *(Chinese, Korean, Japanese all contract, to ×0.45–0.58)* | | |
+| Zulu | 219 | **x1.27** |
+| French | 210 | x1.22 |
+| Spanish | 207 | x1.20 |
+| Yoruba | 203 | x1.18 |
+| Italian | 202 | x1.17 |
+| *(Chinese, Korean and Japanese contract, to x0.45-0.58)* | | |
 
-At ×1.27, **415 English characters becomes roughly 528**. The safe English ceiling is
-`500 ÷ 1.27 = 393`, and that assumes the new text expands like the old one, which is not
-guaranteed — so the target used below is **≤ 370**, leaving 30 characters of headroom in the
-worst language.
+At x1.27 the safe **English** ceiling is 787 characters, not 393. The rule still
+holds -- write to the worst expander, not to the English cap -- only the number
+was wrong.
 
-This is the same failure the release-notes runbook already records at 1.2.2, where a
-1431-character English draft put thirteen translations over the limit. The rule is worth
-stating once: **write to the worst expander, not to the English cap.**
+**The real finding is the opposite of the one this document was written around.**
+The live short description is **172 characters against a 1000 limit**: the most-read
+string in the listing, the card a stranger sees in search results, is using a sixth
+of its budget. The problem was never that the replacement was too long.
 
 ---
 
-## 3. Short description — 370 characters
+## 3. Short description
 
-> Buy and print carrier shipping labels from a fast native Windows app. Compare live rates
-> cheapest-first, print to thermal or plain paper and track every parcel, with customs,
-> insurance and claims built in. Free to install, on your own free EasyPost account, so postage
-> bills at your own rates with no markup. Independent open-source client, not affiliated with
+Both candidates fit. This is now an editorial choice rather than a constraint, and
+the longer one says more:
+
+> Buy and print carrier shipping labels from a fast native Windows app. Compare live
+> rates cheapest-first, print to thermal or plain paper, track every parcel, handle
+> customs, insurance and claims. Free to install and free to trial. It runs on your
+> own EasyPost account, which is free to open, so postage is billed to you at your
+> own rates with no markup. Independent open-source client, not affiliated with
 > EasyPost.
 
-Same facts and the same disclosure as the live string, reordered so the product is described
-before the prerequisite, and the prerequisite is framed as free rather than as a barrier. The
-live copy opens with *"for your EasyPost account"* and closes with *"an EasyPost account is
-required"*, so a stranger reading the search card meets the disqualification twice before
-learning what the application does.
+415 characters, about 528 in Zulu, against 1000.
 
-"Open-source" is accurate and checked: the repository is public and carries an MIT licence.
+The 370-character version written under the mistaken cap is kept below as the
+shorter option, not because it is safer:
+
+> Buy and print carrier shipping labels from a fast native Windows app. Compare live
+> rates cheapest-first, print to thermal or plain paper and track every parcel, with
+> customs, insurance and claims built in. Free to install, on your own free EasyPost
+> account, so postage bills at your own rates with no markup. Independent open-source
+> client, not affiliated with EasyPost.
+
+Either reorders the copy so the product is described before the prerequisite. The
+live string opens with "for your EasyPost account" and closes with "an EasyPost
+account is required", so a stranger reading the search card meets the
+disqualification twice before learning what the application does.
+
+"Open-source" is accurate and checked: the repository is public and MIT licensed.
 
 ---
 
