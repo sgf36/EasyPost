@@ -30,7 +30,7 @@
 <div class="hero">
   <div class="wrap">
     <p class="eyebrow">Descargar</p>
-    <h1>Versión 1.2.7</h1>
+    <h1>Versión 1.2.8</h1>
     <p class="lede">Windows y macOS. Instalación gratuita — una clave de licencia desbloquea el uso en producción. Las versiones de Microsoft Store y Mac App Store lo desbloquean directamente en la aplicación.</p>
   </div>
 </div>
@@ -44,7 +44,7 @@
         <h3>Windows 10 y 11</h3>
         <p class="seats">64 bits · 88 MB</p>
         <p class="per-seat">Descomprima en cualquier carpeta y ejecute EasyPostDesktop.exe</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-Windows-x64.zip">Descargar para Windows</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-Windows-x64.zip">Descargar para Windows</a>
       </div>
 
       <div class="tier">
@@ -52,7 +52,7 @@
         <h3>macOS en Apple silicon</h3>
         <p class="seats">Apple silicon · 82 MB</p>
         <p class="per-seat">Notarizado por Apple · se abre sin advertencias</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-macOS-arm64.dmg">Descargar para macOS</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-macOS-arm64.dmg">Descargar para macOS</a>
       </div>
 
       <div class="tier">
@@ -75,7 +75,7 @@
     <div class="prose" style="margin-top:2.5rem;">
       <h2>La descarga de Windows está firmada digitalmente</h2>
       <p>A partir de la versión 1.2.7, ambos ejecutables llevan una firma de confianza pública emitida por Microsoft a nombre de <strong>Spencer Fields</strong>, por lo que Windows muestra el nombre del editor en lugar de advertir sobre uno que no reconoce. Haga clic con el botón derecho en el archivo, elija <strong>Propiedades</strong> y luego <strong>Firmas digitales</strong> para verla.</p>
-      <p>Firmar es una novedad de esta versión, y SmartScreen construye su reputación a partir de la frecuencia con la que se descarga y ejecuta una aplicación firmada. En un equipo con <strong>Smart App Control</strong> activado, un certificado tan reciente puede seguir siendo retenido. Si eso ocurre, la versión de Microsoft Store lleva la propia firma de Microsoft y es la vía más sencilla.</p>
+      <p>La firma llegó en la versión 1.2.7, y SmartScreen construye su reputación según la frecuencia con la que se descarga y ejecuta una aplicación firmada. En un equipo con <strong>Smart App Control</strong> activado, un certificado tan reciente puede seguir siendo bloqueado. Si eso ocurre, la versión de Microsoft Store lleva la propia firma de Microsoft y es la vía más sencilla.</p>
       <p>Para comprobar usted mismo la descarga antes de ejecutarla, compare su suma de comprobación con la lista siguiente:</p>
       <pre><code>powershell -Command "Get-FileHash .\EasyPostDesktop-Windows-x64.zip -Algorithm SHA256"</code></pre>
 
@@ -89,8 +89,8 @@
 
       <h2>Sumas de comprobación</h2>
       <p>SHA-256, para quien desee verificar una descarga antes de ejecutarla:</p>
-      <pre><code>fb19b693d8a274e1244546b6a31a106e4532d2fe82fa19b50c74638502208e6a  EasyPostDesktop-Windows-x64.zip
-c00e422b40c0bb8489f45c09ed4310e9c9ff6c14f394d30fe31c6d4023cb0882  EasyPostDesktop-macOS-arm64.dmg</code></pre>
+      <pre><code>65390260cd5ede5482103bf3a023a26b99a5e3b2c70755a78f3feccec277ddf1  EasyPostDesktop-Windows-x64.zip
+185f831d75c5b126c82be3c76eed6aab0e1515005b5f987ebe5fdc516144ea58  EasyPostDesktop-macOS-arm64.dmg</code></pre>
 
       <h2>Requisitos</h2>
       <ul>
