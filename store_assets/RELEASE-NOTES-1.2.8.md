@@ -103,7 +103,15 @@ the Microsoft Store commerce system"*, and it must stay **unticked** —
 `production_unlock` is a Store add-on and does use that system, so ticking it
 would be a false declaration.
 
-**What is actually outstanding: the screenshots.** Hashing all 423 published
-images showed slots 1, 2 and 3 byte-identical to the English ones in 36 of the
-47 languages, with slots 4-9 correctly localised in the same listings. Renders
-for all 36 are built; see `build_shot_repair.py`.
+**The screenshots need nothing.** They show the current interface: nothing on
+those nine screens has changed since 1.2.6, and the only two commits touching
+`app/ui` since are the review prompt and the Android page removal, which was
+never visible on a Store build.
+
+A same-day audit claimed otherwise and was wrong. Hashing all 423 published
+images showed slots 1-3 byte-identical to English in 36 of 47 languages, which
+looked like a partial re-render. Compared position-free instead, **exactly 40
+languages carry the nine English images reordered and exactly 7 have their own
+set (en, de, es, fr, hi, ja, zh)** — the split `LISTING_IMPORT.md` describes as
+normal practice. Slot order differs per language, so comparing slot against slot
+compares different pages.
