@@ -30,7 +30,7 @@
 <div class="hero">
   <div class="wrap">
     <p class="eyebrow">ダウンロード</p>
-    <h1>バージョン 1.2.7</h1>
+    <h1>バージョン 1.2.8</h1>
     <p class="lede">Windows と macOS に対応しています。インストールは無料で、ライセンスキーにより本番利用が解放されます。Microsoft Store 版と Mac App Store 版はアプリ内で解放される仕組みです。</p>
   </div>
 </div>
@@ -44,7 +44,7 @@
         <h3>Windows 10 &amp; 11</h3>
         <p class="seats">64ビット・88 MB</p>
         <p class="per-seat">任意の場所に解凍し、EasyPostDesktop.exe を実行してください</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-Windows-x64.zip">Windows 用をダウンロード</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-Windows-x64.zip">Windows 用をダウンロード</a>
       </div>
 
       <div class="tier">
@@ -52,7 +52,7 @@
         <h3>Apple silicon 搭載の macOS</h3>
         <p class="seats">Apple silicon · 82 MB</p>
         <p class="per-seat">Apple による公証済み · 警告なしで開きます</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-macOS-arm64.dmg">macOS 用をダウンロード</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-macOS-arm64.dmg">macOS 用をダウンロード</a>
       </div>
 
       <div class="tier">
@@ -75,7 +75,7 @@
     <div class="prose" style="margin-top:2.5rem;">
       <h2>Windows 版ダウンロードはコード署名済みです</h2>
       <p>バージョン 1.2.7 以降、両方の実行ファイルには <strong>Spencer Fields</strong> 名義の Microsoft 発行 Public Trust 署名が付与されているため、Windows は発行元不明として警告する代わりに発行元名を表示します。ファイルを右クリックし、<strong>プロパティ</strong>、続いて<strong>デジタル署名</strong>を選択すると確認できます。</p>
-      <p>署名はこのリリースで新しく導入されたもので、SmartScreenは署名済みアプリケーションがダウンロードされ実行された回数から評価を積み重ねていきます。<strong>Smart App Control</strong>が有効になっているマシンでは、これほど新しい証明書はまだブロックされることがあります。その場合は、Microsoft Store版であればMicrosoft自身の署名が付いているため、よりスムーズにご利用いただけます。</p>
+      <p>この署名は1.2.7で導入されました。SmartScreenは、署名済みアプリケーションがどれだけの頻度でダウンロードされ実行されているかによって信頼度を築いていきます。<strong>スマート アプリ コントロール</strong>が有効になっているマシンでは、これほど新しい証明書はまだブロックされることがあります。その場合は、Microsoft自身の署名が付いたMicrosoft Store版の方がスムーズにご利用いただけます。</p>
       <p>実行する前にダウンロードしたファイルをご自身で確認したい場合は、チェックサムを以下のリストと照合してください。</p>
       <pre><code>powershell -Command "Get-FileHash .\EasyPostDesktop-Windows-x64.zip -Algorithm SHA256"</code></pre>
 
@@ -89,8 +89,8 @@
 
       <h2>チェックサム</h2>
       <p>実行前にダウンロードを確認したい方向けのSHA-256です。</p>
-      <pre><code>fb19b693d8a274e1244546b6a31a106e4532d2fe82fa19b50c74638502208e6a  EasyPostDesktop-Windows-x64.zip
-c00e422b40c0bb8489f45c09ed4310e9c9ff6c14f394d30fe31c6d4023cb0882  EasyPostDesktop-macOS-arm64.dmg</code></pre>
+      <pre><code>65390260cd5ede5482103bf3a023a26b99a5e3b2c70755a78f3feccec277ddf1  EasyPostDesktop-Windows-x64.zip
+185f831d75c5b126c82be3c76eed6aab0e1515005b5f987ebe5fdc516144ea58  EasyPostDesktop-macOS-arm64.dmg</code></pre>
 
       <h2>必要条件</h2>
       <ul>

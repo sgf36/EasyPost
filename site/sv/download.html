@@ -30,7 +30,7 @@
 <div class="hero">
   <div class="wrap">
     <p class="eyebrow">Ladda ner</p>
-    <h1>Version 1.2.7</h1>
+    <h1>Version 1.2.8</h1>
     <p class="lede">Windows och macOS. Gratis att installera — en licensnyckel låser upp produktionsanvändning. Versionerna från Microsoft Store och Mac App Store låser i stället upp den i appen.</p>
   </div>
 </div>
@@ -44,7 +44,7 @@
         <h3>Windows 10 och 11</h3>
         <p class="seats">64-bitars · 88 MB</p>
         <p class="per-seat">Packa upp var som helst, och kör sedan EasyPostDesktop.exe</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-Windows-x64.zip">Ladda ner för Windows</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-Windows-x64.zip">Ladda ner för Windows</a>
       </div>
 
       <div class="tier">
@@ -52,7 +52,7 @@
         <h3>macOS för Apple silicon</h3>
         <p class="seats">Apple silicon · 82 MB</p>
         <p class="per-seat">Notariserad av Apple · öppnas utan varningar</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-macOS-arm64.dmg">Ladda ned för macOS</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-macOS-arm64.dmg">Ladda ned för macOS</a>
       </div>
 
       <div class="tier">
@@ -75,7 +75,7 @@
     <div class="prose" style="margin-top:2.5rem;">
       <h2>Windows-nedladdningen är kodsignerad</h2>
       <p>Från och med version 1.2.7 bär båda körbara filerna en Microsoft-utfärdad Public Trust-signatur i namnet <strong>Spencer Fields</strong>, så Windows anger utgivaren i stället för att varna för en det inte känner igen. Högerklicka på filen, välj <strong>Egenskaper</strong> och sedan <strong>Digitala signaturer</strong> för att se den.</p>
-      <p>Signeringen är ny för den här utgåvan, och SmartScreen bygger sitt rykte på hur ofta en signerad applikation laddas ner och körs. På en dator med <strong>Smart App Control</strong> påslaget kan ett så pass nytt certifikat ändå hållas tillbaka. Om det händer är versionen från Microsoft Store, som bär Microsofts egen signatur, det smidigare alternativet.</p>
+      <p>Signaturen tillkom i 1.2.7, och SmartScreen bygger sitt rykte på hur ofta en signerad applikation laddas ned och körs. På en dator med <strong>Smart App Control</strong> aktiverat kan ett så nytt certifikat ändå spärras tillfälligt. Om det inträffar är versionen från Microsoft Store, som bär Microsofts egen signatur, den smidigare vägen.</p>
       <p>Om du vill kontrollera nedladdningen själv innan du kör den, jämför dess kontrollsumma med listan nedan:</p>
       <pre><code>powershell -Command "Get-FileHash .\EasyPostDesktop-Windows-x64.zip -Algorithm SHA256"</code></pre>
 
@@ -89,8 +89,8 @@
 
       <h2>Kontrollsummor</h2>
       <p>SHA-256, för den som vill verifiera en nedladdning innan den körs:</p>
-      <pre><code>fb19b693d8a274e1244546b6a31a106e4532d2fe82fa19b50c74638502208e6a  EasyPostDesktop-Windows-x64.zip
-c00e422b40c0bb8489f45c09ed4310e9c9ff6c14f394d30fe31c6d4023cb0882  EasyPostDesktop-macOS-arm64.dmg</code></pre>
+      <pre><code>65390260cd5ede5482103bf3a023a26b99a5e3b2c70755a78f3feccec277ddf1  EasyPostDesktop-Windows-x64.zip
+185f831d75c5b126c82be3c76eed6aab0e1515005b5f987ebe5fdc516144ea58  EasyPostDesktop-macOS-arm64.dmg</code></pre>
 
       <h2>Krav</h2>
       <ul>

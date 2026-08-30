@@ -30,7 +30,7 @@
 <div class="hero">
   <div class="wrap">
     <p class="eyebrow">Download</p>
-    <h1>Version 1.2.7</h1>
+    <h1>Version 1.2.8</h1>
     <p class="lede">Windows und macOS. Kostenlose Installation – ein Lizenzschlüssel schaltet die produktive Nutzung frei. Bei den Versionen aus dem Microsoft Store und dem Mac App Store erfolgt die Freischaltung stattdessen direkt in der App.</p>
   </div>
 </div>
@@ -44,7 +44,7 @@
         <h3>Windows 10 &amp; 11</h3>
         <p class="seats">64-Bit · 88 MB</p>
         <p class="per-seat">Entpacken Sie die Datei an einem beliebigen Ort und führen Sie dann EasyPostDesktop.exe aus</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-Windows-x64.zip">Für Windows herunterladen</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-Windows-x64.zip">Für Windows herunterladen</a>
       </div>
 
       <div class="tier">
@@ -52,7 +52,7 @@
         <h3>macOS auf Apple Silicon</h3>
         <p class="seats">Apple Silicon · 82 MB</p>
         <p class="per-seat">Von Apple notarisiert · öffnet ohne Warnungen</p>
-        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.7/EasyPostDesktop-macOS-arm64.dmg">Für macOS herunterladen</a>
+        <a class="btn" href="https://github.com/sgf36/EasyPost/releases/download/v1.2.8/EasyPostDesktop-macOS-arm64.dmg">Für macOS herunterladen</a>
       </div>
 
       <div class="tier">
@@ -75,7 +75,7 @@
     <div class="prose" style="margin-top:2.5rem;">
       <h2>Der Windows-Download ist codesigniert</h2>
       <p>Ab Version 1.2.7 tragen beide ausführbaren Dateien eine von Microsoft ausgestellte Public-Trust-Signatur auf den Namen <strong>Spencer Fields</strong>, sodass Windows den Herausgeber nennt, anstatt vor einem unbekannten zu warnen. Klicken Sie mit der rechten Maustaste auf die Datei und wählen Sie <strong>Eigenschaften</strong>, dann <strong>Digitale Signaturen</strong>, um sie einzusehen.</p>
-      <p>Eine Signatur ist neu in dieser Version, und SmartScreen baut seine Reputation danach auf, wie oft eine signierte Anwendung heruntergeladen und ausgeführt wird. Auf einem Rechner mit aktiviertem <strong>Smart App Control</strong> kann ein so junges Zertifikat trotzdem zurückgehalten werden. Sollte das geschehen, ist die Version aus dem Microsoft Store der reibungslosere Weg, da sie Microsofts eigene Signatur trägt.</p>
+      <p>Die Signatur kam mit 1.2.7 hinzu, und SmartScreen baut seinen Ruf darauf auf, wie oft eine signierte Anwendung heruntergeladen und ausgeführt wird. Auf einem Rechner mit aktivierter <strong>Smart App Control</strong> kann ein so neues Zertifikat noch zurückgehalten werden. In diesem Fall trägt die Version aus dem Microsoft Store Microsofts eigene Signatur und ist der reibungslosere Weg.</p>
       <p>Um den Download selbst vor der Ausführung zu prüfen, vergleichen Sie seine Prüfsumme mit der folgenden Liste:</p>
       <pre><code>powershell -Command "Get-FileHash .\EasyPostDesktop-Windows-x64.zip -Algorithm SHA256"</code></pre>
 
@@ -89,8 +89,8 @@
 
       <h2>Prüfsummen</h2>
       <p>SHA-256, für alle, die einen Download vor dem Ausführen überprüfen möchten:</p>
-      <pre><code>fb19b693d8a274e1244546b6a31a106e4532d2fe82fa19b50c74638502208e6a  EasyPostDesktop-Windows-x64.zip
-c00e422b40c0bb8489f45c09ed4310e9c9ff6c14f394d30fe31c6d4023cb0882  EasyPostDesktop-macOS-arm64.dmg</code></pre>
+      <pre><code>65390260cd5ede5482103bf3a023a26b99a5e3b2c70755a78f3feccec277ddf1  EasyPostDesktop-Windows-x64.zip
+185f831d75c5b126c82be3c76eed6aab0e1515005b5f987ebe5fdc516144ea58  EasyPostDesktop-macOS-arm64.dmg</code></pre>
 
       <h2>Voraussetzungen</h2>
       <ul>
