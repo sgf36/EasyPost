@@ -490,6 +490,18 @@ jobs:
             platform: mac
           - os: windows-latest
             platform: windows
+          # The Microsoft Store listing is a third size, not a variant of the
+          # Windows one. make_screenshots.py's own table says why: "store" is
+          # 1600x1000, "the size the Microsoft Store listing sources in
+          # store_assets/screenshots are captured at. A replacement has to match
+          # its siblings exactly or it sits visibly different in the carousel
+          # beside the eight it did not replace."
+          #
+          # Without this row the only Windows-shaped output is 1366x768, which
+          # is 16:9 against the listing's 16:10 — a different shape in the same
+          # carousel. Forty languages were built that way before anyone checked.
+          - os: windows-latest
+            platform: store
         locale: ${{ fromJSON(needs.locales.outputs.list) }}
     runs-on: ${{ matrix.target.os }}
     steps:
