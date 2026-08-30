@@ -214,6 +214,83 @@ def _size_widget_column(table, col: int, *, padding: int = 16) -> None:
         table.setColumnWidth(col, width + padding)
 
 
+#: Never let the badge column squeeze below this. Narrower than a short badge,
+#: wide enough that the column still reads as a column rather than a seam.
+_RATE_BADGE_FLOOR = 44
+
+
+def _fit_rate_columns(tree, *, padding: int = 12) -> None:
+    """Give the carrier-and-service column the width its text actually needs.
+
+    Column 0 was Stretch, so it took whatever the other four left it, and those
+    four were sized by ResizeToContents -- which measures the *header* as well
+    as the data. In English the headers are short and column 0 gets enough. In
+    Tamil, Telugu and Arabic "Included", "Rate" and "Est. days" run two to three
+    times longer, the badge text with them, and the service name is what loses:
+    the Store screenshots for those languages showed "Stanc", "Next l" and
+    "Royal Mail 2" where the app should read "Standard" and "Royal Mail 2nd
+    Class".
+
+    Carrier and service names are never translated -- they are the carrier's own
+    product names -- so column 0 needs the same width in every language. What
+    varies is everything competing with it. The priority is therefore fixed here
+    rather than left to Qt:
+
+        service name  >  rate  >  estimated days  >  badge
+
+    A clipped badge still reads as a badge, and a clipped header is a word the
+    reader can infer from the column beneath it. A clipped service name is a
+    false statement about what the button beside it buys.
+
+    So: headers elide instead of forcing width, the two compact columns are
+    sized to their data, column 0 takes what it needs, and the badge column
+    absorbs whatever is left over or missing.
+    """
+    header = tree.header()
+    viewport = tree.viewport().width()
+    if viewport <= 0:                  # not laid out yet; nothing to divide up
+        return
+
+    header.setTextElideMode(Qt.TextElideMode.ElideRight)
+    for col in (0, 1, 2, 3):
+        header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
+
+    fm = tree.fontMetrics()
+    indent = tree.indentation()
+
+    def widest(item, depth: int) -> int:
+        width = fm.horizontalAdvance(item.text(0)) + indent * (depth + 1)
+        for i in range(item.childCount()):
+            width = max(width, widest(item.child(i), depth + 1))
+        return width
+
+    needed = padding
+    for i in range(tree.topLevelItemCount()):
+        needed = max(needed, widest(tree.topLevelItem(i), 0) + padding)
+
+    # sizeHintForColumn measures the items only, so a long header no longer
+    # drags these two wider than the figures they hold.
+    compact = {c: tree.sizeHintForColumn(c) + padding for c in (2, 3)}
+    buy = header.sectionSize(_RATE_COLUMN_COUNT - 1)
+
+    room = max(viewport - sum(compact.values()) - buy, 0)
+    badge = tree.sizeHintForColumn(1) + padding
+    if needed + badge > room:
+        # Contested. The badge gives way first, to its floor, and then past it
+        # to nothing: a floor that is honoured while the service name clips
+        # would invert the whole priority, which is what the first draft did --
+        # 185px of column for 223px of name, to keep a 44px badge.
+        badge = room - needed
+        if badge >= _RATE_BADGE_FLOOR:
+            badge = max(_RATE_BADGE_FLOOR, badge)
+        else:
+            badge = max(0, badge)
+    header.resizeSection(0, max(room - badge, 0))
+    header.resizeSection(1, badge)
+    for col, width in compact.items():
+        header.resizeSection(col, width)
+
+
 def _fit_columns_to_widgets(table, *, stretch_col: int = 0, padding: int = 20) -> None:
     """Size each non-stretch column to fit the wider of its header text and its
     widest cell widget. Used for tables whose cells are all widgets (spin boxes,
@@ -986,15 +1063,17 @@ class CreateShipmentView(QWidget):
         self._rates_tree.setColumnCount(_RATE_COLUMN_COUNT)
         self._rates_tree.setHeaderLabels(rate_columns)
         header = self._rates_tree.header()
-        # Carrier & service (col 0) absorbs the slack; the compact columns —
-        # Included, Rate and Est. days — size to their own content. The Buy
-        # column holds a widget, which ResizeToContents can't measure — left to
-        # itself it collapses and clips the button, so it's Fixed and sized
-        # explicitly in _resize_rates_tree_to_content instead.
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        # All four text columns are divided explicitly in _fit_rate_columns,
+        # which runs on every rebuild. Stretch on column 0 plus ResizeToContents
+        # on the rest looks right and is not: ResizeToContents measures the
+        # HEADER as well as the data, so a language with long header words took
+        # the width out of the service name — the one column that must never be
+        # cut. The Buy column holds a widget Qt won't measure at all, so it stays
+        # Fixed and is sized to the widest button in _resize_rates_tree_to_content.
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Interactive)
         header.setSectionResizeMode(_RATE_COLUMN_COUNT - 1, QHeaderView.ResizeMode.Fixed)
         # Don't let Qt stretch the last (Buy) section — it's sized to the button,
         # and a stretched final column would swallow col 0's slack.
@@ -1220,6 +1299,9 @@ class CreateShipmentView(QWidget):
 
         if buy_width:
             tree.setColumnWidth(_RATE_COLUMN_COUNT - 1, buy_width + 16)
+        # After the Buy column, because it is one of the fixed costs the text
+        # columns are divided around.
+        _fit_rate_columns(tree)
         tree.setFixedHeight(total_height + 2)
 
     def _build_result_group(self) -> QGroupBox:
