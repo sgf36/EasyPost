@@ -11,6 +11,22 @@ The only change since 1.2.7 is the in-app review prompt (#31). It behaves
 differently per channel, and only two of the three channels have anything to
 announce.
 
+> **Correction, 2026-08-30, made while submitting.** The sections below claimed
+> the Tools-page removal is visible to a Store customer. It is not. At `v1.2.6`
+> that entry was gated in `main_window.py` on
+> `not (STORE_BUILD or MAS_BUILD) and production_allowed()`, so it never
+> appeared on a Store or Mac App Store build at all — which is exactly what
+> `RELEASE-NOTES-1.2.7.md` says, and why 1.2.7 was skipped on both. Verified by
+> reading the code at the tag rather than by trusting either document.
+>
+> **Both submissions therefore describe the review prompt and nothing else.**
+> The signing paragraph is dropped for the same reason it was dropped from
+> 1.2.7: Microsoft re-signs Store packages, so the certificate changes nothing
+> for the person reading the note. What shipped is in
+> `release-notes-1.2.8-translations.json` (47 languages, longest 516 characters
+> against the 1500 cap) and, for the Mac App Store, in 28 locales through the
+> App Store Connect API.
+
 **On the Microsoft Store and the Mac App Store**, the application may now ask
 whether you would rate it. It asks at the moment a label renders successfully,
 never on a first label, never within seven days of installation, never within
@@ -78,7 +94,24 @@ python store_assets/build_releasenotes_import.py \
 
 ## Still outstanding on the listing, and not fixed here
 
-The listing declares **no in-app purchases** while `production_unlock` is live
-at $29.99. Carried forward from 1.2.7. It belongs in the same submission as the
-copy in `LISTING-COPY-2026-08.md` rather than spending a certification cycle of
-its own.
+~~The listing declares **no in-app purchases** while `production_unlock` is live
+at $29.99.~~ **Not a defect — checked 2026-08-30 and closed.** The live listing
+returns `HasAddOns: True`: Microsoft derives the in-app-purchase flag from the
+published add-on and there is no checkbox to tick. The only related control in
+Properties reads *"This product allows users to make purchases, but does not use
+the Microsoft Store commerce system"*, and it must stay **unticked** —
+`production_unlock` is a Store add-on and does use that system, so ticking it
+would be a false declaration.
+
+**The screenshots need nothing.** They show the current interface: nothing on
+those nine screens has changed since 1.2.6, and the only two commits touching
+`app/ui` since are the review prompt and the Android page removal, which was
+never visible on a Store build.
+
+A same-day audit claimed otherwise and was wrong. Hashing all 423 published
+images showed slots 1-3 byte-identical to English in 36 of 47 languages, which
+looked like a partial re-render. Compared position-free instead, **exactly 40
+languages carry the nine English images reordered and exactly 7 have their own
+set (en, de, es, fr, hi, ja, zh)** — the split `LISTING_IMPORT.md` describes as
+normal practice. Slot order differs per language, so comparing slot against slot
+compares different pages.
