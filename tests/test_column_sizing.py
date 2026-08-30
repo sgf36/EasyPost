@@ -69,7 +69,7 @@ def test_service_name_survives_long_headers_and_badges(qapp):
          "மதிப்பீட்டு நாட்கள்", ""],
         [service, "Royal Mail 2nd Class"],
         "கண்காணிக்கப்படுகிறது",
-        430,
+        900,
     )
     _fit_rate_columns(tree)
     fm = tree.fontMetrics()
@@ -78,6 +78,27 @@ def test_service_name_survives_long_headers_and_badges(qapp):
         f"service name clipped: column 0 is {tree.columnWidth(0)}px "
         f"for {need}px of text"
     )
+
+
+def test_service_name_outranks_the_badge_when_space_is_short(qapp):
+    """The same Tamil headers in a pane too narrow for everything.
+
+    Deliberately no absolute pixel assertion: how much fits depends on which
+    fonts the machine has, which is why the first version of the test above
+    passed locally at 430px and failed on CI. What must hold everywhere is the
+    ORDER — the name is fed before the badge.
+    """
+    from app.ui.views.create_shipment_view import _fit_rate_columns
+
+    tree = _rates_tree(
+        ["கேரியர் மற்றும் சேவை", "உள்ளடக்கியது", "கட்டணம்",
+         "மதிப்பீட்டு நாட்கள்", ""],
+        ["Royal Mail 1st Class Signed For", "Royal Mail 2nd Class"],
+        "கண்காணிக்கப்படுகிறது",
+        430,
+    )
+    _fit_rate_columns(tree)
+    assert tree.columnWidth(0) > tree.columnWidth(1)
 
 
 def test_english_layout_is_not_made_worse(qapp):
@@ -141,7 +162,7 @@ def test_the_view_actually_calls_the_sizing(qapp):
          "மதிப்பீட்டு நாட்கள்", ""],
         [service, "Royal Mail 2nd Class"],
         "கண்காணிக்கப்படுகிறது",
-        430,
+        900,
     )
     CreateShipmentView._resize_rates_tree_to_content(
         SimpleNamespace(_rates_tree=tree)
