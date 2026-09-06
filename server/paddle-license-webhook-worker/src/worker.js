@@ -282,6 +282,41 @@ const PRODUCTS = {
       "Something else",
     ]),
   },
+  dawnlist: {
+    id: "dawnlist",
+    name: "Dawnlist",
+    // No Resend account of its own yet, and no inbound MX on the domain, so
+    // both of these env entries stay unset: resolveSender() falls back to the
+    // Easy-Post account under a "Dawnlist Support" display name, and
+    // replyDomainFor() keeps replies routing through the Easy-Post domain.
+    // Set them when the product ships and Resend has verified the domain.
+    keyVar: "RESEND_API_KEY_DAWNLIST",
+    fromVar: "DAWNLIST_FROM_EMAIL",
+    replyDomain: "dawnlist.spencerfields.com",
+    webhookSecretVar: "RESEND_WEBHOOK_SECRET_DAWNLIST",
+    // The site has one form and one topic, so the model is allowed to answer
+    // it. What it is allowed to say is bounded by the facts below, which state
+    // plainly that there is no date, no price and nothing to download -- the
+    // three things a waiting-list enquiry actually asks about.
+    aiAutoTopics: new Set(["Dawnlist waiting list", "Dawnlist waiting list — question"]),
+    // Topics that are discharged by the acknowledgement alone. A bare sign-up
+    // is not a question and nobody is going to answer it individually, so
+    // tagging every one "[needs reply]" would bury the tag for the mail that
+    // actually does. The site sends the "— question" variant when something
+    // was typed in the note, and that keeps the tag.
+    noReplyTopics: new Set(["Dawnlist waiting list"]),
+    // Standard acknowledgements promise a personal reply within a business
+    // day. That is right for support and wrong for a sign-up: most of these
+    // carry no question and nobody is going to answer them individually.
+    // A product may therefore state its own, and it is translated into the
+    // sender's language on the same path a model answer takes.
+    ackEnglish:
+      "Thank you for joining the Dawnlist waiting list. The address given " +
+      "will be used once, to say when there is something real to try, and " +
+      "for nothing else. There is no date yet and nothing to download.\n\n" +
+      "No reply to this message is needed. Anything worth asking in the " +
+      "meantime is welcome at Apps@spencerfields.com.",
+  },
 };
 
 const DEFAULT_PRODUCT = "easy-post";
@@ -375,9 +410,23 @@ const SOFTWARE_FACTS = `- Spencer Fields is a sole trader established in the Uni
 - Purchases are handled by the store or merchant of record -- Paddle for Easy-Post Desktop, Apple for App Store purchases -- so this business never sees payment details.
 - Contact: Apps@spencerfields.com .`;
 
+const DAWNLIST_FACTS = `- Dawnlist is a desktop application for macOS and Windows for people looking for work. It reads job feeds every morning, judges every posting against a fit brief it builds by interviewing the user, and hands back a ranked shortlist with the rejected postings still visible and the reason for each rejection stated.
+- STATUS: Dawnlist is IN DEVELOPMENT and is NOT available. There is nothing to buy, nothing to download, no beta and NO RELEASE DATE. Never estimate or imply one. The waiting list at https://dawnlist.spencerfields.com/ is the only way to be told when there is something to try, and joining it is all anyone can do right now.
+- PRICING IS NOT SETTLED and no figure has been published. Never quote, estimate or hint at a price, and never describe it as free, paid, subscription or one-time.
+- It NEVER sends anything. Every outreach path ends in a draft that opens in the user's own mail application, addressed and composed; the user sends it. The application contains no code for sending mail at all. This is the deliberate position against services that apply automatically on someone's behalf.
+- It reads no mailbox. There is no mail account connection, no password and no sign-in of any kind. Job-alert emails and the user's own writing samples are dragged onto the application as files by the user.
+- Postings come from licensed job-data providers indexing employer career pages and applicant tracking systems across nearly two hundred countries, reached through a proxy run by Spencer Fields, plus job-alert emails the user drags in from any sender.
+- Onboarding is an interview: the application reads existing curricula vitae and asks what the evidence supports, what is ambition rather than record, and what disqualifies a role. It produces a fit brief and a background factsheet the user can edit. Before daily runs begin, it shows its verdicts on a sample of live postings and the user corrects them. Target is thirty to forty-five minutes from first launch to first shortlist.
+- Every run shows its full funnel counts -- swept, deduplicated, gated, screened, assessed -- and a count is never shown without what it excludes. Postings set aside stay browsable with their reasons. A rejection on a stated requirement quotes the line that caused it.
+- It tracks every company pursued inside the application: stage, an evidence log, and the next step date. Follow-up timing comes from evidenced contact, never falls on a Monday or a Friday, and an out-of-office with a return date moves the next approach to a week after that return. There are no integrations with other tracking tools in the first release.
+- It does not write curricula vitae, does not apply to anything on anyone's behalf, and promises no outcome.
+- Data: postings, decisions, drafts and the tracker live in a database on the user's own machine and export on request. Assessment and drafting use a large language model, so the fit brief, factsheet and posting text are sent off the machine for processing. The full privacy policy is published before anything can be bought.
+- Dawnlist is the third application from Spencer Fields, alongside Easy-Post Desktop and Wren. Site: https://dawnlist.spencerfields.com/ . Contact: Apps@spencerfields.com .`;
+
 PRODUCTS["easy-post"].facts = EASY_POST_FACTS;
 PRODUCTS.wren.facts = WREN_FACTS;
 PRODUCTS.software.facts = SOFTWARE_FACTS;
+PRODUCTS.dawnlist.facts = DAWNLIST_FACTS;
 
 async function resendSend(env, { from, to, replyTo, subject, text, html, apiKey }) {
   const payload = { from, to: [to], reply_to: replyTo, subject, text };
@@ -645,19 +694,34 @@ async function handleContact(request, env) {
   //    Skipped entirely for spam: acknowledging unsolicited outreach only
   //    confirms the address and invites more, and the owner still gets it below.
   if (!isSpam) {
-    // The template builds both halves and labels each with its language. Only
-    // a real AI answer needs translating here; the standard acknowledgement is
-    // already in the email string table.
+    /*
+     * What the customer is told, in order of preference:
+     *   1. the model's answer, when there was one;
+     *   2. the product's own acknowledgement, where it defines one;
+     *   3. the standard acknowledgement from the string table.
+     *
+     * (2) exists because the standard text promises a personal reply within a
+     * business day. That is right for support and wrong for a waiting-list
+     * sign-up, most of which carry no question. Passing it as `english` sends
+     * it down the same path a model answer takes -- including translation --
+     * while `isAutoReply` stays false, because a fixed sentence is not a
+     * drafted reply and must not be labelled as one.
+     */
+    const customerBody = aiReply || product.ackEnglish || null;
+
+    // The template builds both halves and labels each with its language. The
+    // string table already holds the standard acknowledgement translated, so
+    // only a body that came from here needs the model.
     const translatedAnswer =
-      detected.translated && aiReply
-        ? await fromEnglish(env, aiReply, detected.lang, detected.langName)
+      detected.translated && customerBody
+        ? await fromEnglish(env, customerBody, detected.lang, detected.langName)
         : null;
 
     const customer = contactCustomerEmail({
       name,
       topic,
       caseId,
-      english: aiReply,
+      english: customerBody,
       translated: translatedAnswer,
       lang: detected.translated ? detected.lang : "en",
       productName: product.name,
@@ -703,6 +767,8 @@ async function handleContact(request, env) {
     triageNote: triageNote + "\n" + languageNote,
     message: ownerMessage, autoReplied,
     spam: isSpam, productName: product.name, productId: product.id,
+    // Discharged by the acknowledgement alone — see noReplyTopics.
+    noReplyNeeded: Boolean(product.noReplyTopics && product.noReplyTopics.has(topic)),
   });
   const r = await resendSend(env, {
     apiKey: ownerSender.apiKey,
