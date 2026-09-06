@@ -94,6 +94,29 @@ const BRANDS = {
     ],
     support: "Apps@spencerfields.com",
   },
+  dawnlist: {
+    // The product teal and the gold that goes on it, straight out of
+    // brand-dawnlist/README.md. No colour was invented for email: that file
+    // says no new colours, and an email is not an exception.
+    green: "#1E4B45",
+    greenDark: "#16352F",
+    wordmarkColor: "#DDA758", // gold lifted: the on-dark variant
+    ink: INK,
+    body: BODY,
+    muted: MUTED,
+    cream: "#f0ece4",
+    rule: "#e4ddcd",
+    white: WHITE,
+    footerKey: "footer_product",
+    wordmark: "Dawnlist",
+    footerName: "Dawnlist",
+    site: "https://dawnlist.spencerfields.com",
+    // One link only. The site is a single page: there is no support page and
+    // no privacy policy yet, and a footer link to a 404 is worse than none.
+    // Add both when the product ships.
+    links: [["link_website", ""]],
+    support: "Apps@spencerfields.com",
+  },
 };
 
 // Every pre-existing builder — the licence email above all — was written
@@ -445,6 +468,7 @@ export function contactOwnerEmail({
   message,
   autoReplied,
   spam = false,
+  noReplyNeeded = false,
   productName = "Easy-Post Desktop",
   productId = "easy-post",
 }) {
@@ -467,7 +491,21 @@ export function contactOwnerEmail({
     </tr>`;
   const bodyHtml =
     heading(`New ${productName} enquiry`, br) +
-    refBox("Case", caseId, spam ? "Likely spam — no acknowledgement sent." : autoReplied ? "Customer already received an automated first reply." : "Awaiting your reply.", br) +
+    refBox(
+      "Case",
+      caseId,
+      spam
+        ? "Likely spam — no acknowledgement sent."
+        : autoReplied
+        ? "Customer already received an automated first reply."
+        // Must agree with the subject prefix above. It said "Awaiting your
+        // reply" on a waiting-list sign-up tagged "[on the list]", which is a
+        // straight contradiction inside one message.
+        : noReplyNeeded
+        ? "Acknowledged. No reply expected — for your records."
+        : "Awaiting your reply.",
+      br
+    ) +
     `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px;">
       ${row("Name", name)}
       ${row("Email", email, true)}
@@ -483,7 +521,17 @@ export function contactOwnerEmail({
     // Product goes in the subject because two products now land in the same
     // inbox and the case reference does not distinguish them.
     subject:
-      (spam ? "[spam?] " : autoReplied ? "[auto-replied] " : "[needs reply] ") +
+      (spam
+        ? "[spam?] "
+        : autoReplied
+        ? "[auto-replied] "
+        // A waiting-list sign-up carries no question and gets a fixed
+        // acknowledgement, so it is already discharged. Tagging those
+        // "[needs reply]" too would make the tag meaningless on the mail
+        // that genuinely needs one.
+        : noReplyNeeded
+        ? "[on the list] "
+        : "[needs reply] ") +
       `[${productName}] [${caseId}] ${topic} — ${name}`,
     text,
     html: emailShell({
