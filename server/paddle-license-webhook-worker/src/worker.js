@@ -285,11 +285,36 @@ const PRODUCTS = {
   dawnlist: {
     id: "dawnlist",
     name: "Dawnlist",
-    // No Resend account of its own yet, and no inbound MX on the domain, so
-    // both of these env entries stay unset: resolveSender() falls back to the
-    // Easy-Post account under a "Dawnlist Support" display name, and
-    // replyDomainFor() keeps replies routing through the Easy-Post domain.
-    // Set them when the product ships and Resend has verified the domain.
+    /*
+     * KNOWN WRONG, AND KEPT ON PURPOSE UNTIL THE DOMAIN IS VERIFIED.
+     *
+     * These stay unset, so resolveSender() falls back to the Easy-Post account
+     * and mail goes out as "Dawnlist Support <licenses@easy-post.
+     * spencerfields.com>". That address is wrong for this product twice over —
+     * the wrong domain and a "licenses@" mailbox that means nothing to somebody
+     * joining a waiting list.
+     *
+     * It was pointed at the software account on 2026-09-06 to fix exactly that,
+     * and reverted the same hour. Measured, not assumed: the Worker reported
+     * `sent` and `own_account: true`, and the message had still not reached the
+     * mailbox eighteen minutes later, while a control sent through the
+     * Easy-Post account at the same moment arrived in twenty-three seconds. A
+     * waiting list that silently loses sign-ups is far worse than one whose
+     * confirmations carry an odd From address, so the delivering path wins
+     * until the right one is proven.
+     *
+     * END STATE: verify dawnlist.spencerfields.com in Resend, add its DKIM and
+     * SPF records, then set RESEND_API_KEY_DAWNLIST and DAWNLIST_FROM_EMAIL.
+     * Do NOT set webhookSecretVar until an inbound route exists: replyDomainFor
+     * returns product.replyDomain the moment that var is set, and naming a
+     * domain with no inbound MX has Resend accept every reply and drop it —
+     * worse than no relay, because the owner believes they replied.
+     * spencerfields.com's own MX is Microsoft 365 and must not be touched.
+     *
+     * The software account's own deliverability is now in doubt and worth
+     * checking on its own account: software.spencerfields.com's contact form
+     * sends through it.
+     */
     keyVar: "RESEND_API_KEY_DAWNLIST",
     fromVar: "DAWNLIST_FROM_EMAIL",
     replyDomain: "dawnlist.spencerfields.com",
