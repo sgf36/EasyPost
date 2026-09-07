@@ -398,30 +398,37 @@ function resolveSender(env, product, displaySuffix) {
  * never the Worker. Microsoft accepted and then filtered, on a sending domain
  * with almost no history.
  *
- * Nor was it the message shape, which was the standing hypothesis for a day. On
- * 2026-09-07 a 2x2 was sent from `support@wren.spencerfields.com` -- bracketed
- * subject tags on/off, the IP row on/off, everything else identical. ALL FOUR
- * arrived, including the variant byte-for-byte equivalent to the one that
- * vanished. A single probe from `support@software.spencerfields.com` arrived
- * too. Both domains have simply warmed up.
+ * THE MESSAGE SHAPE IS PART OF IT, AND A PROBE THAT SIMPLIFIES THE MESSAGE
+ * PROVES NOTHING. On 2026-09-07 a 2x2 went from `support@wren.spencerfields.com`
+ * -- bracketed subject tags on/off, the IP row on/off -- and all four arrived,
+ * as did one from `support@software.spencerfields.com`. That looked like proof
+ * the domains had warmed up, the branded senders went back on, and the very
+ * next REAL owner forward through the live form (EPD-260907-R6Z2, sent 12:42:24
+ * on the wren account, Resend `delivered`) never reached the mailbox.
  *
- * So the branded sender is restored, per product, on evidence rather than on
- * hope -- and PROVEN_OWNER_SENDERS is the list of what has actually been shown
- * to arrive. Anything not in it falls back to the Easy-Post account, which has
- * the longest sending history of the three.
+ * The probes were hand-built: a small HTML table and a sentence. The real thing
+ * carries emailShell -- preheader, styled shell, footer links -- the customer's
+ * own words, and a live reply+<token> Reply-To. Whatever Microsoft scores, it is
+ * in the difference, and the probe threw exactly that away. A simplified probe
+ * of a message that is filtered is a checker, not the artefact.
  *
- * HOW TO ADD A PRODUCT TO THE LIST. Send one owner-forward-shaped message from
- * that product's account to CONTACT_TO_EMAIL, wait five minutes, and find it in
- * the mailbox. Resend's `last_event: delivered` is NOT that evidence -- it is
- * one hop earlier and looks identical on a message about to be quarantined.
- * The keys are in Credential Manager (`<product>-resend`), so this needs no
- * dashboard.
+ * So the list holds only what has been seen to arrive AS THE REAL ARTEFACT,
+ * which today is the Easy-Post account alone. Anything not in it falls back to
+ * it. Nothing here is a guess about why.
+ *
+ * HOW TO ADD A PRODUCT TO THE LIST. Not with a probe. Put the product in the
+ * set, deploy, submit its real form, and find THAT message in the mailbox five
+ * minutes later. Resend's `last_event: delivered` is not the evidence either --
+ * it means the receiving server accepted the message, which is one hop earlier
+ * than a human seeing it and looks identical on a message about to be
+ * quarantined. Only the mailbox counts. (Account keys are in Credential Manager
+ * under `<product>-resend` if a send needs reproducing outside the Worker.)
  *
  * HOW TO REVERT. Empty the set. Every owner forward then goes out on the
  * Easy-Post account, which is where this stood between 2026-09-07 12:29 and
  * 13:0x, and which is known to work.
  */
-const PROVEN_OWNER_SENDERS = new Set(["easy-post", "wren", "software"]);
+const PROVEN_OWNER_SENDERS = new Set(["easy-post"]);
 
 function resolveOwnerSender(env, product) {
   if (PROVEN_OWNER_SENDERS.has(product.id)) {
