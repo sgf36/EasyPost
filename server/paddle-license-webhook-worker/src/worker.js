@@ -412,15 +412,19 @@ function resolveSender(env, product, displaySuffix) {
  * looking too early, in opposite directions.
  *
  * The list therefore holds what has been seen arriving AS THE REAL ARTEFACT,
- * end to end through the live form: easy-post, and wren (EPD-260907-R6Z2,
- * 12:45:46). Anything not in it falls back to the Easy-Post account.
+ * end to end through each product's own live form:
+ *
+ *   wren      EPD-260907-B29T  sent 12:49:20, arrived 12:51:58
+ *   software  EPD-260907-P9QC  sent ~12:54,   arrived 12:55:04
+ *
+ * plus easy-post, which never stopped working. Anything not in the list falls
+ * back to the Easy-Post account.
  *
  * HOW TO ADD A PRODUCT TO THE LIST. Put the product in the set, deploy, submit
  * its real form, and find THAT message in the mailbox. WAIT FIVE FULL MINUTES
  * before concluding anything -- see above; the acknowledgement arrives in
  * seconds and the forward does not, and that gap is normal rather than a
- * symptom. (`software` is in the list on a probe plus its acknowledgement path;
- * its real owner forward is being confirmed now.) Resend's `last_event: delivered` is not the evidence either --
+ * symptom. Resend's `last_event: delivered` is not the evidence either --
  * it means the receiving server accepted the message, which is one hop earlier
  * than a human seeing it and looks identical on a message about to be
  * quarantined. Only the mailbox counts. (Account keys are in Credential Manager
