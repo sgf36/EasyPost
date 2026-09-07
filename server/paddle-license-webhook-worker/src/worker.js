@@ -383,35 +383,65 @@ function resolveSender(env, product, displaySuffix) {
 }
 
 /**
- * Who the OWNER forward is sent as — always the Easy-Post account.
+ * Who the OWNER forward is sent as.
  *
- * Not a fallback and not a bug. Measured 2026-09-06, posting to /contact one
- * product at a time with the same From and To on every send, so neither
- * address was the variable:
+ * The product's own account, for products measured to deliver one. That measure
+ * is not optional and not a formality: on 2026-09-06 the wren and software
+ * accounts delivered their customer acknowledgements and silently lost every
+ * owner forward, so a customer was told "we have received your message" and
+ * nobody ever saw it.
  *
- *   easy-post   customer acknowledgement ~23s    owner forward ~96s
- *   software    customer acknowledgement ~140s   owner forward NEVER
- *   wren        customer acknowledgement ~124s   owner forward NEVER
+ * WHAT THAT WAS, AND WHAT IT WAS NOT. Resend reported `delivered` for the lost
+ * messages, which means Microsoft ACCEPTED them; they simply never reached the
+ * mailbox. So it was never Resend, never DNS (the three subdomains are
+ * identical in shape and all inherit `_dmarc.spencerfields.com`, `p=none`), and
+ * never the Worker. Microsoft accepted and then filtered, on a sending domain
+ * with almost no history.
  *
- * Each product's own account delivers the customer acknowledgement perfectly
- * well. What it cannot deliver is the owner forward, which is the spammier
- * artefact of the two — a subject opening "[needs reply]", an IP address in
- * the body, and a reply+<token>@ Reply-To — and only the Easy-Post domain has
- * enough sending history to carry it. DNS is not the difference: all three
- * subdomains are identical in shape, and none of them has a DMARC record.
+ * THE SHAPE WAS NEVER THE PROBLEM, AND THE CLOCK NEARLY FOOLED US TWICE. On
+ * 2026-09-07 a 2x2 went from `support@wren.spencerfields.com` -- bracketed
+ * subject tags on/off, the IP row on/off -- and all four arrived, as did one
+ * from `support@software.spencerfields.com`. The branded senders went back on.
+ * The next REAL owner forward (EPD-260907-R6Z2, wren account) had not appeared
+ * ~100 seconds later, that was read as a regression, and it was reverted --
+ * and then the message arrived, 3 minutes 22 seconds after sending.
  *
- * So: the mail a CUSTOMER sees keeps its product's own branded sender, and the
- * mail only the owner sees goes out on the path that actually arrives. The
- * product is still named in the display name and in the subject, so nothing is
- * lost by it, and a support enquiry that silently never arrives is the worst
- * failure this Worker has.
+ * So the branded sender works, and the only real finding is the one that keeps
+ * being relearned: **these take three to four minutes, and checking at ninety
+ * seconds reads exactly like failure.** Two wrong conclusions today came from
+ * looking too early, in opposite directions.
  *
- * Revisit only with evidence: send one owner forward through the product's own
- * account, and confirm it in the mailbox. `sent`, `own_account: true` and a
- * Resend message id all appear exactly the same on a message that is later
- * quarantined, so none of them is that evidence.
+ * The list therefore holds what has been seen arriving AS THE REAL ARTEFACT,
+ * end to end through each product's own live form:
+ *
+ *   wren      EPD-260907-B29T  sent 12:49:20, arrived 12:51:58
+ *   software  EPD-260907-P9QC  sent ~12:54,   arrived 12:55:04
+ *
+ * plus easy-post, which never stopped working. Anything not in the list falls
+ * back to the Easy-Post account.
+ *
+ * HOW TO ADD A PRODUCT TO THE LIST. Put the product in the set, deploy, submit
+ * its real form, and find THAT message in the mailbox. WAIT FIVE FULL MINUTES
+ * before concluding anything -- see above; the acknowledgement arrives in
+ * seconds and the forward does not, and that gap is normal rather than a
+ * symptom. Resend's `last_event: delivered` is not the evidence either --
+ * it means the receiving server accepted the message, which is one hop earlier
+ * than a human seeing it and looks identical on a message about to be
+ * quarantined. Only the mailbox counts. (Account keys are in Credential Manager
+ * under `<product>-resend` if a send needs reproducing outside the Worker.)
+ *
+ * HOW TO REVERT. Empty the set. Every owner forward then goes out on the
+ * Easy-Post account, which is where this stood between 2026-09-07 12:29 and
+ * 13:0x, and which is known to work.
  */
+const PROVEN_OWNER_SENDERS = new Set(["easy-post", "wren", "software"]);
+
 function resolveOwnerSender(env, product) {
+  if (PROVEN_OWNER_SENDERS.has(product.id)) {
+    // Display name without a suffix: this is internal mail and "Wren Support"
+    // would read as the customer-facing sender it is not.
+    return resolveSender(env, product, "");
+  }
   const deliverable = PRODUCTS[DEFAULT_PRODUCT];
   return {
     apiKey: env[deliverable.keyVar],
