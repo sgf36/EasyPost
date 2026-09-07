@@ -382,6 +382,44 @@ function resolveSender(env, product, displaySuffix) {
   };
 }
 
+/**
+ * Who the OWNER forward is sent as — always the Easy-Post account.
+ *
+ * Not a fallback and not a bug. Measured 2026-09-06, posting to /contact one
+ * product at a time with the same From and To on every send, so neither
+ * address was the variable:
+ *
+ *   easy-post   customer acknowledgement ~23s    owner forward ~96s
+ *   software    customer acknowledgement ~140s   owner forward NEVER
+ *   wren        customer acknowledgement ~124s   owner forward NEVER
+ *
+ * Each product's own account delivers the customer acknowledgement perfectly
+ * well. What it cannot deliver is the owner forward, which is the spammier
+ * artefact of the two — a subject opening "[needs reply]", an IP address in
+ * the body, and a reply+<token>@ Reply-To — and only the Easy-Post domain has
+ * enough sending history to carry it. DNS is not the difference: all three
+ * subdomains are identical in shape, and none of them has a DMARC record.
+ *
+ * So: the mail a CUSTOMER sees keeps its product's own branded sender, and the
+ * mail only the owner sees goes out on the path that actually arrives. The
+ * product is still named in the display name and in the subject, so nothing is
+ * lost by it, and a support enquiry that silently never arrives is the worst
+ * failure this Worker has.
+ *
+ * Revisit only with evidence: send one owner forward through the product's own
+ * account, and confirm it in the mailbox. `sent`, `own_account: true` and a
+ * Resend message id all appear exactly the same on a message that is later
+ * quarantined, so none of them is that evidence.
+ */
+function resolveOwnerSender(env, product) {
+  const deliverable = PRODUCTS[DEFAULT_PRODUCT];
+  return {
+    apiKey: env[deliverable.keyVar],
+    from: `${product.name} <${env[deliverable.fromVar]}>`,
+    usingOwnAccount: false,
+  };
+}
+
 const EASY_POST_FACTS = `- Easy-Post Desktop is an independent, open-source desktop app for Windows and macOS that drives the customer's OWN EasyPost account. It does not sell postage; labels are bought through the customer's EasyPost account and EasyPost bills them directly.
 - An EasyPost account (free at easypost.com) and API key are required. A test-mode key lets them try everything with no real charges.
 - Pricing: Personal is $29 one-time for up to 3 computers and never expires. Business is $149/year for up to 10 computers. Organisation is $349/year for up to 30. Both annual tiers are subscriptions, cancellable at any time. Enterprise (more than 30 computers) is by enquiry.
@@ -401,13 +439,22 @@ const EASY_POST_FACTS = `- Easy-Post Desktop is an independent, open-source desk
  * answer from these and refuse otherwise, so a fact invented here becomes a
  * fact asserted to a customer.
  *
- * The release-status line goes stale the moment Apple approves the app. Update
- * it then, or someone asking where to download Wren will be told it is not out.
+ * The release-status line goes stale the moment Apple changes anything. It said
+ * "submitted and awaiting review, nothing to download yet" for the three weeks
+ * after 1.0 went live, so every customer asking where to get Wren was told it
+ * was not out. Updated 2026-09-07, and written so that ONE line moves on
+ * release day rather than five.
+ *
+ * The pricing line is the other one that bites: it described a single one-time
+ * purchase while 2.0 was being submitted with three products.
  */
 const WREN_FACTS = `- Wren is an independent iPhone app that turns places someone has recommended into a guide in Apple Maps. It has no account and no sign-in, and reads nothing from the customer's.
-- Places arrive three ways: from screenshots (text recognition runs on the device, so screenshots are never uploaded), from a file another app exported (CSV, KML, KMZ, GPX, GeoJSON, or a Google Takeout export of saved places), or from a guide already in Apple Maps, shared into Wren as a link.
+- Places arrive four ways: by sharing a reel or a post to Wren (version 2.0 and later -- see the STATUS line below before promising it to anybody), from screenshots (text recognition runs on the device, so screenshots are never uploaded), from a file another app exported (CSV, KML, KMZ, GPX, GeoJSON, or a Google Takeout export of saved places), or from a guide already in Apple Maps, shared into Wren as a link.
+- Sharing a reel or post: Wren sends the LINK, and proof of purchase, to a server it runs. That server fetches the post, has a language model read the place names out of it, sends the names back, and discards everything else. Nothing about the post is kept -- not the video, not the caption, not the names. Wren never signs in to Instagram, TikTok or YouTube, is not affiliated with them, and only ever asks for a post the customer chose to share.
+- A post that cannot be read: private accounts, deleted posts, and posts unavailable in the customer's country cannot be fetched at all, and Wren says which it thinks it was. Screenshotting the post and sharing the screenshots instead works on anything and is free.
+- Reading posts carries a fair-use allowance of 250 posts per rolling thirty days. The window rolls rather than resetting monthly, and the app names the date the allowance returns. It limits how fast the purchase may be used, not how long it lasts: the purchase itself never expires.
 - Wren requires iOS 18 or later. That is not a preference: the identifier Apple Maps needs for each place only exists from iOS 18, and without it nothing can be found.
-- Pricing: guides of up to three places are free, permanently. A single one-time purchase unlocks both saving a guide with more than three places and adding to a guide the customer already has. There is no subscription and nothing renews.
+- Pricing: guides of up to three places are free permanently, and reading a screenshot is free at any size. There are TWO one-time purchases. One removes the three-place limit and allows adding to a guide the customer already has. The other reads places out of a reel or post they share. Buying both together costs less than buying them apart, and someone who already owns the first is offered the second at the difference rather than the full price. There is no subscription and nothing renews or expires.
 - A purchase restores at no further cost on any device signed in to the same Apple Account: the menu in the top-right, then "Restore purchase". If it still does not restore, ask for the Apple Account email used to buy it.
 - Purchases go through Apple, so refunds do too, at https://reportaproblem.apple.com/ . Wren never receives the payment and cannot refund it directly.
 - Apple offers no way to add places to an existing guide from outside Maps. Wren therefore reads the places out of the guide shared with it and makes ONE new guide holding both the old and the new, which the customer keeps instead of the old one. Wren keeps the places afterwards, so a guide deleted by mistake can be remade in a tap. A single place is the exception: Maps itself offers to add one to a guide that already exists.
@@ -420,8 +467,8 @@ const WREN_FACTS = `- Wren is an independent iPhone app that turns places someon
 - A guide can come back with fewer places than it had. Apple silently drops a place whose record it no longer holds -- somewhere that closed, or two entries it has merged. Nothing Wren can do: those places were already unreachable if tapped in Maps.
 - Files are read by their contents rather than their extension, so a renamed file is usually fine. A row holding nothing that looks like a place name is skipped, and Wren says how many were.
 - Nothing is written to Apple Maps until the customer says so, and every place shows what was read beside what was matched, so a wrong match is obvious rather than confident.
-- In normal use only two things leave the device: a place name sent to Apple Maps so it can be found, exactly as the Maps app does, and a shared guide link sent to Apple to be expanded. Entering a complimentary access code is the only time Wren contacts a server of its own.
-- Status: Wren has been submitted to the App Store and is awaiting review. There is nothing to download yet.
+- In normal use what leaves the device is: a place name sent to Apple Maps so it can be found, exactly as the Maps app does, and a shared guide link sent to Apple to be expanded. Two things reach a server Wren runs, and only when asked for: a complimentary access code if one is entered, and the link to a reel or post if one is shared.
+- STATUS, and the only line here that changes on release day: Wren is on the App Store and can be downloaded now. The version customers have is 1.2.0, which reads screenshots, files and existing guides. Version 2.0, which reads a shared reel or post and adds the second purchase, is APPROVED BY APPLE BUT NOT YET RELEASED. Do not tell anybody they can share a reel yet, and do not quote the second purchase as something they can buy; say it is coming shortly if asked. When 2.0 is released, replace this line with "Wren is on the App Store at version 2.0, which reads shared reels and posts", and everything else here is already correct.
 - The app is translated into 47 languages.
 - Source code: https://github.com/sgf36/wren . Bug reports are also welcome at https://github.com/sgf36/wren/issues .
 - Contact: Apps@spencerfields.com . Replies come from Spencer Fields, usually within one business day.`;
@@ -430,7 +477,7 @@ const WREN_FACTS = `- Wren is an independent iPhone app that turns places someon
 // its temporal dead zone until its own declaration runs, so referencing these
 // from the PRODUCTS literal would throw at module load.
 const SOFTWARE_FACTS = `- Spencer Fields is a sole trader established in the United Kingdom, publishing software under its own name. Registered address: Lytchett House, 13 Freeland Park, Wareham Road, Lytchett Matravers, Poole, BH16 6FA.
-- Three applications: Easy-Post Desktop (Windows and macOS, available), Easy-Post Mobile Companion (Android as a direct download, iPhone edition heading to the App Store), and Wren (iPhone, submitted to the App Store and awaiting review).
+- Three applications: Easy-Post Desktop (Windows and macOS, available), Easy-Post Mobile Companion (Android as a direct download, iPhone edition heading to the App Store), and Wren (on the App Store now, and in testing on Google Play).
 - Each application has its own website carrying its own pricing, terms and privacy policy. Direct any question about a specific application to that site rather than answering it here.
 - Purchases are handled by the store or merchant of record -- Paddle for Easy-Post Desktop, Apple for App Store purchases -- so this business never sees payment details.
 - Contact: Apps@spencerfields.com .`;
@@ -704,7 +751,9 @@ async function handleContact(request, env) {
   });
 
   const customerSender = resolveSender(env, product, " Support");
-  const ownerSender = resolveSender(env, product, "");
+  // Not resolveSender: the owner forward goes out on the account measured to
+  // deliver it, whatever the product. See resolveOwnerSender().
+  const ownerSender = resolveOwnerSender(env, product);
 
   // Where a reply from the owner should land. Without the token secret this
   // stays the customer address, which is exactly the behaviour before the
@@ -807,8 +856,32 @@ async function handleContact(request, env) {
   if (!r.ok) {
     // Surface the reason so the PHP side can log it and fall back to mail().
     const detail = await r.text().catch(() => "");
+    console.log(`contact ${caseId} ${product.id}: owner forward REJECTED ${r.status}`);
     return json({ error: "resend", status: r.status, detail: detail.slice(0, 300) }, 502);
   }
+
+  /*
+   * Record which message Resend actually accepted.
+   *
+   * Until now this response was read for its status and thrown away, so a
+   * successful POST left no trace at all: `wrangler tail` showed `outcome: ok`
+   * and no logs, and there was nothing to look up in Resend's delivery log
+   * afterwards. That is what made three weeks of vanished owner forwards
+   * invisible -- not the sending, the absence of anything to check.
+   *
+   * The id is the join between "the Worker sent it" and "Resend delivered,
+   * bounced or suppressed it", and it is the ONLY one of those two facts this
+   * Worker can establish. Logged and returned, never treated as delivery.
+   */
+  const ownerMessageId = await r
+    .clone()
+    .json()
+    .then((b) => b && b.id)
+    .catch(() => null);
+  console.log(
+    `contact ${caseId} ${product.id}: owner forward accepted as ` +
+      `${ownerMessageId || "(no id returned)"} -> ${to}`
+  );
   // product is echoed so the PHP side can log which registry entry matched --
   // a site posting a typo'd product would otherwise silently get Easy-Post
   // branding and nothing would say so.
@@ -818,6 +891,10 @@ async function handleContact(request, env) {
     case_id: caseId,
     product: product.id,
     own_account: customerSender.usingOwnAccount,
+    // Resend's id for the OWNER forward, so a case that never arrived can be
+    // looked up in the delivery log rather than argued about. It means Resend
+    // accepted the message; it does not mean anybody received it.
+    owner_message_id: ownerMessageId,
   });
 }
 
