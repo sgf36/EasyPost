@@ -383,35 +383,52 @@ function resolveSender(env, product, displaySuffix) {
 }
 
 /**
- * Who the OWNER forward is sent as — always the Easy-Post account.
+ * Who the OWNER forward is sent as.
  *
- * Not a fallback and not a bug. Measured 2026-09-06, posting to /contact one
- * product at a time with the same From and To on every send, so neither
- * address was the variable:
+ * The product's own account, for products measured to deliver one. That measure
+ * is not optional and not a formality: on 2026-09-06 the wren and software
+ * accounts delivered their customer acknowledgements and silently lost every
+ * owner forward, so a customer was told "we have received your message" and
+ * nobody ever saw it.
  *
- *   easy-post   customer acknowledgement ~23s    owner forward ~96s
- *   software    customer acknowledgement ~140s   owner forward NEVER
- *   wren        customer acknowledgement ~124s   owner forward NEVER
+ * WHAT THAT WAS, AND WHAT IT WAS NOT. Resend reported `delivered` for the lost
+ * messages, which means Microsoft ACCEPTED them; they simply never reached the
+ * mailbox. So it was never Resend, never DNS (the three subdomains are
+ * identical in shape and all inherit `_dmarc.spencerfields.com`, `p=none`), and
+ * never the Worker. Microsoft accepted and then filtered, on a sending domain
+ * with almost no history.
  *
- * Each product's own account delivers the customer acknowledgement perfectly
- * well. What it cannot deliver is the owner forward, which is the spammier
- * artefact of the two — a subject opening "[needs reply]", an IP address in
- * the body, and a reply+<token>@ Reply-To — and only the Easy-Post domain has
- * enough sending history to carry it. DNS is not the difference: all three
- * subdomains are identical in shape, and none of them has a DMARC record.
+ * Nor was it the message shape, which was the standing hypothesis for a day. On
+ * 2026-09-07 a 2x2 was sent from `support@wren.spencerfields.com` -- bracketed
+ * subject tags on/off, the IP row on/off, everything else identical. ALL FOUR
+ * arrived, including the variant byte-for-byte equivalent to the one that
+ * vanished. A single probe from `support@software.spencerfields.com` arrived
+ * too. Both domains have simply warmed up.
  *
- * So: the mail a CUSTOMER sees keeps its product's own branded sender, and the
- * mail only the owner sees goes out on the path that actually arrives. The
- * product is still named in the display name and in the subject, so nothing is
- * lost by it, and a support enquiry that silently never arrives is the worst
- * failure this Worker has.
+ * So the branded sender is restored, per product, on evidence rather than on
+ * hope -- and PROVEN_OWNER_SENDERS is the list of what has actually been shown
+ * to arrive. Anything not in it falls back to the Easy-Post account, which has
+ * the longest sending history of the three.
  *
- * Revisit only with evidence: send one owner forward through the product's own
- * account, and confirm it in the mailbox. `sent`, `own_account: true` and a
- * Resend message id all appear exactly the same on a message that is later
- * quarantined, so none of them is that evidence.
+ * HOW TO ADD A PRODUCT TO THE LIST. Send one owner-forward-shaped message from
+ * that product's account to CONTACT_TO_EMAIL, wait five minutes, and find it in
+ * the mailbox. Resend's `last_event: delivered` is NOT that evidence -- it is
+ * one hop earlier and looks identical on a message about to be quarantined.
+ * The keys are in Credential Manager (`<product>-resend`), so this needs no
+ * dashboard.
+ *
+ * HOW TO REVERT. Empty the set. Every owner forward then goes out on the
+ * Easy-Post account, which is where this stood between 2026-09-07 12:29 and
+ * 13:0x, and which is known to work.
  */
+const PROVEN_OWNER_SENDERS = new Set(["easy-post", "wren", "software"]);
+
 function resolveOwnerSender(env, product) {
+  if (PROVEN_OWNER_SENDERS.has(product.id)) {
+    // Display name without a suffix: this is internal mail and "Wren Support"
+    // would read as the customer-facing sender it is not.
+    return resolveSender(env, product, "");
+  }
   const deliverable = PRODUCTS[DEFAULT_PRODUCT];
   return {
     apiKey: env[deliverable.keyVar],
