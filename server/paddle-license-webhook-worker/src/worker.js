@@ -315,9 +315,19 @@ const PRODUCTS = {
      * checking on its own account: software.spencerfields.com's contact form
      * sends through it.
      */
-    keyVar: "RESEND_API_KEY_DAWNLIST",
+    // The domain is verified on the EASY-POST Resend account, not one of its
+    // own, so the key is that account's. Dawnlist is pre-launch and does not
+    // warrant a fourth account; when it gets one, this becomes
+    // RESEND_API_KEY_DAWNLIST and nothing else here changes. The consequence
+    // worth knowing: rotating RESEND_API_KEY rotates Dawnlist's sender too.
+    keyVar: "RESEND_API_KEY",
     fromVar: "DAWNLIST_FROM_EMAIL",
     replyDomain: "dawnlist.spencerfields.com",
+    // Still deliberately unset. An MX for inbound now exists, but nothing is
+    // listening behind it: no Resend inbound webhook is configured for this
+    // domain. Setting this var makes replyDomainFor hand out reply addresses on
+    // dawnlist.spencerfields.com, and Resend would accept every reply and drop
+    // it -- worse than no relay, because the owner believes they replied.
     webhookSecretVar: "RESEND_WEBHOOK_SECRET_DAWNLIST",
     // The site has one form and one topic, so the model is allowed to answer
     // it. What it is allowed to say is bounded by the facts below, which state

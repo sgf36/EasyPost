@@ -48,6 +48,13 @@ WREN_FROM_EMAIL = "support@wren.spencerfields.com"
 # The business site has its own Resend account and verified domain, so its mail
 # goes out under its own name rather than borrowing the Easy-Post sender.
 SOFTWARE_FROM_EMAIL = "support@software.spencerfields.com"
+# Dawnlist has no Resend account of its own. dawnlist.spencerfields.com is a
+# verified domain on the EASY-POST account (DKIM + both SPF records verified
+# 2026-09-07), so PRODUCTS.dawnlist.keyVar points at RESEND_API_KEY. Comment
+# this line out and redeploy to roll back: resolveSender() needs BOTH the key
+# and the address, so Dawnlist mail falls straight back to the Easy-Post
+# sender under a "Dawnlist Support" display name, exactly as before.
+DAWNLIST_FROM_EMAIL = "support@dawnlist.spencerfields.com"
 # PADDLE_API_BASE = "https://api.paddle.com"      # sandbox: https://sandbox-api.paddle.com
 # LICENSE_PRODUCT_ID = "easypost-desktop"
 
