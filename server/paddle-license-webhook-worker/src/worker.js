@@ -331,8 +331,10 @@ const PRODUCTS = {
     webhookSecretVar: "RESEND_WEBHOOK_SECRET_DAWNLIST",
     // The site has one form and one topic, so the model is allowed to answer
     // it. What it is allowed to say is bounded by the facts below, which state
-    // plainly that there is no date, no price and nothing to download -- the
-    // three things a waiting-list enquiry actually asks about.
+    // MOVED on 2026-09-09: there is now a price and something to download (the
+    // Store listing, free, Windows). What has NOT moved is that it cannot be
+    // BOUGHT, which is the half a waiting-list enquiry turns on -- so the
+    // facts make it say both halves together.
     aiAutoTopics: new Set(["Dawnlist waiting list", "Dawnlist waiting list — question"]),
     // Topics that are discharged by the acknowledgement alone. A bare sign-up
     // is not a question and nobody is going to answer it individually, so
@@ -347,8 +349,8 @@ const PRODUCTS = {
     // sender's language on the same path a model answer takes.
     ackEnglish:
       "Thank you for joining the Dawnlist waiting list. The address given " +
-      "will be used once, to say when there is something real to try, and " +
-      "for nothing else. There is no date yet and nothing to download.\n\n" +
+      "will be used once, to say when a licence can be bought, and for " +
+      "nothing else. Dawnlist is on the Microsoft Store for Windows and installs free, but it needs a licence to run and licences are not on sale yet. There is no date for that, and no macOS edition.\n\n" +
       "No reply to this message is needed. Anything worth asking in the " +
       "meantime is welcome at Apps@spencerfields.com.",
   },
@@ -522,12 +524,12 @@ const SOFTWARE_FACTS = `- Spencer Fields is a sole trader established in the Uni
 - Purchases are handled by the store or merchant of record -- Paddle for Easy-Post Desktop, Apple for App Store purchases -- so this business never sees payment details.
 - Contact: Apps@spencerfields.com .`;
 
-const DAWNLIST_FACTS = `- Dawnlist is a desktop application for macOS and Windows for people looking for work. It reads job feeds every morning, judges every posting against a fit brief it builds by interviewing the user, and hands back a ranked shortlist with the rejected postings still visible and the reason for each rejection stated.
-- STATUS: Dawnlist is IN DEVELOPMENT and is NOT available. There is nothing to buy, nothing to download, no beta and NO RELEASE DATE. Never estimate or imply one. The waiting list at https://dawnlist.spencerfields.com/ is the only way to be told when there is something to try, and joining it is all anyone can do right now.
-- PRICING IS NOT SETTLED and no figure has been published. Never quote, estimate or hint at a price, and never describe it as free, paid, subscription or one-time.
+const DAWNLIST_FACTS = `- Dawnlist is a desktop application for Windows for people looking for work. A macOS edition is not available and none should be promised. It reads job feeds every morning, judges every posting against a fit brief it builds by interviewing the user, and hands back a ranked shortlist with the rejected postings still visible and the reason for each rejection stated.
+- STATUS: Dawnlist is ON THE MICROSOFT STORE for Windows and installs FREE, but it is NOT YET ON SALE: a licence is required to run it and licences cannot be bought yet, so it installs and then asks for a key nobody can obtain. Say both halves together, never just the first. There is NO macOS edition. There is NO DATE for purchasing opening -- never estimate or imply one. The waiting list at https://dawnlist.spencerfields.com/ is the way to be told when a licence can be bought.
+- PRICING: $79 per month, a RECURRING SUBSCRIPTION, one plan. It is NOT a one-time purchase -- never say bought once, yours forever, or no subscription. The job feed is included in that price and needs no separate job-board account. SEPARATELY, the buyer supplies their own Anthropic API key and Anthropic bills them directly -- usually a pound or two a month, depending on how much they search. Say so plainly if asked. NEVER quote a more precise figure, never split it into reading and drafting, and never state a one-off setup cost: no such figures are measured. The reading and drafting costs are the BUYER'S, not Spencer's. The job feed is the opposite -- Spencer's cost, included in the $79. A second plan covers searches spanning many regions; its price is NOT decided, so never quote or guess one. Nothing is purchasable yet.
 - It NEVER sends anything. Every outreach path ends in a draft that opens in the user's own mail application, addressed and composed; the user sends it. The application contains no code for sending mail at all. This is the deliberate position against services that apply automatically on someone's behalf.
 - It reads no mailbox. There is no mail account connection, no password and no sign-in of any kind. Job-alert emails and the user's own writing samples are dragged onto the application as files by the user.
-- Postings come from licensed job-data providers indexing employer career pages and applicant tracking systems across nearly two hundred countries, reached through a proxy run by Spencer Fields, plus job-alert emails the user drags in from any sender.
+- Postings come from licensed job-data feeds, reached through a service run by Spencer Fields so the user needs no job-board account of their own, plus job-alert emails the user drags in from any sender. NEVER state a number of countries, name a data provider, or quote volumes: the licensing question that decides the data route is unanswered, so any such number would be a guess about somebody else's product.
 - Onboarding is an interview: the application reads existing curricula vitae and asks what the evidence supports, what is ambition rather than record, and what disqualifies a role. It produces a fit brief and a background factsheet the user can edit. Before daily runs begin, it shows its verdicts on a sample of live postings and the user corrects them. Target is thirty to forty-five minutes from first launch to first shortlist.
 - Every run shows its full funnel counts -- swept, deduplicated, gated, screened, assessed -- and a count is never shown without what it excludes. Postings set aside stay browsable with their reasons. A rejection on a stated requirement quotes the line that caused it.
 - It tracks every company pursued inside the application: stage, an evidence log, and the next step date. Follow-up timing comes from evidenced contact, never falls on a Monday or a Friday, and an out-of-office with a return date moves the next approach to a week after that return. There are no integrations with other tracking tools in the first release.
