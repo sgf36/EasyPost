@@ -162,6 +162,15 @@ def refresh_refund_status(shipment_id: str) -> Optional[str]:
     return status
 
 
+def is_refund_pending(refund_status: Optional[str]) -> bool:
+    """Asked for, and not yet confirmed or rejected by the carrier.
+
+    One definition, because History decides from this which button to offer
+    and the Dashboard counts from it what is still outstanding.
+    """
+    return str(refund_status or "").lower() == "submitted"
+
+
 def update_refund_status(shipment_id: str, refund_status: Optional[str]) -> None:
     with db_cursor() as cur:
         cur.execute(

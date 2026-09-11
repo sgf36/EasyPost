@@ -955,6 +955,12 @@ def main() -> int:
              "screenshots. Repeatable. Suppresses the bare-view captures.",
     )
     parser.add_argument(
+        "--unseeded", action="store_true",
+        help="Leave the scratch database empty, so a page can be captured as a "
+             "new install first sees it. Its empty state is a screen users "
+             "meet too, and the seed hides it.",
+    )
+    parser.add_argument(
         "--offscreen", action="store_true",
         help="Force the offscreen Qt plugin. Last resort only — it has no font "
              "database, so every string renders as an empty box.",
@@ -988,7 +994,12 @@ def main() -> int:
 
     app = QApplication.instance() or QApplication([])
     print(f"Qt platform plugin: {app.platformName()}")
-    _seed_database(Path(str(DATABASE_PATH)))
+    if args.unseeded:
+        from app.core.db import init_db
+
+        init_db()
+    else:
+        _seed_database(Path(str(DATABASE_PATH)))
 
     # i18n reads the active language from settings (current_locale), which the
     # write above has already set; clearing the cache makes it take effect.

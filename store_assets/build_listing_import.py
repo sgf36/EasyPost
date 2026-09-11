@@ -68,12 +68,13 @@ RELEASE_NOTES_LIMIT = 1500
 # it is the one image that shows what the product actually does. Settings
 # trails, because nobody installs an app for its settings page.
 #
-# The dashboard is deliberately absent. DashboardView is still a placeholder —
-# its entire body is a label reading "Shipments, tracking, address book, and
-# reporting views are added in later build stages" — so the screenshot showed
-# an empty screen saying the product was unfinished. It is the one image that
-# argued against the app. The source capture is kept in screenshots/ so it can
-# be restored in one line once there is a real dashboard to show.
+# The dashboard is absent. When this order was set, DashboardView was a
+# placeholder whose entire body said the other views were "added in later build
+# stages", so its screenshot showed an empty screen saying the product was
+# unfinished: the one image that argued against the app. The page is real now,
+# but any capture of it made before that change still shows the placeholder, so
+# restoring it here needs a fresh render first. Adding it back changes a public
+# listing, which is a decision in its own right rather than a tidy-up.
 #
 # Dropping it takes the set from nine images to eight, but note what the import
 # can and cannot do: a blank image cell is a no-op, not a delete — that is the

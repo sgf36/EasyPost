@@ -33,10 +33,15 @@ def spend_by_carrier() -> dict[str, dict[str, float]]:
     return {carrier: dict(by_ccy) for carrier, by_ccy in totals.items()}
 
 
-def total_spend_by_currency() -> dict[str, float]:
-    """``{currency: amount}`` across every shipment in this mode."""
+def total_spend_by_currency(records=None) -> dict[str, float]:
+    """``{currency: amount}`` across every shipment in this mode.
+
+    A caller that has already read the shipments passes them in, so the
+    Dashboard's figure is this function's figure rather than a second copy of
+    the rule that could drift from Reports.
+    """
     totals: dict[str, float] = defaultdict(float)
-    for rec in list_shipments():
+    for rec in list_shipments() if records is None else records:
         if rec.rate_amount:
             totals[(rec.rate_currency or UNKNOWN_CURRENCY).strip()] += _to_float(rec.rate_amount)
     return dict(totals)

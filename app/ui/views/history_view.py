@@ -34,6 +34,7 @@ from app.services.insurance import (
     validate_amount,
 )
 from app.services.shipments import (
+    is_refund_pending,
     list_shipments,
     refund_shipment,
     refresh_refund_status,
@@ -179,7 +180,7 @@ class HistoryView(QWidget):
                 refund_btn = QPushButton(tr("history.request_refund_button"))
                 refund_btn.clicked.connect(partial(self._on_refund_clicked, rec.id))
                 actions_layout.addWidget(refund_btn)
-            elif rec.refund_status == "submitted":
+            elif is_refund_pending(rec.refund_status):
                 check_btn = QPushButton(tr("history.check_refund_status_button"))
                 check_btn.clicked.connect(partial(self._on_check_refund_clicked, rec.id))
                 actions_layout.addWidget(check_btn)
