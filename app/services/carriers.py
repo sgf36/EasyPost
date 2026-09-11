@@ -182,6 +182,53 @@ def _record_carrier_names(pairs: list[tuple[str, Optional[str]]]) -> None:
     _carrier_names = None
 
 
+# ---------------------------------------------------------------------------
+# The names the tracker endpoint uses
+# ---------------------------------------------------------------------------
+
+# The tracker endpoint does not share the metadata catalogue's vocabulary for
+# every carrier: a few it knows only by a former brand name or by their carrier
+# ACCOUNT name. Sending the catalogue code for one of those is refused as "not
+# supported by EasyPost" — and the Tracking page offers carriers from that very
+# catalogue, so picking one of them failed every time.
+#
+# Every entry was established by experiment, not inferred. In test mode the
+# endpoint refuses a carrier it does not know outright (a made-up name is
+# refused), each source code below was refused, and each target was accepted.
+# tests/tracker_carriers_live_test.py repeats all of that whenever
+# EASYPOST_TEST_API_KEY is set, and fails when the catalogue gains a carrier the
+# endpoint refuses that is neither mapped here nor listed as untrackable.
+#
+# Two carriers are deliberately absent although an accepted spelling exists.
+# "epostglobal" is accepted only as "epostglobalv2", a different integration —
+# the same trap as royalmail against royalmailv3. "sekoomniparcel" is accepted
+# both as "seko" and as "omniparcel", which come back as two different carriers.
+# Guessing either would attach the tracker to the wrong carrier, which fails
+# later and far less visibly than a refusal now.
+_TRACKER_CARRIER_NAMES = {
+    "evri": "hermes",  # Evri traded as Hermes; its account type is HermesAccount
+    "dhlecommercesolutions": "dhlecs",  # its account type is DhlEcsAccount
+    "fedexgroundeconomy": "fedexsmartpost",  # FedEx Ground Economy was SmartPost
+}
+
+# The reverse, so a tracker that reads back as "Hermes" is shown under the name
+# the user picked. A target that is a catalogue carrier in its own right
+# (fedexsmartpost) still resolves to its own label first, through the overrides.
+_TRACKER_NAME_SOURCES = {target: source for source, target in _TRACKER_CARRIER_NAMES.items()}
+
+
+def tracker_carrier_name(carrier: str) -> str:
+    """The spelling of ``carrier`` to send to the tracker endpoint.
+
+    Only a spelling known to be refused is ever replaced, and only with one known
+    to be accepted. Anything else — including text a user typed — passes through
+    exactly as given, so this cannot stop a working carrier from working.
+    """
+    if not carrier:
+        return carrier
+    return _TRACKER_CARRIER_NAMES.get(carrier.casefold(), carrier)
+
+
 def carrier_display_name(carrier: str, human_readable: Optional[str] = None) -> str:
     """A human-readable label for an EasyPost carrier code.
 
@@ -204,6 +251,11 @@ def carrier_display_name(carrier: str, human_readable: Optional[str] = None) -> 
         return override
     if human_readable:
         return human_readable
+    source = _TRACKER_NAME_SOURCES.get(key)
+    if source and carrier_is_known(source):
+        # Created under its tracker-endpoint name, read back under it too; the
+        # user chose the catalogue carrier, so that is the name they see.
+        return carrier_display_name(source)
     # Metadata first (authoritative), then a label learnt from a carrier
     # account, then the raw code. The account labels are display-only — see
     # _account_labels — so an account type can never masquerade as a carrier.
@@ -223,10 +275,15 @@ def carrier_is_known(carrier: str) -> bool:
     if not carrier:
         return False
     key = carrier.casefold()
+    source = _TRACKER_NAME_SOURCES.get(key)
     return (
         key in _CARRIER_DISPLAY_OVERRIDES
         or key in _carrier_name_map()
         or key in _account_labels
+        # A tracker-endpoint name is known exactly when the carrier it stands
+        # for is; otherwise display falls back to humanising it, which beats
+        # showing the internal catalogue code of a carrier nothing has cached.
+        or (source is not None and carrier_is_known(source))
     )
 
 

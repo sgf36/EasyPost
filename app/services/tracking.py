@@ -8,6 +8,7 @@ from typing import Optional
 
 from app.core.client import client_manager
 from app.core.db import db_cursor
+from app.services.carriers import tracker_carrier_name
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +38,11 @@ def is_problem(status: Optional[str]) -> bool:
 
 def create_tracker(tracking_code: str, carrier: str = ""):
     client = client_manager.get_client()
-    return client.tracker.create(tracking_code=tracking_code, carrier=carrier or None)
+    # The picker offers catalogue codes, and the tracker endpoint refuses a few
+    # of them under that name — see carriers.tracker_carrier_name.
+    return client.tracker.create(
+        tracking_code=tracking_code, carrier=tracker_carrier_name(carrier) or None
+    )
 
 
 def retrieve_tracker(tracker_id: str):
