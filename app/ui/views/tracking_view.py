@@ -23,6 +23,7 @@ from app.i18n import tr
 from app.services.formatting import display_carrier, display_status
 from app.services.tracking import create_tracker, list_trackers, refresh_all_trackers, save_tracker_locally
 from app.ui.widgets.async_worker import run_async
+from app.ui.widgets.carrier_combo import CarrierCombo
 
 _COLUMN_KEYS = [
     "tracking.column_tracking_code",
@@ -65,8 +66,13 @@ class TrackingView(QWidget):
         group = QGroupBox(tr("tracking.add_group_title"))
         self._tracking_code_input = QLineEdit()
         self._tracking_code_input.setPlaceholderText(tr("tracking.tracking_number_placeholder"))
-        self._carrier_input = QLineEdit()
-        self._carrier_input.setPlaceholderText(tr("tracking.carrier_placeholder"))
+        # Typeable, not a closed menu. EasyPost detects the carrier from the
+        # tracking code when this is left blank, and a carrier the local
+        # catalogue has not cached is still one the user may name — so the
+        # dropdown offers the known names without making them the only ones.
+        self._carrier_input = CarrierCombo(free_text=True)
+        self._carrier_input.set_placeholder(tr("tracking.carrier_placeholder"))
+        self._carrier_input.load_catalogue()
 
         add_btn = QPushButton(tr("tracking.add_button"))
         add_btn.clicked.connect(self._on_add_clicked)
@@ -99,7 +105,7 @@ class TrackingView(QWidget):
 
     def _on_add_clicked(self) -> None:
         code = self._tracking_code_input.text().strip()
-        carrier = self._carrier_input.text().strip()
+        carrier = self._carrier_input.current_carrier()
         if not code:
             QMessageBox.warning(
                 self,
@@ -117,7 +123,7 @@ class TrackingView(QWidget):
         self._add_btn.setEnabled(True)
         save_tracker_locally(tracker)
         self._tracking_code_input.clear()
-        self._carrier_input.clear()
+        self._carrier_input.set_current_carrier("")
         self.refresh_table()
 
     def _on_add_failed(self, exc: Exception) -> None:

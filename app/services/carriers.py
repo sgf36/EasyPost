@@ -24,12 +24,14 @@ Two API facts worth stating plainly, because both are easy to get backwards:
 
 import logging
 from dataclasses import dataclass
-from typing import Optional
+from typing import Iterable, Optional, TypeVar
 
 from app.core.client import client_manager
 from app.core.db import db_cursor
 
 logger = logging.getLogger(__name__)
+
+_T = TypeVar("_T")
 
 
 @dataclass(frozen=True)
@@ -391,8 +393,77 @@ def enabled_carrier_codes() -> Optional[set[str]]:
     return codes or None
 
 
+# ---------------------------------------------------------------------------
+# Matching a carrier: the one place it happens
+# ---------------------------------------------------------------------------
+
+
+def carrier_matches(left: str, right: str) -> bool:
+    """Whether two carrier spellings name the same carrier.
+
+    One carrier reaches this app under three spellings — the metadata
+    endpoint's lowercase "royalmailv3", ``rate.carrier``'s CamelCase
+    "RoyalMailV3", and ``carrier_account.type``'s "RoyalMailV3Account" (see the
+    module docstring). So ``a.carrier == b.carrier`` is only ever right by
+    luck: it is right when both operands came from the same endpoint, and wrong
+    the first time a value crosses between two.
+
+    That is why this exists as a function rather than as a convention. It is a
+    rule that has to hold at every site that pairs a carrier with the things it
+    offers, and a rule written down is a rule the next call site does not know
+    about; ``tests/test_carrier_filtering.py`` fails the build on any new
+    inline comparison of a ``carrier`` attribute.
+    """
+    return (left or "").casefold() == (right or "").casefold()
+
+
+def for_carrier(items: Iterable[_T], carrier: str) -> list[_T]:
+    """Every item offered by one carrier, matched through :func:`carrier_matches`.
+
+    Deliberately generic over "anything with a ``carrier`` attribute" —
+    :class:`ServiceLevel`, :class:`~app.services.packages.PredefinedPackage`
+    and an EasyPost rate object all carry one, and all three are filtered by
+    carrier somewhere in the UI. Passing an empty ``carrier`` returns nothing
+    rather than everything: a caller with no carrier chosen wants its own
+    unfiltered list, and silently handing back the whole catalogue would make
+    "no carrier selected" indistinguishable from "this carrier offers the lot".
+    """
+    if not carrier:
+        return []
+    return [item for item in items if carrier_matches(getattr(item, "carrier", ""), carrier)]
+
+
+def carriers_present_in(items: Iterable) -> list[str]:
+    """The distinct carriers named by a collection, ordered by display name.
+
+    Used to populate a carrier picker from whatever is actually on screen — the
+    rates a shipment came back with, say — rather than from the whole
+    catalogue, so the picker can never offer a carrier that would filter the
+    view down to nothing. Spellings are de-duplicated case-insensitively, with
+    the first spelling seen kept as the value, because that is the one the rest
+    of the view is keyed by.
+    """
+    seen: dict[str, str] = {}
+    for item in items:
+        code = getattr(item, "carrier", "") or ""
+        if code and code.casefold() not in seen:
+            seen[code.casefold()] = code
+    return sorted(seen.values(), key=lambda c: carrier_display_name(c).casefold())
+
+
+def all_carrier_codes() -> list[str]:
+    """Every carrier the cached catalogue names, ordered by display name.
+
+    Reads the cache rather than the API because the callers are pickers that
+    must draw immediately, and because the cache is filled as a side effect of
+    any catalogue refresh (see :func:`retrieve_carrier_metadata`). An empty list
+    means nothing has refreshed it yet — a first run with no network — which is
+    a reason for a picker to stay typeable, not a reason to block.
+    """
+    return sorted(_carrier_name_map(), key=lambda c: carrier_display_name(c).casefold())
+
+
 def service_levels_for_carrier(carrier: str) -> list[ServiceLevel]:
     """Cached service levels for one carrier, matched case-insensitively so a
     CamelCase code from a rate resolves against the lowercase catalogue."""
-    key = (carrier or "").casefold()
-    return [s for s in _cached_service_levels() if s.carrier.casefold() == key]
+    return for_carrier(_cached_service_levels(), carrier)

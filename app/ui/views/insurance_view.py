@@ -21,6 +21,7 @@ from app.services.insurance import (
     validate_amount,
 )
 from app.ui.widgets.async_worker import run_async
+from app.ui.widgets.carrier_combo import CarrierCombo
 from app.ui.widgets.purchase_confirm import confirm_if_production
 
 
@@ -44,7 +45,11 @@ class InsuranceView(QWidget):
         form = QFormLayout()
 
         self._tracking_code_input = QLineEdit()
-        self._carrier_input = QLineEdit()
+        # Same picker as Tracking, and typeable for the same reason: the
+        # catalogue is a cache, and a standalone insurance policy names the
+        # carrier that is actually carrying the parcel.
+        self._carrier_input = CarrierCombo(free_text=True)
+        self._carrier_input.load_catalogue()
         self._amount_input = QLineEdit()
         self._amount_input.setPlaceholderText(tr("insurance.amount_placeholder"))
         self._reference_input = QLineEdit()
@@ -65,7 +70,7 @@ class InsuranceView(QWidget):
 
     def _on_submit(self) -> None:
         tracking_code = self._tracking_code_input.text().strip()
-        carrier = self._carrier_input.text().strip()
+        carrier = self._carrier_input.current_carrier()
         amount = self._amount_input.text().strip()
         reference = self._reference_input.text().strip()
 

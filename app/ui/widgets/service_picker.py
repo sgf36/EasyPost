@@ -37,33 +37,13 @@ from app.services.carriers import (
     ServiceLevel,
     carrier_display_name,
     enabled_carrier_codes,
+    for_carrier,
     list_service_levels,
 )
 from app.services.insurance import INSURANCE_MAX_USD
 from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
-
-
-# A QComboBox defaults to AdjustToContentsOnFirstShow, and both of these are
-# empty when first shown — carriers and services arrive from an async catalogue
-# load afterwards. So each sized itself to nothing and stayed there: the Batch
-# page published "DHL Expre" and "ExpressWorldw" on store screenshots in all
-# seven languages. Same defect as the Package combo's "Custom di" (6070f4a),
-# different cause, so that fix did not cover these.
-#
-# The floor is measured in characters, not pixels. A pixel minimum does not
-# know the font, and a value generous enough for English is a value that makes
-# the whole Batch page overflow its window in German — which it did, at 220px,
-# pushing "Datei wählen…" off the right edge. Eighteen characters covers
-# "ExpressWorldwide" and every carrier name in the catalogue.
-_COMBO_MIN_CHARS = 18
-
-
-def _widen(combo: QComboBox) -> None:
-    combo.setMinimumContentsLength(_COMBO_MIN_CHARS)
-    combo.setSizeAdjustPolicy(
-        QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
-    )
+from app.ui.widgets.carrier_combo import CarrierCombo, widen
 
 
 @dataclass(frozen=True)
@@ -95,9 +75,8 @@ class ServicePicker(QGroupBox):
         self._quoted: dict[tuple[str, str], str] = {}
         self._quoted_line: Optional[int] = None
 
-        self._carrier_combo = QComboBox()
-        _widen(self._carrier_combo)
-        self._carrier_combo.currentIndexChanged.connect(self._on_carrier_changed)
+        self._carrier_combo = CarrierCombo()
+        self._carrier_combo.carrier_changed.connect(self._on_carrier_changed)
 
         self._show_all_check = QCheckBox(tr("batch_shipments.show_all_carriers"))
         self._show_all_check.setToolTip(tr("batch_shipments.show_all_carriers_tip"))
@@ -118,7 +97,7 @@ class ServicePicker(QGroupBox):
         self._service_filter.textChanged.connect(lambda _: self._populate_services())
 
         self._service_combo = QComboBox()
-        _widen(self._service_combo)
+        widen(self._service_combo)
         self._service_combo.currentIndexChanged.connect(self._on_service_changed)
 
         service_box = QVBoxLayout()
@@ -242,27 +221,20 @@ class ServicePicker(QGroupBox):
         return sorted(codes, key=lambda c: carrier_display_name(c).casefold())
 
     def _populate_carriers(self) -> None:
-        previous = self._carrier_combo.currentData()
         self._carrier_combo.blockSignals(True)
-        self._carrier_combo.clear()
-        for code in self._carrier_codes():
-            self._carrier_combo.addItem(carrier_display_name(code), code)
-        if previous:
-            index = self._carrier_combo.findData(previous)
-            if index >= 0:
-                self._carrier_combo.setCurrentIndex(index)
+        self._carrier_combo.set_carriers(self._carrier_codes())
         self._carrier_combo.blockSignals(False)
         self._populate_services()
 
-    def _on_carrier_changed(self, _index: int) -> None:
+    def _on_carrier_changed(self, _carrier: str) -> None:
         self._populate_services()
 
     def _services_for_current_carrier(self) -> list[ServiceLevel]:
-        carrier = self._carrier_combo.currentData()
+        carrier = self._carrier_combo.current_carrier()
         if not carrier:
             return []
         needle = self._service_filter.text().strip().casefold()
-        matches = [s for s in self._levels if s.carrier == carrier]
+        matches = for_carrier(self._levels, carrier)
         if self._filtering_to_quoted():
             quoted = [s for s in matches if (s.carrier, s.name) in self._quoted]
             # Same reasoning as the carrier list: an empty picker is worse than
@@ -296,12 +268,10 @@ class ServicePicker(QGroupBox):
 
     def _current_level(self) -> Optional[ServiceLevel]:
         name = self._service_combo.currentData()
-        carrier = self._carrier_combo.currentData()
+        carrier = self._carrier_combo.current_carrier()
         if not name or not carrier:
             return None
-        return next(
-            (s for s in self._levels if s.carrier == carrier and s.name == name), None
-        )
+        return next((s for s in for_carrier(self._levels, carrier) if s.name == name), None)
 
     def _on_show_all_toggled(self) -> None:
         self._populate_carriers()
@@ -341,8 +311,14 @@ class ServicePicker(QGroupBox):
 
     # -- result --------------------------------------------------------------
 
+    def current_carrier(self) -> str:
+        """The chosen carrier code, or "" when none is. Exposed so the page can
+        narrow other carrier-specific choices — the downloadable template's
+        package list — to the same carrier the batch will be bought with."""
+        return self._carrier_combo.current_carrier()
+
     def is_complete(self) -> bool:
-        return bool(self._carrier_combo.currentData() and self._service_combo.currentData())
+        return bool(self._carrier_combo.current_carrier() and self._service_combo.currentData())
 
     def selection(self) -> Optional[ServiceSelection]:
         if not self.is_complete():
@@ -352,7 +328,7 @@ class ServicePicker(QGroupBox):
             # EasyPost takes insurance as a string amount, always in USD.
             insurance = f"{self._insurance_amount.value():.2f}"
         return ServiceSelection(
-            carrier=self._carrier_combo.currentData(),
+            carrier=self._carrier_combo.current_carrier(),
             service=self._service_combo.currentData(),
             delivery_confirmation="SIGNATURE" if self._signature_check.isChecked() else None,
             insurance=insurance,
