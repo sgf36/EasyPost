@@ -33,6 +33,7 @@ BORDER_STRONG = "#c2c9d2"
 INPUT_DISABLED_BG = "#eef1f4"
 TABLE_HEADER_BG = "#f0f3f7"
 TABLE_ALT_BG = "#f8fafc"
+DANGER = "#b42318"  # a parcel that will not arrive unless somebody acts
 
 
 def _ui_font() -> QFont:

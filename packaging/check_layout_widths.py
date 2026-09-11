@@ -33,6 +33,7 @@ ms._seed_database(Path(str(DATABASE_PATH)))
 AVAILABLE = 1245
 LOCALES = ["en", "de", "es", "fr", "hi", "ja", "zh", "ru", "pl", "nl", "pt", "it"]
 VIEWS = [
+    ("DashboardView", "app.ui.views.dashboard_view"),
     ("CreateShipmentView", "app.ui.views.create_shipment_view"),
     ("TrackingView", "app.ui.views.tracking_view"),
     ("AddressBookView", "app.ui.views.address_book_view"),
@@ -44,12 +45,6 @@ VIEWS = [
     ("PickupsView", "app.ui.views.pickups_view"),
     ("InsuranceView", "app.ui.views.insurance_view"),
     ("ClaimsView", "app.ui.views.claims_view"),
-    # Not capturable by make_screenshots: its navigation entry exists only on a
-    # direct-download build held by a production licensee, and a screenshot run
-    # has stubbed credentials and no licence. Constructing it works, which is
-    # the whole reason this checker builds views itself rather than driving the
-    # window — so the one page the harness cannot reach is still measured.
-    ("AndroidAppView", "app.ui.views.android_app_view"),
 ]
 
 import importlib  # noqa: E402

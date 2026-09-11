@@ -69,7 +69,7 @@ def test_mode_change_leaves_other_views_to_their_own_on_show(qapp):
 
 
 def test_mode_change_on_a_view_with_no_refresh_is_a_no_op(qapp):
-    """Some pages (Dashboard, HTS Lookup) register no on-show callable."""
+    """Some pages (HTS Lookup, Insurance) register no on-show callable."""
     stack = _stack_with_two_pages(qapp)
     stack.setCurrentIndex(1)
 

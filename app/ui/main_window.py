@@ -162,8 +162,32 @@ class MainWindow(QMainWindow):
         body_layout.addWidget(self._view_stack, stretch=1)
         outer.addWidget(body, stretch=1)
 
+        self._connect_dashboard()
         self._select_first_nav_entry()
         return shell
+
+    def _connect_dashboard(self) -> None:
+        self._dashboard_view.create_shipment_requested.connect(
+            lambda: self._show_view(self._create_shipment_view)
+        )
+        self._dashboard_view.tracking_requested.connect(
+            lambda: self._show_view(self._tracking_view)
+        )
+        self._dashboard_view.history_requested.connect(
+            lambda: self._show_view(self._history_view)
+        )
+
+    def _show_view(self, view: QWidget) -> None:
+        """Open a page by selecting its sidebar entry, so the sidebar highlight
+        follows and the page's on-show refresh runs exactly as for a click."""
+        for row in range(self._nav.count()):
+            index = self._nav.item(row).data(Qt.ItemDataRole.UserRole)
+            if index is None:  # a section header
+                continue
+            holder = self._view_stack.widget(index)
+            if (holder.widget() if hasattr(holder, "widget") else holder) is view:
+                self._nav.setCurrentRow(row)
+                return
 
     def _nav_sections(self):
         """Sidebar grouped by what the user is trying to do, so the everyday
@@ -192,7 +216,7 @@ class MainWindow(QMainWindow):
             (
                 "main_window.nav_section_shipping",
                 [
-                    ("main_window.nav_dashboard", self._dashboard_view, None),
+                    ("main_window.nav_dashboard", self._dashboard_view, self._dashboard_view.refresh),
                     (
                         "main_window.nav_create_shipment",
                         self._create_shipment_view,
@@ -370,6 +394,11 @@ class MainWindow(QMainWindow):
     def _show_app_shell(self) -> None:
         client_manager.reload()
         self._mode_banner.refresh()
+        # The shell's pages were filled when it was built, before _route_startup
+        # settled which mode the app opens in, and the Dashboard is on screen
+        # the moment this returns. That is a mode switch in all but name, so it
+        # gets the same refresh.
+        self._on_mode_changed(client_manager.active_mode)
         self._root_stack.setCurrentWidget(self._app_shell)
         self._maybe_resume_webhook()
         self._maybe_resume_relay()
