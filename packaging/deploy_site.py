@@ -28,7 +28,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import requests
 
@@ -85,6 +85,22 @@ def uapi(token: str, module: str, function: str, **params):
     return payload.get("data")
 
 
+def _remote_parts(name: str) -> tuple[str, str]:
+    """Split a site-relative name into the cPanel (dir, file) pair.
+
+    Fileman takes a directory and a bare filename, not a path, so a translated
+    page like "de/download.html" has to be addressed as dir .../de plus file
+    download.html. Passing the whole thing as the filename writes a file whose
+    name contains a slash rather than one inside the language folder — and UAPI
+    answers 200 either way, so nothing would look wrong until the live page
+    failed to change. Verification reads back over HTTPS, which already uses
+    the full relative path, so only the upload side needs splitting.
+    """
+    parent = PurePosixPath(name).parent
+    remote_dir = REMOTE_DIR if str(parent) == "." else f"{REMOTE_DIR}/{parent}"
+    return remote_dir, PurePosixPath(name).name
+
+
 def upload(token: str, name: str, dry_run: bool = False) -> bool:
     local = SITE_DIR / name
     if not local.is_file():
@@ -102,12 +118,13 @@ def upload(token: str, name: str, dry_run: bool = False) -> bool:
         print(f"  would send  {name}  ({len(content.encode()):,} bytes)")
         return True
 
+    remote_dir, remote_file = _remote_parts(name)
     uapi(
         token,
         "Fileman",
         "save_file_content",
-        dir=REMOTE_DIR,
-        file=name,
+        dir=remote_dir,
+        file=remote_file,
         content=content,
         from_charset="UTF-8",
         to_charset="UTF-8",
@@ -143,8 +160,8 @@ def _upload_binary(token: str, name: str, local: Path, dry_run: bool) -> bool:
         response = requests.post(
             f"{HOST}/execute/Fileman/upload_files",
             headers={"Authorization": f"cpanel {CPANEL_USER}:{token}"},
-            data={"dir": REMOTE_DIR, "overwrite": 1},
-            files={"file-1": (name, fh, "application/octet-stream")},
+            data={"dir": _remote_parts(name)[0], "overwrite": 1},
+            files={"file-1": (_remote_parts(name)[1], fh, "application/octet-stream")},
             timeout=120,
         )
     response.raise_for_status()
@@ -199,8 +216,8 @@ def _verify_over_api(token: str, name: str, content: str) -> tuple[bool, str]:
         token,
         "Fileman",
         "get_file_content",
-        dir=REMOTE_DIR,
-        file=name,
+        dir=_remote_parts(name)[0],
+        file=_remote_parts(name)[1],
         from_charset="UTF-8",
         to_charset="UTF-8",
     )["content"]
