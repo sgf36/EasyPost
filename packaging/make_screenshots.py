@@ -35,6 +35,9 @@ import sys
 import tempfile
 from pathlib import Path
 
+from keyring.backend import KeyringBackend
+from keyring.errors import PasswordDeleteError
+
 # Rendering happens through the NATIVE platform plugin, and no window is ever
 # shown — grab() paints a widget that was never mapped to the screen. That
 # matters: the `offscreen` plugin ships no font database, so every string comes
@@ -225,26 +228,98 @@ def _seed_database(db_path: Path) -> None:
         )
 
 
+# Deliberately not a valid key shape, so an accidental network call fails loudly
+# instead of quietly succeeding against a real account.
+PLACEHOLDER_TEST_KEY = "EZTK_screenshot_placeholder_not_a_real_key"
+
+
+class _ScreenshotKeyring(KeyringBackend):
+    """The process-wide keyring for a screenshot run: in memory, gone on exit."""
+
+    # keyring's own backend discovery considers every viable subclass it has
+    # seen, and this one must only ever be installed deliberately.
+    viable = False
+    priority = 0
+
+    def __init__(self) -> None:
+        super().__init__()
+        self._entries: dict[tuple[str, str], str] = {}
+
+    def get_password(self, service, username):
+        return self._entries.get((service, username))
+
+    def set_password(self, service, username, password):
+        self._entries[(service, username)] = password
+
+    def delete_password(self, service, username):
+        if self._entries.pop((service, username), None) is None:
+            raise PasswordDeleteError(username)
+
+
 def _stub_credentials() -> None:
     """Replace the credential store with a placeholder for the whole run.
 
     Screenshots are published publicly. Two things must never reach one: a real
     API key, and live data pulled from a real EasyPost account. The keyring is
     machine-wide and unaffected by the scratch data directory, so it is stubbed
-    here rather than hoped about. The placeholder is deliberately not a valid
-    key shape, so any accidental network call fails loudly instead of quietly
-    succeeding against a real account.
+    here rather than hoped about.
+
+    The stub is the keyring backend, not load_credentials. It used to replace
+    load_credentials on its module, which missed every module that had already
+    bound the name with `from app.core.credential_store import load_credentials`.
+    app.core.client is one: ClientManager.reload(), called while MainWindow is
+    built, went on reading the real keyring and threw the placeholder away before
+    any page was painted (proved on 2026-09-11 with a recording backend). Every
+    read and write reaches the installed backend however it was imported, so no
+    call site is left to miss — tests/test_screenshot_credential_isolation.py
+    holds that for each module that binds the name.
     """
+    import keyring
+
+    from app.core import credential_store
+
+    # Installed before app.core.client is imported: its module-level
+    # ClientManager reads the store as it is constructed.
+    keyring.set_keyring(_ScreenshotKeyring())
+    credential_store.save_credentials(credential_store.Credentials(
+        test_key=PLACEHOLDER_TEST_KEY,
+        production_key=None,
+        active_mode="test",
+    ))
+
+    from app.core.client import client_manager
+
+    client_manager.reload()
+
+
+def _assert_credentials_isolated() -> None:
+    """Refuse to paint unless the run is still on the placeholder credentials.
+
+    Checked at the moment of capture rather than assumed from _stub_credentials
+    having been called, because what matters is what the window being painted
+    was built from.
+    """
+    import keyring
+
     from app.core import credential_store
     from app.core.client import client_manager
 
-    placeholder = credential_store.Credentials(
-        test_key="EZTK_screenshot_placeholder_not_a_real_key",
-        production_key=None,
-        active_mode="test",
-    )
-    credential_store.load_credentials = lambda: placeholder
-    client_manager._credentials = placeholder
+    backend = keyring.get_keyring()
+    if not isinstance(backend, _ScreenshotKeyring):
+        raise SystemExit(
+            f"Refusing to capture: the keyring backend is "
+            f"{type(backend).__name__}, not the screenshot placeholder, so a "
+            f"real API key could have been loaded."
+        )
+    for source, creds in (
+        ("client manager", client_manager.credentials),
+        ("credential store", credential_store.load_credentials()),
+    ):
+        if creds.test_key != PLACEHOLDER_TEST_KEY or creds.production_key:
+            raise SystemExit(
+                f"Refusing to capture: the {source} holds credentials other "
+                f"than the screenshot placeholder."
+            )
 
 
 # Pages that must never appear in a store screenshot, whatever else changes.
@@ -324,6 +399,7 @@ def _capture(widget, path: Path, width: int, height: int, scale: int) -> None:
     if app is not None:
         _settle(app, 0.5)
 
+    _assert_credentials_isolated()
     pixmap = widget.grab()
     if scale != 1:
         from PySide6.QtCore import Qt
@@ -530,6 +606,9 @@ def _capture_print_sheet(app, path: Path, width: int, height: int, scale: int):
         )
     _settle(app, 0.4)
 
+    # This route paints with its own grab rather than _capture, so it needs
+    # the same check.
+    _assert_credentials_isolated()
     shot = dialog.grab()
     if shot.width() > width or shot.height() > height:
         shot = shot.scaled(
@@ -893,8 +972,9 @@ def main() -> int:
     # keyring, which is machine-wide. Without this, a run on a developer's own
     # machine would load their real EasyPost API keys — and anything that
     # renders a key, or fetches live data belonging to a real account, would be
-    # published to a public store listing. So the credential store is replaced
-    # outright with an obvious placeholder before any app module can read it.
+    # published to a public store listing. So the keyring backend itself is
+    # replaced with one holding an obvious placeholder, before any app module
+    # can read it.
     _stub_credentials()
 
     from app.config import DATABASE_PATH  # noqa: F401  (honours the env var)
