@@ -120,6 +120,12 @@ def create_standalone_insurance(
     amount = validate_amount(amount)
     client = client_manager.get_client()
     try:
+        # The carrier goes as given, NOT through carriers.tracker_carrier_name.
+        # That map is proven for the tracker endpoint only, and this endpoint
+        # could not be tested: the account used has no standalone insurance,
+        # and EasyPost refuses on that before it reads the carrier at all (a
+        # made-up carrier gets the identical refusal). There is no evidence
+        # either way here, so nothing is rewritten on a guess.
         insurance = client.insurance.create(
             tracking_code=tracking_code,
             carrier=carrier,
