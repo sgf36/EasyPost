@@ -396,8 +396,16 @@ class BatchView(QWidget):
 
         # Fetch the carrier package list off the UI thread, then write the
         # workbook — the fetch may hit the network (falls back to cache).
+        #
+        # Narrowed to the carrier chosen in the picker above. The template used
+        # to offer every carrier's boxes regardless, so choosing Royal Mail and
+        # then downloading the sheet handed the recipient a dropdown of FedEx
+        # envelopes and USPS flat-rate boxes — none of which the batch could
+        # have been bought with. Read here, on the UI thread, because the worker
+        # must not touch a widget.
+        carrier = self._service_picker.current_carrier()
         self._pending_task = run_async(
-            lambda: (write_xlsx_template(path, predefined_package_choices()), path)[1], self
+            lambda: (write_xlsx_template(path, predefined_package_choices(carrier)), path)[1], self
         )
         self._pending_task.succeeded.connect(
             lambda saved: QMessageBox.information(

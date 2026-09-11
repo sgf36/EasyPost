@@ -18,6 +18,7 @@ from app.core.db import db_cursor
 from app.services.carriers import (
     carrier_display_name,
     coerce_dimensions,
+    for_carrier,
     retrieve_carrier_metadata,
 )
 
@@ -185,7 +186,7 @@ def predefined_package_names() -> list[str]:
 PACKAGE_CHOICE_SEPARATOR = " — "
 
 
-def predefined_package_choices() -> list[str]:
+def predefined_package_choices(carrier: str = "") -> list[str]:
     """Carrier-qualified package labels for the batch template dropdown.
 
     Each entry is ``"<carrier> — <code>"`` (e.g. "Royal Mail — LETTER"), so
@@ -194,10 +195,21 @@ def predefined_package_choices() -> list[str]:
     Shipment combo does. De-duplicated (two Royal Mail carrier codes that both
     expose "LETTER" collapse to one choice) and sorted by carrier then code.
     Recover the bare code EasyPost wants with :func:`package_code_from_choice`.
+
+    ``carrier`` narrows the list to one carrier's packages, so a template
+    downloaded under a chosen carrier does not offer boxes that carrier does not
+    have. It falls back to the full list when that carrier has no predefined
+    packages at all — which is common, and leaves the recipient a sheet with a
+    dropdown of nothing to choose from if taken literally. The fallback is the
+    same policy the carrier and service pickers use: an unfiltered list beats an
+    empty one.
     """
+    packages = list_predefined_packages()
+    if carrier:
+        packages = for_carrier(packages, carrier) or packages
     seen: set[str] = set()
     choices: list[str] = []
-    for p in list_predefined_packages():
+    for p in packages:
         if not p.name:
             continue
         label = f"{carrier_display_name(p.carrier)}{PACKAGE_CHOICE_SEPARATOR}{p.name}"

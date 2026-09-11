@@ -36,6 +36,7 @@ from app.core.errors import carrier_messages, format_api_error
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
 from app.services.addresses import address_choice_label, list_addresses
+from app.services.carriers import carriers_present_in, for_carrier
 from app.services.formatting import display_carrier, humanize_code
 from app.services.insurance import INSURANCE_MAX_USD
 from app.services.packages import (
@@ -54,6 +55,7 @@ from app.services.shipments import (
 from app.core.review_prompt import mark_session_friction, note_successful_shipment
 from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
+from app.ui.widgets.carrier_combo import CarrierCombo
 from app.ui.widgets.chips import badge
 from app.ui.widgets.purchase_confirm import confirm_if_production
 from app.ui.widgets.review_nudge import schedule_review_prompt
@@ -326,6 +328,19 @@ class CreateShipmentView(QWidget):
         self._address_by_id = {}
         self._saved_packages = []
         self._predefined_packages = []
+        # The rates the last rating returned, held so the carrier filter can
+        # re-draw the tree without re-rating. The cheapest/fastest badges are
+        # computed once over the WHOLE set and kept: they answer "cheapest of
+        # everything quoted", and recomputing them per filtered view would let
+        # filtering to one carrier crown that carrier's cheapest service as the
+        # cheapest full stop.
+        self._rates: list = []
+        self._cheapest_id = None
+        self._fastest_id = None
+        # The carrier implied by a chosen predefined package, applied to the
+        # filter once a rating comes back. Empty means the user has not implied
+        # one, not that they chose "all carriers".
+        self._preferred_carrier = ""
         # True when the current rates came from a postal-code-only quote, in
         # which case no rate on screen can actually be bought.
         self._quote_only = False
@@ -765,6 +780,13 @@ class CreateShipmentView(QWidget):
         is_predefined = isinstance(data, tuple) and data[0] == "predefined"
         is_saved = isinstance(data, tuple) and data[0] == "saved"
 
+        # A carrier's own predefined package names that carrier, so the rates
+        # filter follows it — a user who picks a Royal Mail box is asking about
+        # Royal Mail. Recorded rather than applied: the filter is populated from
+        # rates, which do not exist yet, and choosing a package clears the table
+        # anyway (see _invalidate_rates).
+        self._preferred_carrier = data[1].carrier if is_predefined else ""
+
         self._length_input.setEnabled(not is_predefined)
         self._width_input.setEnabled(not is_predefined)
         self._height_input.setEnabled(not is_predefined)
@@ -1059,6 +1081,33 @@ class CreateShipmentView(QWidget):
         # shown flat: Royal Mail v3 alone returns 70+ services, which used to
         # drown every other carrier in one long list. Each carrier is a
         # top-level row (name + service count) with its services as children.
+        # Narrowing the tree to one carrier. It defaults to "All carriers" and
+        # is populated from the rates that actually came back, never from the
+        # catalogue: a filter offering a carrier that quoted nothing would empty
+        # the table and look like a failed rating.
+        #
+        # Deliberately a filter the user can see and clear rather than a silent
+        # narrowing. A rate this app hides is a service the user cannot buy
+        # through it at all, which is exactly how Royal Mail's whole
+        # account-billed catalogue once disappeared (see _is_placeholder_rate),
+        # so the count of what is hidden is stated in _carrier_filter_note
+        # rather than left for the user to notice.
+        self._carrier_filter = CarrierCombo(include_all=True)
+        self._carrier_filter.carrier_changed.connect(lambda _: self._render_rates())
+        filter_row = QHBoxLayout()
+        filter_row.setContentsMargins(0, 0, 0, 0)
+        filter_row.addWidget(QLabel(tr("create_shipment.carrier_filter_label")))
+        filter_row.addWidget(self._carrier_filter)
+        filter_row.addStretch(1)
+        self._carrier_filter_row = QWidget()
+        self._carrier_filter_row.setLayout(filter_row)
+        self._carrier_filter_row.setVisible(False)
+
+        self._carrier_filter_note = QLabel("")
+        self._carrier_filter_note.setWordWrap(True)
+        self._carrier_filter_note.setStyleSheet(f"color: {TEXT_MUTED};")
+        self._carrier_filter_note.setVisible(False)
+
         self._rates_tree = QTreeWidget()
         self._rates_tree.setColumnCount(_RATE_COLUMN_COUNT)
         self._rates_tree.setHeaderLabels(rate_columns)
@@ -1105,9 +1154,16 @@ class CreateShipmentView(QWidget):
         self._carrier_notes_label.setVisible(False)
 
         layout = QVBoxLayout()
+        layout.addWidget(self._carrier_filter_row)
         layout.addWidget(self._rates_tree)
+        layout.addWidget(self._carrier_filter_note)
         layout.addWidget(self._quote_only_note)
         layout.addWidget(self._carrier_notes_label)
+        # Packs everything to the top. The tree is sized to its rows, and this
+        # group shares a row with the taller Purchased label panel, so the slack
+        # was handed out as gaps between the filter, the tree and its note —
+        # which only showed once filtering made the tree short.
+        layout.addStretch(1)
         group.setLayout(layout)
         return group
 
@@ -1216,6 +1272,30 @@ class CreateShipmentView(QWidget):
             parent.setExpanded(len(group_rates) <= _MAX_AUTO_EXPAND or has_cheapest)
 
         self._resize_rates_tree_to_content()
+
+    def _render_rates(self) -> None:
+        """Draw the held rates through the carrier filter.
+
+        Kept apart from :meth:`_on_rates_received` so changing the filter
+        re-draws without re-rating: a second rating call would cost a round trip
+        and could come back with different prices, so the table would change
+        under a user who only asked to look at one carrier.
+        """
+        carrier = self._carrier_filter.current_carrier()
+        shown = for_carrier(self._rates, carrier) if carrier else list(self._rates)
+        hidden = len(self._rates) - len(shown)
+        self._populate_rates_tree(shown, self._cheapest_id, self._fastest_id)
+        if carrier and hidden:
+            self._carrier_filter_note.setText(
+                tr(
+                    "create_shipment.carrier_filter_note",
+                    carrier=self._carrier_display_name(carrier),
+                    hidden=hidden,
+                )
+            )
+        else:
+            self._carrier_filter_note.setText("")
+        self._carrier_filter_note.setVisible(bool(self._carrier_filter_note.text()))
 
     def _order_carriers(self, by_carrier: dict[str, list]) -> list[str]:
         """Carriers with a real (non-account-billed) rate first, ordered by that
@@ -1408,8 +1488,11 @@ class CreateShipmentView(QWidget):
         if self._rates_tree.topLevelItemCount() == 0:
             return
         self._rates_tree.clear()
+        self._rates = []
         self._current_shipment = None
         self._quote_only_note.setVisible(False)
+        self._carrier_filter_row.setVisible(False)
+        self._carrier_filter_note.setVisible(False)
         self._resize_rates_tree_to_content()
 
     def _connect_rate_invalidation(self) -> None:
@@ -1548,11 +1631,23 @@ class CreateShipmentView(QWidget):
         # never hidden.
         real_rates = [r for r in all_rates if not _is_placeholder_rate(r)]
         rates = real_rates or all_rates
-        cheapest_id = _cheapest_rate_id(rates)
-        fastest_id = _fastest_rate_id(rates)
+        self._rates = rates
+        self._cheapest_id = _cheapest_rate_id(rates)
+        self._fastest_id = _fastest_rate_id(rates)
 
         self._quote_only_note.setVisible(self._quote_only)
-        self._populate_rates_tree(rates, cheapest_id, fastest_id)
+        # Offer only the carriers that quoted, then honour the carrier implied
+        # by a chosen predefined package. Preference is applied here rather than
+        # when the package is picked because the filter has nothing to select
+        # from until a rating has come back.
+        self._carrier_filter.blockSignals(True)
+        self._carrier_filter.set_carriers(carriers_present_in(rates))
+        self._carrier_filter.set_current_carrier(self._preferred_carrier)
+        self._carrier_filter.blockSignals(False)
+        # One carrier is nothing to filter, and a control with a single choice
+        # reads as a broken one.
+        self._carrier_filter_row.setVisible(self._carrier_filter.count() > 2)
+        self._render_rates()
 
         # Carriers that declined to quote say why here, and nowhere else. The
         # call succeeded, so this is not an error — but without it a carrier
