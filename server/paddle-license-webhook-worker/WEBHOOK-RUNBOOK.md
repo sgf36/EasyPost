@@ -304,7 +304,8 @@ Replay a **no-op** event and read the response code.
 
 ```js
 // transaction.updated is a no-op: the Worker only acts on adjustment.created,
-// subscription.*, and transaction.completed. Everything else -> json({ignored}).
+// adjustment.updated, subscription.*, and transaction.completed. Everything
+// else -> json({ignored}).
 // So this tests signature handling WITHOUT minting a licence or sending email.
 const r = await client.notifications.replay("ntf_01m00k7bdjfz0qqh91wg6efdvt");
 // then read logs for r.notification_id -> expect response_code 200
@@ -423,6 +424,84 @@ created during the 2026-08-16 rotation.
 - **Still unproven:** a real end-to-end purchase. A simulation exercises
   signature verification; it does not exercise checkout, minting, Resend, or
   actual inbox delivery.
+
+---
+
+## 10. Revocation rules (since 2026-09-13)
+
+Until 2026-09-13 **every** `adjustment.created` revoked the key and deleted its
+seats: a refund request Paddle later rejected, a goodwill credit, a partial
+refund, even a chargeback Paddle went on to win. Those rows carry the reason
+`created`. Separately, a refunded annual plan was never revoked, because the
+revocation was written under the `txn_` id while the key is signed with the
+`sub_` id.
+
+The rules now live in `src/adjustments.js` (`classifyAdjustment`) and are
+tested in `test/revocation.test.mjs` (`npm test`, Node 22.13 or later):
+
+| Adjustment | Effect |
+|---|---|
+| `refund`, `approved`, `type: full` (or every item `full`) | Revoke, reason `refunded` |
+| `chargeback`, `approved` (any amount) | Revoke, reason `chargeback` |
+| `chargeback_reverse` `approved`, or `chargeback` moving to `reversed` | Lift a `chargeback` or `created` revocation |
+| any action, `rejected` | Lift a `created` revocation only |
+| `pending_approval`, partial refunds, `credit`, `credit_reverse`, `chargeback_warning`, `chargeback_warning_reverse` | Nothing |
+
+- Both `adjustment.created` **and** `adjustment.updated` are handled. Most live
+  refunds are created `pending_approval` and only become `approved` in an
+  update, so the destination must stay subscribed to both.
+- A revocation is written for the `transaction_id` **and**, when present, the
+  `subscription_id`. Refunding any transaction of an annual plan, including a
+  renewal, therefore revokes the plan's key.
+- `refunded` and hand-written reasons (`withdrawn`) are final: a later
+  chargeback does not relabel them and no webhook ever clears them.
+- Lifting a revocation does not restore deleted device rows. The customer's app
+  activates again and takes a fresh seat.
+- `chargeback_warning` does not revoke. Paddle's documentation says the amount
+  is refunded at that point, but the ordering of a warning against its later
+  chargeback or warning reversal is not documented, so revoking on it would
+  need a restore rule that could fire in the wrong order. Revisit if a warning
+  is ever seen that never becomes a chargeback.
+
+Two related rules changed at the same time:
+
+- **Subscription events carry `occurred_at` into `subscriptions.updated_at`,
+  and an older event changes nothing** (response
+  `subscription_stale_ignored`, still HTTP 200). A late `subscription.updated`
+  can no longer revive a cancelled plan.
+- **Seats follow the tier being paid for.** When the subscription row names a
+  lower tier than the key (a downgrade), new activations are capped at that
+  tier's seats. Computers already seated keep working until released or
+  reclaimed.
+
+### Revocations left behind by the old rule
+
+Rows with reason `created` pre-date the fix. A later `rejected` or reversal
+event clears them automatically, but a credit or partial refund never produces
+such an event, so those customers stay locked out until someone looks. List
+them (read-only):
+
+```bash
+npx wrangler d1 execute easypost-licenses --remote \
+  --command "SELECT order_id, revoked_at FROM revocations WHERE reason = 'created'"
+```
+
+For each, read the transaction's adjustments in Paddle. Only an approved full
+refund or an approved chargeback should stay revoked; relabel those
+`refunded`/`chargeback`, and delete the rest. Write the statements into a
+`.sql` file and run it with `--file`, never inline.
+
+### After deploying a change to these rules
+
+1. Replay the `transaction.updated` no-op per §5 and confirm **HTTP 200** with
+   body `{"ignored":"transaction.updated"}`. That proves the new bundle loads
+   and signature handling is untouched.
+2. `npx wrangler tail easypost-license-webhook` while replaying: no
+   `paddle webhook failed at stage=` lines.
+3. Confirm in the Paddle dashboard that the live destination (§9) is still
+   subscribed to `adjustment.created` **and** `adjustment.updated`.
+4. Do not replay a real adjustment to "test" revocation: an approved refund
+   replay revokes that customer again, which is correct but not a test.
 
 ---
 

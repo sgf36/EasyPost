@@ -26,6 +26,8 @@
 
 import { createHmac, createPrivateKey, createPublicKey, sign as nodeSign, verify as nodeVerify, timingSafeEqual } from "node:crypto";
 
+import { RECOVERABLE_REASONS } from "./adjustments.js";
+
 const LICENSE_TAG = "EPD1";
 const RECEIPT_TAG = "EPDR1";
 
@@ -200,7 +202,7 @@ async function receiptWindow(db, license) {
   }
 
   const row = await db.prepare(
-    "SELECT status, period_end FROM subscriptions WHERE sub_id = ?"
+    "SELECT status, period_end, tier FROM subscriptions WHERE sub_id = ?"
   ).bind(license.order).first();
 
   if (!row) {
@@ -229,17 +231,65 @@ async function receiptWindow(db, license) {
       status: 402,
     };
   }
-  return { expiresAt: until.toISOString().replace(/\.\d{3}Z$/, "Z") };
+  return {
+    expiresAt: until.toISOString().replace(/\.\d{3}Z$/, "Z"),
+    paidTier: String(row.tier || ""),
+  };
 }
 
-/** Record what Paddle says about a subscription. */
-export async function recordSubscription(db, subId, status, periodEnd, tier) {
-  await db.prepare(
+/**
+ * Seats this activation may use.
+ *
+ * The key's seat count is signed at purchase and never changes, so a customer
+ * who buys Organisation and downgrades to Business in the Paddle portal would
+ * otherwise keep 30 seats at Business price. The subscription row records the
+ * tier currently being paid for; when it names a capped tier, that cap wins.
+ * An unknown or empty tier (a price missing from PRICE_TIERS) caps nothing, so
+ * a configuration gap can never take seats away from a customer.
+ */
+function effectiveSeats(license, paidTier) {
+  const cap = TIER_SEATS[paidTier];
+  if (!Number.isInteger(cap) || cap <= 0) return license.seats;
+  if (license.seats === 0 || license.seats > cap) return cap;
+  return license.seats;
+}
+
+/**
+ * Record what Paddle says about a subscription, unless we already hold newer news.
+ *
+ * Paddle does not guarantee delivery order, and retries a failed delivery for
+ * hours. Without a guard, a subscription.updated from before a cancellation
+ * that lands after it rewrites the row to "active" and brings the subscription
+ * back to life for a whole year. So updated_at holds the event's own
+ * occurred_at, and an event older than the stored one changes nothing.
+ *
+ * julianday() rather than string comparison: Paddle sends microseconds
+ * ("…:49.621022Z") while rows written before this change hold whole seconds
+ * ("…:49Z"), and those two sort wrongly as text within the same second. A
+ * stored value julianday cannot parse is treated as older than anything, so a
+ * malformed row can never freeze a subscription.
+ *
+ * Rows written before this change hold the time the Worker processed an event,
+ * usually seconds after it occurred, but hours later if that delivery was
+ * retried. The first event after deploy is compared against that late stamp,
+ * so it is dropped only if it occurred before the previous event was processed.
+ *
+ * Returns false when the event was older than what is stored and was ignored.
+ */
+export async function recordSubscription(db, subId, status, periodEnd, tier, occurredAt) {
+  const parsed = Date.parse(occurredAt || "");
+  // No usable timestamp: fall back to now, which is what every event used to
+  // get, so such an event still applies rather than being silently lost.
+  const at = Number.isNaN(parsed) ? new Date().toISOString() : new Date(parsed).toISOString();
+  const res = await db.prepare(
     "INSERT INTO subscriptions (sub_id, status, period_end, tier, updated_at) "
     + "VALUES (?, ?, ?, ?, ?) ON CONFLICT(sub_id) DO UPDATE SET "
     + "status = excluded.status, period_end = excluded.period_end, "
-    + "tier = excluded.tier, updated_at = excluded.updated_at"
-  ).bind(subId, status || "active", periodEnd || "", tier || "", nowIso()).run();
+    + "tier = excluded.tier, updated_at = excluded.updated_at "
+    + "WHERE julianday(subscriptions.updated_at) IS NULL "
+    + "OR julianday(excluded.updated_at) >= julianday(subscriptions.updated_at)"
+  ).bind(subId, status || "active", periodEnd || "", tier || "", at).run();
+  return changesOf(res) !== 0;
 }
 
 async function logAttempt(db, order, device, action, outcome) {
@@ -339,6 +389,7 @@ export async function handleActivate(request, env, json) {
   }
 
   await reclaimStale(db, license.order);
+  const seats = effectiveSeats(license, window.paidTier);
 
   const existing = await db.prepare(
     "SELECT device FROM devices WHERE order_id = ? AND device = ?"
@@ -354,15 +405,15 @@ export async function handleActivate(request, env, json) {
       + "platform = COALESCE(NULLIF(?, ''), platform) WHERE order_id = ? AND device = ?"
     ).bind(nowIso(), String(body.label || "").slice(0, 64), platform, license.order, device).run();
   } else {
-    if (license.seats > 0) {
+    if (seats > 0) {
       const row = await db.prepare("SELECT COUNT(*) AS n FROM devices WHERE order_id = ?")
         .bind(license.order).first();
-      if ((row?.n ?? 0) >= license.seats) {
+      if ((row?.n ?? 0) >= seats) {
         await logAttempt(db, license.order, device, "activate", "seats_exhausted");
         return json({
-          error: `This licence covers ${license.seats} computers and is already on ${row.n}. `
+          error: `This licence covers ${seats} computers and is already on ${row.n}. `
                + `Release one to free a seat.`,
-          seats: license.seats,
+          seats,
           devices: await deviceList(db, license.order),
         }, 409);
       }
@@ -372,18 +423,18 @@ export async function handleActivate(request, env, json) {
       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
     ).bind(
       license.order, device, String(body.label || "").slice(0, 64), platform,
-      license.tier, license.seats, nowIso(), nowIso()
+      license.tier, seats, nowIso(), nowIso()
     ).run();
   }
 
   await logAttempt(db, license.order, device, "activate", "ok");
   return json({
     receipt: signReceipt(env.LICENSE_PRIVATE_KEY_PEM, {
-      order: license.order, device, tier: license.tier, seats: license.seats,
+      order: license.order, device, tier: license.tier, seats,
       expiresAt: window.expiresAt,
     }),
     tier: license.tier,
-    seats: license.seats,
+    seats,
     plan: license.plan,
     expires: window.expiresAt,
     used: (await deviceList(db, license.order)).length,
@@ -471,12 +522,41 @@ export async function handleStats(request, env, json) {
 
 /** Kill a key: refunds, and freebies that turned out to be a mistake. */
 export async function revokeOrder(db, order, reason) {
+  // An existing final reason ("refunded", or "withdrawn" written by hand) is
+  // kept. Otherwise a chargeback arriving after a refund would relabel the row
+  // "chargeback", and a later chargeback reversal would then restore a key whose
+  // money had already been refunded.
+  const placeholders = RECOVERABLE_REASONS.map(() => "?").join(", ");
   await db.prepare(
     "INSERT INTO revocations (order_id, reason, revoked_at) VALUES (?, ?, ?) "
-    + "ON CONFLICT(order_id) DO UPDATE SET reason = excluded.reason, revoked_at = excluded.revoked_at"
-  ).bind(order, reason || "withdrawn", nowIso()).run();
+    + "ON CONFLICT(order_id) DO UPDATE SET reason = excluded.reason, revoked_at = excluded.revoked_at "
+    + `WHERE revocations.reason IN (${placeholders})`
+  ).bind(order, reason || "withdrawn", nowIso(), ...RECOVERABLE_REASONS).run();
   // Free the seats too, so a re-sold or replacement key starts clean.
   await db.prepare("DELETE FROM devices WHERE order_id = ?").bind(order).run();
+}
+
+/**
+ * Lift a revocation, but only one whose reason is in `reasons`.
+ *
+ * The filter is the safety: a chargeback reversal clears a chargeback, never a
+ * refund. Device rows deleted at revocation are not brought back; the customer's
+ * app simply activates again and takes a fresh seat.
+ */
+export async function restoreOrder(db, order, reasons) {
+  const list = (reasons || []).filter(Boolean);
+  if (list.length === 0) return 0;
+  const placeholders = list.map(() => "?").join(", ");
+  const res = await db.prepare(
+    `DELETE FROM revocations WHERE order_id = ? AND reason IN (${placeholders})`
+  ).bind(order, ...list).run();
+  return changesOf(res);
+}
+
+// D1 reports affected rows as meta.changes; node:sqlite (the local test shim)
+// as changes. Undefined means the driver did not say.
+function changesOf(res) {
+  return res?.meta?.changes ?? res?.changes;
 }
 
 export { TIER_SEATS, TIER_PLANS, RECEIPT_DAYS, RECLAIM_DAYS, SUBSCRIPTION_GRACE_DAYS };

@@ -1,0 +1,39 @@
+name: Licence Worker tests
+
+# The Paddle licence Worker is the money path and had no tests in CI. This job
+# runs its Node tests against an in-memory SQLite stand-in for D1; it needs no
+# secrets, installs nothing (the tests use only Node built-ins) and deploys
+# nothing.
+#
+# A separate workflow on purpose: `build (macos-latest)` and
+# `build (windows-latest)` in build.yml are required checks, and nothing here
+# may rename or retrigger them. This job is not required, so filtering it by
+# path cannot leave a pull request waiting on a check that never arrives.
+on:
+  pull_request:
+    paths:
+      - "server/paddle-license-webhook-worker/**"
+      - ".github/workflows/licence-worker-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "server/paddle-license-webhook-worker/**"
+      - ".github/workflows/licence-worker-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  worker-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: server/paddle-license-webhook-worker
+    steps:
+      - uses: actions/checkout@v5
+      # node:sqlite is unflagged from Node 22.13; 24 matches local runs.
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+      - run: node --test test/*.test.mjs
