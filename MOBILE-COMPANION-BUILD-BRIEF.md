@@ -94,11 +94,14 @@ holds the raw key, server holds nothing) — a smaller code change from here.
    rotating the key and letting old device tokens be revoked.
 
 ### Endpoint allow-list (server-enforced)
-- **Allowed (read):** trackers retrieve/list, shipments list/retrieve, HTS is
-  external (USITC, no key — proxy or call direct), claim status, pickup list.
-- **Allowed (spend, confirm-gated):** insurance create, pickup create/cancel,
-  claim create.
-- **Refused (403):** shipment rate-buy, label purchase, any key/account mutation.
+- **Allowed (read):** trackers, shipments, insurances, claims and pickups, as
+  paged lists only. HTS is external (USITC, no key — called direct).
+- **Allowed (manage):** pickup cancel only.
+- **Refused (403):** everything else, including shipment rate-buy, label
+  purchase, insurance create, pickup create/buy and claim create. Insurance and
+  claims left the app under App Review 5.1.1(ix), and the proxy must refuse what
+  the app does not offer: a copied device credential is not limited to the
+  app's buttons. `server/easypost-mobile-proxy/README.md` lists the routes.
 
 ### Push notifications
 The proxy is a permanent public URL, so it becomes the EasyPost webhook target

@@ -18,8 +18,16 @@ EASYPOST_API_BASE = "https://api.easypost.com/v2"
 LICENSE_PUBLIC_KEY_B64 = "344VCmZ52xHf0sTVsAidKz0Dsn0/QfZ+kwcKRGj+GDc="
 LICENSE_PRODUCT_ID = "easypost-desktop"
 LICENSE_FORMAT_TAG = "EPD1"
-# How long a pairing token is claimable before it expires (seconds).
+# How long a pairing token is claimable before it expires (seconds). Also how
+# long an unclaimed pairing's key material may stay in D1: see [triggers].
 PAIR_TTL_SECONDS = "600"
+
+# Deletes unclaimed pairings older than PAIR_TTL_SECONDS. Every /pair/register
+# sweeps as well, so this only matters when nobody is pairing; with both, an
+# abandoned pairing's KEK and ciphertext are gone at most 10 + 15 = 25 minutes
+# after its QR was generated.
+[triggers]
+crons = ["*/15 * * * *"]
 
 # Pairing + proxy need no secrets. Two optional secrets enable app-store
 # reviewer access (a working app on demo TEST-mode data, no QR pairing needed):

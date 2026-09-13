@@ -39,6 +39,20 @@ export async function encryptWithNewKek(plaintext) {
   };
 }
 
+// Stable, non-reversible identifier for the EasyPost account a pairing belongs
+// to, so the desktop can revoke every phone paired to its key by presenting
+// that key again. Nothing else the desktop holds names the account: a licence
+// order can cover several machines and several EasyPost accounts.
+//
+// Unsalted SHA-256 is enough because the input cannot be guessed — an EasyPost
+// API key carries well over 100 bits of randomness — and a salt would defeat
+// the lookup this exists for. The prefix keeps the digest from matching a bare
+// SHA-256 of the key computed for any other purpose.
+export async function ownerHash(easypostKey) {
+  const bytes = new TextEncoder().encode("easypost-mobile-proxy/owner/v1:" + easypostKey);
+  return b64urlEncode(await crypto.subtle.digest("SHA-256", bytes));
+}
+
 // Decrypt a stored ciphertext using the KEK the phone presented. Throws on any
 // tampering (AES-GCM auth) or a wrong KEK.
 export async function decryptWithKek(kekB64, ciphertextB64, ivB64) {
