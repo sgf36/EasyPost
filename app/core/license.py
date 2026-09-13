@@ -32,8 +32,12 @@ LICENSE_PUBLIC_KEY_B64 = "344VCmZ52xHf0sTVsAidKz0Dsn0/QfZ+kwcKRGj+GDc="
 LICENSE_PRODUCT_ID = "easypost-desktop"
 LICENSE_FORMAT_TAG = "EPD1"
 
-# Where customers buy a license (Paddle checkout — set once the product exists).
-PADDLE_CHECKOUT_URL = ""
+# Where customers buy a license. The pricing page rather than a raw Paddle
+# checkout link: it shows all three tiers and their seat counts, carries the
+# launch discount, and is where checkout.js opens the Paddle overlay. Empty sent
+# every licence-gated user to a "purchases coming soon" dialog while the prices
+# were live.
+PADDLE_CHECKOUT_URL = "https://easy-post.spencerfields.com/pricing.html"
 
 # How many computers one key may activate.
 TIERS = {
