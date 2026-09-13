@@ -95,7 +95,13 @@ CREATE TABLE IF NOT EXISTS batches (
     status TEXT,
     num_shipments INTEGER,
     source_csv TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
+    created_at TEXT DEFAULT (datetime('now')),
+    -- The auto-track choice made when the batch was created, kept so labels
+    -- recorded in a later session honour it. NULL where it was never kept.
+    auto_track INTEGER,
+    -- 1 once nothing is still queued for purchase and every label the batch
+    -- bought is in History. Until then the start-up backfill keeps looking.
+    shipments_recorded INTEGER NOT NULL DEFAULT 0
 );
 
 -- HTS codes are global reference data (not test/production specific), so
@@ -236,6 +242,11 @@ def get_connection() -> sqlite3.Connection:
 # definition) and is applied only when genuinely absent.
 _COLUMN_MIGRATIONS = [
     ("trackers", "status_detail", "TEXT"),
+    ("batches", "auto_track", "INTEGER"),
+    # Existing rows take the default, 0, on purpose. Batches bought before
+    # recording waited for the purchase to settle never reached History, and
+    # this is what makes the backfill look at each of them once.
+    ("batches", "shipments_recorded", "INTEGER NOT NULL DEFAULT 0"),
 ]
 
 
