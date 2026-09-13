@@ -1,9 +1,9 @@
 -- Revocation and pairing expiry, for a database created from the schema.sql
 -- that predates them. Fresh databases get the same shape from schema.sql.
 --
--- Apply BEFORE deploying the Worker that needs it. The new Worker writes
--- owner_hash on every pairing, so running it against the old tables makes
--- /pair/register fail. The old Worker never names these columns, so it keeps
+-- Apply BEFORE deploying the Worker that needs it. The new Worker reads and
+-- writes owner_hash on every pairing and every proxied request, so running it
+-- against the old tables fails pairing and every phone's requests alike. The old Worker never names these columns, so it keeps
 -- working against the new tables and the order is safe that way round.
 --
 -- Run it once. SQLite's ADD COLUMN has no IF NOT EXISTS, so a second run fails
