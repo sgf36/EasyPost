@@ -128,3 +128,18 @@ def test_activate_rejects_bad_key(signer, monkeypatch):
     monkeypatch.setattr(lic, "save_settings", lambda s: store.__setitem__("s", s))
     assert lic.activate("EPD1.garbage.sig") is None
     assert store["s"].license_key is None
+
+
+def test_buy_button_opens_the_published_pricing_page():
+    # An empty URL sends licence-gated users to "purchases coming soon" while
+    # the Paddle prices are live. Tie the URL to a page this repo publishes, so
+    # renaming or dropping the page fails here rather than in a customer's hands.
+    from pathlib import Path
+    from urllib.parse import urlparse
+
+    url = urlparse(lic.PADDLE_CHECKOUT_URL)
+    assert url.scheme == "https"
+    assert url.netloc == "easy-post.spencerfields.com"
+    page = Path(__file__).resolve().parents[1] / "site" / url.path.lstrip("/")
+    assert page.is_file(), f"{url.path} is not in site/"
+    assert "data-paddle-price" in page.read_text(encoding="utf-8")
