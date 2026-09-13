@@ -12,6 +12,7 @@ import {
   randomToken,
   encryptWithNewKek,
   decryptWithKek,
+  ownerHash,
   verifyLicense,
 } from "./crypto.js";
 
@@ -26,19 +27,29 @@ function now() {
   return Math.floor(Date.now() / 1000);
 }
 
-// EasyPost operations the phone is allowed to invoke. Anything not listed —
-// notably shipment creation, rate buying and label purchase — is refused, so a
-// compromised phone can never buy a label or read the raw key.
+// EasyPost operations the phone is allowed to invoke: exactly the calls the
+// shipped mobile app makes (`lib/services/proxy_client.dart` in
+// sgf36/Easy-Post-Mobile-Companion), and nothing else.
+//
+// This list is the only thing standing between a copied device credential and
+// the customer's production EasyPost account. The app hiding a button protects
+// nothing, because anyone holding the device token and KEK can call the proxy
+// with curl. So it used to matter that this still allowed buying insurance,
+// scheduling and buying pickups and filing claims long after the app removed
+// them (App Review 5.1.1(ix)): a lost or backed-up phone could spend money the
+// app itself could not. Adding a route here is adding it to every phone ever
+// paired, so add one only in the same change that ships the client calling it.
+//
+// Collections only, never `/{id}`: the app lists and pages, and has never
+// fetched a single object. Cancelling a pickup stays because the app offers it
+// and it returns money rather than spending it.
 const ALLOW = [
-  { method: "GET", re: /^\/trackers(\/[^/]+)?$/ },
-  { method: "GET", re: /^\/shipments(\/[^/]+)?$/ },
-  { method: "GET", re: /^\/insurances(\/[^/]+)?$/ },
-  { method: "POST", re: /^\/insurances$/ }, // buy insurance — confirm-gated in-app
-  { method: "GET", re: /^\/pickups(\/[^/]+)?$/ },
-  { method: "POST", re: /^\/pickups$/ }, // schedule — confirm-gated in-app
-  { method: "POST", re: /^\/pickups\/[^/]+\/(cancel|buy)$/ },
-  { method: "GET", re: /^\/claims(\/[^/]+)?$/ },
-  { method: "POST", re: /^\/claims$/ }, // file a claim
+  { method: "GET", re: /^\/trackers$/ },
+  { method: "GET", re: /^\/shipments$/ },
+  { method: "GET", re: /^\/insurances$/ },
+  { method: "GET", re: /^\/pickups$/ },
+  { method: "GET", re: /^\/claims$/ },
+  { method: "POST", re: /^\/pickups\/[^/]+\/cancel$/ },
 ];
 
 function isAllowed(method, epPath) {
@@ -65,17 +76,50 @@ async function handleRegister(request, env) {
   const lic = await verifyLicense(license, env);
   if (!lic) return json({ error: "invalid_license" }, 403);
 
-  const { kek, ciphertext, iv } = await encryptWithNewKek(String(easypost_key));
+  // Sweep before inserting, so pairing activity alone keeps abandoned rows
+  // short-lived even if the scheduled sweep is not running.
+  await purgeExpiredPairs(env);
 
-  await env.PAIRING.prepare(
-    `INSERT OR REPLACE INTO pending_pairs
-       (pairing_token, ciphertext, iv, kek, license_order, license_tier, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  )
-    .bind(pairing_token, ciphertext, iv, kek, lic.order, lic.tier, now())
-    .run();
+  const { kek, ciphertext, iv } = await encryptWithNewKek(String(easypost_key));
+  const owner = await ownerHash(String(easypost_key));
+
+  // Plain INSERT, not INSERT OR REPLACE: replacing let anyone who had seen a
+  // pairing token swap a different EasyPost key in behind it before the phone
+  // claimed. The desktop mints a fresh random token each time, so a genuine
+  // collision never happens and refusing one costs nothing.
+  try {
+    await env.PAIRING.prepare(
+      `INSERT INTO pending_pairs
+         (pairing_token, ciphertext, iv, kek, license_order, license_tier, owner_hash, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+      .bind(pairing_token, ciphertext, iv, kek, lic.order, lic.tier, owner, now())
+      .run();
+  } catch (err) {
+    if (/UNIQUE|PRIMARY KEY|constraint/i.test(String(err && err.message))) {
+      return json({ error: "token_in_use" }, 409);
+    }
+    throw err;
+  }
 
   return json({ ok: true, tier: lic.tier });
+}
+
+// How long a pairing token may be claimed. The same number bounds how long a
+// pending row — which holds the KEK next to the ciphertext, and so is a usable
+// production key to anyone reading the database — may exist.
+function pairTtl(env) {
+  const ttl = parseInt(env.PAIR_TTL_SECONDS || "600", 10);
+  return Number.isFinite(ttl) && ttl > 0 ? ttl : 600;
+}
+
+// Delete every pairing nobody claimed in time. Claiming used to be the only
+// thing that removed a row, so every QR that was generated and never scanned
+// left a decryptable production key in D1 indefinitely.
+async function purgeExpiredPairs(env) {
+  await env.PAIRING.prepare(`DELETE FROM pending_pairs WHERE created_at < ?`)
+    .bind(now() - pairTtl(env))
+    .run();
 }
 
 // Phone → proxy. Presents the pairing token, receives a long-lived device token
@@ -130,7 +174,7 @@ async function handleClaim(request, env) {
   }
 
   const row = await env.PAIRING.prepare(
-    `SELECT ciphertext, iv, kek, license_order, license_tier, created_at
+    `SELECT ciphertext, iv, kek, license_order, license_tier, owner_hash, created_at
        FROM pending_pairs WHERE pairing_token = ?`,
   )
     .bind(pairing_token)
@@ -138,8 +182,7 @@ async function handleClaim(request, env) {
 
   if (!row) return json({ error: "unknown_or_used_token" }, 404);
 
-  const ttl = parseInt(env.PAIR_TTL_SECONDS || "600", 10);
-  if (now() - row.created_at > ttl) {
+  if (now() - row.created_at > pairTtl(env)) {
     await env.PAIRING.prepare(`DELETE FROM pending_pairs WHERE pairing_token = ?`)
       .bind(pairing_token)
       .run();
@@ -154,9 +197,12 @@ async function handleClaim(request, env) {
   await env.PAIRING.batch([
     env.PAIRING.prepare(
       `INSERT INTO devices
-         (device_token, ciphertext, iv, license_order, license_tier, platform, created_at, last_seen, revoked)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`,
-    ).bind(deviceToken, row.ciphertext, row.iv, row.license_order, row.license_tier, plat, now(), now()),
+         (device_token, ciphertext, iv, license_order, license_tier, platform, owner_hash, created_at, last_seen, revoked)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+    ).bind(
+      deviceToken, row.ciphertext, row.iv, row.license_order, row.license_tier, plat,
+      row.owner_hash, now(), now(),
+    ),
     env.PAIRING.prepare(`DELETE FROM pending_pairs WHERE pairing_token = ?`).bind(pairing_token),
   ]);
 
@@ -205,16 +251,107 @@ function safeEqual(a, b) {
   return diff === 0;
 }
 
+// ---- revocation ----------------------------------------------------------
+
+// What revoking a device does to its row. `revoked` is what the proxy checks;
+// blanking the ciphertext as well means a revoked phone's KEK, if it is ever
+// recovered from the handset or a backup, no longer has anything to decrypt,
+// even against a copy of the database. The row itself stays so a repeated
+// revoke is recognised and answered, not mistaken for a stranger.
+const REVOKE_SET = `revoked = 1, revoked_at = ?, ciphertext = '', iv = ''`;
+
+function bearerToken(request) {
+  const auth = request.headers.get("authorization") || "";
+  return auth.startsWith("Bearer ") ? auth.slice(7) : null;
+}
+
+// Phone → proxy, on unpair. Authenticated by the device token alone, not the
+// KEK as well: the worst anyone holding just the token can do with it is cut
+// that phone off, and a phone whose keychain has lost its KEK should still be
+// able to revoke itself.
+//
+// Repeating it succeeds, because the phone cannot tell a lost response from a
+// refusal and must be free to retry before it wipes its credentials.
+async function handleRevoke(request, env) {
+  const deviceToken = bearerToken(request);
+  if (!deviceToken) return json({ error: "unauthenticated" }, 401);
+
+  const dev = await env.PAIRING.prepare(`SELECT revoked FROM devices WHERE device_token = ?`)
+    .bind(deviceToken)
+    .first();
+  if (!dev) return json({ error: "unauthenticated" }, 401);
+  if (!dev.revoked) {
+    await env.PAIRING.prepare(`UPDATE devices SET ${REVOKE_SET} WHERE device_token = ?`)
+      .bind(now(), deviceToken)
+      .run();
+  }
+  return json({ ok: true, revoked: 1 });
+}
+
+// Desktop → proxy: revoke every phone paired to this desktop's EasyPost account.
+//
+// Authenticated by the production key itself, because that is what the desktop
+// holds that names the account, and whoever holds it can already do everything
+// a phone can and more — so accepting it grants nothing new. It is matched by
+// `ownerHash`, never stored.
+//
+// Also takes the licence, optionally, for phones paired before `owner_hash`
+// existed: those rows cannot be matched by key, since the proxy only ever had
+// the key encrypted under a KEK it no longer holds. With a valid licence they
+// are matched by its order instead. That is broader than the account — one
+// order can pair several EasyPost accounts — but revoking is the only thing
+// it can do, so the worst case is a customer's own phones having to pair again.
+// The reviewer devices share the order `REVIEW`, which no genuine licence
+// carries, and are excluded outright rather than trusting that.
+async function handleRevokeAll(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "bad_json" }, 400);
+  }
+  const { easypost_key, license } = body || {};
+  if (!easypost_key) return json({ error: "missing_fields" }, 400);
+
+  let lic = null;
+  if (license) {
+    lic = await verifyLicense(license, env);
+    if (!lic) return json({ error: "invalid_license" }, 403);
+  }
+
+  const owner = await ownerHash(String(easypost_key));
+  const stamp = now();
+  const statements = [
+    env.PAIRING.prepare(
+      `UPDATE devices SET ${REVOKE_SET} WHERE owner_hash = ? AND revoked = 0`,
+    ).bind(stamp, owner),
+    // A QR still on screen is a pairing in waiting; revoking "all phones" has
+    // to include the one about to scan it.
+    env.PAIRING.prepare(`DELETE FROM pending_pairs WHERE owner_hash = ?`).bind(owner),
+  ];
+  if (lic && lic.order && lic.order !== "REVIEW") {
+    statements.push(
+      env.PAIRING.prepare(
+        `UPDATE devices SET ${REVOKE_SET}
+          WHERE owner_hash IS NULL AND license_order = ? AND revoked = 0`,
+      ).bind(stamp, lic.order),
+    );
+  }
+  const results = await env.PAIRING.batch(statements);
+  const revoked = (results[0]?.meta?.changes || 0) + (results[2]?.meta?.changes || 0);
+
+  return json({ ok: true, revoked });
+}
+
 // ---- proxy ---------------------------------------------------------------
 
 async function handleProxy(request, env, url) {
-  const auth = request.headers.get("authorization") || "";
-  const deviceToken = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+  const deviceToken = bearerToken(request);
   const kek = request.headers.get("x-ep-kek");
   if (!deviceToken || !kek) return json({ error: "unauthenticated" }, 401);
 
   const dev = await env.PAIRING.prepare(
-    `SELECT ciphertext, iv, revoked FROM devices WHERE device_token = ?`,
+    `SELECT ciphertext, iv, revoked, owner_hash FROM devices WHERE device_token = ?`,
   )
     .bind(deviceToken)
     .first();
@@ -230,6 +367,24 @@ async function handleProxy(request, env, url) {
     easypostKey = await decryptWithKek(kek, dev.ciphertext, dev.iv);
   } catch {
     return json({ error: "bad_kek" }, 401);
+  }
+
+  // Phones paired before `owner_hash` existed carry none, so the desktop's
+  // revoke-all could reach them only through the licence order. This is the one
+  // moment the proxy holds their key in the clear, so bind them to their
+  // account now; after one request each, they revoke by key like any other.
+  //
+  // Awaited, unlike `last_seen`: it happens once per phone, and a write the
+  // runtime drops after the response is sent would leave that phone unbound.
+  // A failure is still swallowed — the request itself must not fail over it.
+  if (!dev.owner_hash) {
+    const owner = await ownerHash(easypostKey);
+    await env.PAIRING.prepare(
+      `UPDATE devices SET owner_hash = ? WHERE device_token = ? AND owner_hash IS NULL`,
+    )
+      .bind(owner, deviceToken)
+      .run()
+      .catch(() => {});
   }
 
   // `url.search` must reach EasyPost unmodified. The mobile app's list screens
@@ -288,9 +443,21 @@ export default {
     if (request.method === "POST" && url.pathname === "/pair/demo") {
       return handleDemo(request, env);
     }
+    if (request.method === "POST" && url.pathname === "/pair/revoke") {
+      return handleRevoke(request, env);
+    }
+    if (request.method === "POST" && url.pathname === "/pair/revoke-all") {
+      return handleRevokeAll(request, env);
+    }
     if (url.pathname === "/ep" || url.pathname.startsWith("/ep/")) {
       return handleProxy(request, env, url);
     }
     return json({ error: "not_found" }, 404);
+  },
+
+  // Cron trigger (wrangler.toml). Registering sweeps too, but a quiet week with
+  // no pairings would otherwise leave the last abandoned QR's row in place.
+  async scheduled(_event, env) {
+    await purgeExpiredPairs(env);
   },
 };
