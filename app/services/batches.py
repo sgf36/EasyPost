@@ -610,6 +610,58 @@ def bought_shipment_ids(batch) -> list[str]:
     ]
 
 
+# A stub's batch_status from the moment `batch.buy` accepts it until its label is
+# bought or refused. Before purchase the stubs say "created" instead.
+PURCHASE_QUEUED_STATUS = "queued_for_purchase"
+
+
+def purchase_in_progress(batch) -> bool:
+    """Whether EasyPost is still buying labels for this batch.
+
+    Read from the shipment stubs, because the batch's own state does not say.
+    Verified live in test mode: `batch.buy` answers ``state: created`` with every
+    stub queued and no tracking code, the stubs then turn ``postage_purchased``
+    one at a time, and the batch still says ``created`` until the last one has
+    settled. Going by the state alone, a purchase looks finished before it has
+    bought a single label — which is how every batch purchase went unrecorded.
+    """
+    if _batch_state(batch) == "purchasing":
+        return True
+    return any(
+        shipment.get("batch_status") == PURCHASE_QUEUED_STATUS
+        for shipment in getattr(batch, "shipments", None) or []
+    )
+
+
+def _retrieve_shipments(shipment_ids) -> list:
+    client = client_manager.get_client()
+    shipments = []
+    for shipment_id in shipment_ids:
+        try:
+            shipments.append(client.shipment.retrieve(shipment_id))
+        except Exception:
+            logger.exception("Could not retrieve batch shipment %s", shipment_id)
+    return shipments
+
+
+def unrecorded_shipment_ids(batch) -> list[str]:
+    """Bought shipments in this batch that are not yet in the local History.
+
+    What makes recording idempotent at the price of one local query. The rows
+    themselves are upserts and would never duplicate, but each label costs a
+    request to retrieve, and a batch is handed back on every poll, refresh and
+    pushed event: without this a 200-label batch would be fetched again each
+    time."""
+    bought = bought_shipment_ids(batch)
+    if not bought:
+        return []
+    placeholders = ", ".join("?" for _ in bought)
+    with db_cursor() as cur:
+        cur.execute(f"SELECT id FROM shipments WHERE id IN ({placeholders})", bought)
+        recorded = {row["id"] for row in cur.fetchall()}
+    return [shipment_id for shipment_id in bought if shipment_id not in recorded]
+
+
 def full_shipments(batch) -> list:
     """Retrieve each bought shipment in full.
 
@@ -621,14 +673,7 @@ def full_shipments(batch) -> list:
     does. One request per shipment, so callers should treat it as a network
     operation and keep it off the UI thread.
     """
-    client = client_manager.get_client()
-    shipments = []
-    for shipment_id in bought_shipment_ids(batch):
-        try:
-            shipments.append(client.shipment.retrieve(shipment_id))
-        except Exception:
-            logger.exception("Could not retrieve batch shipment %s", shipment_id)
-    return shipments
+    return _retrieve_shipments(bought_shipment_ids(batch))
 
 
 def batch_label_urls(batch) -> list[str]:
@@ -677,15 +722,22 @@ def record_batch_shipments(batch, *, track: bool = True) -> tuple[int, int]:
 
     Best effort by design: the labels are already paid for, so a local
     bookkeeping failure must never be reported as a failed purchase.
+
+    Safe to call as often as a batch is seen. Only labels bought and not yet in
+    History are fetched and written (see unrecorded_shipment_ids), so partial
+    purchases record their bought labels as they appear and a label is recorded
+    once however many times the batch is handed back. Once nothing is queued and
+    nothing is left unrecorded, the batch is marked done so the start-up
+    backfill stops looking at it.
     """
     from app.services.shipments import save_shipment_locally
     from app.services.tracking import save_tracker_locally
 
     shipments_recorded = 0
     trackers_recorded = 0
-    # One pass over the retrieved shipments: full_shipments is a request per
-    # shipment, so History and Tracking must not each fetch their own copy.
-    for shipment in full_shipments(batch):
+    # One pass over the retrieved shipments: each is a request, so History and
+    # Tracking must not each fetch their own copy.
+    for shipment in _retrieve_shipments(unrecorded_shipment_ids(batch)):
         try:
             save_shipment_locally(shipment)
             shipments_recorded += 1
@@ -701,18 +753,72 @@ def record_batch_shipments(batch, *, track: bool = True) -> tuple[int, int]:
             trackers_recorded += 1
         except Exception:
             logger.exception("Could not record tracker for shipment %s", shipment.id)
+
+    # A shipment whose retrieval or save failed above is still unrecorded, and
+    # leaving the batch open is what gives it another try.
+    if not purchase_in_progress(batch) and not unrecorded_shipment_ids(batch):
+        with db_cursor() as cur:
+            cur.execute("UPDATE batches SET shipments_recorded = 1 WHERE id = ?", (batch.id,))
     return shipments_recorded, trackers_recorded
 
 
-def save_batch_locally(batch, source_csv: str = "") -> None:
+def backfill_batch_shipments(*, skip_batch_id: Optional[str] = None) -> int:
+    """Record the labels of batches an earlier session bought but never recorded.
+
+    Until recording waited for a purchase to settle, no batch purchase reached
+    History at all, and a purchase can still be cut short by closing the app
+    while labels are queued. Every saved batch in the active mode not yet marked
+    recorded is retrieved and handed to record_batch_shipments, which records
+    what has been bought and marks the batch done once it has settled — so each
+    batch costs requests until then, and nothing after.
+
+    ``skip_batch_id`` is the batch the Batch page is already following; its own
+    polling records it, and a second recorder would only fetch the same labels.
+
+    The auto-track choice saved with the batch is honoured. Batches saved before
+    it was kept fall back to the picker's default, which is to track.
+
+    Returns the number of shipments recorded. Best effort per batch: one that
+    cannot be retrieved is left for the next time and does not stop the rest.
+    """
     mode = client_manager.active_mode
     with db_cursor() as cur:
         cur.execute(
+            "SELECT id, auto_track FROM batches"
+            " WHERE mode = ? AND shipments_recorded = 0 ORDER BY created_at",
+            (mode,),
+        )
+        pending = [(row["id"], row["auto_track"]) for row in cur.fetchall()]
+
+    recorded = 0
+    for batch_id, auto_track in pending:
+        if batch_id == skip_batch_id:
+            continue
+        try:
+            batch = retrieve_batch(batch_id)
+            save_batch_locally(batch)
+            track = True if auto_track is None else bool(auto_track)
+            recorded += record_batch_shipments(batch, track=track)[0]
+        except Exception:
+            logger.exception("Could not backfill the shipments of batch %s", batch_id)
+    return recorded
+
+
+def save_batch_locally(batch, source_csv: str = "", *, auto_track: Optional[bool] = None) -> None:
+    mode = client_manager.active_mode
+    with db_cursor() as cur:
+        # A purchase under way reopens the batch for the backfill. A batch can be
+        # marked done before it is bought (a sweep that saw it merely created),
+        # and closing the app while its labels are queued must still leave them
+        # to be recorded at the next launch.
+        cur.execute(
             """
-            INSERT INTO batches (id, mode, status, num_shipments, source_csv)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO batches (id, mode, status, num_shipments, source_csv, auto_track)
+            VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
-                status=excluded.status, num_shipments=excluded.num_shipments
+                status=excluded.status, num_shipments=excluded.num_shipments,
+                auto_track=COALESCE(excluded.auto_track, batches.auto_track),
+                shipments_recorded=CASE WHEN ? THEN 0 ELSE batches.shipments_recorded END
             """,
             (
                 batch.id,
@@ -720,6 +826,8 @@ def save_batch_locally(batch, source_csv: str = "") -> None:
                 _batch_state(batch),
                 getattr(batch, "num_shipments", None),
                 source_csv or None,
+                None if auto_track is None else int(auto_track),
+                int(purchase_in_progress(batch)),
             ),
         )
 

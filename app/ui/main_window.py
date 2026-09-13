@@ -225,7 +225,7 @@ class MainWindow(QMainWindow):
                     (
                         "main_window.nav_batch_shipments",
                         self._batch_view,
-                        self._batch_view.refresh_address_choices,
+                        self._batch_view.on_show,
                     ),
                     (
                         "main_window.nav_address_book",
