@@ -33,122 +33,121 @@ def test_hts_header_not_clipped(qapp):
     assert table.columnWidth(1) >= fm.horizontalAdvance("HTS number (optional)")
 
 
-def _rates_tree(header_labels, service_names, badge_text, width):
+def _rates_tree(header_labels, service_names, width, *, price="24.60 GBP"):
     """A rates tree shaped like the real one: carrier headers with service
-    children, five columns, the last holding a Buy button."""
+    children, four columns, the last holding a Buy button."""
     from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem, QPushButton
 
     tree = QTreeWidget()
-    tree.setColumnCount(5)
+    tree.setColumnCount(4)
     tree.setHeaderLabels(header_labels)
-    carrier = QTreeWidgetItem([f"Royal Mail V3 ({len(service_names)})", "", "", "", ""])
+    carrier = QTreeWidgetItem([f"Royal Mail V3 ({len(service_names)})", "", "", ""])
     tree.addTopLevelItem(carrier)
     for name in service_names:
-        child = QTreeWidgetItem(carrier, ["", badge_text, "24.60 GBP", "3", ""])
+        child = QTreeWidgetItem(carrier, ["", price, "3", ""])
         child.setText(0, name)
-        tree.setItemWidget(child, 4, QPushButton("Buy"))
+        tree.setItemWidget(child, 3, QPushButton("Buy"))
     carrier.setExpanded(True)
+    # As the view sets it up: the Buy column is sized to its button, not
+    # stretched over whatever the text columns leave.
+    tree.header().setStretchLastSection(False)
+    tree.setColumnWidth(3, 80)
     tree.resize(width, 300)
     tree.show()
     return tree
 
 
-def test_service_name_survives_long_headers_and_badges(qapp):
-    """The Tamil case: long headers and a long badge starved column 0.
+TAMIL_HEADERS = ["கேரியர் மற்றும் சேவை", "கட்டணம்", "மதிப்பீட்டு நாட்கள்", ""]
 
-    Header words and badge text are translated; carrier and service names are
-    not, so column 0 needs the same width in every language. This asserts the
-    priority the fix encodes -- the service name keeps its width and the badge
-    gives way -- rather than asserting particular pixel numbers.
+
+def _need(tree, service):
+    return tree.fontMetrics().horizontalAdvance(service) + tree.indentation() * 2
+
+
+def test_service_name_survives_long_headers(qapp):
+    """The Tamil case: long headers starved column 0.
+
+    Header words are translated; carrier and service names are not, so column 0
+    needs the same width in every language.
     """
     from app.ui.views.create_shipment_view import _fit_rate_columns
 
     service = "Royal Mail 1st Class Signed For"
-    tree = _rates_tree(
-        ["கேரியர் மற்றும் சேவை", "உள்ளடக்கியது", "கட்டணம்",
-         "மதிப்பீட்டு நாட்கள்", ""],
-        [service, "Royal Mail 2nd Class"],
-        "கண்காணிக்கப்படுகிறது",
-        900,
-    )
+    tree = _rates_tree(TAMIL_HEADERS, [service, "Royal Mail 2nd Class"], 900)
     _fit_rate_columns(tree)
-    fm = tree.fontMetrics()
-    need = fm.horizontalAdvance(service) + tree.indentation() * 2
-    assert tree.columnWidth(0) >= need, (
+    assert tree.columnWidth(0) >= _need(tree, service), (
         f"service name clipped: column 0 is {tree.columnWidth(0)}px "
-        f"for {need}px of text"
+        f"for {_need(tree, service)}px of text"
     )
 
 
-def test_service_name_outranks_the_badge_when_space_is_short(qapp):
+def test_the_name_outranks_the_figures_when_space_is_short(qapp):
     """The same Tamil headers in a pane too narrow for everything.
 
     Deliberately no absolute pixel assertion: how much fits depends on which
-    fonts the machine has, which is why the first version of the test above
+    fonts the machine has, which is why an earlier version of these tests
     passed locally at 430px and failed on CI. What must hold everywhere is the
-    ORDER — the name is fed before the badge.
+    ORDER: the name is fed before the price and the days.
     """
     from app.ui.views.create_shipment_view import _fit_rate_columns
 
-    tree = _rates_tree(
-        ["கேரியர் மற்றும் சேவை", "உள்ளடக்கியது", "கட்டணம்",
-         "மதிப்பீட்டு நாட்கள்", ""],
-        ["Royal Mail 1st Class Signed For", "Royal Mail 2nd Class"],
-        "கண்காணிக்கப்படுகிறது",
-        430,
-    )
-    _fit_rate_columns(tree)
-    assert tree.columnWidth(0) > tree.columnWidth(1)
-
-
-def test_english_layout_is_not_made_worse(qapp):
-    """Short headers: column 0 should still take the slack, not shrink to fit."""
-    from app.ui.views.create_shipment_view import _fit_rate_columns
-
-    tree = _rates_tree(
-        ["Carrier & service", "Included", "Rate", "Est. days", ""],
-        ["Royal Mail 1st Class Signed For", "Royal Mail 2nd Class"],
-        "Tracked",
-        430,
-    )
+    tree = _rates_tree(TAMIL_HEADERS, ["Royal Mail 1st Class Signed For"], 430)
     _fit_rate_columns(tree)
     assert tree.columnWidth(0) > tree.columnWidth(1)
     assert tree.columnWidth(0) > tree.columnWidth(2)
 
 
-def test_badge_yields_entirely_rather_than_clip_the_service_name(qapp):
-    """At a width where both cannot fit, the badge goes, not the name.
+def test_a_long_price_wraps_between_words_before_the_name_gives_way(qapp):
+    """"Billed to account" is two long words in Tamil. When the name needs the
+    room, the price column narrows to its longest word, never below it."""
+    from app.ui.views.create_shipment_view import _fit_rate_columns
 
-    A floor honoured while the name clips would invert the priority this whole
-    helper exists to set. "Signed For" is in the service name anyway; the badge
-    repeats it.
-    """
-    from app.ui.views.create_shipment_view import (
-        _fit_rate_columns, _RATE_BADGE_FLOOR,
-    )
-
-    service = "Royal Mail 1st Class Signed For"
-    tree = _rates_tree(
-        ["Carrier & service", "Included", "Rate", "Est. days", ""],
-        [service],
-        "Tracked",
-        260,
-    )
+    billed = "கணக்கில் வசூலிக்கப்படும்"
+    tree = _rates_tree(TAMIL_HEADERS, ["Royal Mail Tracked 48 Signed For Age Verification"],
+                       520, price=billed)
     _fit_rate_columns(tree)
-    # The badge has given up its floor, and what little room exists went to the
-    # name. At this width the name still cannot fit whole, and that is the
-    # honest end of the ladder — but nothing else is being fed before it.
-    assert tree.columnWidth(1) < _RATE_BADGE_FLOOR
-    assert tree.columnWidth(0) > tree.columnWidth(1)
+    fm = tree.fontMetrics()
+    longest_word = max(fm.horizontalAdvance(w) for w in billed.split())
+    assert tree.columnWidth(1) < fm.horizontalAdvance(billed)
+    assert tree.columnWidth(1) >= longest_word
+
+
+def test_headers_get_the_room_when_there_is_room(qapp):
+    """With the names fed, left-over width un-elides the headers first."""
+    from app.ui.views.create_shipment_view import _fit_rate_columns
+
+    tree = _rates_tree(["Carrier & service", "Rate", "Est. days", ""], ["Priority"], 700)
+    _fit_rate_columns(tree)
+    header = tree.header()
+    assert tree.columnWidth(2) >= header.sectionSizeFromContents(2).width()
+
+
+def test_a_collapsed_group_does_not_claim_width(qapp):
+    """Royal Mail's collapsed catalogue holds very long names nobody can see."""
+    from PySide6.QtWidgets import QTreeWidgetItem
+    from app.ui.views.create_shipment_view import _fit_rate_columns
+
+    tree = _rates_tree(["Carrier & service", "Rate", "Est. days", ""], ["Priority"], 700)
+    hidden = QTreeWidgetItem(["Royal Mail V3 (1)", "", "", ""])
+    tree.addTopLevelItem(hidden)
+    long_name = "DE Import Tracked 24 Parcel Boxable High Volume Weekend Service"
+    QTreeWidgetItem(hidden, [long_name, "0.01 GBP", "", ""])
+    hidden.setExpanded(False)
+    _fit_rate_columns(tree)
+    days_while_collapsed = tree.columnWidth(2)
+    hidden.setExpanded(True)
+    _fit_rate_columns(tree)
+    assert tree.columnWidth(0) >= _need(tree, long_name)
+    assert days_while_collapsed >= tree.columnWidth(2)
 
 
 def test_the_view_actually_calls_the_sizing(qapp):
     """The wiring, not just the helper.
 
     Written after a mutation test: deleting the call from
-    _resize_rates_tree_to_content left all four tests above green, because they
-    each call _fit_rate_columns directly. A helper nothing invokes fixes
-    nothing, and that is precisely the shape of bug this file exists to catch.
+    _resize_rates_tree_to_content left the helper tests green, because they each
+    call _fit_rate_columns directly. A helper nothing invokes fixes nothing, and
+    that is precisely the shape of bug this file exists to catch.
 
     _resize_rates_tree_to_content touches only self._rates_tree, so a stub with
     that one attribute exercises the real method.
@@ -157,19 +156,9 @@ def test_the_view_actually_calls_the_sizing(qapp):
     from app.ui.views.create_shipment_view import CreateShipmentView
 
     service = "Royal Mail 1st Class Signed For"
-    tree = _rates_tree(
-        ["கேரியர் மற்றும் சேவை", "உள்ளடக்கியது", "கட்டணம்",
-         "மதிப்பீட்டு நாட்கள்", ""],
-        [service, "Royal Mail 2nd Class"],
-        "கண்காணிக்கப்படுகிறது",
-        900,
-    )
-    CreateShipmentView._resize_rates_tree_to_content(
-        SimpleNamespace(_rates_tree=tree)
-    )
-    fm = tree.fontMetrics()
-    need = fm.horizontalAdvance(service) + tree.indentation() * 2
-    assert tree.columnWidth(0) >= need, (
+    tree = _rates_tree(TAMIL_HEADERS, [service, "Royal Mail 2nd Class"], 900)
+    CreateShipmentView._resize_rates_tree_to_content(SimpleNamespace(_rates_tree=tree))
+    assert tree.columnWidth(0) >= _need(tree, service), (
         "the view did not size its own columns: "
-        f"column 0 is {tree.columnWidth(0)}px for {need}px of text"
+        f"column 0 is {tree.columnWidth(0)}px for {_need(tree, service)}px of text"
     )

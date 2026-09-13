@@ -7,7 +7,8 @@ cannot actually be purchased. Those must be hidden when genuine quotes exist.
 
 from types import SimpleNamespace
 
-from app.ui.views.create_shipment_view import _is_account_billed, _is_placeholder_rate
+from app.services.rates import is_account_billed as _is_account_billed
+from app.services.rates import is_placeholder_rate as _is_placeholder_rate
 
 
 def _rate(amount):

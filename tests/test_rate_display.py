@@ -7,12 +7,8 @@ smoke pass.
 
 from types import SimpleNamespace
 
-from app.ui.views.create_shipment_view import (
-    _fastest_rate_id,
-    _format_delivery,
-    _format_price,
-    _rate_sort_key,
-)
+from app.services.rates import sort_key as _rate_sort_key
+from app.ui.views.create_shipment_view import _format_delivery, _format_price
 from app.ui.widgets.chips import carrier_colors
 
 
@@ -42,19 +38,6 @@ def test_sort_is_stable_for_equal_prices():
     assert [r.id for r in sorted(rates, key=_rate_sort_key)] == ["first", "second"]
 
 
-def test_fastest_rate_ignores_rates_with_no_estimate():
-    rates = [rate("slow", days=5), rate("none", days=None), rate("quick", days=1)]
-    assert _fastest_rate_id(rates) == "quick"
-
-
-def test_fastest_rate_is_none_when_nobody_quoted_days():
-    assert _fastest_rate_id([rate("a"), rate("b")]) is None
-
-
-def test_fastest_rate_handles_empty_list():
-    assert _fastest_rate_id([]) is None
-
-
 def test_price_folds_currency_into_one_cell():
     assert _format_price(rate("a", amount="10.97", currency="GBP")) == "10.97 GBP"
 
@@ -75,7 +58,9 @@ def test_delivery_shows_bare_number_under_the_est_days_header():
     # avoids plural rules across all 50 locales.
     assert _format_delivery(rate("a", days=3)) == "3"
     assert _format_delivery(rate("one", days=1)) == "1"
-    assert _format_delivery(rate("b", days=None)) == "Not quoted"
+    # No estimate is a dash; the words are the cell's tooltip, so a long
+    # translation never takes width from the service name.
+    assert _format_delivery(rate("b", days=None)) == "—"
 
 
 def test_carrier_colors_are_stable_and_distinct_for_major_carriers():

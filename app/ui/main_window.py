@@ -200,8 +200,15 @@ class MainWindow(QMainWindow):
         outer.addWidget(body, stretch=1)
 
         self._connect_dashboard()
+        self._connect_create_shipment()
         self._select_first_nav_entry()
         return shell
+
+    def _connect_create_shipment(self) -> None:
+        # "Track parcel" on a label just bought: the page asks, the window navigates.
+        self._create_shipment_view.tracking_requested.connect(
+            lambda: self._show_view(self._tracking_view)
+        )
 
     def _connect_dashboard(self) -> None:
         self._dashboard_view.create_shipment_requested.connect(
