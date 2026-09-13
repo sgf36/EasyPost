@@ -71,6 +71,10 @@ UNCHECKED_CURRENCY = "currency"
 # queued days ago from being clicked long after its rate has expired.
 APPROVAL_TTL_SECONDS = 3600
 
+# How a request whose purchase call failed without proof of refusal is marked.
+# One constant, because reconciliation finds those requests by this prefix.
+OUTCOME_UNKNOWN = "outcome unknown"
+
 
 class SpendLimitExceeded(Exception):
     """Raised when a request breaches a ceiling. Never offered for approval."""
@@ -99,9 +103,14 @@ class ApprovalRequest:
     currency: Optional[str]
     status: str
     requested_at: str
+    error: Optional[str] = None
+    decided_at: Optional[str] = None
+    # Seconds since decided_at, filled only by list_outcome_unknown.
+    age_seconds: Optional[float] = None
 
 
 def _row_to_request(row) -> ApprovalRequest:
+    keys = row.keys()
     return ApprovalRequest(
         id=row["id"],
         mode=row["mode"],
@@ -112,6 +121,9 @@ def _row_to_request(row) -> ApprovalRequest:
         currency=row["currency"],
         status=row["status"],
         requested_at=row["requested_at"],
+        error=row["error"] if "error" in keys else None,
+        decided_at=row["decided_at"] if "decided_at" in keys else None,
+        age_seconds=row["age_seconds"] if "age_seconds" in keys else None,
     )
 
 
@@ -296,6 +308,51 @@ def release_claim(request_id: str, error: str = None) -> None:
             "error = COALESCE(?, error) WHERE id = ? AND status = 'approved'",
             (error, request_id),
         )
+
+
+def list_outcome_unknown(abandoned_after_seconds: float = 900) -> list[ApprovalRequest]:
+    """This mode's approved requests that nobody is carrying out any more.
+
+    Two kinds: a purchase call that failed without proof of refusal (marked
+    OUTCOME_UNKNOWN), and a claim so old that whatever was running it must have
+    stopped, which is what an app closed mid-purchase leaves. A claim younger
+    than that with no error is a purchase in flight on another thread and is
+    not touched. Only the active mode, because only its key can look them up.
+    """
+    with db_cursor() as cur:
+        cur.execute(
+            """
+            SELECT *, (julianday('now') - julianday(decided_at)) * 86400 AS age_seconds
+            FROM mcp_approvals
+            WHERE mode = ? AND status = 'approved'
+              AND (error LIKE ? OR decided_at IS NULL
+                   OR (julianday('now') - julianday(decided_at)) * 86400 > ?)
+            ORDER BY requested_at ASC
+            """,
+            (client_manager.active_mode, f"{OUTCOME_UNKNOWN}%", abandoned_after_seconds),
+        )
+        return [_row_to_request(r) for r in cur.fetchall()]
+
+
+def settle_unknown(request_id: str, status: str, result: Any = None,
+                   error: str = None) -> bool:
+    """Record what EasyPost says became of an approved request.
+
+    Conditional on the request still being 'approved', so a check that raced
+    another settlement cannot overwrite it. decided_at is left alone: the daily
+    limit counts by that date, and restamping it would charge a purchase made
+    yesterday to today's allowance.
+    """
+    with db_cursor() as cur:
+        cur.execute(
+            """
+            UPDATE mcp_approvals
+            SET status = ?, result_json = COALESCE(?, result_json), error = ?
+            WHERE id = ? AND status = 'approved'
+            """,
+            (status, json.dumps(result) if result is not None else None, error, request_id),
+        )
+        return cur.rowcount == 1
 
 
 def reject_if_pending(request_id: str) -> bool:

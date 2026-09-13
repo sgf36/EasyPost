@@ -176,11 +176,14 @@ class DashboardView(QWidget):
             row, tr("dashboard.card_problems", days=PROBLEM_WINDOW_DAYS)
         )
         self._refunds_figure = self._add_card(row, tr("dashboard.card_refunds_pending"))
-        self._spend_figure = self._add_card(row, tr("dashboard.card_total_spend"))
+        self._spend_note = _label("", "dashboardMuted")
+        self._spend_figure = self._add_card(
+            row, tr("dashboard.card_total_spend"), note=self._spend_note
+        )
         return row
 
     @staticmethod
-    def _add_card(row: QHBoxLayout, caption: str) -> QLabel:
+    def _add_card(row: QHBoxLayout, caption: str, note: QLabel | None = None) -> QLabel:
         card = QFrame()
         card.setObjectName("dashboardCard")
         box = QVBoxLayout(card)
@@ -188,6 +191,8 @@ class DashboardView(QWidget):
         box.addWidget(_label(caption, "dashboardCaption"))
         figure = _label("", "dashboardFigure")
         box.addWidget(figure)
+        if note is not None:
+            box.addWidget(note)
         box.addStretch(1)
         row.addWidget(card, stretch=1)
         return figure
@@ -272,6 +277,16 @@ class DashboardView(QWidget):
         # One figure per currency, never a sum: there is no exchange rate in
         # this application.
         self._spend_figure.setText(format_money_map(summary.spend_by_currency))
+        # Refunded labels are already out of the figure. A submitted refund is
+        # still in it, because the carrier can refuse it, so the page says how
+        # much of the figure is waiting rather than leaving the reader to guess
+        # whether the refunds card and the spend card overlap.
+        pending = {c: v for c, v in summary.pending_refund_by_currency.items() if v}
+        self._spend_note.setText(
+            tr("dashboard.spend_includes_pending_refunds", amount=format_money_map(pending))
+            if pending else ""
+        )
+        self._spend_note.setVisible(bool(pending))
 
     def _render_attention(self, summary: DashboardSummary) -> None:
         rows = [

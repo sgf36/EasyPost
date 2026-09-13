@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 from app.core.client import client_manager
-from app.services.reports import total_spend_by_currency
+from app.services.reports import pending_refund_by_currency, total_spend_by_currency
 from app.services.shipments import ShipmentRecord, is_refund_pending, list_shipments
 from app.services.tracking import TrackerRecord, is_problem, is_terminal, list_trackers
 
@@ -40,6 +40,8 @@ class DashboardSummary:
     pending_refunds: tuple[ShipmentRecord, ...]
     spend_by_currency: dict[str, float]
     recent_shipments: tuple[ShipmentRecord, ...]
+    # The part of spend_by_currency that a submitted refund may still give back.
+    pending_refund_by_currency: dict[str, float]
 
     @property
     def is_empty(self) -> bool:
@@ -69,6 +71,7 @@ def build_summary(
         # Reports' own function, so the two pages can never disagree about spend.
         spend_by_currency=total_spend_by_currency(shipments),
         recent_shipments=tuple(shipments[:RECENT_SHIPMENTS]),
+        pending_refund_by_currency=pending_refund_by_currency(shipments),
     )
 
 
