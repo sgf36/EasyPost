@@ -24,6 +24,11 @@ So the trust boundary sits outside anything the agent can influence:
    the per-purchase or daily limit is refused outright rather than presented
    for confirmation, so no amount of persuasion in the agent's message can
    talk a tired human into it.
+5. A ceiling that cannot be evaluated never passes silently. An unreadable
+   price is refused. A price the limits cannot measure (billed to the account
+   later, or in a currency the limits are not set in) is queued with the
+   reason attached, and cannot be carried out until the person approving it
+   has been shown that reason and accepted it.
 
 None of this makes an agent trustworthy. It makes an untrusted agent unable to
 move money on its own.
@@ -52,6 +57,16 @@ SPENDING_ACTIONS = frozenset(
     }
 )
 
+# Spending actions that give money back rather than charging, so they have no
+# price for the ceilings to measure.
+NON_CHARGING_ACTIONS = frozenset({"refund_shipment"})
+
+# Why a ceiling could not be checked. Stored on the request summary under
+# UNCHECKED_KEY so the approval card can say so, and re-derived at approval.
+UNCHECKED_KEY = "ceiling_unchecked"
+UNCHECKED_ACCOUNT_BILLED = "account_billed"
+UNCHECKED_CURRENCY = "currency"
+
 # Requests older than this are treated as abandoned. Prevents an approval
 # queued days ago from being clicked long after its rate has expired.
 APPROVAL_TTL_SECONDS = 3600
@@ -59,6 +74,18 @@ APPROVAL_TTL_SECONDS = 3600
 
 class SpendLimitExceeded(Exception):
     """Raised when a request breaches a ceiling. Never offered for approval."""
+
+
+class CeilingNotChecked(PermissionError):
+    """Raised when the ceilings could not measure a purchase and nobody has
+    accepted that. Carries the reason so the caller can ask the person."""
+
+    def __init__(self, reason: str):
+        super().__init__(
+            "The spending limits could not check this purchase "
+            f"({reason}). It needs explicit confirmation before it is carried out."
+        )
+        self.reason = reason
 
 
 @dataclass
@@ -88,32 +115,78 @@ def _row_to_request(row) -> ApprovalRequest:
     )
 
 
-def spent_today(mode: str) -> float:
-    """Total approved-and-completed spend today, for the daily ceiling."""
+def limit_currency(settings) -> str:
+    """The currency the ceilings are denominated in."""
+    return str(getattr(settings, "mcp_limit_currency", "") or "USD").strip().upper()
+
+
+def spent_today(mode: str, currency: Optional[str] = None,
+                exclude_request_id: Optional[str] = None) -> float:
+    """Today's agent spend, for the daily ceiling.
+
+    Counts requests in flight ('approved') as well as completed ones: a
+    purchase whose outcome is not yet known may already have been charged,
+    and two approvals racing each other must each see the other. Only amounts
+    in `currency` are summed, because adding pounds to dollars gives a number
+    that is neither.
+    """
+    query = (
+        "SELECT COALESCE(SUM(amount), 0) AS total FROM mcp_approvals "
+        "WHERE mode = ? AND status IN ('done', 'approved') AND amount IS NOT NULL "
+        "AND date(decided_at) = date('now')"
+    )
+    params: list = [mode]
+    if currency:
+        query += " AND UPPER(currency) = ?"
+        params.append(currency.upper())
+    if exclude_request_id:
+        query += " AND id != ?"
+        params.append(exclude_request_id)
     with db_cursor() as cur:
-        cur.execute(
-            """
-            SELECT COALESCE(SUM(amount), 0) AS total FROM mcp_approvals
-            WHERE mode = ? AND status = 'done' AND amount IS NOT NULL
-              AND date(decided_at) = date('now')
-            """,
-            (mode,),
-        )
+        cur.execute(query, params)
         return float(cur.fetchone()["total"] or 0.0)
 
 
-def check_ceilings(amount: Optional[float], settings) -> None:
-    """Refuse outright, before a human is ever asked.
+def assess_ceilings(amount: Optional[float], settings, currency: Optional[str] = None,
+                    *, account_billed: bool = False,
+                    exclude_request_id: Optional[str] = None) -> Optional[str]:
+    """Refuse outright, before a human is ever asked; otherwise say whether
+    the ceilings were able to measure the purchase.
 
-    A ceiling that can be argued past is not a ceiling. These raise rather
+    A ceiling that can be argued past is not a ceiling. Breaches raise rather
     than creating a pending request, so an over-limit purchase never appears
     as something a person can simply click through.
+
+    Returns None when the limits were applied, or an UNCHECKED_* reason when
+    they could not be. A reason is not a pass: check_ceilings enforces that.
     """
-    if amount is None:
-        return
     mode = client_manager.active_mode
     per_purchase = float(getattr(settings, "mcp_max_purchase", 0) or 0)
     per_day = float(getattr(settings, "mcp_daily_limit", 0) or 0)
+    denomination = limit_currency(settings)
+
+    if account_billed:
+        # The figure is a marker and the real price arrives on an invoice, so
+        # there is nothing to compare. A daily allowance already used up still
+        # means nothing more today.
+        if per_day and spent_today(mode, denomination, exclude_request_id) >= per_day:
+            raise SpendLimitExceeded(
+                f"Today's agent spend has already reached the daily limit of {per_day:.2f}."
+            )
+        return UNCHECKED_ACCOUNT_BILLED
+
+    if amount is None:
+        # Refused rather than confirmed: no carrier legitimately quotes an
+        # unreadable price, and the agent can choose a rate that has one.
+        raise SpendLimitExceeded(
+            "The price of this purchase could not be read, so the spending limits "
+            "cannot be applied. Choose a rate that has a price."
+        )
+
+    if not currency or currency.strip().upper() != denomination:
+        # No conversion: an exchange rate picked here would be a guess, and a
+        # guessed ceiling is worse than an admitted gap.
+        return UNCHECKED_CURRENCY
 
     if per_purchase and amount > per_purchase:
         raise SpendLimitExceeded(
@@ -121,12 +194,25 @@ def check_ceilings(amount: Optional[float], settings) -> None:
             "Raise it in Settings if this is intended."
         )
     if per_day:
-        already = spent_today(mode)
+        already = spent_today(mode, denomination, exclude_request_id)
         if already + amount > per_day:
             raise SpendLimitExceeded(
                 f"{amount:.2f} would take today's agent spend to "
                 f"{already + amount:.2f}, over the daily limit of {per_day:.2f}."
             )
+    return None
+
+
+def check_ceilings(amount: Optional[float], settings, currency: Optional[str] = None,
+                   *, account_billed: bool = False, acknowledged: bool = False,
+                   exclude_request_id: Optional[str] = None) -> Optional[str]:
+    """assess_ceilings, except that a purchase the limits could not measure
+    raises CeilingNotChecked unless a person has accepted that."""
+    reason = assess_ceilings(amount, settings, currency, account_billed=account_billed,
+                             exclude_request_id=exclude_request_id)
+    if reason and not acknowledged:
+        raise CeilingNotChecked(reason)
+    return reason
 
 
 def create_request(action: str, args: dict, summary: dict, amount, currency) -> ApprovalRequest:
@@ -183,6 +269,44 @@ def expire_stale() -> int:
             (APPROVAL_TTL_SECONDS,),
         )
         return cur.rowcount
+
+
+def claim_for_execution(request_id: str) -> bool:
+    """Move a pending request to 'approved' in one statement.
+
+    Checking the status and then setting it in two transactions let two quick
+    Approve clicks, each on its own worker thread, both see 'pending' and both
+    buy. The conditional UPDATE lets exactly one of them through.
+    """
+    with db_cursor() as cur:
+        cur.execute(
+            "UPDATE mcp_approvals SET status = 'approved', decided_at = datetime('now') "
+            "WHERE id = ? AND status = 'pending'",
+            (request_id,),
+        )
+        return cur.rowcount == 1
+
+
+def release_claim(request_id: str, error: str = None) -> None:
+    """Hand a claimed request back to the queue when nothing was attempted,
+    so the person can approve it again once the obstacle is gone."""
+    with db_cursor() as cur:
+        cur.execute(
+            "UPDATE mcp_approvals SET status = 'pending', decided_at = NULL, "
+            "error = COALESCE(?, error) WHERE id = ? AND status = 'approved'",
+            (error, request_id),
+        )
+
+
+def reject_if_pending(request_id: str) -> bool:
+    """Reject from the queue without overwriting a purchase already under way."""
+    with db_cursor() as cur:
+        cur.execute(
+            "UPDATE mcp_approvals SET status = 'rejected', decided_at = datetime('now') "
+            "WHERE id = ? AND status = 'pending'",
+            (request_id,),
+        )
+        return cur.rowcount == 1
 
 
 def set_status(request_id: str, status: str, result: Any = None, error: str = None) -> None:
