@@ -94,6 +94,11 @@ class AppSettings:
     label_sheet_template: str = "avery_j8169"
     label_offset_x_mm: float = 0.0
     label_offset_y_mm: float = 0.0
+    # Whether a phone may be paired under the current production key, so that
+    # changing or removing the key revokes those phones only when there can be
+    # any (see app/services/mobile_pairing.py). None is "never recorded": an
+    # install that paired before this existed, where only the proxy knows.
+    mobile_phones_may_be_paired: Optional[bool] = None
 
 
 def load_settings() -> AppSettings:

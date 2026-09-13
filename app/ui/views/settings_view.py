@@ -1,6 +1,7 @@
 """Settings: update stored API keys, view active mode, language, labels."""
 
 import webbrowser
+from typing import Callable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -41,6 +42,12 @@ from app.core.webhook_manager import (
     webhook_manager,
 )
 from app.i18n import SUPPORTED_LOCALES, tr
+from app.services.mobile_pairing import (
+    phones_may_be_paired,
+    record_no_phones_paired,
+    revoke_all_phones,
+)
+from app.ui.views.pair_mobile_view import unpair_error_text
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.key_verification import verify_key_slots
 
@@ -405,6 +412,7 @@ class SettingsView(QWidget):
             # would wipe both keys the first time anyone opened Settings and
             # pressed Save — including someone who came here only to change
             # the label size.
+            old_prod = creds.production_key
             if test_key:
                 creds.test_key = test_key
             if prod_key:
@@ -416,12 +424,77 @@ class SettingsView(QWidget):
                     if creds.has_mode(fallback):
                         creds.active_mode = fallback
                         break
-            save_credentials(creds)
-            QMessageBox.information(
-                self, tr("settings.saved_title"), tr("settings.saved_body")
-            )
+
+            def commit(revoked: int | None) -> None:
+                save_credentials(creds)
+                body = tr("settings.saved_body")
+                if revoked:
+                    body += "\n\n" + tr("settings.phones_unpaired_body", count=revoked)
+                QMessageBox.information(self, tr("settings.saved_title"), body)
+
+            replacing = bool(prod_key and old_prod and prod_key != old_prod)
+            if replacing and phones_may_be_paired():
+                self._revoke_phones_then(
+                    old_prod, commit, "settings.unpair_failed_save_body"
+                )
+                return
+            if prod_key and prod_key != old_prod:
+                # A key this computer has never paired under has no phones yet.
+                record_no_phones_paired()
+            commit(None)
 
         verify_key_slots(self, test_key, prod_key, on_ok=save, on_busy=self._set_keys_busy)
+
+    def _revoke_phones_then(
+        self,
+        old_prod: str,
+        proceed: Callable[[int | None], None],
+        failed_body_key: str,
+    ) -> None:
+        """Revoke the phones paired with ``old_prod``, then call ``proceed``.
+
+        This has to happen before the key is overwritten or removed. The proxy
+        finds phones by the key they were paired with, and a phone keeps using
+        that key through the proxy whatever this computer stores next, so once
+        it is gone from here nothing can reach those phones short of deleting
+        the key in EasyPost itself.
+
+        If revoking fails the user decides: ``proceed(None)`` on going ahead
+        anyway, nothing at all on declining, so the stored key and the phones
+        stay exactly as they were and they can try again.
+        """
+        self._set_revoke_busy(True)
+
+        def done(revoked: int) -> None:
+            self._set_revoke_busy(False)
+            record_no_phones_paired()
+            proceed(revoked)
+
+        def failed(exc: Exception) -> None:
+            self._set_revoke_busy(False)
+            if QMessageBox.question(
+                self,
+                tr("settings.unpair_failed_title"),
+                tr(failed_body_key, error=unpair_error_text(exc)),
+            ) != QMessageBox.StandardButton.Yes:
+                return
+            # Whatever this computer paired, it paired under the old key, which
+            # is now going; nothing is paired under the new one.
+            record_no_phones_paired()
+            proceed(None)
+
+        task = run_async(lambda: revoke_all_phones(old_prod), self)
+        task.succeeded.connect(done)
+        task.failed.connect(failed)
+        # Keep a reference so the QThread is not garbage-collected mid-flight.
+        self._pending_revoke_task = task
+
+    def _set_revoke_busy(self, busy: bool) -> None:
+        self._save_btn.setEnabled(not busy)
+        self._forget_btn.setEnabled(not busy)
+        self._save_btn.setText(
+            tr("pair_mobile.unpairing_button") if busy else tr("settings.save_button")
+        )
 
     def _on_forget_keys(self) -> None:
         """Remove both stored keys from this computer's credential store."""
@@ -432,10 +505,24 @@ class SettingsView(QWidget):
         ) != QMessageBox.StandardButton.Yes:
             return
         creds = load_credentials()
-        creds.test_key = None
-        creds.production_key = None
-        save_credentials(creds)
-        self.refresh()
+        old_prod = creds.production_key
+
+        def forget(revoked: int | None) -> None:
+            creds.test_key = None
+            creds.production_key = None
+            save_credentials(creds)
+            self.refresh()
+            if revoked:
+                QMessageBox.information(
+                    self,
+                    tr("settings.forget_keys_confirm_title"),
+                    tr("settings.phones_unpaired_body", count=revoked),
+                )
+
+        if old_prod and phones_may_be_paired():
+            self._revoke_phones_then(old_prod, forget, "settings.unpair_failed_forget_body")
+            return
+        forget(None)
 
     def _set_keys_busy(self, busy: bool) -> None:
         self._save_btn.setEnabled(not busy)

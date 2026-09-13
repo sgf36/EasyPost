@@ -13,6 +13,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QGroupBox,
     QLabel,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -20,7 +21,14 @@ from PySide6.QtWidgets import (
 
 from app.core.license import production_allowed
 from app.i18n import tr
-from app.services.mobile_pairing import PairingError, production_key, register_pairing
+from app.services.mobile_pairing import (
+    PairingError,
+    production_key,
+    record_no_phones_paired,
+    record_pairing_registered,
+    register_pairing,
+    revoke_all_phones,
+)
 from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
 
@@ -38,6 +46,7 @@ class PairMobileView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._pending_task = None
+        self._pending_revoke_task = None
 
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"<h2>{tr('pair_mobile.title')}</h2>"))
@@ -83,6 +92,13 @@ class PairMobileView(QWidget):
         security.setStyleSheet(f"color: {TEXT_MUTED};")
         layout.addWidget(security)
 
+        # Outside the licence gate on purpose: the proxy needs only the key to
+        # revoke, and a customer whose licence has lapsed must still be able to
+        # cut off a lost or sold phone.
+        self._unpair_btn = QPushButton(tr("pair_mobile.unpair_all_button"))
+        self._unpair_btn.clicked.connect(self._on_unpair_all_clicked)
+        layout.addWidget(self._unpair_btn)
+
         layout.addStretch(1)
         self._qr_group.setVisible(False)
         self.refresh()
@@ -90,9 +106,11 @@ class PairMobileView(QWidget):
     def refresh(self) -> None:
         """Re-evaluate whether pairing is available and reflect it in the UI.
         Called whenever the page is shown (licence/key state may have changed)."""
+        has_key = bool(production_key())
+        self._unpair_btn.setEnabled(has_key and self._pending_revoke_task is None)
         if not production_allowed():
             self._set_unavailable(tr("pair_mobile.needs_production"))
-        elif not production_key():
+        elif not has_key:
             self._set_unavailable(tr("pair_mobile.needs_key"))
         else:
             self._gate_label.setVisible(False)
@@ -116,6 +134,7 @@ class PairMobileView(QWidget):
         self._generate_btn.setEnabled(True)
         self._generate_btn.setText(tr("pair_mobile.generate_button"))
         self._regenerate_btn.setEnabled(True)
+        record_pairing_registered()
         self._qr_label.setPixmap(_qr_pixmap(result["qr_payload"]))
         self._qr_group.setVisible(True)
 
@@ -126,3 +145,52 @@ class PairMobileView(QWidget):
         known = {"no_production_key", "no_license", "invalid_license", "network", "server"}
         reason = exc.reason if isinstance(exc, PairingError) and exc.reason in known else "server"
         self._set_unavailable(tr(f"pair_mobile.error_{reason}"))
+
+    def _on_unpair_all_clicked(self) -> None:
+        # Every phone, not one: the proxy can match phones only by the key, so
+        # there is no choosing which to keep, and the user has to know that
+        # before a phone they still use stops working.
+        if QMessageBox.question(
+            self,
+            tr("pair_mobile.unpair_all_button"),
+            tr("pair_mobile.unpair_all_confirm_body"),
+        ) != QMessageBox.StandardButton.Yes:
+            return
+        self._unpair_btn.setEnabled(False)
+        self._unpair_btn.setText(tr("pair_mobile.unpairing_button"))
+        self._pending_revoke_task = run_async(revoke_all_phones, self)
+        self._pending_revoke_task.succeeded.connect(self._on_unpaired)
+        self._pending_revoke_task.failed.connect(self._on_unpair_failed)
+
+    def _end_unpair(self) -> None:
+        self._pending_revoke_task = None
+        self._unpair_btn.setText(tr("pair_mobile.unpair_all_button"))
+        self._unpair_btn.setEnabled(bool(production_key()))
+
+    def _on_unpaired(self, revoked: int) -> None:
+        self._end_unpair()
+        record_no_phones_paired()
+        # Revoking also deletes any pairing still waiting to be scanned, so a
+        # code left on screen would now fail on the phone for no visible reason.
+        self._qr_group.setVisible(False)
+        body = (
+            tr("pair_mobile.unpair_all_done", count=revoked)
+            if revoked
+            else tr("pair_mobile.unpair_all_none")
+        )
+        QMessageBox.information(self, tr("pair_mobile.unpair_all_button"), body)
+
+    def _on_unpair_failed(self, exc: Exception) -> None:
+        self._end_unpair()
+        QMessageBox.warning(
+            self, tr("pair_mobile.unpair_all_button"), unpair_error_text(exc)
+        )
+
+
+def unpair_error_text(exc: Exception) -> str:
+    """The translated reason a revoke failed. The pairing messages already say
+    the right thing for each reason, so unpairing shares them rather than
+    carrying a second set of near-identical translations."""
+    known = {"no_production_key", "invalid_license", "network", "server"}
+    reason = exc.reason if isinstance(exc, PairingError) and exc.reason in known else "server"
+    return tr(f"pair_mobile.error_{reason}")
