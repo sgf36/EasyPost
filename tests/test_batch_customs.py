@@ -125,7 +125,9 @@ def test_international_shipment_carries_a_full_declaration():
     item, = info["customs_items"]
     assert item["description"] == "Cotton t-shirt"
     assert item["quantity"] == 2
-    assert item["value"] == 12.50
+    # Text, not a float: money reaches the payload exactly as it was read.
+    # EasyPost accepts the string form (checked live in test mode).
+    assert item["value"] == "12.50"
     assert item["hs_tariff_number"] == "610910"
     # The parcel weight doubles as the item weight, already in ounces.
     assert item["weight"] == 3.5
@@ -227,3 +229,60 @@ def test_the_reported_case(tmp_path):
     assert len(rows) == 5
     assert all(not r.is_valid for r in rows), "every international row should be flagged"
     assert all("customs_description" in _flagged(r) for r in rows)
+
+
+# ---------------------------------------------------------------------------
+# Numbers in the file
+# ---------------------------------------------------------------------------
+
+
+def _customs_item(row_fields, from_country="GB"):
+    row = _validate_row(2, row_fields, from_country=from_country)
+    assert row.is_valid, row.errors
+    params = _row_to_shipment_params(row, "adr_1", from_country=from_country,
+                                     declaration=DECLARATION)
+    return params, params["customs_info"]["customs_items"][0]
+
+
+@pytest.mark.parametrize(
+    ("value", "sent"), [("12,50", "12.50"), ("1.234,56", "1234.56"), ("1,234.56", "1234.56")]
+)
+def test_a_decimal_comma_in_the_file_is_read_when_unambiguous(value, sent):
+    _params, item = _customs_item(_customs_row(customs_value=value))
+    assert item["value"] == sent
+
+
+def test_a_decimal_comma_weight_is_read():
+    params, item = _customs_item(_customs_row(weight="3,5"))
+    assert params["parcel"]["weight"] == 3.5
+    assert item["weight"] == 3.5
+
+
+@pytest.mark.parametrize("column", ["customs_value", "weight"])
+def test_a_comma_before_three_digits_is_refused_as_ambiguous(column):
+    row = _validate_row(2, _customs_row(**{column: "1,234"}), from_country="GB")
+    assert column in _flagged(row)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [{"customs_value": "nan"}, {"customs_value": "-50"}, {"customs_value": "0"},
+     {"weight": "inf"}, {"weight": "-3"}, {"weight": "0"},
+     {"customs_quantity": "2.9"}, {"customs_quantity": "0"}],
+)
+def test_nonsense_numbers_are_refused(bad):
+    column, = bad
+    row = _validate_row(2, _customs_row(**bad), from_country="GB")
+    assert column in _flagged(row), row.errors
+
+
+def test_a_whole_quantity_written_with_decimals_is_accepted():
+    _params, item = _customs_item(_customs_row(customs_quantity="2.0"))
+    assert item["quantity"] == 2
+
+
+@pytest.mark.parametrize("column", ["length", "width", "height"])
+def test_dimensions_must_be_positive(column):
+    dimensions = {"length": "10", "width": "6", "height": "4", column: "-1"}
+    row = _validate_row(2, _row(predefined_package="", **dimensions), from_country="US")
+    assert column in _flagged(row)

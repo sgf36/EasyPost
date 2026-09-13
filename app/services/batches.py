@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+from app.core.amounts import AmountError, parse_file_number
 from app.core.client import client_manager
 from app.core.countries import COUNTRIES
 from app.core.customs import build_customs_info, currency_for, customs_item, is_international
@@ -211,6 +212,25 @@ def _row_error(kind: str, field: str) -> str:
     return tr(f"batch_errors.{kind}", field=field)
 
 
+def _number_error(column: str, value: str, *, positive: bool = False) -> Optional[str]:
+    """The preview error for a numeric cell, or None when it reads cleanly.
+
+    Read as a file number, not in the interface language: the same spreadsheet
+    can be opened anywhere, so a dot is always the decimal separator and a comma
+    is one only when it cannot be grouping (app/core/amounts.py). Bare float()
+    also accepted "nan", "inf" and negative weights and values, all of which
+    reached EasyPost as a declaration or a parcel.
+    """
+    try:
+        number = parse_file_number(value)
+    except AmountError as exc:
+        kind = "ambiguous_number" if exc.kind == "ambiguous" else "not_a_number"
+        return _row_error(kind, column)
+    if positive and number <= 0:
+        return _row_error("must_be_positive", column)
+    return None
+
+
 def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = None) -> BatchRow:
     fields = {k: (str(v) if v is not None else "").strip() for k, v in fields.items()}
     # Country columns are reduced to a bare code up front, so the dropdown's
@@ -244,17 +264,23 @@ def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = 
                       for col in CUSTOMS_REQUIRED_COLUMNS if not fields.get(col))
         quantity = fields.get("customs_quantity")
         if quantity:
-            try:
-                if int(float(quantity)) < 1:
-                    errors.append(_row_error("at_least_one", "customs_quantity"))
-            except ValueError:
-                errors.append(_row_error("not_a_number", "customs_quantity"))
+            error = _number_error("customs_quantity", quantity)
+            if not error:
+                number = parse_file_number(quantity)
+                # "2.9" used to be declared as 2 without a word. A quantity is
+                # a count, so a fraction is a mistake in the file, not a figure
+                # to round.
+                if number != number.to_integral_value():
+                    error = _row_error("not_a_whole_number", "customs_quantity")
+                elif number < 1:
+                    error = _row_error("at_least_one", "customs_quantity")
+            if error:
+                errors.append(error)
         value = fields.get("customs_value")
         if value:
-            try:
-                float(value)
-            except ValueError:
-                errors.append(_row_error("not_a_number", "customs_value"))
+            error = _number_error("customs_value", value, positive=True)
+            if error:
+                errors.append(error)
 
     # A predefined package brings its own dimensions, so length/width/height
     # are only required when no package is named. When they are supplied either
@@ -266,10 +292,9 @@ def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = 
     for numeric_col in (*DIMENSION_COLUMNS, "weight"):
         value = fields.get(numeric_col)
         if value:
-            try:
-                float(value)
-            except ValueError:
-                errors.append(_row_error("not_a_number", numeric_col))
+            error = _number_error(numeric_col, value, positive=True)
+            if error:
+                errors.append(error)
 
     return BatchRow(line_number=line_number, fields=fields, errors=errors)
 
@@ -349,11 +374,13 @@ def _row_customs_info(f: dict, from_country: Optional[str], declaration: Optiona
     quantity = f.get("customs_quantity") or "1"
     item = customs_item(
         description=f.get("customs_description", ""),
-        quantity=int(float(quantity)),
-        value=float(f.get("customs_value") or 0),
+        quantity=int(parse_file_number(quantity)),
+        # Decimal, not float: the declared value is money, and it is sent as
+        # the exact text that was read (see customs_item).
+        value=parse_file_number(f.get("customs_value") or "0"),
         # The CSV's weight column is already ounces, which is what a customs
         # item wants, so it passes through rather than being converted.
-        weight_oz=float(f["weight"]),
+        weight_oz=float(parse_file_number(f["weight"])),
         origin_country=f.get("customs_origin_country") or (from_country or ""),
         currency=currency_for(from_country),
         hs_tariff_number=f.get("customs_hs_tariff", ""),
@@ -377,7 +404,7 @@ def _row_to_shipment_params(
     # A predefined package carries fixed dimensions, so send its code alone and
     # omit length/width/height — the same rule as a single Create Shipment
     # (app/services/shipments.py). Otherwise send the parcel's own dimensions.
-    parcel = {"weight": float(f["weight"])}
+    parcel = {"weight": float(parse_file_number(f["weight"]))}
     if f.get("predefined_package"):
         # The .xlsx dropdown offers carrier-qualified labels ("Royal Mail —
         # LETTER"); EasyPost's predefined_package wants the bare code alone. A
@@ -385,9 +412,9 @@ def _row_to_shipment_params(
         parcel["predefined_package"] = package_code_from_choice(f["predefined_package"])
     else:
         parcel.update({
-            "length": float(f["length"]),
-            "width": float(f["width"]),
-            "height": float(f["height"]),
+            "length": float(parse_file_number(f["length"])),
+            "width": float(parse_file_number(f["width"])),
+            "height": float(parse_file_number(f["height"])),
         })
     # Same printed-label format/size as a single shipment — label_size is only
     # honoured at creation time, so a batch has to carry it too. A signature

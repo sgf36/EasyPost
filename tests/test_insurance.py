@@ -9,12 +9,14 @@ as new, pending, purchased, failed and cancelled.
 from unittest.mock import Mock, patch
 
 import pytest
+import app.i18n
 from easypost.easypost_object import convert_to_easypost_object
 
 from app.core.db import db_cursor, init_db
 from app.services.insurance import (
     INSURANCE_MAX_USD,
     InsuranceAmountError,
+    insure_existing_shipment,
     is_pending,
     list_insurances,
     refund_insurance,
@@ -82,6 +84,43 @@ def test_amounts_above_the_ceiling_are_refused_before_any_purchase(given):
 def test_nonsense_amounts_are_refused(given):
     with pytest.raises(InsuranceAmountError):
         validate_amount(given)
+
+
+@pytest.fixture
+def german(monkeypatch):
+    monkeypatch.setattr(app.i18n, "current_locale", lambda: "de")
+
+
+@pytest.mark.parametrize(
+    ("given", "expected"),
+    [("45,00", "45.00"), ("12,50", "12.50"), ("100,00", "100.00"),
+     ("1.234,56", "1234.56"), ("4.500", "4500.00"), ("45.00", "45.00")],
+)
+def test_a_german_decimal_comma_is_a_decimal_not_a_hundredfold_amount(german, given, expected):
+    """The German prompt's own example is "100,00". Stripping the comma turned
+    "45,00" into 4,500 US dollars of cover at a hundred times the fee, and
+    refused the example itself as over the ceiling."""
+    assert validate_amount(given) == expected
+
+
+def test_an_english_decimal_comma_is_still_a_decimal():
+    """The interface language is not the region: a German running the app in
+    English types the same "45,00"."""
+    assert validate_amount("45,00") == "45.00"
+
+
+@pytest.mark.parametrize("given", ["1,234", "12,345"])
+def test_an_amount_that_could_be_decimals_or_thousands_is_refused(german, given):
+    with pytest.raises(InsuranceAmountError) as excinfo:
+        validate_amount(given)
+    assert given in str(excinfo.value)
+
+
+def test_insuring_sends_the_normalised_amount(german):
+    manager = _manager()
+    with patch("app.services.insurance.client_manager", manager),             patch("app.services.insurance.save_insurance_locally"):
+        insure_existing_shipment("shp_1", "45,00")
+    assert manager.get_client.return_value.shipment.insure.call_args.kwargs["amount"] == "45.00"
 
 
 # ---------------------------------------------------------------------------

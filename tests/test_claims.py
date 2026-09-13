@@ -19,6 +19,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+import app.i18n
+
 from app.services.claims import (
     ClaimRequestError,
     claim_is_open,
@@ -133,6 +135,22 @@ def test_empty_attachment_lists_are_omitted_entirely():
 
 def test_payment_method_is_sent_when_chosen():
     assert _file(payment_method="easypost_wallet")["payment_method"] == "easypost_wallet"
+
+
+def test_a_german_decimal_comma_claims_the_amount_typed(monkeypatch):
+    """The claim amount went to EasyPost exactly as typed, so "45,00" left it to
+    the API to decide what a comma means."""
+    monkeypatch.setattr(app.i18n, "current_locale", lambda: "de")
+    assert _file(amount="45,00")["amount"] == "45.00"
+    assert _file(amount="1.234,56")["amount"] == "1234.56"
+
+
+@pytest.mark.parametrize("amount", ["abc", "0", "-5", "1,234", "12,3456"])
+def test_an_unreadable_or_ambiguous_claim_amount_is_refused_before_filing(monkeypatch, amount):
+    monkeypatch.setattr(app.i18n, "current_locale", lambda: "de")
+    with pytest.raises(ClaimRequestError):
+        validate_claim(claim_type="loss", contact_email="a@b.com", description="x",
+                       amount=amount)
 
 
 # ---------------------------------------------------------------------------

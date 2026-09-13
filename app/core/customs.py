@@ -14,7 +14,8 @@ validation as complete. Anything that builds a shipment should build its
 declaration from here, so a second caller cannot quietly miss it again.
 """
 
-from typing import Optional
+from decimal import Decimal
+from typing import Optional, Union
 
 # The exemption citation for the ordinary case of an export below the value at
 # which a real EEI filing is required. Some carriers reject a label outright
@@ -61,7 +62,7 @@ def customs_item(
     *,
     description: str,
     quantity: int,
-    value: float,
+    value: Union[Decimal, float],
     weight_oz: float,
     origin_country: str,
     currency: str,
@@ -72,11 +73,17 @@ def customs_item(
     `weight_oz` is ounces regardless of the unit the parcel form is showing —
     a customs item weight is always ounces, and sending a kilogram figure raw
     understates the declaration by a factor of 28.
+
+    A Decimal `value` is sent as its text ("12.50"). The HTTP client's JSON
+    encoder cannot serialise a Decimal, and turning it into a float to get past
+    that is the round trip money should not make. EasyPost reads the string
+    form as the same value (checked in test mode). A float is passed through
+    for callers that still hold one.
     """
     item = {
         "description": description,
         "quantity": quantity,
-        "value": value,
+        "value": str(value) if isinstance(value, Decimal) else value,
         "weight": weight_oz,
         "origin_country": (origin_country or "").upper(),
         "currency": currency,

@@ -22,9 +22,11 @@ What the live API actually enforces, none of which the previous version did:
 import base64
 import logging
 from dataclasses import dataclass
+from decimal import Decimal
 from pathlib import Path
 from typing import Optional
 
+from app.core.amounts import AmountError, parse_typed_amount
 from app.core.client import client_manager
 from app.core.db import db_cursor
 
@@ -73,6 +75,22 @@ def encode_attachment(path: str) -> str:
     return base64.b64encode(data).decode("ascii")
 
 
+def normalise_claim_amount(amount) -> str:
+    """The claimed amount as the plain "1234.56" EasyPost reads, or raise.
+
+    It used to go to the API exactly as typed, so "45,00" from a German user
+    left EasyPost to decide what the comma meant. Read in the active language
+    instead, with the same refusals as insurance (app/core/amounts.py).
+    """
+    try:
+        value = parse_typed_amount(amount, max_decimals=2)
+        if value <= 0:
+            raise AmountError("not_positive", str(amount).strip())
+    except AmountError as exc:
+        raise ClaimRequestError(str(exc)) from None
+    return str(value.quantize(Decimal("0.01")))
+
+
 def validate_claim(
     *,
     claim_type: str,
@@ -82,6 +100,7 @@ def validate_claim(
     supporting_documentation_attachments: Optional[list[str]] = None,
     invoice_attachments: Optional[list[str]] = None,
     email_evidence_attachments: Optional[list[str]] = None,
+    amount=None,
     **_ignored,
 ) -> None:
     """Raise if EasyPost would reject this claim.
@@ -94,6 +113,8 @@ def validate_claim(
             f"'{claim_type}' is not a claim type. Choose one of: "
             f"{', '.join(CLAIM_TYPES)}."
         )
+    if amount is not None:
+        normalise_claim_amount(amount)
     if not contact_email.strip():
         raise ClaimRequestError("A contact email address is required.")
     if not description.strip():
@@ -133,6 +154,7 @@ def file_claim(
     supporting = list(supporting_documentation_attachments or [])
     invoices = list(invoice_attachments or [])
     emails = list(email_evidence_attachments or [])
+    amount = normalise_claim_amount(amount)
     validate_claim(
         claim_type=claim_type,
         contact_email=contact_email,
