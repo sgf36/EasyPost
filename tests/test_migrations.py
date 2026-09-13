@@ -34,6 +34,14 @@ CREATE TABLE addresses (
     is_favorite INTEGER DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now'))
 );
+CREATE TABLE batches (
+    id TEXT PRIMARY KEY,
+    mode TEXT NOT NULL,
+    status TEXT,
+    num_shipments INTEGER,
+    source_csv TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
 """
 
 
@@ -53,6 +61,12 @@ def old_db(tmp_path, monkeypatch):
         [("adr_1", "test", "221b Baker Street", 1),
          ("adr_2", "test", "10 Downing St", 1),
          ("adr_3", "test", "Somewhere", 0)],
+    )
+    # A batch bought before recording waited for the purchase to settle: saved
+    # at the buy response's "created", its labels never recorded.
+    conn.execute(
+        "INSERT INTO batches (id, mode, status, num_shipments) VALUES (?,?,?,?)",
+        ("batch_1", "test", "created", 2),
     )
     conn.commit()
     conn.close()
@@ -88,6 +102,15 @@ def test_existing_rows_survive_the_migration(old_db):
     db_module.init_db()
     rows = _query(old_db, "SELECT id, tracking_code, status FROM trackers")
     assert rows == [("trk_1", "EZ1000000001", "in_transit")]
+
+
+def test_existing_batches_are_left_for_the_backfill_to_record(old_db):
+    """Every batch bought before the fix is unrecorded, so each must come
+    through the migration marked as such, with its auto-track choice unknown."""
+    db_module.init_db()
+    assert _query(old_db, "SELECT id, shipments_recorded, auto_track FROM batches") == [
+        ("batch_1", 0, None)
+    ]
 
 
 def test_untrustworthy_verified_flags_are_cleared(old_db):

@@ -36,6 +36,7 @@ from app.core.webhook_manager import webhook_manager
 from app.i18n import tr
 from app.services.addresses import address_choice_label, list_addresses
 from app.services.batches import (
+    backfill_batch_shipments,
     batch_failure_messages,
     batch_label_urls,
     bought_shipment_ids,
@@ -43,6 +44,7 @@ from app.services.batches import (
     create_batch,
     generate_batch_label,
     parse_import,
+    purchase_in_progress,
     quoted_services,
     rate_representative_row,
     retrieve_batch,
@@ -73,6 +75,11 @@ class BatchView(QWidget):
         self._pending_task = None
         self._poll_task = None
         self._labels_task = None
+        # Recording and backfill each run one at a time. A batch seen again while
+        # its recording is in flight is kept here and recorded straight after.
+        self._record_task = None
+        self._record_again = None
+        self._backfill_task = None
         self._label_urls = []
         self._csv_path = None
         self._parsed_rows = []
@@ -103,6 +110,30 @@ class BatchView(QWidget):
         self._from_combo.currentIndexChanged.connect(self._on_from_address_changed)
         self.refresh_address_choices()
         self._service_picker.load_catalogue()
+        # At start-up, not when the page is first opened: labels a previous
+        # session paid for belong in History whether or not anyone visits here.
+        self.backfill_unrecorded_batches()
+
+    def on_show(self) -> None:
+        """The page's refresh when navigated to, and after a mode switch."""
+        self.refresh_address_choices()
+        # A mode switch brings another account's batches into view, and the
+        # start-up backfill only looked at the mode active then.
+        self.backfill_unrecorded_batches()
+
+    def backfill_unrecorded_batches(self) -> None:
+        """Record batches an earlier session bought but never recorded.
+
+        Silent and best effort: with no API key for the mode yet, or no
+        network, it simply fails and the next launch or visit tries again."""
+        if self._backfill_task is not None:
+            return
+        skip = self._current_batch.id if self._current_batch else None
+        task = self._backfill_task = run_async(
+            lambda: backfill_batch_shipments(skip_batch_id=skip), self
+        )
+        task.succeeded.connect(lambda _n: setattr(self, "_backfill_task", None))
+        task.failed.connect(lambda _exc: setattr(self, "_backfill_task", None))
 
     @staticmethod
     def _save_template_filter() -> str:
@@ -536,7 +567,13 @@ class BatchView(QWidget):
     def _on_batch_created(self, batch) -> None:
         self._update_create_enabled()
         self._current_batch = batch
-        save_batch_locally(batch, self._csv_path or "")
+        # Kept with the batch so labels recorded in a later session, by the
+        # backfill, still honour the choice made here.
+        selection = getattr(self, "_selection", None)
+        save_batch_locally(
+            batch, self._csv_path or "",
+            auto_track=selection.auto_track if selection else None,
+        )
         self._refresh_status_btn.setEnabled(True)
         self._update_status_label(batch)
 
@@ -556,6 +593,41 @@ class BatchView(QWidget):
         self._current_batch = batch
         save_batch_locally(batch, self._csv_path or "")
         self._update_status_label(batch)
+        self._record_bought_shipments(batch)
+
+    def _record_bought_shipments(self, batch) -> None:
+        """Copy whatever this batch has bought so far into History and Tracking.
+
+        Called with every fresh copy of the batch (purchase response, poll,
+        Refresh Status, pushed event) because the labels are bought after
+        `batch.buy` has answered, not by it; see purchase_in_progress. Labels
+        already recorded are skipped, so each one is fetched and written once.
+
+        Always records the shipments so a bulk purchase appears in History like
+        any other; the auto-track choice governs only the trackers. History
+        refreshes when navigated to, as it does after a single purchase, so
+        there is nothing to signal here.
+        """
+        if not bought_shipment_ids(batch):
+            return
+        if self._record_task is not None:
+            self._record_again = batch
+            return
+        track = bool(getattr(self, "_selection", None) and self._selection.auto_track)
+        task = self._record_task = run_async(
+            lambda: record_batch_shipments(batch, track=track), self
+        )
+        # Best effort: the labels are already bought, so failing to record them
+        # locally must not be reported as a failed purchase. Anything missed
+        # stays unrecorded for the next copy of the batch, or the backfill.
+        task.succeeded.connect(lambda _counts: self._on_recorded())
+        task.failed.connect(lambda _exc: self._on_recorded())
+
+    def _on_recorded(self) -> None:
+        self._record_task = None
+        again, self._record_again = self._record_again, None
+        if again is not None:
+            self._record_bought_shipments(again)
 
     # -- polling -------------------------------------------------------------
 
@@ -580,8 +652,11 @@ class BatchView(QWidget):
         if self._current_batch and batch_id == self._current_batch.id:
             self._poll_once()
 
-    def _sync_polling(self, state) -> None:
-        if state in TRANSITIONAL_STATES:
+    def _sync_polling(self, state, batch) -> None:
+        # The state alone stopped polling the moment a purchase was accepted: it
+        # stays "created" while the labels are bought, and it is the polls that
+        # carry them into History.
+        if state in TRANSITIONAL_STATES or purchase_in_progress(batch):
             if not self._poll_timer.isActive():
                 self._poll_timer.start()
         elif self._poll_timer.isActive():
@@ -604,7 +679,7 @@ class BatchView(QWidget):
             text += "\n" + "\n".join(failures)
         self._status_label.setText(text)
 
-        self._sync_polling(state)
+        self._sync_polling(state, batch)
 
         self._buy_batch_btn.setEnabled(state in ("created",))
         # Enabled on `label_generated`, not `label_generating`: the latter means
@@ -650,9 +725,11 @@ class BatchView(QWidget):
         )
 
     def _on_batch_bought(self, batch) -> None:
-        self._current_batch = batch
-        save_batch_locally(batch, self._csv_path or "")
-        self._update_status_label(batch)
+        # The response normally has nothing bought yet. The labels arrive over
+        # the polls this keeps running and are recorded as each copy comes in,
+        # starting here and before the failure check below, so labels that did
+        # buy are never lost to a row that did not.
+        self._on_status_refreshed(batch)
 
         failures = batch_failure_messages(batch)
         if failures:
@@ -670,17 +747,6 @@ class BatchView(QWidget):
             )
             return
 
-        # Always record the shipments so a bulk purchase appears in History
-        # like any other; the auto-track choice governs only the trackers.
-        # Best effort: the labels are already bought, so failing to record
-        # them locally must not be reported as a failed purchase.
-        track = bool(getattr(self, "_selection", None) and self._selection.auto_track)
-        # History refreshes when navigated to, as it does after a single
-        # purchase, so there is nothing to signal here.
-        self._pending_task = run_async(
-            lambda: record_batch_shipments(batch, track=track), self
-        )
-
         QMessageBox.information(
             self, tr("batch_shipments.purchased_title"), tr("batch_shipments.purchased_body")
         )
@@ -695,8 +761,12 @@ class BatchView(QWidget):
 
         This is one request per shipment — the batch's own shipment entries are
         stubs with no postage label on them — so it must not run on the UI
-        thread, and it only runs once the batch reports something bought."""
-        if self._label_urls or not bought_shipment_ids(batch):
+        thread, and it only runs once the batch reports something bought.
+
+        It also waits for the purchase to settle. The URLs are fetched once, so
+        fetching while labels were still being bought would leave the print
+        sheet short of every label bought after that."""
+        if self._label_urls or not bought_shipment_ids(batch) or purchase_in_progress(batch):
             return
         self._labels_task = run_async(lambda: batch_label_urls(batch), self)
         self._labels_task.succeeded.connect(self._on_label_urls)

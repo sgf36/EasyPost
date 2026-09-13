@@ -8,8 +8,10 @@ fixture can pass against code that would fail on a live response.
 
 from unittest.mock import Mock, patch
 
+import pytest
 from easypost.easypost_object import convert_to_easypost_object
 
+from app.core.db import db_cursor, init_db
 from app.services.batches import (
     batch_failure_messages,
     batch_label_urls,
@@ -22,6 +24,15 @@ from app.services.batches import (
 SIGNATURE_MESSAGE = (
     "RoyalMailV3 does not offer service RoyalMail2ndClassSignedFor for this shipment."
 )
+
+
+@pytest.fixture(autouse=True)
+def _empty_history():
+    """Recording skips labels already in History, so each test starts from an
+    empty one rather than whatever an earlier test left there."""
+    init_db()
+    with db_cursor() as cur:
+        cur.execute("DELETE FROM shipments")
 
 
 def _batch(shipments, state="purchase_failed"):
