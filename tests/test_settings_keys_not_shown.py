@@ -84,7 +84,7 @@ def test_saving_with_blank_fields_keeps_the_stored_keys(qt_app):
     with patch.object(sv, "load_credentials", return_value=creds), \
             patch.object(sv, "save_credentials"), \
             patch.object(sv, "verify_key_slots",
-                         side_effect=lambda w, t, p, on_ok, on_busy=None: on_ok()), \
+                         side_effect=lambda w, t, p, on_ok, **_callbacks: on_ok()), \
             patch.object(sv.QMessageBox, "information"):
         view._on_save()
 
@@ -100,7 +100,7 @@ def test_a_typed_key_replaces_the_stored_one(qt_app):
     with patch.object(sv, "load_credentials", return_value=creds), \
             patch.object(sv, "save_credentials"), \
             patch.object(sv, "verify_key_slots",
-                         side_effect=lambda w, t, p, on_ok, on_busy=None: on_ok()), \
+                         side_effect=lambda w, t, p, on_ok, **_callbacks: on_ok()), \
             patch.object(sv.QMessageBox, "information"):
         view._on_save()
 

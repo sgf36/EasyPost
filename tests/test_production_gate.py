@@ -8,6 +8,8 @@ it into the test slot.
 
 import types
 
+import easypost
+
 import pytest
 
 import app.core.client as client_mod
@@ -113,10 +115,10 @@ def _fake_easypost(mode_or_exc):
             raise mode_or_exc
         return types.SimpleNamespace(mode=mode_or_exc)
 
-    def EasyPostClient(_key):
+    def EasyPostClient(_key, **_kwargs):
         return types.SimpleNamespace(address=types.SimpleNamespace(create=create))
 
-    return types.SimpleNamespace(EasyPostClient=EasyPostClient)
+    return types.SimpleNamespace(EasyPostClient=EasyPostClient, errors=easypost.errors)
 
 
 @pytest.mark.parametrize("reported", [MODE_TEST, MODE_PRODUCTION])

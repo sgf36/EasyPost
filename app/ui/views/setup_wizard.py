@@ -6,7 +6,8 @@ anywhere else. Either key may be left blank and added later from Settings,
 but at least one is required to finish setup.
 """
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QComboBox,
     QFormLayout,
@@ -26,9 +27,15 @@ from app.config import MODE_PRODUCTION, MODE_TEST
 from app.core.credential_store import Credentials, save_credentials
 from app.core.settings import load_settings, save_settings
 from app.i18n import SUPPORTED_LOCALES, is_rtl, tr
-from app.ui.widgets.key_verification import verify_key_slots
+from app.ui.widgets.key_verification import FIELD_TEST, mark_field, verify_key_slots
 
 _CARD_MAX_WIDTH = 460
+
+# Where someone without an EasyPost account gets one, and where an account
+# holder finds both keys. Kept out of the catalogues so a translation can never
+# break a link.
+EASYPOST_SIGNUP_URL = "https://www.easypost.com/signup"
+EASYPOST_API_KEYS_URL = "https://www.easypost.com/account/api-keys"
 
 _CARD_STYLE = """
 QFrame#setupCard {
@@ -70,6 +77,18 @@ class SetupWizard(QWidget):
         self._subtitle_label = QLabel()
         self._subtitle_label.setWordWrap(True)
         self._subtitle_label.setStyleSheet("color: palette(dark);")
+
+        # Most people who download "a shipping app" have no EasyPost account and
+        # do not know what an API key is. Without this line the first screen
+        # asks for something they cannot find.
+        self._account_help_label = QLabel()
+        self._account_help_label.setWordWrap(True)
+        self._account_help_label.setTextFormat(Qt.TextFormat.RichText)
+        self._account_help_label.setOpenExternalLinks(False)
+        self._account_help_label.linkActivated.connect(self._on_help_link)
+
+        self._test_first_label = QLabel()
+        self._test_first_label.setWordWrap(True)
 
         self._language_label = QLabel()
         self._language_combo = QComboBox()
@@ -122,6 +141,8 @@ class SetupWizard(QWidget):
         card_layout.addWidget(self._subtitle_label)
         card_layout.addLayout(language_row)
         card_layout.addSpacing(4)
+        card_layout.addWidget(self._account_help_label)
+        card_layout.addWidget(self._test_first_label)
         card_layout.addLayout(self._form)
         card_layout.addSpacing(4)
         card_layout.addLayout(button_row)
@@ -150,6 +171,14 @@ class SetupWizard(QWidget):
     def _apply_translations(self) -> None:
         self._title_label.setText(tr("setup_wizard.title"))
         self._subtitle_label.setText(tr("setup_wizard.subtitle"))
+        self._account_help_label.setText(
+            tr(
+                "setup_wizard.account_help",
+                signup_url=EASYPOST_SIGNUP_URL,
+                keys_url=EASYPOST_API_KEYS_URL,
+            )
+        )
+        self._test_first_label.setText(tr("setup_wizard.test_first_hint"))
         self._language_label.setText(tr("settings.language_group_title") + ":")
         self._test_key_input.setPlaceholderText(tr("setup_wizard.test_key_placeholder"))
         self._prod_key_input.setPlaceholderText(tr("setup_wizard.prod_key_placeholder"))
@@ -166,10 +195,13 @@ class SetupWizard(QWidget):
         settings = load_settings()
         settings.locale = code
         save_settings(settings)
-        # Re-render this screen's own text immediately so the language
-        # picker feels responsive; the rest of the app picks up the new
-        # locale on next launch (documented in Settings).
+        # Re-render this screen's own text immediately so the picker visibly
+        # works. The rest of the app is built after setup completes (see
+        # MainWindow._ensure_app_shell), so it opens in this language too.
         self._apply_translations()
+
+    def _on_help_link(self, url: str) -> None:
+        QDesktopServices.openUrl(QUrl(url))
 
     def _toggle_visibility(self, checked: bool) -> None:
         mode = QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.Password
@@ -201,7 +233,21 @@ class SetupWizard(QWidget):
             )
             self.setup_complete.emit()
 
-        verify_key_slots(self, test_key, prod_key, on_ok=save, on_busy=self._set_busy)
+        mark_field(self._test_key_input, False)
+        mark_field(self._prod_key_input, False)
+        verify_key_slots(
+            self,
+            test_key,
+            prod_key,
+            on_ok=save,
+            on_busy=self._set_busy,
+            on_field_error=self._mark_bad_field,
+        )
+
+    def _mark_bad_field(self, field: str) -> None:
+        mark_field(
+            self._test_key_input if field == FIELD_TEST else self._prod_key_input, True
+        )
 
     def _set_busy(self, busy: bool) -> None:
         self._continue_btn.setEnabled(not busy)
