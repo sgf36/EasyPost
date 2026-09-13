@@ -16,8 +16,10 @@ and neither fails gracefully:
 
 import logging
 from dataclasses import dataclass
+from decimal import Decimal
 from typing import Optional
 
+from app.core.amounts import AmountError, parse_typed_amount
 from app.core.client import client_manager
 from app.core.db import db_cursor
 
@@ -77,18 +79,21 @@ def validate_amount(amount) -> str:
     *after* the user has confirmed a purchase — a poor moment to discover the
     figure was never allowed.
     """
+    # Read in the active language, never by stripping commas: the German and
+    # French prompts show "100,00", and stripping turned "45,00" into 4,500
+    # dollars of cover. See app/core/amounts.py for what is refused and why.
     try:
-        value = float(str(amount).replace(",", "").strip().lstrip("$"))
-    except (TypeError, ValueError):
-        raise InsuranceAmountError(f"'{amount}' is not a number.") from None
+        value = parse_typed_amount(amount, max_decimals=2)
+    except AmountError as exc:
+        raise InsuranceAmountError(str(exc)) from None
     if value <= 0:
         raise InsuranceAmountError("Insured value must be greater than zero.")
-    if value > INSURANCE_MAX_USD:
+    if value > Decimal(str(INSURANCE_MAX_USD)):
         raise InsuranceAmountError(
             f"EasyPost insures up to ${INSURANCE_MAX_USD:,.0f} USD. "
             f"${value:,.2f} is above that limit."
         )
-    return f"{value:.2f}"
+    return str(value.quantize(Decimal("0.01")))
 
 
 def is_pending(insurance) -> bool:

@@ -33,6 +33,7 @@ from app.services.claims import (
     claim_needs_action,
     encode_attachment,
     file_claim,
+    normalise_claim_amount,
     validate_claim,
     list_claims,
     refresh_claim_status,
@@ -205,12 +206,15 @@ class ClaimsView(QWidget):
         # the user has committed to filing.
         try:
             validate_claim(**params)
+            # The confirmation shows the figure that will be filed, so "1.234,56"
+            # is confirmed as 1234.56 rather than echoed back as typed.
+            params["amount"] = normalise_claim_amount(amount)
         except ClaimRequestError as exc:
             QMessageBox.warning(self, tr("claims.missing_info_title"), str(exc))
             return
 
         if not confirm_if_production(
-            self, tr("claims.confirm_file_body", claim_type=claim_type, amount=amount)
+            self, tr("claims.confirm_file_body", claim_type=claim_type, amount=params["amount"])
         ):
             return
 
