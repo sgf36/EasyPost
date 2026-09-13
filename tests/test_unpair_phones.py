@@ -405,7 +405,7 @@ def settings_page(qt_app, tasks):
     with patch.object(sv, "load_credentials", return_value=creds), \
             patch.object(sv, "save_credentials", side_effect=save), \
             patch.object(sv, "verify_key_slots",
-                         side_effect=lambda w, t, p, on_ok, on_busy=None: on_ok()), \
+                         side_effect=lambda w, t, p, on_ok, **_callbacks: on_ok()), \
             patch.object(sv, "run_async", side_effect=fake_run_async), \
             patch.object(sv, "phones_may_be_paired", return_value=True) as may_be_paired, \
             patch.object(sv, "record_no_phones_paired") as record_none, \

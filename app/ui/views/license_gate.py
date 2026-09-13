@@ -13,6 +13,7 @@ be reached the app lets them in on a time-limited grace — an outage of ours
 must never look like a licensing problem of theirs.
 """
 
+import html
 import webbrowser
 
 from PySide6.QtCore import Qt, Signal
@@ -55,6 +56,7 @@ QPushButton#activateButton {
     font-weight: 600;
 }
 QPushButton#activateButton:hover { background-color: #2c5282; }
+QPushButton#activateButton:disabled { background-color: #90a4bd; }
 """
 
 
@@ -85,6 +87,7 @@ class LicenseGate(QWidget):
         self._key_input = QLineEdit()
         self._key_input.setMinimumHeight(30)
         self._key_input.returnPressed.connect(self._on_activate)
+        self._key_input.textChanged.connect(self._update_activate_enabled)
 
         self._buy_btn = QPushButton()
         self._buy_btn.setFlat(True)
@@ -96,6 +99,10 @@ class LicenseGate(QWidget):
         self._activate_btn.setStyleSheet(_ACTIVATE_BUTTON_STYLE)
         self._activate_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._activate_btn.clicked.connect(self._on_activate)
+        # Nothing to activate until there is a key. An enabled button on an empty
+        # field only led to "Invalid licence key", which scolds someone for a
+        # mistake they have not made yet.
+        self._activate_btn.setEnabled(False)
 
         # Escape hatch: this screen appears only when the user reaches for
         # production, so there is always a free way back to test mode.
@@ -131,7 +138,8 @@ class LicenseGate(QWidget):
         self._apply_translations()
 
     def _apply_translations(self) -> None:
-        self._title_label.setText(tr("license_gate.title"))
+        # A heading, as on the setup screen this one sits beside.
+        self._title_label.setText(f"<h2>{html.escape(tr('license_gate.title'))}</h2>")
         self._subtitle_label.setText(tr("license_gate.subtitle"))
         self._key_label.setText(tr("license_gate.key_label"))
         self._key_input.setPlaceholderText(tr("license_gate.key_placeholder"))
@@ -152,8 +160,13 @@ class LicenseGate(QWidget):
                 tr("license_gate.buy_soon_body"),
             )
 
+    def _update_activate_enabled(self, text: str = "") -> None:
+        self._activate_btn.setEnabled(bool(text.strip()))
+
     def _on_activate(self) -> None:
         key = self._key_input.text().strip()
+        if not key:
+            return  # Enter on an empty field: nothing typed, nothing to fault
         info = activate(key)
         if info is None:
             QMessageBox.warning(

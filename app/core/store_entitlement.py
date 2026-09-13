@@ -258,6 +258,43 @@ def _associate_window(ctx, hwnd: int) -> None:
     ctx.initialize_with_window(hwnd)  # type: ignore[attr-defined]
 
 
+def unlock_price() -> Optional[str]:
+    """The add-on's price as the Store formats it for this customer's market
+    (currency, separators and all), or None if the Store will not say.
+
+    Shown on the unlock screen, which otherwise asked people to buy without
+    telling them what it costs. None hides the line rather than guessing: a
+    price typed into the app would be wrong in most markets and stale after
+    any change in Partner Center.
+    """
+    ctx = _store_context()
+    if ctx is None or not STORE_ADDON_STORE_ID:
+        return None
+    try:
+        result = _await(ctx.get_store_products_async(["Durable"], [STORE_ADDON_STORE_ID]))
+        products = result.products
+    except Exception:
+        return None
+    # IMapView[str, StoreProduct]; access differs across binding versions, as
+    # in _owns_unlock_live.
+    product = None
+    for fetch in (
+        lambda: products.lookup(STORE_ADDON_STORE_ID),
+        lambda: products[STORE_ADDON_STORE_ID],
+        lambda: next(iter(products.values())),
+    ):
+        try:
+            product = fetch()
+            break
+        except Exception:
+            continue
+    try:
+        text = str(product.price.formatted_price or "").strip()
+    except Exception:
+        return None
+    return text or None
+
+
 def store_listing_uri() -> str:
     """A ``ms-windows-store:`` deep link to the app's Store page, where the
     add-on can be bought. The fallback when the in-app purchase is unavailable."""

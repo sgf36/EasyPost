@@ -14,7 +14,7 @@ Public surface is identical to the Windows module so ``license.py``,
 
     IN_APP_OFFER_TOKEN, STORE_UNLOCK_GRACE_DAYS, PurchaseResult,
     production_unlocked(), refresh_entitlement(), purchase_unlock(hwnd=None),
-    store_listing_uri()
+    unlock_price(), store_listing_uri()
 
 **StoreKit approach (A): StoreKit 1 via PyObjC** (``pyobjc-framework-StoreKit``).
 For a single non-consumable, ``restoreCompletedTransactions`` answers "does this
@@ -376,6 +376,78 @@ def _buy_offer(sk, timeout: float) -> PurchaseResult:
     if not pay_state["done"]:
         return PurchaseResult.ERROR
     return pay_state["result"]
+
+
+# Bound for the price lookup. Shorter than a purchase: it only decorates the
+# unlock screen, which must never wait on it.
+_PRICE_TIMEOUT = 8.0
+
+# The Objective-C delegate class for the price lookup, created once. PyObjC
+# registers a class by name process-wide, so defining it afresh on every call
+# (as a nested class would) risks a clash that could also break _buy_offer.
+_price_delegate_class = None
+
+
+def _price_delegate():
+    global _price_delegate_class
+    if _price_delegate_class is None:
+        from Foundation import NSObject  # type: ignore
+
+        class EasyPostPriceProductsDelegate(NSObject):
+            def productsRequest_didReceiveResponse_(self, request, response):  # noqa: N802
+                try:
+                    products = list(response.products())
+                    if products:
+                        self.state["product"] = products[0]
+                except Exception:
+                    pass
+
+            def requestDidFinish_(self, request):  # noqa: N802
+                self.state["done"] = True
+
+            def request_didFailWithError_(self, request, error):  # noqa: N802
+                self.state["done"] = True
+
+        _price_delegate_class = EasyPostPriceProductsDelegate
+    return _price_delegate_class
+
+
+def unlock_price() -> Optional[str]:
+    """The unlock's price formatted for the customer's App Store storefront, or
+    None if StoreKit will not say. None hides the price rather than guessing:
+    Apple sets a different price per storefront, so any figure typed into the
+    app would be wrong for most customers. Not verified on a Mac yet; every
+    failure path returns None, which leaves the screen as it was."""
+    sk = _storekit()
+    if sk is None:
+        return None
+    try:
+        from CoreFoundation import CFRunLoopRunInMode, kCFRunLoopDefaultMode  # type: ignore
+        from Foundation import NSNumberFormatter, NSSet  # type: ignore
+
+        state = {"done": False, "product": None}
+        delegate = _price_delegate().alloc().init()
+        # A plain Python attribute, so the dict is never bridged to Objective-C.
+        delegate.state = state
+        request = sk.SKProductsRequest.alloc().initWithProductIdentifiers_(
+            NSSet.setWithObject_(IN_APP_OFFER_TOKEN)
+        )
+        request.setDelegate_(delegate)
+        request.start()
+        waited = 0.0
+        while not state["done"] and waited < _PRICE_TIMEOUT:
+            CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.1, False)
+            waited += 0.1
+        product = state["product"]
+        if product is None:
+            return None
+        formatter = NSNumberFormatter.alloc().init()
+        formatter.setNumberStyle_(2)  # NSNumberFormatterCurrencyStyle
+        formatter.setLocale_(product.priceLocale())
+        text = str(formatter.stringFromNumber_(product.price()) or "").strip()
+        return text or None
+    except Exception:
+        return None
 
 
 def store_listing_uri() -> str:

@@ -1,6 +1,6 @@
 """Application shell: first-run gate, nav sidebar, mode banner, view stack."""
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -29,7 +29,7 @@ from app.core.credential_store import load_credentials, save_credentials
 from app.core.license import is_licensed, load_active_license, production_allowed
 from app.core.settings import load_settings
 from app.core.webhook_manager import webhook_manager
-from app.i18n import tr
+from app.i18n import current_locale, tr
 from app.ui.views.address_book_view import AddressBookView
 from app.ui.views.batch_view import BatchView
 from app.ui.views.claims_view import ClaimsView
@@ -83,17 +83,28 @@ class MainWindow(QMainWindow):
         self._root_stack.addWidget(self._license_gate)
 
         self._setup_wizard = SetupWizard()
-        self._setup_wizard.setup_complete.connect(self._show_app_shell)
+        # Through the same routing as a launch, not straight into the shell: a
+        # production-only setup on a licensed build has to meet the licence gate
+        # first, or every call it makes fails with "A licence is required".
+        self._setup_wizard.setup_complete.connect(self._route_startup)
         self._root_stack.addWidget(self._setup_wizard)
 
-        self._app_shell = self._build_app_shell()
-        self._root_stack.addWidget(self._app_shell)
+        # The shell is built the first time it is shown, not here. Every page
+        # reads its text once, when it is constructed, so a shell built before
+        # the first-run wizard stayed in whatever language the wizard started
+        # in, while the language picker on that wizard appeared not to work.
+        self._app_shell: QWidget | None = None
+        self._shell_locale: str | None = None
+        # Shells replaced after a language change. Kept alive rather than
+        # deleted: their pages may still own a running network task, and
+        # destroying a QThread mid-run aborts the process.
+        self._retired_shells: list[QWidget] = []
 
         client_manager.reload()
         self._route_startup()
 
         # Enable touchscreen/pen finger-drag scrolling on every scroll area and
-        # table in the window (gate, wizard, and app shell are all built by now).
+        # table in the window built so far (the shell does its own when built).
         # Touch-only, so mouse and two-finger-touchpad scrolling are unchanged.
         enable_touch_scrolling_tree(self)
 
@@ -114,6 +125,30 @@ class MainWindow(QMainWindow):
         else:
             self.resize(preferred_w, preferred_h)
 
+    def _ensure_app_shell(self) -> None:
+        """Build the shell if it does not exist, or rebuild it if the language
+        has changed since it was built (the wizard's picker can change it
+        after a shell exists, e.g. when "Continue in test mode" leads back to
+        setup)."""
+        locale = current_locale()
+        if self._app_shell is not None and self._shell_locale == locale:
+            return
+        old = self._app_shell
+        self._app_shell = self._build_app_shell()
+        self._shell_locale = locale
+        self._root_stack.addWidget(self._app_shell)
+        enable_touch_scrolling_tree(self._app_shell)
+        if old is not None:
+            self._root_stack.removeWidget(old)
+            old.hide()
+            # Its pages' poll timers would otherwise keep calling EasyPost for
+            # screens nobody can see, alongside the new shell's own.
+            for timer in old.findChildren(QTimer):
+                timer.stop()
+            self._retired_shells.append(old)
+        # The gate was built with the rest of the window, in the old language.
+        self._license_gate._apply_translations()
+
     def _build_app_shell(self) -> QWidget:
         shell = QWidget()
         outer = QVBoxLayout(shell)
@@ -127,6 +162,7 @@ class MainWindow(QMainWindow):
 
         self._mode_banner = ModeBanner()
         self._mode_banner.production_locked.connect(self._on_production_locked)
+        self._mode_banner.production_key_needed.connect(self._open_production_key_settings)
         self._mode_banner.mode_changed.connect(self._on_mode_changed)
         outer.addWidget(self._mode_banner)
 
@@ -322,7 +358,7 @@ class MainWindow(QMainWindow):
                 client_manager.reload()
             else:
                 self._pending_production = True
-                self._root_stack.setCurrentWidget(self._license_gate)
+                self._show_license_gate()
                 return
         if client_manager.credentials.active_key():
             self._show_app_shell()
@@ -364,6 +400,7 @@ class MainWindow(QMainWindow):
     def _on_license_activated(self) -> None:
         """Activation succeeded in the gate. If the gate was shown to unlock
         production (not as a first-run wall), switch into production now."""
+        wanted_production = self._pending_production
         if self._pending_production:
             self._pending_production = False
             creds = load_credentials()
@@ -372,10 +409,30 @@ class MainWindow(QMainWindow):
                 save_credentials(creds)
                 client_manager.reload()
         self._route_startup()
+        # Paid for production but has no production key: without this they
+        # land back in test mode with nothing saying what is still missing.
+        if (
+            wanted_production
+            and not load_credentials().has_mode(MODE_PRODUCTION)
+            and self._app_shell is not None
+            and self._root_stack.currentWidget() is self._app_shell
+        ):
+            self._open_production_key_settings()
+
+    def _open_production_key_settings(self) -> None:
+        """Production was chosen but no production key is stored: open Settings
+        at the production key field, with a line saying what to add."""
+        self._show_view(self._settings_view)
+        self._settings_view.prompt_for_production_key()
 
     def _on_production_locked(self) -> None:
         """The user reached for production without a licence: offer the gate."""
         self._pending_production = True
+        self._show_license_gate()
+
+    def _show_license_gate(self) -> None:
+        # Re-read its text: the language may have changed since it was built.
+        self._license_gate._apply_translations()
         self._root_stack.setCurrentWidget(self._license_gate)
 
     def _on_use_test_mode(self) -> None:
@@ -394,6 +451,7 @@ class MainWindow(QMainWindow):
 
     def _show_app_shell(self) -> None:
         client_manager.reload()
+        self._ensure_app_shell()
         self._mode_banner.refresh()
         # The shell's pages were filled when it was built, before _route_startup
         # settled which mode the app opens in, and the Dashboard is on screen

@@ -49,7 +49,7 @@ from app.services.mobile_pairing import (
 )
 from app.ui.views.pair_mobile_view import unpair_error_text
 from app.ui.widgets.async_worker import run_async
-from app.ui.widgets.key_verification import verify_key_slots
+from app.ui.widgets.key_verification import FIELD_TEST, mark_field, verify_key_slots
 
 
 class SettingsView(QWidget):
@@ -72,6 +72,13 @@ class SettingsView(QWidget):
         form.addRow(tr("settings.test_key_label"), self._test_key_input)
         form.addRow(tr("settings.prod_key_label"), self._prod_key_input)
 
+        # Shown only when the user was sent here for a production key they do
+        # not have yet (see prompt_for_production_key).
+        self._prod_key_hint = QLabel(tr("settings.add_production_key_hint"))
+        self._prod_key_hint.setWordWrap(True)
+        self._prod_key_hint.setStyleSheet("color: #c53030; font-weight: 600;")
+        self._prod_key_hint.hide()
+
         self._save_btn = QPushButton(tr("settings.save_button"))
         self._save_btn.clicked.connect(self._on_save)
 
@@ -88,6 +95,7 @@ class SettingsView(QWidget):
 
         layout = QVBoxLayout(self)
         layout.addWidget(title)
+        layout.addWidget(self._prod_key_hint)
         layout.addLayout(form)
         layout.addLayout(button_row)
         layout.addWidget(self._build_label_group())
@@ -427,6 +435,8 @@ class SettingsView(QWidget):
 
             def commit(revoked: int | None) -> None:
                 save_credentials(creds)
+                if creds.production_key:
+                    self._prod_key_hint.hide()
                 body = tr("settings.saved_body")
                 if revoked:
                     body += "\n\n" + tr("settings.phones_unpaired_body", count=revoked)
@@ -443,7 +453,27 @@ class SettingsView(QWidget):
                 record_no_phones_paired()
             commit(None)
 
-        verify_key_slots(self, test_key, prod_key, on_ok=save, on_busy=self._set_keys_busy)
+        mark_field(self._test_key_input, False)
+        mark_field(self._prod_key_input, False)
+        verify_key_slots(
+            self,
+            test_key,
+            prod_key,
+            on_ok=save,
+            on_busy=self._set_keys_busy,
+            on_field_error=lambda field: mark_field(
+                self._test_key_input if field == FIELD_TEST else self._prod_key_input, True
+            ),
+        )
+
+    def prompt_for_production_key(self) -> None:
+        """Explain and focus the production field.
+
+        Reached when someone chooses Production with no production key stored.
+        The mode selector used to snap back to Test with no word of why, which
+        reads as a broken control."""
+        self._prod_key_hint.show()
+        self._prod_key_input.setFocus()
 
     def _revoke_phones_then(
         self,

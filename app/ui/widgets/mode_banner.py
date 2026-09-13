@@ -28,6 +28,9 @@ class ModeBanner(QWidget):
     # Emitted when the user reaches for production but the build isn't licensed.
     # The main window shows the licence gate in response.
     production_locked = Signal()
+    # Emitted when production is allowed but no production key is stored. The
+    # main window opens Settings at the production key field in response.
+    production_key_needed = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -73,8 +76,11 @@ class ModeBanner(QWidget):
             self.production_locked.emit()
             return
         if not creds.has_mode(new_mode):
-            # No key stored for that mode yet; revert selection.
+            # No key stored for that mode yet; revert selection, and say why:
+            # a selector that silently snaps back reads as broken.
             self.refresh()
+            if new_mode == MODE_PRODUCTION:
+                self.production_key_needed.emit()
             return
         creds.active_mode = new_mode
         save_credentials(creds)
