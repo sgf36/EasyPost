@@ -19,12 +19,15 @@ from app.i18n import tr
 from app.services.formatting import display_carrier, display_status, format_money_map
 from app.services.reports import (
     label_counts_by_status,
+    pending_refund_by_currency,
     primary_currency,
     refund_status_breakdown,
+    refunded_by_currency,
     spend_by_carrier,
     total_labels_purchased,
     total_spend_by_currency,
 )
+from app.services.shipments import list_shipments
 
 
 class ReportsView(QWidget):
@@ -36,6 +39,9 @@ class ReportsView(QWidget):
 
         self._summary_label = QLabel()
         layout.addWidget(self._summary_label)
+        self._refunds_label = QLabel()
+        self._refunds_label.setWordWrap(True)
+        layout.addWidget(self._refunds_label)
 
         charts_row = QHBoxLayout()
         self._chart_view = QChartView()
@@ -73,17 +79,30 @@ class ReportsView(QWidget):
         # Every figure carries its currency. Summing across them produced
         # "12.25" for 3.85 GBP plus 8.40 USD, and that number reached both
         # store listings before anyone read it.
+        # One read for every figure: each helper used to read all the shipments
+        # itself, six queries per refresh.
+        records = list_shipments()
         self._summary_label.setText(
             tr(
                 "reports.summary_label",
-                total_spend=format_money_map(total_spend_by_currency()),
-                labels_purchased=total_labels_purchased(),
+                total_spend=format_money_map(total_spend_by_currency(records)),
+                labels_purchased=total_labels_purchased(records),
             )
         )
-        self._render_chart(spend_by_carrier())
-        self._render_breakdown()
+        # Spend leaves out confirmed refunds and keeps submitted ones, so both
+        # are named here; otherwise a refund the person asked for would seem to
+        # have vanished from the total, or to be missing from it.
+        self._refunds_label.setText(
+            tr(
+                "reports.refunds_label",
+                refunded=format_money_map(refunded_by_currency(records)),
+                pending=format_money_map(pending_refund_by_currency(records)),
+            )
+        )
+        self._render_chart(spend_by_carrier(records), primary_currency(records))
+        self._render_breakdown(records)
 
-    def _render_chart(self, spend: dict[str, dict[str, float]]) -> None:
+    def _render_chart(self, spend: dict[str, dict[str, float]], currency: str) -> None:
         """One currency per chart, named in its own title.
 
         A bar chart has one axis and an axis has one unit, so pounds and
@@ -91,7 +110,6 @@ class ReportsView(QWidget):
         shows the currency most of the spend is in and says which; the rest is
         still in the summary line above.
         """
-        currency = primary_currency()
         chart = QChart()
         title = tr("reports.spend_chart_title")
         chart.setTitle(f"{title} ({currency})" if currency else title)
@@ -126,9 +144,9 @@ class ReportsView(QWidget):
         chart.legend().setVisible(False)
         self._chart_view.setChart(chart)
 
-    def _render_breakdown(self) -> None:
-        statuses = label_counts_by_status()
-        refunds = refund_status_breakdown()
+    def _render_breakdown(self, records) -> None:
+        statuses = label_counts_by_status(records)
+        refunds = refund_status_breakdown(records)
 
         # "Status: purchased" was as raw as the tracking table's in_transit.
         rows = [

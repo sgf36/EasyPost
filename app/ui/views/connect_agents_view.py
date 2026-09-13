@@ -9,6 +9,7 @@ MCP_SUPPORTED) and this page says so rather than silently hiding.
 
 from __future__ import annotations
 
+import html
 import json
 
 from PySide6.QtCore import Qt, QTimer
@@ -44,7 +45,11 @@ from app.core.mcp_relay_client import (
 )
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
-from app.services.mcp_runner import execute_approved
+from app.services.mcp_runner import (
+    ABANDONED_AFTER_SECONDS,
+    execute_approved,
+    reconcile_unknown_outcomes,
+)
 from app.ui.theme import DANGER, TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
 
@@ -57,6 +62,7 @@ class ConnectAgentsView(QWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._pending_task = None
+        self._reconcile_task = None
         self._client_rows: list[tuple] = []
 
         content = QWidget()
@@ -78,6 +84,7 @@ class ConnectAgentsView(QWidget):
                 layout.addWidget(self._build_clients_group())
                 layout.addWidget(self._build_manual_group())
                 layout.addWidget(self._build_relay_group())
+            layout.addWidget(self._build_unknown_group())
             layout.addWidget(self._build_approvals_group())
             layout.addStretch(1)
 
@@ -96,7 +103,9 @@ class ConnectAgentsView(QWidget):
         outer.addWidget(scroll)
 
         if MCP_SUPPORTED:
-            self.refresh()
+            # No EasyPost call while the window is still being built: the mode
+            # and key are not settled yet. The window checks once it has opened.
+            self.refresh(check_easypost=False)
 
     # ------------------------------------------------------------ store build
 
@@ -427,6 +436,105 @@ class ConnectAgentsView(QWidget):
         except OSError as exc:
             QMessageBox.critical(self, tr("common.error"), str(exc))
 
+    # -------------------------------------------------------- unknown outcomes
+
+    def _build_unknown_group(self) -> QGroupBox:
+        """Purchases whose buy call failed without saying whether it charged.
+
+        They count against the daily limit and are no longer pending, so they
+        left the approval list; with nowhere else to appear, a possible charge
+        was invisible. Shown in red, above the queue, until EasyPost settles it.
+        """
+        self._unknown_group = QGroupBox(tr("connect_agents.unknown_group"))
+        intro = QLabel(tr("connect_agents.unknown_intro"))
+        intro.setWordWrap(True)
+        intro.setStyleSheet(f"color: {DANGER};")
+        self._unknown_layout = QVBoxLayout()
+        self._unknown_status = QLabel()
+        self._unknown_status.setWordWrap(True)
+        self._unknown_status.setStyleSheet(f"color: {TEXT_MUTED};")
+        self._unknown_status.hide()
+        self._check_now = QPushButton(tr("connect_agents.check_now_button"))
+        self._check_now.clicked.connect(self.check_unknown_outcomes)
+        buttons = QHBoxLayout()
+        buttons.addWidget(self._check_now)
+        buttons.addStretch(1)
+
+        layout = QVBoxLayout()
+        layout.addWidget(intro)
+        layout.addLayout(self._unknown_layout)
+        layout.addWidget(self._unknown_status)
+        layout.addLayout(buttons)
+        self._unknown_group.setLayout(layout)
+        self._unknown_group.hide()
+        return self._unknown_group
+
+    def _render_unknown(self) -> None:
+        """Rebuilt from the local table only, so the poll never waits on EasyPost."""
+        while self._unknown_layout.count():
+            item = self._unknown_layout.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        try:
+            unknown = mcp_approvals.list_outcome_unknown(ABANDONED_AFTER_SECONDS)
+        except Exception:  # noqa: BLE001 - never let the poller break the page
+            unknown = []
+        for request in unknown:
+            self._unknown_layout.addWidget(self._build_unknown_card(request))
+        self._unknown_group.setVisible(bool(unknown))
+
+    def _build_unknown_card(self, request) -> QWidget:
+        card = QGroupBox(tr("connect_agents.approval_card_title", action=request.action))
+        summary = request.summary or {}
+        if summary.get("account_billed"):
+            amount_text = tr("create_shipment.billed_to_account")
+        else:
+            amount_text = f"{summary.get('price', request.amount or '—')} " \
+                          f"{summary.get('currency', request.currency or '')}"
+        lines = [
+            f"<b>{tr('connect_agents.field_carrier')}:</b> {summary.get('carrier', '—')} "
+            f"{summary.get('service', '')}",
+            f"<b>{tr('connect_agents.field_amount')}:</b> {amount_text}",
+            f"<b>{tr('connect_agents.field_to')}:</b> {summary.get('to', '—')}",
+            f"<b>{tr('connect_agents.field_mode')}:</b> {request.mode}",
+            # The ids are what a person searches their EasyPost account for.
+            f"<span style='color:{TEXT_MUTED}'>"
+            f"{html.escape(', '.join(str(v) for v in request.args.values()))}</span>",
+            f"<b>{tr('connect_agents.field_problem')}:</b> "
+            f"{html.escape(request.error or '—')}",
+        ]
+        detail = QLabel("<br>".join(lines))
+        detail.setWordWrap(True)
+        detail.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        layout = QVBoxLayout()
+        layout.addWidget(detail)
+        card.setLayout(layout)
+        return card
+
+    def check_unknown_outcomes(self) -> None:
+        """Ask EasyPost about every unknown purchase, off the UI thread."""
+        if self._reconcile_task is not None:
+            return
+        self._check_now.setEnabled(False)
+        self._unknown_status.hide()
+        task = run_async(reconcile_unknown_outcomes, self)
+        self._reconcile_task = task
+        task.succeeded.connect(self._on_reconciled)
+        task.failed.connect(self._on_reconcile_failed)
+
+    def _on_reconciled(self, _report) -> None:
+        self._reconcile_task = None
+        self._check_now.setEnabled(True)
+        self.refresh_approvals()
+
+    def _on_reconcile_failed(self, exc) -> None:
+        # Nothing was settled, so the list stands; say why it did not change.
+        self._reconcile_task = None
+        self._check_now.setEnabled(True)
+        self._unknown_status.setText(tr("connect_agents.check_failed", error=str(exc)))
+        self._unknown_status.show()
+        self.refresh_approvals()
+
     # -------------------------------------------------------------- approvals
 
     def _build_approvals_group(self) -> QGroupBox:
@@ -441,6 +549,7 @@ class ConnectAgentsView(QWidget):
         return group
 
     def refresh_approvals(self) -> None:
+        self._render_unknown()
         while self._approvals_layout.count():
             item = self._approvals_layout.takeAt(0)
             if item.widget():
@@ -593,11 +702,15 @@ class ConnectAgentsView(QWidget):
 
     # ----------------------------------------------------------------- public
 
-    def refresh(self) -> None:
+    def refresh(self, check_easypost: bool = True) -> None:
         if not MCP_SUPPORTED:
             return
         if not MAS_BUILD:
             self._populate_clients()
             self._snippet.setPlainText(mcp_clients.config_snippet())
         self.refresh_approvals()
+        if check_easypost:
+            # Opening the page is when someone is looking, so it is when an
+            # unknown purchase is worth an EasyPost call. Not on the poll.
+            self.check_unknown_outcomes()
         self._spending_check.setEnabled(self._enabled_check.isChecked())

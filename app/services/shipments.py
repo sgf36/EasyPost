@@ -171,6 +171,16 @@ def is_refund_pending(refund_status: Optional[str]) -> bool:
     return str(refund_status or "").lower() == "submitted"
 
 
+def is_refunded(refund_status: Optional[str]) -> bool:
+    """The carrier has confirmed the refund, so the postage has come back.
+
+    Only this state takes a label out of spend. A submitted refund can still be
+    rejected (a label that was already scanned, for one), and a total that left
+    it out would understate spend and jump back up when the carrier said no.
+    """
+    return str(refund_status or "").lower() == "refunded"
+
+
 def update_refund_status(shipment_id: str, refund_status: Optional[str]) -> None:
     with db_cursor() as cur:
         cur.execute(

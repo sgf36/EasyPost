@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QMainWindow,
+    QMessageBox,
     QScrollArea,
     QStackedWidget,
     QVBoxLayout,
@@ -402,7 +403,37 @@ class MainWindow(QMainWindow):
         self._root_stack.setCurrentWidget(self._app_shell)
         self._maybe_resume_webhook()
         self._maybe_resume_relay()
+        self._maybe_reconcile_agent_purchases()
         self._maybe_check_update()
+
+    def _maybe_reconcile_agent_purchases(self) -> None:
+        """Settle agent purchases whose outcome is unknown, once the mode and
+        key are known, and tell the person about any EasyPost cannot settle.
+
+        A purchase that may have been charged must not wait for someone to
+        happen to open Connect AI Agents, which most sessions never do.
+        """
+        if not MCP_SUPPORTED:
+            return
+        from app.services.mcp_runner import reconcile_unknown_outcomes
+
+        self._reconcile_task = run_async(reconcile_unknown_outcomes, self)
+        self._reconcile_task.succeeded.connect(self._on_agent_purchases_reconciled)
+        # A failed check settles nothing and leaves the rows as they were; the
+        # page lists them and checks again when it is opened.
+
+    def _on_agent_purchases_reconciled(self, report) -> None:
+        if not getattr(report, "unresolved", None):
+            return
+        answer = QMessageBox.question(
+            self,
+            tr("main_window.unknown_purchases_title"),
+            tr("main_window.unknown_purchases_body"),
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.Yes,
+        )
+        if answer == QMessageBox.StandardButton.Yes:
+            self._show_view(self._connect_agents_view)
 
     def _maybe_check_update(self) -> None:
         """Ask GitHub (once per launch, in the background) whether a newer

@@ -17,17 +17,37 @@ only as honest as it is:
 * When the purchase call fails in a way that does not prove nothing was
   charged (a timeout, a dropped connection, a 5xx), the request stays
   ``approved``, which the ceiling counts, rather than being written off.
+
+That second rule left a request counting against the limit with nobody ever
+finding out whether it had bought, so reconcile_unknown_outcomes asks
+EasyPost, by the ids the request already holds, and settles what it can prove.
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Callable, NamedTuple, Optional
 
 from app.core import mcp_approvals
 from app.core.client import client_manager
 from app.core.settings import load_settings
 from app.services.pickups import buy_pickup
-from app.services.shipments import buy_shipment, refund_shipment, save_shipment_locally
+from app.services.shipments import (
+    buy_shipment,
+    refund_shipment,
+    save_shipment_locally,
+    update_refund_status,
+)
+
+# A claim with no error this old was abandoned: a purchase call gives up after
+# the client's 60-second timeout, so nothing still running is this slow.
+ABANDONED_AFTER_SECONDS = 900
+
+# How long after the failure an absence at EasyPost is believed. A buy that was
+# still being processed when the reply was lost has no label for a moment, and
+# writing that off as "not bought" would release the limit for a real charge.
+# A label found is believed at once; only "nothing there" waits.
+SETTLE_AFTER_SECONDS = 300
 
 
 class _Handler(NamedTuple):
@@ -106,8 +126,10 @@ def execute_approved(request_id: str, *, acknowledge_unchecked: bool = False) ->
             mcp_approvals.set_status(request_id, "rejected", error=str(exc))
             mcp_approvals.audit(request.action, request.args, f"failed: {exc}")
         else:
-            mcp_approvals.set_status(request_id, "approved",
-                                     error=f"outcome unknown, check EasyPost: {exc}")
+            mcp_approvals.set_status(
+                request_id, "approved",
+                error=f"{mcp_approvals.OUTCOME_UNKNOWN}, check EasyPost: {exc}",
+            )
             mcp_approvals.audit(request.action, request.args, f"outcome unknown: {exc}")
         raise
 
@@ -195,3 +217,111 @@ def _summarise(result) -> dict:
         "tracking_code": getattr(result, "tracking_code", None),
         "status": getattr(result, "status", None),
     }
+
+
+# ------------------------------------------------------------ reconciliation
+
+_BOUGHT, _NOT_BOUGHT, _UNCLEAR = "bought", "not_bought", "unclear"
+
+
+@dataclass
+class ReconcileReport:
+    bought: list[str] = field(default_factory=list)
+    not_bought: list[str] = field(default_factory=list)
+    # Still unknown after asking, as requests, so a page can show them.
+    unresolved: list = field(default_factory=list)
+
+
+def reconcile_unknown_outcomes() -> ReconcileReport:
+    """Ask EasyPost what became of each purchase whose outcome is unknown.
+
+    Found bought: ``done``, recorded locally, still counted. Proven absent:
+    ``rejected``, which releases the daily limit. Anything else, including
+    EasyPost being unreachable, stays ``approved`` and is returned in
+    ``unresolved`` for the person to see. Guessing either way is worse: one
+    guess hides a charge, the other holds the limit for nothing bought.
+    """
+    report = ReconcileReport()
+    for request in mcp_approvals.list_outcome_unknown(ABANDONED_AFTER_SECONDS):
+        check = _CHECKS.get(request.action)
+        if check is None:
+            report.unresolved.append(request)
+            continue
+        try:
+            verdict, found = check(request)
+        except Exception as exc:  # noqa: BLE001
+            if getattr(exc, "http_status", None) != 404:
+                report.unresolved.append(request)
+                continue
+            # EasyPost has no such object, so nothing can have been bought on it.
+            verdict, found = _NOT_BOUGHT, None
+
+        if verdict == _BOUGHT:
+            _settle_bought(request, found, report)
+        elif verdict == _NOT_BOUGHT and (request.age_seconds or 0) >= SETTLE_AFTER_SECONDS:
+            if mcp_approvals.settle_unknown(
+                request.id, "rejected",
+                error="not bought: EasyPost shows no purchase (checked after the call failed)",
+            ):
+                mcp_approvals.audit(request.action, request.args,
+                                    "reconciled: not bought, limit released")
+                report.not_bought.append(request.id)
+        else:
+            report.unresolved.append(request)
+    return report
+
+
+def _settle_bought(request, found, report: ReconcileReport) -> None:
+    summary = _summarise(found)
+    summary["reconciled"] = True
+    try:
+        if request.action == "buy_shipment":
+            # The mode the request was made in, which list_outcome_unknown has
+            # already matched to the key that found it.
+            save_shipment_locally(found, request.mode)
+        elif request.action == "refund_shipment":
+            update_refund_status(found.id, getattr(found, "refund_status", None))
+    except Exception as exc:  # noqa: BLE001 - the purchase stands either way
+        summary["local_save_error"] = str(exc) or type(exc).__name__
+    if mcp_approvals.settle_unknown(request.id, "done", result=summary):
+        mcp_approvals.audit(request.action, request.args, "reconciled: found bought at EasyPost")
+        report.bought.append(request.id)
+
+
+def _check_shipment_bought(request):
+    shipment = client_manager.get_client().shipment.retrieve(request.args["shipment_id"])
+    # EasyPost sets these only when postage is bought, so either one is proof;
+    # checking both does not depend on which the carrier fills first.
+    if getattr(shipment, "postage_label", None) or getattr(shipment, "selected_rate", None):
+        return _BOUGHT, shipment
+    return _NOT_BOUGHT, shipment
+
+
+def _check_pickup_bought(request):
+    pickup = client_manager.get_client().pickup.retrieve(request.args["pickup_id"])
+    status = str(getattr(pickup, "status", "") or "").lower()
+    if status == "scheduled" or getattr(pickup, "confirmation", None):
+        return _BOUGHT, pickup
+    if status in ("", "unknown"):
+        return _NOT_BOUGHT, pickup
+    # Cancelled can follow a purchase or not, and EasyPost's record does not
+    # say which, so a person has to look.
+    return _UNCLEAR, pickup
+
+
+def _check_refund_requested(request):
+    shipment = client_manager.get_client().shipment.retrieve(request.args["shipment_id"])
+    # Any refund status means EasyPost took the request, whatever the carrier
+    # later decides.
+    if getattr(shipment, "refund_status", None):
+        return _BOUGHT, shipment
+    return _NOT_BOUGHT, shipment
+
+
+# One lookup per action in _HANDLERS. An action without one is always shown as
+# unresolved rather than guessed.
+_CHECKS: dict[str, Callable] = {
+    "buy_shipment": _check_shipment_bought,
+    "buy_pickup": _check_pickup_bought,
+    "refund_shipment": _check_refund_requested,
+}
