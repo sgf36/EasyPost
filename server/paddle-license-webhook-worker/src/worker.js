@@ -42,10 +42,13 @@ import {
   handleDevices,
   handleStats,
   recordSubscription,
+  restoreOrder,
   revokeOrder,
   TIER_PLANS,
   TIER_SEATS,
 } from "./activation.js";
+
+import { classifyAdjustment } from "./adjustments.js";
 
 import {
   contactCustomerEmail,
@@ -1214,18 +1217,32 @@ async function processPaddleWebhook(request, env, setStage) {
   // A refunded or charged-back purchase must stop working. Revoking also frees
   // the seats, so a replacement key issued later starts from a clean slate.
   //
-  // Paddle signals this with adjustment.created, NOT transaction.refunded -
-  // that event does not exist and the notification destination rejects it as
-  // an invalid subscription. The second name is kept only as a harmless guard.
-  if (event.event_type === "adjustment.created"
-      || event.event_type === "transaction.refunded") {
-    const txnId = data.transaction_id || data.id || "";
-    if (txnId && env.LICENSES) {
+  // Paddle signals this with adjustments, NOT transaction.refunded - that event
+  // does not exist and the notification destination rejects it as an invalid
+  // subscription. Both adjustment events matter: most live refunds are created
+  // pending_approval and only become approved (or rejected) in a later
+  // adjustment.updated. classifyAdjustment() holds the rules; see
+  // WEBHOOK-RUNBOOK.md §10.
+  if (event.event_type === "adjustment.created" || event.event_type === "adjustment.updated") {
+    if (!env.LICENSES) return json({ ignored: "no-database" });
+    const decision = classifyAdjustment(data);
+    const transaction = data.transaction_id || "";
+    if (decision.verdict === "revoke") {
       setStage("revoke-order");
-      await revokeOrder(env.LICENSES, txnId, event.event_type.split(".")[1]);
-      return json({ status: "revoked", transaction: txnId });
+      for (const order of decision.orders) {
+        await revokeOrder(env.LICENSES, order, decision.reason);
+      }
+      return json({ status: "revoked", transaction, orders: decision.orders, reason: decision.reason });
     }
-    return json({ ignored: "no-transaction-id" });
+    if (decision.verdict === "restore") {
+      setStage("restore-order");
+      let restored = 0;
+      for (const order of decision.orders) {
+        restored += (await restoreOrder(env.LICENSES, order, decision.clear)) || 0;
+      }
+      return json({ status: "restore_checked", transaction, orders: decision.orders, restored });
+    }
+    return json({ ignored: "adjustment", why: decision.why, adjustment: data.id || "" });
   }
 
   // Subscription lifecycle. The licence key never changes; what changes is how
@@ -1247,7 +1264,14 @@ async function processPaddleWebhook(request, env, setStage) {
       || "";
 
     setStage("record-subscription");
-    await recordSubscription(env.LICENSES, subId, status, periodEnd, subTier);
+    const applied = await recordSubscription(
+      env.LICENSES, subId, status, periodEnd, subTier, event.occurred_at
+    );
+    // Still a 200: an out-of-order event is expected traffic, and a 5xx would
+    // only make Paddle retry something that must not apply.
+    if (!applied) {
+      return json({ status: "subscription_stale_ignored", subscription: subId, state: status });
+    }
     return json({ status: "subscription_recorded", subscription: subId, state: status });
   }
 

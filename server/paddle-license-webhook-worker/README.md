@@ -145,12 +145,13 @@ Paddle product `pro_01ky2h8cfe2ven8ypchnmfbena` — "Easy-Post Desktop License":
 | `pri_01ky3fxdv0gcg0xnf04npzpb2k` | organisation | $349 | yearly |
 
 Notification destination `ntfset_01ky3g1b29r9zvgz1vyw9n6wyh` posts to
-`/paddle/webhook` for `transaction.completed`, `adjustment.created` and the
-`subscription.*` lifecycle events.
+`/paddle/webhook` for `transaction.completed`, `adjustment.created`,
+`adjustment.updated` and the `subscription.*` lifecycle events.
 
 **`transaction.refunded` is not a Paddle event.** Refunds arrive as
-`adjustment.created`; subscribing to the former makes the whole destination
-fail validation.
+adjustments; subscribing to the former makes the whole destination fail
+validation. Which adjustments revoke a key is set out in
+`WEBHOOK-RUNBOOK.md` §10.
 
 The Paddle API key (`Licence webhook (Worker, read-only)`) is scoped to
 **`customer.read` + `transaction.read` only** — the sole runtime call is
