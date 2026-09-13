@@ -31,6 +31,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.core import customs, units
+from app.core.client import client_manager
 from app.core.countries import COUNTRIES
 from app.core.errors import carrier_messages, format_api_error
 from app.core.settings import load_settings, save_settings
@@ -73,6 +74,29 @@ _CUSTOMS_ITEM_COLUMN_COUNT = 7
 # painted by Qt without a PDF engine, so those fall back to the open/save
 # buttons alone.
 _PREVIEWABLE_SUFFIXES = (".png", ".jpg", ".jpeg", ".gif", ".bmp")
+
+# The label formats EasyPost produces (app/core/label_options.py), keyed by the
+# suffix of the label URL, with label_file_type as the fallback. Checked live in
+# test mode for all four: the URL suffix and file type match the format asked for.
+_LABEL_FILE_FORMATS = {"png": "PNG", "pdf": "PDF", "zpl": "ZPL", "epl2": "EPL2"}
+_LABEL_FILE_TYPES = {
+    "image/png": "png", "application/pdf": "pdf",
+    "application/zpl": "zpl", "application/x-epl2": "epl2",
+}
+
+
+def _label_file_extension(url: str, file_type: str | None = None) -> str | None:
+    """The extension of the file a label URL actually serves, or None.
+
+    The bytes are written exactly as downloaded, so the name must say what they
+    are. Offering "label.pdf" for the default PNG label produced a file no PDF
+    reader would open, at the moment a new customer first bought something.
+    """
+    path = (url or "").split("?")[0].lower()
+    for ext in _LABEL_FILE_FORMATS:
+        if path.endswith("." + ext):
+            return ext
+    return _LABEL_FILE_TYPES.get((file_type or "").lower())
 
 
 def _rate_sort_key(rate) -> float:
@@ -348,6 +372,19 @@ class CreateShipmentView(QWidget):
         # does not read as the user editing the parcel. Must exist before any
         # widget is built, since building them can emit valueChanged.
         self._suspend_rate_invalidation = False
+        # Bumped by every rating request and every edit that invalidates rates.
+        # A reply is installed only if the generation it was requested under is
+        # still current: otherwise it describes a parcel, address or declaration
+        # the form no longer holds, and its Buy buttons would buy that instead.
+        self._rates_generation = 0
+        self._rating_in_flight = False
+        # Buy stays disabled from the click until the purchase settles.
+        # EasyPost refuses a second buy on the same shipment, so a double click
+        # showed "purchase failed" beside a label that had in fact been bought.
+        self._purchase_in_flight = False
+        # The shipment on screen has been bought, so none of its other rates can
+        # be bought either: EasyPost answers "Postage already exists".
+        self._label_bought = False
 
         content = QWidget()
         content_layout = QVBoxLayout(content)
@@ -673,6 +710,7 @@ class CreateShipmentView(QWidget):
         ):
             spin.setValue(units.from_inches(canon, new_dim))
         self._weight_input.setValue(units.from_ounces(weight_canon, self._weight_unit))
+        self._convert_customs_item_weights(old_weight_unit)
         self._suspend_rate_invalidation = False
         self._persist_units()
 
@@ -681,6 +719,7 @@ class CreateShipmentView(QWidget):
         if not new_unit or new_unit == self._weight_unit:
             return
         canon = units.to_ounces(self._weight_input.value(), self._weight_unit)
+        old_unit = self._weight_unit
         self._weight_unit = new_unit
         wlo, whi, wdec, wstep = units.WEIGHT_SPIN[new_unit]
         # Same weight, different unit — not a different parcel.
@@ -689,6 +728,7 @@ class CreateShipmentView(QWidget):
         self._weight_input.setRange(wlo, whi)
         self._weight_input.setSingleStep(wstep)
         self._weight_input.setValue(units.from_ounces(canon, new_unit))
+        self._convert_customs_item_weights(old_unit)
         self._suspend_rate_invalidation = False
         self._persist_units()
 
@@ -901,8 +941,8 @@ class CreateShipmentView(QWidget):
             [
                 tr("create_shipment.customs_item_col_description"),
                 tr("create_shipment.customs_item_col_quantity"),
-                tr("create_shipment.customs_item_col_value"),
-                tr("create_shipment.customs_item_col_weight"),
+                "",  # value and weight: set by _update_customs_item_headers
+                "",
                 tr("create_shipment.customs_item_col_hts"),
                 tr("create_shipment.customs_item_col_origin"),
                 "",
@@ -911,6 +951,7 @@ class CreateShipmentView(QWidget):
         self._customs_items_table.horizontalHeader().setSectionResizeMode(
             0, QHeaderView.ResizeMode.Stretch
         )
+        self._update_customs_item_headers()
 
         add_item_btn = QPushButton(tr("create_shipment.add_customs_item_button"))
         add_item_btn.clicked.connect(self._on_add_customs_item)
@@ -957,7 +998,10 @@ class CreateShipmentView(QWidget):
         value_spin = self._spin(0.01, 100000, 10)
         self._customs_items_table.setCellWidget(row, 2, value_spin)
 
-        weight_spin = self._spin(0.1, 5000, 8)
+        # Entered in the parcel's weight unit, which the column header names.
+        weight_spin = QDoubleSpinBox()
+        self._configure_customs_weight_spin(weight_spin)
+        weight_spin.setValue(units.from_ounces(8, self._weight_unit))
         self._customs_items_table.setCellWidget(row, 3, weight_spin)
 
         self._customs_items_table.setCellWidget(row, 4, QLineEdit())
@@ -976,6 +1020,17 @@ class CreateShipmentView(QWidget):
         remove_btn.clicked.connect(partial(self._on_remove_customs_item, remove_btn))
         self._customs_items_table.setCellWidget(row, _CUSTOMS_ITEM_COLUMN_COUNT - 1, remove_btn)
 
+        # The declaration is attached when the shipment is created, so a rate
+        # quoted before an item changed would buy a label carrying the old one.
+        # Wired per row because rows are added after the form is connected.
+        self._customs_items_table.cellWidget(row, 0).textChanged.connect(self._invalidate_rates)
+        qty_spin.valueChanged.connect(self._invalidate_rates)
+        value_spin.valueChanged.connect(self._invalidate_rates)
+        weight_spin.valueChanged.connect(self._invalidate_rates)
+        self._customs_items_table.cellWidget(row, 4).textChanged.connect(self._invalidate_rates)
+        origin_combo.currentIndexChanged.connect(self._invalidate_rates)
+        self._invalidate_rates()
+
         # Every cell in this table is a widget, which ResizeToContents can't
         # measure — without this the header for a widget-only column (e.g. "HTS
         # number (optional)") clips. Fit each column to header + widget.
@@ -985,6 +1040,7 @@ class CreateShipmentView(QWidget):
         for row in range(self._customs_items_table.rowCount()):
             if self._customs_items_table.cellWidget(row, _CUSTOMS_ITEM_COLUMN_COUNT - 1) is button:
                 self._customs_items_table.removeRow(row)
+                self._invalidate_rates()
                 return
 
     def _is_international(self) -> bool:
@@ -1000,6 +1056,60 @@ class CreateShipmentView(QWidget):
         zip_mode = getattr(self, "_mode_zip_radio", None) is not None and self._mode_zip_radio.isChecked()
         self._customs_group.setVisible(not zip_mode and self._is_international())
         self._resync_customs_item_origins()
+        # The declared currency follows the sender, so its header does too.
+        self._update_customs_item_headers()
+
+    def _customs_currency(self) -> str:
+        """The currency a declared value is stated in. Read by both the column
+        header and the declaration, so the two cannot disagree."""
+        from_rec = self._address_by_id.get(self._from_combo.currentData())
+        return customs.currency_for(getattr(from_rec, "country", None))
+
+    def _update_customs_item_headers(self) -> None:
+        """Name the currency and unit the declaration will actually carry.
+
+        The headers were fixed at "Value (USD)" and "Weight (oz)" while the
+        declaration used the sender's currency and the form's weight unit, so a
+        metric UK user's "8" under "Weight (oz)" was declared as 8 kg, in pounds
+        sterling. The currency is the sender's by design (a London sender typing
+        10 means ten pounds) and the weight unit is the one the parcel is being
+        entered in, so the headers follow them rather than the other way round.
+        Both are line totals: EasyPost defines value and weight as the unit
+        amount times the quantity.
+        """
+        table = getattr(self, "_customs_items_table", None)
+        if table is None:
+            return
+        table.horizontalHeaderItem(2).setText(
+            tr("create_shipment.customs_item_col_value", currency=self._customs_currency())
+        )
+        table.horizontalHeaderItem(3).setText(
+            tr("create_shipment.customs_item_col_weight", unit=self._weight_unit)
+        )
+        _fit_columns_to_widgets(table, stretch_col=0)
+
+    def _configure_customs_weight_spin(self, spin: QDoubleSpinBox) -> None:
+        lo, hi, dec, step = units.WEIGHT_SPIN[self._weight_unit]
+        spin.setDecimals(dec)
+        spin.setRange(lo, hi)
+        spin.setSingleStep(step)
+
+    def _convert_customs_item_weights(self, old_unit: str) -> None:
+        """Re-express every item weight in the new unit, as the parcel weight
+        is. Relabelling the column without converting would silently turn a
+        declared 8 oz into 8 g. Callers suspend rate invalidation, because the
+        items weigh the same."""
+        table = getattr(self, "_customs_items_table", None)
+        if table is None:
+            return
+        for row in range(table.rowCount()):
+            spin = table.cellWidget(row, 3)
+            if spin is None:
+                continue
+            ounces = units.to_ounces(spin.value(), old_unit)
+            self._configure_customs_weight_spin(spin)
+            spin.setValue(units.from_ounces(ounces, self._weight_unit))
+        self._update_customs_item_headers()
 
     def _resync_customs_item_origins(self) -> None:
         """Keeps each customs item row's origin-country default in step with
@@ -1035,8 +1145,7 @@ class CreateShipmentView(QWidget):
         # than hard-coded to USD. A London sender entering "10" means ten
         # pounds; declaring that as ten dollars misstates the value on a customs
         # form.
-        from_rec = self._address_by_id.get(self._from_combo.currentData())
-        customs_currency = customs.currency_for(getattr(from_rec, "country", None))
+        customs_currency = self._customs_currency()
 
         items = []
         for row in range(self._customs_items_table.rowCount()):
@@ -1336,7 +1445,29 @@ class CreateShipmentView(QWidget):
             buy_btn.setToolTip(tr("create_shipment.buy_needs_full_address"))
         else:
             buy_btn.clicked.connect(partial(self._on_buy_clicked, rate))
+            # A redraw during a purchase (the carrier filter) must not hand back
+            # live buttons.
+            self._apply_buy_button_state(buy_btn)
         tree.setItemWidget(child, _RATE_COLUMN_COUNT - 1, buy_btn)
+
+    def _apply_buy_button_state(self, button: QPushButton) -> None:
+        if self._label_bought:
+            button.setEnabled(False)
+            button.setToolTip(tr("create_shipment.buy_already_bought"))
+        else:
+            button.setEnabled(not self._purchase_in_flight)
+            button.setToolTip("")
+
+    def _refresh_buy_buttons(self) -> None:
+        if self._quote_only:
+            return
+        tree = self._rates_tree
+        for i in range(tree.topLevelItemCount()):
+            top = tree.topLevelItem(i)
+            for j in range(top.childCount()):
+                button = tree.itemWidget(top.child(j), _RATE_COLUMN_COUNT - 1)
+                if button is not None:
+                    self._apply_buy_button_state(button)
 
     def _resize_rates_tree_to_content(self, *_args) -> None:
         """Size the tree to show every currently-visible row in full instead of
@@ -1482,28 +1613,82 @@ class CreateShipmentView(QWidget):
 
         Declared insurance is deliberately NOT wired to this: it is applied at
         purchase time and does not change what carriers quote.
+
+        A rating still in flight is voided too, although the table is empty
+        while it runs. The early return on an empty table used to skip exactly
+        that case, so the reply arrived afterwards and installed live Buy
+        buttons for the parcel as it was when Get Rates was clicked.
         """
         if self._suspend_rate_invalidation:
             return
-        if self._rates_tree.topLevelItemCount() == 0:
+        self._rates_generation += 1
+        self._current_shipment = None
+        self._label_bought = False
+        if self._rating_in_flight:
+            self._end_rating()
+        # Customs rows are wired as they are built, before the rates table
+        # exists, and then there is nothing on screen to clear.
+        tree = getattr(self, "_rates_tree", None)
+        if tree is None or tree.topLevelItemCount() == 0:
             return
         self._rates_tree.clear()
         self._rates = []
-        self._current_shipment = None
         self._quote_only_note.setVisible(False)
         self._carrier_filter_row.setVisible(False)
         self._carrier_filter_note.setVisible(False)
         self._resize_rates_tree_to_content()
 
     def _connect_rate_invalidation(self) -> None:
-        """Wire every input that changes what a carrier would quote."""
-        for combo in (self._from_combo, self._to_combo, self._package_combo):
+        """Wire every input that changes what a carrier would quote, or what the
+        shipment behind the rates carries. Customs item cells are wired per row
+        in _on_add_customs_item."""
+        for combo in (
+            self._from_combo, self._to_combo, self._package_combo,
+            self._from_country_combo, self._to_country_combo,
+            self._contents_type_combo, self._restriction_type_combo,
+            self._non_delivery_combo,
+        ):
             combo.currentIndexChanged.connect(self._invalidate_rates)
         for spin in (
             self._length_input, self._width_input,
             self._height_input, self._weight_input,
         ):
             spin.valueChanged.connect(self._invalidate_rates)
+        # The reference and the declaration are fixed when the shipment is
+        # created, so a label bought from earlier rates would carry the old ones.
+        for line in (
+            self._reference_input, self._from_zip_input, self._to_zip_input,
+            self._contents_explanation_input, self._restriction_comments_input,
+            self._customs_signer_input,
+        ):
+            line.textChanged.connect(self._invalidate_rates)
+        self._customs_certify_checkbox.toggled.connect(self._invalidate_rates)
+        self._mode_full_radio.toggled.connect(self._invalidate_rates)
+
+    def _begin_rating(self) -> int:
+        """Start a rating request and return the generation its reply must
+        match. Starting one supersedes any request still in flight."""
+        self._rates_generation += 1
+        self._rating_in_flight = True
+        self._get_rates_btn.setEnabled(False)
+        self._get_rates_btn.setText(tr("create_shipment.fetching_rates_button"))
+        return self._rates_generation
+
+    def _end_rating(self) -> None:
+        self._rating_in_flight = False
+        self._get_rates_btn.setEnabled(True)
+        self._get_rates_btn.setText(tr("create_shipment.get_rates_button"))
+
+    def _connect_rating_reply(self, task, generation: int) -> None:
+        task.succeeded.connect(partial(self._deliver_rating, generation, self._on_rates_received))
+        task.failed.connect(partial(self._deliver_rating, generation, self._on_rates_failed))
+
+    def _deliver_rating(self, generation: int, handler, payload) -> None:
+        # A superseded reply is dropped whole, errors included: an error about a
+        # request the user has already edited away from is only noise.
+        if generation != self._rates_generation:
+            return
+        handler(payload)
 
     def _on_get_rates_clicked(self) -> None:
         if self._mode_zip_radio.isChecked():
@@ -1559,8 +1744,7 @@ class CreateShipmentView(QWidget):
                 )
                 return
 
-        self._get_rates_btn.setEnabled(False)
-        self._get_rates_btn.setText(tr("create_shipment.fetching_rates_button"))
+        generation = self._begin_rating()
 
         package_data = self._package_combo.currentData()
         params = dict(
@@ -1579,8 +1763,7 @@ class CreateShipmentView(QWidget):
             params["height"] = self._height_in()
         self._quote_only = False
         self._pending_task = run_async(lambda: create_shipment(**params), self)
-        self._pending_task.succeeded.connect(self._on_rates_received)
-        self._pending_task.failed.connect(self._on_rates_failed)
+        self._connect_rating_reply(self._pending_task, generation)
 
     def _request_zip_quote(self) -> None:
         from_zip = self._from_zip_input.text().strip()
@@ -1593,8 +1776,7 @@ class CreateShipmentView(QWidget):
             )
             return
 
-        self._get_rates_btn.setEnabled(False)
-        self._get_rates_btn.setText(tr("create_shipment.fetching_rates_button"))
+        generation = self._begin_rating()
 
         params = dict(
             from_postal_code=from_zip,
@@ -1614,13 +1796,12 @@ class CreateShipmentView(QWidget):
 
         self._quote_only = True
         self._pending_task = run_async(lambda: create_rate_quote(**params), self)
-        self._pending_task.succeeded.connect(self._on_rates_received)
-        self._pending_task.failed.connect(self._on_rates_failed)
+        self._connect_rating_reply(self._pending_task, generation)
 
     def _on_rates_received(self, shipment) -> None:
-        self._get_rates_btn.setEnabled(True)
-        self._get_rates_btn.setText(tr("create_shipment.get_rates_button"))
+        self._end_rating()
         self._current_shipment = shipment
+        self._label_bought = False
 
         all_rates = sorted(getattr(shipment, "rates", None) or [], key=_rate_sort_key)
         # Drop non-purchasable placeholder rates (e.g. Royal Mail V3 catalogue
@@ -1665,15 +1846,17 @@ class CreateShipmentView(QWidget):
             )
 
     def _on_rates_failed(self, exc: Exception) -> None:
-        self._get_rates_btn.setEnabled(True)
-        self._get_rates_btn.setText(tr("create_shipment.get_rates_button"))
+        self._end_rating()
         QMessageBox.critical(
             self, tr("common.error"), tr("create_shipment.get_rates_error_body", error=format_api_error(exc))
         )
 
     def _on_buy_clicked(self, rate) -> None:
-        if self._current_shipment is None:
+        if self._current_shipment is None or self._purchase_in_flight or self._label_bought:
             return
+        # Before the confirmation rather than after it: test mode has none, and a
+        # second click would otherwise start a second purchase.
+        self._set_purchase_in_flight(True)
         description = tr(
             "create_shipment.buy_confirm_description",
             carrier=getattr(rate, "carrier", ""),
@@ -1688,15 +1871,24 @@ class CreateShipmentView(QWidget):
         if insurance:
             description += "\n" + tr("create_shipment.insured_note", amount=insurance)
         if not confirm_if_production(self, description):
+            self._set_purchase_in_flight(False)
             return
 
         shipment_id = self._current_shipment.id
         rate_id = rate.id
+        # The key that buys the label decides where it is filed, and the mode
+        # banner can be flipped before the reply arrives.
+        mode = client_manager.active_mode
         self._pending_task = run_async(lambda: buy_shipment(shipment_id, rate_id, insurance), self)
-        self._pending_task.succeeded.connect(self._on_bought)
+        self._pending_task.succeeded.connect(partial(self._on_bought, mode=mode))
         self._pending_task.failed.connect(self._on_buy_failed)
 
+    def _set_purchase_in_flight(self, in_flight: bool) -> None:
+        self._purchase_in_flight = in_flight
+        self._refresh_buy_buttons()
+
     def _on_buy_failed(self, exc) -> None:
+        self._set_purchase_in_flight(False)
         # A failed purchase sours the session: no review prompt afterwards,
         # however well a later label goes.
         mark_session_friction()
@@ -1704,13 +1896,15 @@ class CreateShipmentView(QWidget):
             self, tr("common.error"), tr("create_shipment.purchase_error_body", error=format_api_error(exc))
         )
 
-    def _on_bought(self, shipment) -> None:
+    def _on_bought(self, shipment, mode: str | None = None) -> None:
         self._current_shipment = shipment
-        save_shipment_locally(shipment)
+        self._label_bought = True
+        self._set_purchase_in_flight(False)
+        save_shipment_locally(shipment, mode)
         # Buying a label always creates a tracker; recording it here is what
         # puts the shipment on the Tracking page, instead of the user having to
         # paste the tracking number back in by hand.
-        track_shipment(shipment)
+        track_shipment(shipment, mode)
 
         postage_label = getattr(shipment, "postage_label", None)
         label_url = getattr(postage_label, "label_url", None) if postage_label else None
@@ -1727,6 +1921,7 @@ class CreateShipmentView(QWidget):
             self._open_label_btn.setEnabled(True)
             self._save_label_btn.setEnabled(True)
             self._pending_label_url = label_url
+            self._pending_label_file_type = getattr(postage_label, "label_file_type", None)
             self._load_label_preview(label_url)
         else:
             self._result_label.setText(tr("create_shipment.purchased_no_label"))
@@ -1750,11 +1945,20 @@ class CreateShipmentView(QWidget):
         url = getattr(self, "_pending_label_url", None)
         if not url:
             return
+        ext = _label_file_extension(url, getattr(self, "_pending_label_file_type", None))
+        if ext:
+            name = f"label.{ext}"
+            file_filter = tr(
+                "create_shipment.label_file_filter", format=_LABEL_FILE_FORMATS[ext], ext=ext
+            )
+        else:
+            # A format this app does not know: no filter is better than a wrong one.
+            name, file_filter = "label", ""
         path, _ = QFileDialog.getSaveFileName(
             self,
             tr("create_shipment.save_label_dialog_title"),
-            "label.pdf",
-            tr("create_shipment.pdf_filter"),
+            name,
+            file_filter,
         )
         if not path:
             return

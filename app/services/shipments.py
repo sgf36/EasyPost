@@ -190,8 +190,15 @@ def _address_summary(address) -> str:
     return ", ".join(p for p in parts if p)
 
 
-def save_shipment_locally(shipment) -> None:
-    mode = client_manager.active_mode
+def save_shipment_locally(shipment, mode: Optional[str] = None) -> None:
+    """Record a shipment under `mode`, or the active mode when none is given.
+
+    A purchase should pass the mode it was bought in. The mode banner can be
+    flipped while the request is in flight, and reading the active mode on the
+    reply filed a production label under test, where production History never
+    shows it and it can never be refunded from the app.
+    """
+    mode = mode or client_manager.active_mode
     selected_rate = getattr(shipment, "selected_rate", None)
     postage_label = getattr(shipment, "postage_label", None)
     insurance = getattr(shipment, "insurance", None)

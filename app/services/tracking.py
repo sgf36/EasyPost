@@ -50,19 +50,22 @@ def retrieve_tracker(tracker_id: str):
     return client.tracker.retrieve(tracker_id)
 
 
-def track_shipment(shipment) -> bool:
+def track_shipment(shipment, mode: Optional[str] = None) -> bool:
     """Record the tracker that came with a bought label.
 
     Buying a label always creates a tracker; this simply copies it into the
     app's own Tracking page so a shipment does not disappear the moment it is
     purchased. Best effort — the label is already paid for, so a bookkeeping
     failure here must never be reported as a failed purchase.
+
+    `mode` is the mode the label was bought in, for the reason given in
+    shipments.save_shipment_locally.
     """
     tracker = getattr(shipment, "tracker", None)
     if tracker is None:
         return False
     try:
-        save_tracker_locally(tracker)
+        save_tracker_locally(tracker, mode)
     except Exception:
         logger.exception("Could not record tracker for shipment %s",
                          getattr(shipment, "id", "?"))
@@ -78,8 +81,8 @@ def _get(obj, key: str, default=None):
     return getattr(obj, key, default)
 
 
-def save_tracker_locally(tracker) -> None:
-    mode = client_manager.active_mode
+def save_tracker_locally(tracker, mode: Optional[str] = None) -> None:
+    mode = mode or client_manager.active_mode
     with db_cursor() as cur:
         cur.execute(
             """
