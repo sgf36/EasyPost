@@ -107,12 +107,14 @@ def _rate_now(h, shipment=None):
 
 
 def _buy_buttons(view) -> list[QPushButton]:
+    from app.ui.views.create_shipment_view import _buy_button
+
     tree = view._rates_tree
     buttons = []
     for i in range(tree.topLevelItemCount()):
         top = tree.topLevelItem(i)
         for j in range(top.childCount()):
-            widget = tree.itemWidget(top.child(j), 4)
+            widget = _buy_button(tree, top.child(j))
             if widget is not None:
                 buttons.append(widget)
     return buttons
@@ -383,3 +385,144 @@ def test_tracker_is_recorded_under_the_mode_it_was_bought_in(monkeypatch):
     assert tracking.list_trackers() == []
     creds.active_mode = "production"
     assert [t.id for t in tracking.list_trackers()] == ["trk_prod"]
+
+
+# --- a new shipment is not addressed to its sender -----------------------------------
+
+def _records(*ids):
+    return [SimpleNamespace(id=i, label=i, name="N", city="London", state="", country="GB",
+                            company="", phone="1") for i in ids]
+
+
+def test_to_starts_empty_and_from_on_the_first_address(harness, monkeypatch):
+    view = harness.view
+    monkeypatch.setattr(harness.V, "list_addresses", lambda: _records("adr_fav", "adr_other"))
+    view._from_combo.clear()
+    view._to_combo.clear()
+    view.refresh_address_choices()
+    assert view._from_combo.currentData() == "adr_fav"
+    assert view._to_combo.currentData() is None
+    assert view._to_combo.currentText() == ""
+
+
+def test_refreshing_the_page_keeps_what_the_user_chose(harness, monkeypatch):
+    view = harness.view
+    monkeypatch.setattr(harness.V, "list_addresses", lambda: _records("adr_fav", "adr_other"))
+    view.refresh_address_choices()
+    view._from_combo.setCurrentIndex(view._from_combo.findData("adr_other"))
+    view._to_combo.setCurrentIndex(view._to_combo.findData("adr_fav"))
+    view.refresh_address_choices()
+    assert (view._from_combo.currentData(), view._to_combo.currentData()) == ("adr_other", "adr_fav")
+
+
+def test_get_rates_without_a_recipient_asks_for_one(harness):
+    view = harness.view
+    view._to_combo.setCurrentIndex(-1)
+    before = len(harness.tasks)
+    view._get_rates_btn.click()
+    assert harness.dialogs == ["warning"]
+    assert len(harness.tasks) == before, "a quote was requested with no recipient"
+
+
+def test_get_rates_refuses_the_same_address_at_both_ends(harness):
+    view = harness.view
+    view._to_combo.setCurrentIndex(view._to_combo.findData("adr_us1"))
+    before = len(harness.tasks)
+    view._get_rates_btn.click()
+    assert harness.dialogs == ["warning"]
+    assert len(harness.tasks) == before
+
+
+# --- badges and order never compare currencies ------------------------------------------
+
+def _mixed_shipment():
+    def r(id_, carrier, amount, currency, days):
+        return SimpleNamespace(id=id_, carrier=carrier, service="Svc", rate=amount,
+                               currency=currency, delivery_days=days,
+                               delivery_date_guaranteed=False)
+    return SimpleNamespace(id="shp_mixed", messages=[], rates=[
+        r("rm_48", "RoyalMailV3", "3.25", "GBP", 1), r("rm_billed", "RoyalMailV3", "0.01", "GBP", 1),
+        r("usps", "USPS", "7.04", "USD", 2), r("ups", "UPSDAP", "16.75", "USD", 3),
+    ])
+
+
+def test_view_crowns_cheapest_in_the_senders_currency_and_royal_mail_does_not_lead(harness):
+    view = harness.view   # adr_us1 -> adr_us2: a US sender
+    _rate_now(harness, _mixed_shipment())
+    assert view._cheapest_id == "usps"
+    assert view._fastest_id == "usps"
+    tree = view._rates_tree
+    order = [tree.topLevelItem(i).text(0) for i in range(tree.topLevelItemCount())]
+    assert order[-1].startswith("Royal Mail"), order
+    assert "USD" in view._currency_note.text()
+
+
+def test_a_uk_sender_is_ranked_in_pounds(harness):
+    view = harness.view
+    view._from_combo.setCurrentIndex(view._from_combo.findData("adr_gb"))
+    view._to_combo.setCurrentIndex(view._to_combo.findData("adr_us1"))
+    assert view._sender_currency() == "GBP"
+
+
+# --- the carriers that did not quote -----------------------------------------------------
+
+def test_carrier_errors_are_summarised_with_the_raw_text_behind_a_toggle(harness):
+    view = harness.view
+    shipment = _shipment()
+    shipment.messages = [{"carrier": "Evri", "message": "credentials.client_id: Required"},
+                         {"carrier": "FedEx", "message": "Authentication Failed"}]
+    _rate_now(harness, shipment)
+    assert not view._carrier_notes_row.isHidden()
+    assert "Evri" in view._carrier_notes_summary.text()
+    assert "credentials" not in view._carrier_notes_summary.text()
+    assert view._carrier_notes_label.isHidden()
+    view._carrier_notes_toggle.setChecked(True)
+    assert not view._carrier_notes_label.isHidden()
+    assert "credentials.client_id" in view._carrier_notes_label.text()
+
+
+# --- a bought label is where the customer is looking ---------------------------------------
+
+def _bought(label_url="https://easypost-files.s3.amazonaws.com/files/postage_label/2026/e8.png"):
+    return SimpleNamespace(id="shp_1", status="purchased", selected_rate=_rate("rate_1"),
+                           tracking_code="9400100000000000000001",
+                           postage_label=SimpleNamespace(label_url=label_url, label_file_type="image/png"),
+                           insurance=None, refund_status=None, to_address=None, from_address=None)
+
+
+def test_a_purchase_shows_the_result_panel_not_a_dialog_and_no_raw_url(harness, monkeypatch, clean_shipments):
+    view = harness.view
+    monkeypatch.setattr(harness.V, "_is_previewable", lambda url: False)
+    scrolled = []
+    monkeypatch.setattr(view, "_reveal_result", lambda: scrolled.append(True))
+    assert view._result_group.isHidden()
+    _rate_now(harness)
+    _buy_buttons(view)[0].click()
+    harness.tasks[-1].succeed(_bought())
+
+    assert "information" not in harness.dialogs
+    assert not view._result_group.isHidden()
+    assert scrolled == [True]
+    assert "9400100000000000000001" in view._result_label.text()
+    assert "amazonaws" not in view._result_label.text()
+    assert "http" not in view._result_heading.text()
+    assert view._save_label_btn.isEnabled()
+
+
+def test_the_next_quote_hides_the_last_result(harness, monkeypatch, clean_shipments):
+    view = harness.view
+    monkeypatch.setattr(harness.V, "_is_previewable", lambda url: False)
+    monkeypatch.setattr(view, "_reveal_result", lambda: None)
+    _rate_now(harness)
+    _buy_buttons(view)[0].click()
+    harness.tasks[-1].succeed(_bought())
+    view._weight_input.setValue(view._weight_input.value() + 1)
+    view._get_rates_btn.click()
+    assert view._result_group.isHidden()
+
+
+def test_track_parcel_asks_the_window_for_the_tracking_page(harness):
+    asked = []
+    harness.view.tracking_requested.connect(lambda: asked.append(True))
+    harness.view._track_btn.click()
+    assert asked == [True]

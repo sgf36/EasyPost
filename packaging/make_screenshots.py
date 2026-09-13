@@ -828,10 +828,9 @@ def _seed_rate_table(holder) -> None:
     if not (hasattr(view, "_on_rates_received") and hasattr(view, "_populate_rates_tree")):
         return
 
-    # Both address combos default to the first saved address, so the page
-    # screenshots as posting from an office to itself. Point the destination at
-    # the other seeded address to make it the London -> Manchester journey the
-    # rates below are quoted for.
+    # A new shipment starts with no recipient chosen (From is the favourite
+    # address, To is empty). Point the destination at the other seeded address
+    # to make it the London -> Manchester journey the rates below are quoted for.
     to_combo = getattr(view, "_to_combo", None)
     if to_combo is not None and to_combo.count() > 1:
         to_combo.setCurrentIndex(1)

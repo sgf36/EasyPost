@@ -4,7 +4,7 @@ import webbrowser
 from functools import partial
 
 import requests
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QEvent, QPoint, QRect, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
+    QGridLayout,
     QGroupBox,
     QHBoxLayout,
     QHeaderView,
@@ -39,6 +40,7 @@ from app.i18n import tr
 from app.services.addresses import address_choice_label, list_addresses
 from app.services.carriers import carriers_present_in, for_carrier
 from app.services.formatting import display_carrier, humanize_code
+from app.services import rates as rate_rules
 from app.services.insurance import INSURANCE_MAX_USD
 from app.services.packages import (
     delete_saved_package,
@@ -58,16 +60,22 @@ from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.carrier_combo import CarrierCombo
 from app.ui.widgets.chips import badge
+from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
 from app.ui.widgets.review_nudge import schedule_review_prompt
 
-# Carrier & service | Included | Rate | Delivery | Buy. Rates are shown in a
-# QTreeWidget grouped by carrier: the carrier is a top-level (header) row and
-# each service is a child under it, so column 0 carries the carrier name on a
-# header row and the service name on a child row rather than both sharing one
-# flat cell. The "Included" column sits between the service identity and the
-# rate, carrying the enhancement badges (tracked / signed / guaranteed).
-_RATE_COLUMN_COUNT = 5
+# Carrier & service | Rate | Est. days | Buy. Rates are shown in a QTreeWidget
+# grouped by carrier: the carrier is a top-level (header) row and each service
+# is a child under it, so column 0 carries the carrier name on a header row and
+# the service name on a child row rather than both sharing one flat cell.
+#
+# There used to be an "Included" column between the name and the rate, holding
+# the tracked / signed / guaranteed badges. Those badges now sit on a line under
+# the service name with cheapest / fastest (see _build_rate_service_cell). A
+# column of its own competed with the name for width, and at the default window
+# either the name or the badges had to be cut; under the name neither is.
+_RATE_COLUMN_COUNT = 4
+_RATE_COL_SERVICE, _RATE_COL_PRICE, _RATE_COL_DAYS, _RATE_COL_BUY = range(_RATE_COLUMN_COUNT)
 _CUSTOMS_ITEM_COLUMN_COUNT = 7
 
 # Label previews are rendered from the image EasyPost returns. PDFs can't be
@@ -85,6 +93,23 @@ _LABEL_FILE_TYPES = {
 }
 
 
+def _narrowable_combo() -> QComboBox:
+    """A combo whose longest entry does not set the page's minimum width.
+
+    An address choice reads "Label — street, city, state", and Qt sizes a combo
+    to its longest entry by default, so one long saved address widened the whole
+    page. The full text is still shown in the open list.
+    """
+    combo = QComboBox()
+    combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+    combo.setMinimumContentsLength(16)
+    return combo
+
+
+def _is_previewable(url: str) -> bool:
+    return (url or "").lower().split("?")[0].endswith(_PREVIEWABLE_SUFFIXES)
+
+
 def _label_file_extension(url: str, file_type: str | None = None) -> str | None:
     """The extension of the file a label URL actually serves, or None.
 
@@ -97,24 +122,6 @@ def _label_file_extension(url: str, file_type: str | None = None) -> str | None:
         if path.endswith("." + ext):
             return ext
     return _LABEL_FILE_TYPES.get((file_type or "").lower())
-
-
-def _rate_sort_key(rate) -> float:
-    """Cheapest first. EasyPost returns rates in no meaningful order and hands
-    back `rate` as a string, so anything unparseable sorts to the bottom
-    rather than crashing the whole table."""
-    try:
-        return float(getattr(rate, "rate", None))
-    except (TypeError, ValueError):
-        return float("inf")
-
-
-def _delivery_days(rate) -> int | None:
-    days = getattr(rate, "delivery_days", None)
-    try:
-        return int(days)
-    except (TypeError, ValueError):
-        return None
 
 
 def _service_enhancements(rate) -> list[str]:
@@ -138,92 +145,43 @@ def _service_enhancements(rate) -> list[str]:
     return enhancements
 
 
-def _fastest_rate_id(rates) -> str | None:
-    """Id of the quickest rate, or None when no carrier quoted an estimate
-    (common for international and for some regional carriers)."""
-    timed = [r for r in rates if _delivery_days(r) is not None]
-    if not timed:
-        return None
-    return min(timed, key=_delivery_days).id
-
-
 def _format_price(rate) -> str:
     # Royal Mail and other OBA carriers bill the real postage to the account,
     # so the sub-penny figure EasyPost hands back is not the price to show —
     # say it's invoiced rather than a misleading "0.01 GBP".
-    if _is_account_billed(rate):
+    if rate_rules.is_account_billed(rate):
         return tr("create_shipment.billed_to_account")
     amount = getattr(rate, "rate", "") or ""
     currency = getattr(rate, "currency", "") or ""
     return f"{amount} {currency}".strip()
 
 
+#: Shown in the Est. days column when a carrier gave no estimate. The words
+#: ("Not quoted") are the cell's tooltip; in the cell they were a single 170px
+#: word in Tamil, in a column of one- and two-digit numbers, taken out of the
+#: service name's width.
+_NO_ESTIMATE = "—"
+
+
 def _format_delivery(rate) -> str:
     """Just the number — the column is already headed "Est. days", so this
     sidesteps plural rules ("1 days") in every one of the 50 locales."""
-    days = _delivery_days(rate)
+    days = rate_rules.delivery_days(rate)
     if days is None:
-        return tr("create_shipment.delivery_unknown")
+        return _NO_ESTIMATE
     return str(days)
 
 
-# Anything below this (in the rate's own currency) is treated as a
-# non-purchasable placeholder, not a real quote. Some carriers — notably Royal
-# Mail V3 via EasyPost — return their whole service catalogue as rates, including
-# services that don't apply to the route, priced at a nominal 0.01 that cannot be
-# bought. No real shipping service costs a penny, so these are hidden when
-# genuine quotes exist (see _on_rates_received).
-_MIN_REAL_RATE = 0.02
-
-# Carriers that invoice postage to the account externally (Royal Mail's OBA
-# billing) rather than charging the label price up front. EasyPost's Royal Mail
-# v3 integration returns *purchasable* services at a nominal sub-penny rate
-# precisely because the true cost is billed to the account, not quoted on the
-# rate. So for these carriers a sub-_MIN_REAL_RATE figure means "billed to
-# account" and the label genuinely can be bought — it is NOT the non-purchasable
-# catalogue placeholder that the same low number means for any other carrier.
-_ACCOUNT_BILLED_CARRIERS = {"RoyalMail", "RoyalMailV3"}
+# What a rate's figure means (a real price, a "billed to account" marker or a
+# placeholder that cannot be bought) and which rates may be ranked against each
+# other are decided in app/services/rates.py. They used to be private copies
+# here, which is why the agent purchase path never applied them.
 
 # A carrier group with more than this many services starts collapsed (its count
 # stays visible on the header), so a 70-service Royal Mail catalogue doesn't
 # bury every other carrier; smaller groups — and whichever group holds the
 # cheapest rate — start expanded. See _populate_rates_tree.
 _MAX_AUTO_EXPAND = 8
-
-
-def _is_account_billed(rate) -> bool:
-    """True for an account-billed carrier rate whose sub-penny figure is a
-    "billed to account" marker rather than a real quote (see
-    _ACCOUNT_BILLED_CARRIERS). Such rates ARE purchasable despite the low
-    number, so they must be told apart from ordinary placeholders."""
-    if getattr(rate, "carrier", "") not in _ACCOUNT_BILLED_CARRIERS:
-        return False
-    try:
-        return float(getattr(rate, "rate", None)) < _MIN_REAL_RATE
-    except (TypeError, ValueError):
-        return False
-
-
-def _is_placeholder_rate(rate) -> bool:
-    """A non-purchasable catalogue placeholder, priced below _MIN_REAL_RATE.
-    Account-billed carrier rates (Royal Mail via OBA) sit below that threshold
-    too but genuinely can be bought, so they are never hidden as placeholders."""
-    if _is_account_billed(rate):
-        return False
-    try:
-        return float(getattr(rate, "rate", None)) < _MIN_REAL_RATE
-    except (TypeError, ValueError):
-        return False
-
-
-def _cheapest_rate_id(rates) -> str | None:
-    """Id of the cheapest rate, ignoring account-billed rates whose real price
-    is unknown (their sub-penny figure isn't a comparable amount). None when
-    nothing is priced."""
-    priced = [r for r in rates if not _is_account_billed(r)]
-    if not priced:
-        return None
-    return min(priced, key=_rate_sort_key).id
 
 
 def _size_widget_column(table, col: int, *, padding: int = 16) -> None:
@@ -240,37 +198,110 @@ def _size_widget_column(table, col: int, *, padding: int = 16) -> None:
         table.setColumnWidth(col, width + padding)
 
 
-#: Never let the badge column squeeze below this. Narrower than a short badge,
-#: wide enough that the column still reads as a column rather than a seam.
-_RATE_BADGE_FLOOR = 44
+#: The object names inside a rate's first cell, so the column sizing can
+#: measure the name and the badge line themselves rather than the cell's hint.
+_SERVICE_NAME = "rateServiceName"
+_SERVICE_BADGES = "rateServiceBadges"
+
+
+class _ServiceCell(QWidget):
+    """A rate's first cell, whose height Qt can ask for and get a true answer.
+
+    QTreeView sizes a row from each cell widget's sizeHint, and a word-wrapping
+    label's hint is a height for a width Qt guesses, not the width the column
+    has. Rows came out 10 to 40px taller than their text, with the badges
+    stretched to fill the gap. _fit_rate_rows measures the height for the real
+    width and pins it here.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.fitted_height = 0
+
+    def sizeHint(self) -> QSize:
+        hint = super().sizeHint()
+        if self.fitted_height:
+            hint.setHeight(self.fitted_height)
+        return hint
+
+
+def _cell_depth_indent(tree, item) -> int:
+    """The horizontal space the tree takes before an item's column-0 cell."""
+    depth = 0
+    parent = item.parent()
+    while parent is not None:
+        depth += 1
+        parent = parent.parent()
+    return tree.indentation() * (depth + (1 if tree.rootIsDecorated() else 0))
+
+
+def _natural_cell_width(tree, item) -> int:
+    """What column 0 needs to show this row's name on one line.
+
+    Measured from the name label's own text, never from the cell widget's size
+    hint: a word-wrapping label reports a guessed width, and the delegate that
+    Qt's own sizing consults knows nothing about cell widgets at all. The old
+    sizing measured ``item.text(0)``, which is empty on every service row
+    because the name lives in a widget, so column 0 was sized to the carrier
+    headers alone and handed whatever the other columns left: 28px in German,
+    0px in Tamil.
+    """
+    widget = tree.itemWidget(item, _RATE_COL_SERVICE)
+    if widget is None:
+        width = tree.fontMetrics().horizontalAdvance(item.text(0))
+    else:
+        # The badges' padding comes from the stylesheet, which is applied only
+        # at polish; measured before that, chips came out narrower than drawn.
+        widget.ensurePolished()
+        label = widget.findChild(QLabel, _SERVICE_NAME)
+        if label is None:
+            width = widget.sizeHint().width()
+        else:
+            margins = widget.layout().contentsMargins()
+            name = label.fontMetrics().horizontalAdvance(label.text()) + 4
+            # Badges sit on their own line under the name, so they widen the
+            # column only when that line is wider than the name itself.
+            badges = widget.findChild(QWidget, _SERVICE_BADGES)
+            extra = badges.sizeHint().width() if badges is not None else 0
+            width = max(name, extra) + margins.left() + margins.right()
+    return width + _cell_depth_indent(tree, item)
+
+
+def _rate_rows(tree, *, visible_only: bool = False):
+    for i in range(tree.topLevelItemCount()):
+        top = tree.topLevelItem(i)
+        yield top
+        if visible_only and not top.isExpanded():
+            continue
+        for j in range(top.childCount()):
+            yield top.child(j)
 
 
 def _fit_rate_columns(tree, *, padding: int = 12) -> None:
-    """Give the carrier-and-service column the width its text actually needs.
-
-    Column 0 was Stretch, so it took whatever the other four left it, and those
-    four were sized by ResizeToContents -- which measures the *header* as well
-    as the data. In English the headers are short and column 0 gets enough. In
-    Tamil, Telugu and Arabic "Included", "Rate" and "Est. days" run two to three
-    times longer, the badge text with them, and the service name is what loses:
-    the Store screenshots for those languages showed "Stanc", "Next l" and
-    "Royal Mail 2" where the app should read "Standard" and "Royal Mail 2nd
-    Class".
+    """Give the carrier-and-service column the width its names actually need.
 
     Carrier and service names are never translated -- they are the carrier's own
     product names -- so column 0 needs the same width in every language. What
-    varies is everything competing with it. The priority is therefore fixed here
-    rather than left to Qt:
+    varies is everything competing with it: in German and Tamil "Billed to
+    account" and "Est. days" run two to three times longer. The priority is
+    therefore fixed here rather than left to Qt:
 
-        service name  >  rate  >  estimated days  >  badge
+        service name  >  rate and days figures  >  header words
 
-    A clipped badge still reads as a badge, and a clipped header is a word the
-    reader can infer from the column beneath it. A clipped service name is a
+    A clipped header is a word the reader can infer from the column beneath it
+    (and it is one hover away), so headers elide. A clipped service name is a
     false statement about what the button beside it buys.
 
-    So: headers elide instead of forcing width, the two compact columns are
-    sized to their data, column 0 takes what it needs, and the badge column
-    absorbs whatever is left over or missing.
+    The rate and days columns are sized to their figures, column 0 takes what
+    the longest name on screen needs, and anything left over first widens the
+    headers that were cut short and then goes to column 0. Only the rows on
+    screen are measured: Royal Mail's collapsed catalogue holds a 63-character
+    service name that would otherwise take the room from every header while
+    nobody can see it. Expanding a group re-runs this.
+
+    When even a name cannot fit on one line (the 880px minimum window) column 0
+    takes everything and the name wraps; _fit_rate_rows makes the row tall
+    enough, so the whole name is still there to read.
     """
     header = tree.header()
     viewport = tree.viewport().width()
@@ -278,43 +309,109 @@ def _fit_rate_columns(tree, *, padding: int = 12) -> None:
         return
 
     header.setTextElideMode(Qt.TextElideMode.ElideRight)
-    for col in (0, 1, 2, 3):
+    compact_cols = (_RATE_COL_PRICE, _RATE_COL_DAYS)
+    for col in (_RATE_COL_SERVICE,) + compact_cols:
         header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
 
-    fm = tree.fontMetrics()
-    indent = tree.indentation()
-
-    def widest(item, depth: int) -> int:
-        width = fm.horizontalAdvance(item.text(0)) + indent * (depth + 1)
-        for i in range(item.childCount()):
-            width = max(width, widest(item.child(i), depth + 1))
-        return width
-
     needed = padding
-    for i in range(tree.topLevelItemCount()):
-        needed = max(needed, widest(tree.topLevelItem(i), 0) + padding)
+    for item in _rate_rows(tree, visible_only=True):
+        needed = max(needed, _natural_cell_width(tree, item) + padding)
 
     # sizeHintForColumn measures the items only, so a long header no longer
     # drags these two wider than the figures they hold.
-    compact = {c: tree.sizeHintForColumn(c) + padding for c in (2, 3)}
-    buy = header.sectionSize(_RATE_COLUMN_COUNT - 1)
+    compact = {c: tree.sizeHintForColumn(c) + padding for c in compact_cols}
+    buy = header.sectionSize(_RATE_COL_BUY)
 
-    room = max(viewport - sum(compact.values()) - buy, 0)
-    badge = tree.sizeHintForColumn(1) + padding
-    if needed + badge > room:
-        # Contested. The badge gives way first, to its floor, and then past it
-        # to nothing: a floor that is honoured while the service name clips
-        # would invert the whole priority, which is what the first draft did --
-        # 185px of column for 223px of name, to keep a 44px badge.
-        badge = room - needed
-        if badge >= _RATE_BADGE_FLOOR:
-            badge = max(_RATE_BADGE_FLOOR, badge)
-        else:
-            badge = max(0, badge)
-    header.resizeSection(0, max(room - badge, 0))
-    header.resizeSection(1, badge)
+    # Still contested: "Billed to account" is two long words in Tamil. The price
+    # wraps (between words, never inside one) before the name gives up width.
+    shortfall = needed + sum(compact.values()) + buy - viewport
+    if shortfall > 0:
+        floor = padding + max(
+            (
+                tree.fontMetrics().horizontalAdvance(word)
+                for item in _rate_rows(tree, visible_only=True)
+                for word in item.text(_RATE_COL_PRICE).split()
+            ),
+            default=0,
+        )
+        compact[_RATE_COL_PRICE] = max(floor, compact[_RATE_COL_PRICE] - shortfall)
+
+    spare = viewport - sum(compact.values()) - buy - needed
+    for col in compact_cols:
+        if spare <= 0:
+            break
+        extra = min(max(header.sectionSizeFromContents(col).width() - compact[col], 0), spare)
+        compact[col] += extra
+        spare -= extra
+
+    header.resizeSection(_RATE_COL_SERVICE, max(viewport - sum(compact.values()) - buy, 0))
     for col, width in compact.items():
         header.resizeSection(col, width)
+
+
+def _buy_button(tree, item) -> QPushButton | None:
+    """The Buy button on a rate row, or None on a carrier header."""
+    holder = tree.itemWidget(item, _RATE_COL_BUY)
+    return holder.findChild(QPushButton) if holder is not None else None
+
+
+def _wrapped_text_height(tree, text: str, width: int) -> int:
+    rect = tree.fontMetrics().boundingRect(
+        QRect(0, 0, max(width, 1), 100000), int(Qt.TextFlag.TextWordWrap), text
+    )
+    return rect.height()
+
+
+def _fit_rate_rows(tree, *, gap: int = 6, padding: int = 12) -> int:
+    """Make each row as tall as its cell widgets need, and return the total.
+
+    Qt sizes a row from the item delegate, which cannot see cell widgets, so a
+    wrapped service name was cut to its first line and the tree's own height
+    estimate disagreed with the rows it drew (the 900px of blank space inside
+    the tree in the audit). Every row's height is set here instead, from the
+    width its name actually has, and the tree is sized to exactly their sum.
+    """
+    total = 0
+    column0 = tree.columnWidth(_RATE_COL_SERVICE)
+    for item in _rate_rows(tree, visible_only=True):
+        height = 0
+        for col in range(tree.columnCount()):
+            widget = tree.itemWidget(item, col)
+            if widget is None:
+                continue
+            if col == _RATE_COL_SERVICE and widget.hasHeightForWidth():
+                width = max(column0 - _cell_depth_indent(tree, item), 1)
+                fitted = widget.heightForWidth(width)
+                if isinstance(widget, _ServiceCell):
+                    widget.fitted_height = fitted
+                    widget.updateGeometry()
+                height = max(height, fitted)
+            else:
+                height = max(height, widget.sizeHint().height())
+        # The price may wrap too (see _fit_rate_columns), and the delegate's own
+        # size hint does not know the column width it will be drawn in.
+        price = item.text(_RATE_COL_PRICE)
+        if price:
+            height = max(height, _wrapped_text_height(
+                tree, price, tree.columnWidth(_RATE_COL_PRICE) - padding) + 8)
+        if height == 0:
+            # A carrier header has no widgets; size it to its text.
+            height = tree.fontMetrics().height()
+        height += gap
+        # On every column: the row is as tall as its tallest size hint, and the
+        # delegate's hint for a word-wrapping text cell guesses at a width it
+        # does not know, which left gaps of 10 to 40px under single-line rows.
+        # The width half of the hint is the text's single-line width, because
+        # sizeHintForColumn reads it back when the columns are next divided.
+        for col in range(tree.columnCount()):
+            text_width = tree.fontMetrics().horizontalAdvance(item.text(col)) + 8
+            item.setSizeHint(col, QSize(text_width, height))
+        total += height
+    # The view caches each row's height from its last layout, and a changed
+    # size hint does not clear that cache: rows measured while column 0 was
+    # narrower kept their old, taller height.
+    tree.doItemsLayout()
+    return total
 
 
 def _fit_columns_to_widgets(table, *, stretch_col: int = 0, padding: int = 20) -> None:
@@ -336,6 +433,23 @@ def _fit_columns_to_widgets(table, *, stretch_col: int = 0, padding: int = 20) -
         table.setColumnWidth(col, width)
 
 
+def _message_carriers(shipment) -> list[str]:
+    """The carrier codes named in a shipment's messages, in order, once each.
+
+    Each of these reported a problem with this particular shipment, so its
+    group, if it quoted anything at all, should not lead the table.
+    """
+    found: list[str] = []
+    for entry in getattr(shipment, "messages", None) or []:
+        if isinstance(entry, dict):
+            carrier = entry.get("carrier")
+        else:
+            carrier = getattr(entry, "carrier", None)
+        if carrier and str(carrier) not in found:
+            found.append(str(carrier))
+    return found
+
+
 # The customs currency map, the declaration shape and the international test
 # used to live here, which is precisely why batch shipments never got them: a
 # second caller cannot import what is private to a view. They are in
@@ -343,6 +457,10 @@ def _fit_columns_to_widgets(table, *, stretch_col: int = 0, padding: int = 20) -
 
 
 class CreateShipmentView(QWidget):
+    # "Track parcel" on a bought label: the window owns navigation, so the view
+    # only asks for the Tracking page.
+    tracking_requested = Signal()
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._pending_task = None
@@ -388,7 +506,13 @@ class CreateShipmentView(QWidget):
 
         content = QWidget()
         content_layout = QVBoxLayout(content)
-        content_layout.addWidget(QLabel(f"<h2>{tr('create_shipment.title')}</h2>"))
+        # The page must fit its window, not the other way round. Anything that
+        # sets a minimum width wider than the page makes the whole page scroll
+        # sideways, and the rates table, which fills the page width, then has
+        # its Buy column off screen. The Tamil title alone asked for 730px.
+        title = QLabel(f"<h2>{tr('create_shipment.title')}</h2>")
+        title.setWordWrap(True)
+        content_layout.addWidget(title)
         content_layout.addWidget(self._build_form_group())
         content_layout.addWidget(self._build_customs_group())
         # Get Rates sits below the Customs section. On an international shipment
@@ -398,13 +522,14 @@ class CreateShipmentView(QWidget):
         # package form as before.
         content_layout.addWidget(self._get_rates_btn)
 
-        # Rates sit beside the purchased label rather than above it, so the
-        # label you just bought is visible without leaving the page — and the
-        # other quotes stay on screen next to it.
-        results_row = QHBoxLayout()
-        results_row.addWidget(self._build_rates_group(), stretch=3)
-        results_row.addWidget(self._build_result_group(), stretch=2)
-        content_layout.addLayout(results_row)
+        # The purchased label sits ABOVE the rates, full width, and stays hidden
+        # until something is bought. It used to share a row with the rates, and
+        # both mistakes followed from that: the rates got three fifths of the
+        # page, which left no room for a service name at the default 1100px
+        # window, and the panel grew to the height of an 85-row rates tree, so
+        # the label was drawn 2,300px down the page where nobody was looking.
+        content_layout.addWidget(self._build_result_group())
+        content_layout.addWidget(self._build_rates_group())
         content_layout.addStretch(1)
 
         # Connected only once every input exists, and after the initial values
@@ -419,6 +544,9 @@ class CreateShipmentView(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(content)
+        # Held so a purchase can bring its result into view (see _reveal_result).
+        self._scroll = scroll
+        self._content = content
         outer_layout = QVBoxLayout(self)
         outer_layout.setContentsMargins(0, 0, 0, 0)
         outer_layout.addWidget(scroll)
@@ -430,22 +558,31 @@ class CreateShipmentView(QWidget):
     def _build_form_group(self) -> QGroupBox:
         group = QGroupBox(tr("create_shipment.details_group"))
         form = QFormLayout()
+        # A label beside a field that cannot fit moves above it instead of
+        # widening the page.
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
 
-        self._from_combo = QComboBox()
-        self._to_combo = QComboBox()
+        self._from_combo = _narrowable_combo()
+        self._to_combo = _narrowable_combo()
+        # Shown while no recipient is chosen, which is how a new shipment starts
+        # (see refresh_address_choices).
+        self._to_combo.setPlaceholderText(tr("create_shipment.to_placeholder"))
         self._from_combo.currentIndexChanged.connect(self._update_customs_visibility)
         self._to_combo.currentIndexChanged.connect(self._update_customs_visibility)
         refresh_btn = QPushButton(tr("create_shipment.reload_button"))
         refresh_btn.clicked.connect(self.refresh_address_choices)
 
+        # From and To on lines of their own. Side by side, with the reload
+        # button, they needed 1,146px in Tamil.
         self._full_address_widget = QWidget()
-        addr_row = QHBoxLayout(self._full_address_widget)
-        addr_row.setContentsMargins(0, 0, 0, 0)
-        addr_row.addWidget(QLabel(tr("create_shipment.from_label")))
-        addr_row.addWidget(self._from_combo, stretch=1)
-        addr_row.addWidget(QLabel(tr("create_shipment.to_label")))
-        addr_row.addWidget(self._to_combo, stretch=1)
-        addr_row.addWidget(refresh_btn)
+        addr_grid = QGridLayout(self._full_address_widget)
+        addr_grid.setContentsMargins(0, 0, 0, 0)
+        addr_grid.addWidget(QLabel(tr("create_shipment.from_label")), 0, 0)
+        addr_grid.addWidget(self._from_combo, 0, 1)
+        addr_grid.addWidget(QLabel(tr("create_shipment.to_label")), 1, 0)
+        addr_grid.addWidget(self._to_combo, 1, 1)
+        addr_grid.addWidget(refresh_btn, 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        addr_grid.setColumnStretch(1, 1)
 
         mode_row = self._build_address_mode_row()
         self._zip_widget = self._build_zip_row()
@@ -496,10 +633,15 @@ class CreateShipmentView(QWidget):
         self._delete_package_btn.clicked.connect(self._on_delete_package_clicked)
         self._delete_package_btn.setEnabled(False)
 
-        package_row = QHBoxLayout()
-        package_row.addWidget(self._package_combo, stretch=1)
-        package_row.addWidget(self._save_package_btn)
-        package_row.addWidget(self._delete_package_btn)
+        # The buttons go under the combo rather than beside it, which was 642px
+        # of minimum width in Tamil before the field's label was counted.
+        package_row = QVBoxLayout()
+        package_row.addWidget(self._package_combo)
+        package_buttons = QHBoxLayout()
+        package_buttons.addWidget(self._save_package_btn)
+        package_buttons.addWidget(self._delete_package_btn)
+        package_buttons.addStretch(1)
+        package_row.addLayout(package_buttons)
 
         # Labels carry the active dimension unit (e.g. "L (cm)"); _apply_units
         # sets their text. The weight unit is shown by the combo beside it.
@@ -513,16 +655,21 @@ class CreateShipmentView(QWidget):
         units_row.addWidget(self._system_combo)
         units_row.addStretch(1)
 
-        dims_row = QHBoxLayout()
-        dims_row.addWidget(self._length_label)
-        dims_row.addWidget(self._length_input)
-        dims_row.addWidget(self._width_label)
-        dims_row.addWidget(self._width_input)
-        dims_row.addWidget(self._height_label)
-        dims_row.addWidget(self._height_input)
-        dims_row.addWidget(self._weight_label)
-        dims_row.addWidget(self._weight_input)
-        dims_row.addWidget(self._weight_unit_combo)
+        # Two pairs to a line: all four in one row did not fit the minimum
+        # window in the longer languages.
+        dims_row = QGridLayout()
+        dims_row.addWidget(self._length_label, 0, 0)
+        dims_row.addWidget(self._length_input, 0, 1)
+        dims_row.addWidget(self._width_label, 0, 2)
+        dims_row.addWidget(self._width_input, 0, 3)
+        dims_row.addWidget(self._height_label, 1, 0)
+        dims_row.addWidget(self._height_input, 1, 1)
+        dims_row.addWidget(self._weight_label, 1, 2)
+        weight_box = QHBoxLayout()
+        weight_box.addWidget(self._weight_input)
+        weight_box.addWidget(self._weight_unit_combo)
+        dims_row.addLayout(weight_box, 1, 3)
+        dims_row.setColumnStretch(4, 1)
 
         form.addRow(mode_row)
         form.addRow(self._full_address_widget)
@@ -578,7 +725,7 @@ class CreateShipmentView(QWidget):
         group.setLayout(group_layout)
         return group
 
-    def _build_address_mode_row(self) -> QHBoxLayout:
+    def _build_address_mode_row(self) -> QVBoxLayout:
         """Full addresses (can buy a label) vs postal codes only (price check).
 
         A quick "what would this cost?" doesn't need a saved, verified address
@@ -590,10 +737,10 @@ class CreateShipmentView(QWidget):
         self._mode_full_radio.setChecked(True)
         self._mode_full_radio.toggled.connect(self._on_address_mode_changed)
 
-        row = QHBoxLayout()
+        # One above the other: side by side they were 776px in Tamil.
+        row = QVBoxLayout()
         row.addWidget(self._mode_full_radio)
         row.addWidget(self._mode_zip_radio)
-        row.addStretch(1)
         return row
 
     def _build_zip_row(self) -> QWidget:
@@ -605,14 +752,15 @@ class CreateShipmentView(QWidget):
         self._to_country_combo = self._country_combo()
 
         widget = QWidget()
-        row = QHBoxLayout(widget)
-        row.setContentsMargins(0, 0, 0, 0)
-        row.addWidget(QLabel(tr("create_shipment.from_label")))
-        row.addWidget(self._from_zip_input, stretch=1)
-        row.addWidget(self._from_country_combo)
-        row.addWidget(QLabel(tr("create_shipment.to_label")))
-        row.addWidget(self._to_zip_input, stretch=1)
-        row.addWidget(self._to_country_combo)
+        grid = QGridLayout(widget)
+        grid.setContentsMargins(0, 0, 0, 0)
+        grid.addWidget(QLabel(tr("create_shipment.from_label")), 0, 0)
+        grid.addWidget(self._from_zip_input, 0, 1)
+        grid.addWidget(self._from_country_combo, 0, 2)
+        grid.addWidget(QLabel(tr("create_shipment.to_label")), 1, 0)
+        grid.addWidget(self._to_zip_input, 1, 1)
+        grid.addWidget(self._to_country_combo, 1, 2)
+        grid.setColumnStretch(1, 1)
         return widget
 
     @staticmethod
@@ -1181,7 +1329,6 @@ class CreateShipmentView(QWidget):
         group = QGroupBox(tr("create_shipment.rates_group"))
         rate_columns = [
             tr("create_shipment.col_carrier_service"),
-            tr("create_shipment.col_enhancements"),
             tr("create_shipment.col_rate"),
             tr("create_shipment.col_est_days"),
             "",
@@ -1220,19 +1367,33 @@ class CreateShipmentView(QWidget):
         self._rates_tree = QTreeWidget()
         self._rates_tree.setColumnCount(_RATE_COLUMN_COUNT)
         self._rates_tree.setHeaderLabels(rate_columns)
+        # Headers elide rather than take width from the service name, so the
+        # whole word stays one hover away.
+        for col, text in enumerate(rate_columns):
+            if text:
+                self._rates_tree.headerItem().setToolTip(col, text)
+        # Row heights set explicitly per item (see _fit_rate_rows) only take
+        # effect when rows are not all assumed to match the first.
+        self._rates_tree.setUniformRowHeights(False)
+        # Lets a price wrap between words when the service name needs the room.
+        self._rates_tree.setWordWrap(True)
+        # The columns are divided up from the tree's width, and that width
+        # changes with the window. Sizing once, when rates arrived, left a tree
+        # laid out for 1100px inside an 880px window.
+        self._rates_tree_width = -1
+        self._rates_tree.installEventFilter(self)
         header = self._rates_tree.header()
-        # All four text columns are divided explicitly in _fit_rate_columns,
-        # which runs on every rebuild. Stretch on column 0 plus ResizeToContents
-        # on the rest looks right and is not: ResizeToContents measures the
-        # HEADER as well as the data, so a language with long header words took
-        # the width out of the service name — the one column that must never be
-        # cut. The Buy column holds a widget Qt won't measure at all, so it stays
-        # Fixed and is sized to the widest button in _resize_rates_tree_to_content.
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(_RATE_COLUMN_COUNT - 1, QHeaderView.ResizeMode.Fixed)
+        # The text columns are divided explicitly in _fit_rate_columns, which
+        # runs on every rebuild and resize. Stretch on column 0 plus
+        # ResizeToContents on the rest looks right and is not: ResizeToContents
+        # measures the HEADER as well as the data, so a language with long
+        # header words took the width out of the service name — the one column
+        # that must never be cut. The Buy column holds a widget Qt won't measure
+        # at all, so it stays Fixed and is sized to the widest button in
+        # _resize_rates_tree_to_content.
+        for col in (_RATE_COL_SERVICE, _RATE_COL_PRICE, _RATE_COL_DAYS):
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(_RATE_COL_BUY, QHeaderView.ResizeMode.Fixed)
         # Don't let Qt stretch the last (Buy) section — it's sized to the button,
         # and a stretched final column would swallow col 0's slack.
         header.setStretchLastSection(False)
@@ -1254,24 +1415,51 @@ class CreateShipmentView(QWidget):
         self._quote_only_note.setStyleSheet(f"color: {TEXT_MUTED};")
         self._quote_only_note.setVisible(False)
 
+        # Which currency Cheapest and Fastest were judged in, stated only when
+        # the rates span more than one: otherwise a cheaper-looking figure in
+        # another currency without the badge reads as a mistake.
+        self._currency_note = QLabel("")
+        self._currency_note.setWordWrap(True)
+        self._currency_note.setStyleSheet(f"color: {TEXT_MUTED};")
+        self._currency_note.setVisible(False)
+
         # Why a carrier is absent from the table above. EasyPost reports this on
         # the shipment's `messages`, which nothing previously read, so a carrier
-        # that declined to quote simply vanished without explanation.
+        # that declined to quote simply vanished without explanation. The raw
+        # text is carrier configuration jargon ("credentials.client_id:
+        # Required") that reads as the app being broken, so a plain summary
+        # naming the carriers comes first and the raw lines wait behind a toggle.
+        self._carrier_notes_summary = QLabel("")
+        self._carrier_notes_summary.setWordWrap(True)
+        self._carrier_notes_summary.setStyleSheet(f"color: {TEXT_MUTED};")
+        self._carrier_notes_toggle = QPushButton(tr("create_shipment.carrier_notes_show"))
+        self._carrier_notes_toggle.setCheckable(True)
+        self._carrier_notes_toggle.toggled.connect(self._on_carrier_notes_toggled)
+        notes_row = QHBoxLayout()
+        notes_row.setContentsMargins(0, 0, 0, 0)
+        notes_row.addWidget(self._carrier_notes_summary, stretch=1)
+        notes_row.addWidget(self._carrier_notes_toggle, alignment=Qt.AlignmentFlag.AlignTop)
+        self._carrier_notes_row = QWidget()
+        self._carrier_notes_row.setLayout(notes_row)
+        self._carrier_notes_row.setVisible(False)
         self._carrier_notes_label = QLabel("")
         self._carrier_notes_label.setWordWrap(True)
         self._carrier_notes_label.setStyleSheet(f"color: {TEXT_MUTED};")
+        self._carrier_notes_label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+        )
         self._carrier_notes_label.setVisible(False)
 
         layout = QVBoxLayout()
         layout.addWidget(self._carrier_filter_row)
         layout.addWidget(self._rates_tree)
         layout.addWidget(self._carrier_filter_note)
+        layout.addWidget(self._currency_note)
         layout.addWidget(self._quote_only_note)
+        layout.addWidget(self._carrier_notes_row)
         layout.addWidget(self._carrier_notes_label)
-        # Packs everything to the top. The tree is sized to its rows, and this
-        # group shares a row with the taller Purchased label panel, so the slack
-        # was handed out as gaps between the filter, the tree and its note —
-        # which only showed once filtering made the tree short.
+        # Packs everything to the top, so any slack never shows as gaps between
+        # the filter, the tree and its notes.
         layout.addStretch(1)
         group.setLayout(layout)
         return group
@@ -1292,54 +1480,61 @@ class CreateShipmentView(QWidget):
         return display_carrier(carrier, blank="—")
 
     def _build_rate_service_cell(self, rate, *, cheapest: bool, fastest: bool) -> QWidget:
-        """The service cell of a child row: the humanised service name plus any
-        cheapest/fastest marker. Unlike the old flat-table identity cell this
-        carries no carrier chip — the carrier is the parent (group) row now."""
-        cell = QWidget()
-        row = QHBoxLayout(cell)
-        row.setContentsMargins(6, 4, 6, 4)
-        row.setSpacing(8)
+        """The service cell of a child row: the humanised service name, and on a
+        line beneath it any cheapest / fastest marker followed by what the
+        service includes (tracked / signed / guaranteed).
+
+        The markers used to sit beside the name and the "included" badges in a
+        column of their own, and each competed with the name for the same width;
+        at the default window both lost ("Royal", "Che", "Guarante"). On their
+        own line a badge never truncates and never costs the name a character.
+        The name word-wraps as a last resort, when the window is too narrow for
+        it on one line, and the row is then made tall enough (_fit_rate_rows).
+        """
+        cell = _ServiceCell()
+        column = QVBoxLayout(cell)
+        column.setContentsMargins(6, 4, 6, 4)
+        column.setSpacing(3)
+        # Stretches either side keep the name and badges together, centred like
+        # the price and the Buy button, when the row is taller than they are.
+        column.addStretch(1)
         service = self._humanize_service(getattr(rate, "service", "") or "") or "—"
         service_label = QLabel(service)
-        # The column clips very long names rather than widening the tree, so
-        # carry the full text in a tooltip.
+        service_label.setObjectName(_SERVICE_NAME)
+        service_label.setWordWrap(True)
         service_label.setToolTip(service)
-        row.addWidget(service_label)
-        if cheapest:
-            row.addWidget(badge(tr("create_shipment.badge_cheapest")))
-        if fastest:
-            row.addWidget(badge(tr("create_shipment.badge_fastest"), tone="muted"))
-        row.addStretch(1)
-        return cell
+        column.addWidget(service_label)
 
-    def _build_rate_enhancements_cell(self, rate) -> QWidget | None:
-        """The "Included" cell: one muted badge per enhancement the service
-        advertises (tracked / signed / guaranteed), or None when it has none so
-        the caller can leave the cell blank. These describe what the service
-        *includes* and are kept apart from the cheapest/fastest ranking markers,
-        which stay in the service identity cell."""
-        enhancements = _service_enhancements(rate)
-        if not enhancements:
-            return None
+        chips = []
+        if cheapest:
+            chips.append(badge(tr("create_shipment.badge_cheapest")))
+        if fastest:
+            chips.append(badge(tr("create_shipment.badge_fastest"), tone="muted"))
         labels = {
             "tracked": tr("create_shipment.badge_tracked"),
             "signed": tr("create_shipment.badge_signed"),
             "guaranteed": tr("create_shipment.badge_guaranteed"),
         }
-        cell = QWidget()
-        row = QHBoxLayout(cell)
-        row.setContentsMargins(6, 4, 6, 4)
-        row.setSpacing(4)
-        for key in enhancements:
-            row.addWidget(badge(labels[key], tone="muted"))
-        row.addStretch(1)
+        chips += [badge(labels[key], tone="muted") for key in _service_enhancements(rate)]
+        if chips:
+            badges = QWidget()
+            badges.setObjectName(_SERVICE_BADGES)
+            row = QHBoxLayout(badges)
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(4)
+            for chip in chips:
+                row.addWidget(chip)
+            row.addStretch(1)
+            column.addWidget(badges)
+        column.addStretch(1)
         return cell
 
     def _populate_rates_tree(self, rates, cheapest_id, fastest_id) -> None:
         """Build the carrier-grouped tree: one top-level row per carrier with
-        its services as children. Carriers are ordered by their cheapest real
-        rate (account-billed-only carriers last); within a carrier the
-        real-priced services come first, then the account-billed ones."""
+        its services as children, in the order rate_rules.order_carriers gives
+        (carriers that can quote this route in its currency first). Within a
+        carrier the real-priced services come first, cheapest first, then the
+        account-billed ones by name."""
         tree = self._rates_tree
         tree.clear()
 
@@ -1347,17 +1542,19 @@ class CreateShipmentView(QWidget):
         for rate in rates:
             by_carrier.setdefault(getattr(rate, "carrier", "") or "", []).append(rate)
 
-        for carrier in self._order_carriers(by_carrier):
+        order = rate_rules.order_carriers(
+            rates,
+            currency=getattr(self, "_rate_currency", None),
+            declined=getattr(self, "_declined_carriers", ()),
+        )
+        for carrier in order:
             carrier_rates = by_carrier[carrier]
-            # Real-priced services first (cheapest first); then the
-            # account-billed services, whose sub-penny figure isn't a comparable
-            # price, ordered by name.
             real = sorted(
-                (r for r in carrier_rates if not _is_account_billed(r)),
-                key=_rate_sort_key,
+                (r for r in carrier_rates if not rate_rules.is_account_billed(r)),
+                key=rate_rules.sort_key,
             )
             billed = sorted(
-                (r for r in carrier_rates if _is_account_billed(r)),
+                (r for r in carrier_rates if rate_rules.is_account_billed(r)),
                 key=lambda r: (getattr(r, "service", "") or "").lower(),
             )
             group_rates = real + billed
@@ -1365,7 +1562,7 @@ class CreateShipmentView(QWidget):
             display = self._carrier_display_name(carrier)
             # A carrier header carries the name and a count but is not itself a
             # rate — no enhancements, no price, no est. days, no Buy button.
-            parent = QTreeWidgetItem([f"{display} ({len(group_rates)})", "", "", "", ""])
+            parent = QTreeWidgetItem([f"{display} ({len(group_rates)})", "", "", ""])
             tree.addTopLevelItem(parent)
 
             has_cheapest = False
@@ -1406,35 +1603,17 @@ class CreateShipmentView(QWidget):
             self._carrier_filter_note.setText("")
         self._carrier_filter_note.setVisible(bool(self._carrier_filter_note.text()))
 
-    def _order_carriers(self, by_carrier: dict[str, list]) -> list[str]:
-        """Carriers with a real (non-account-billed) rate first, ordered by that
-        carrier's cheapest real rate; carriers offering only account-billed
-        rates (real price unknown) go last, alphabetically."""
-        priced: list[tuple[float, str]] = []
-        billed_only: list[str] = []
-        for carrier, carrier_rates in by_carrier.items():
-            real = [r for r in carrier_rates if not _is_account_billed(r)]
-            if real:
-                priced.append((min(_rate_sort_key(r) for r in real), carrier))
-            else:
-                billed_only.append(carrier)
-        priced.sort(key=lambda pair: (pair[0], pair[1]))
-        billed_only.sort()
-        return [carrier for _key, carrier in priced] + billed_only
-
     def _add_rate_child(self, parent, rate, *, cheapest: bool, fastest: bool) -> None:
         tree = self._rates_tree
-        # Columns: service cell (0), enhancements (1), rate (2), est days (3),
-        # Buy (last). Cols 0/1/last hold widgets, so their text is left blank.
-        child = QTreeWidgetItem(parent, ["", "", _format_price(rate), _format_delivery(rate), ""])
+        # Columns: service cell (0), rate (1), est days (2), Buy (last). The
+        # service and Buy columns hold widgets, so their text is left blank.
+        child = QTreeWidgetItem(parent, ["", _format_price(rate), _format_delivery(rate), ""])
+        if rate_rules.delivery_days(rate) is None:
+            child.setToolTip(_RATE_COL_DAYS, tr("create_shipment.delivery_unknown"))
         tree.setItemWidget(
-            child, 0, self._build_rate_service_cell(rate, cheapest=cheapest, fastest=fastest)
+            child, _RATE_COL_SERVICE,
+            self._build_rate_service_cell(rate, cheapest=cheapest, fastest=fastest),
         )
-        # Enhancement badges (tracked / signed / guaranteed) — only set a widget
-        # when the service has any, so a plain service leaves the cell blank.
-        enhancements_cell = self._build_rate_enhancements_cell(rate)
-        if enhancements_cell is not None:
-            tree.setItemWidget(child, 1, enhancements_cell)
 
         buy_btn = QPushButton(tr("create_shipment.buy_button"))
         if self._quote_only:
@@ -1448,7 +1627,14 @@ class CreateShipmentView(QWidget):
             # A redraw during a purchase (the carrier filter) must not hand back
             # live buttons.
             self._apply_buy_button_state(buy_btn)
-        tree.setItemWidget(child, _RATE_COLUMN_COUNT - 1, buy_btn)
+        # Wrapped so the button keeps its own height, vertically centred, in a
+        # row made taller by a badge line; given the cell directly, Qt stretched
+        # it to the full row.
+        holder = QWidget()
+        holder_layout = QVBoxLayout(holder)
+        holder_layout.setContentsMargins(0, 0, 4, 0)
+        holder_layout.addWidget(buy_btn, alignment=Qt.AlignmentFlag.AlignVCenter)
+        tree.setItemWidget(child, _RATE_COL_BUY, holder)
 
     def _apply_buy_button_state(self, button: QPushButton) -> None:
         if self._label_bought:
@@ -1465,97 +1651,125 @@ class CreateShipmentView(QWidget):
         for i in range(tree.topLevelItemCount()):
             top = tree.topLevelItem(i)
             for j in range(top.childCount()):
-                button = tree.itemWidget(top.child(j), _RATE_COLUMN_COUNT - 1)
+                button = _buy_button(tree, top.child(j))
                 if button is not None:
                     self._apply_buy_button_state(button)
 
     def _resize_rates_tree_to_content(self, *_args) -> None:
         """Size the tree to show every currently-visible row in full instead of
         scrolling internally — the outer QScrollArea handles overflow.
-        Recomputed whenever a carrier group is expanded or collapsed.
+        Recomputed whenever a carrier group is expanded or collapsed, and when
+        the tree's width changes (see eventFilter).
 
-        Qt's row-height machinery measures the item delegate, which knows
-        nothing about a cell widget, so a service row is measured from the
-        service cell and Buy button; a carrier header row (no widgets) falls
-        back to the delegate's own text height. The Buy column likewise holds a
-        widget Qt won't measure, so it's sized to the widest button here.
+        The Buy column holds a widget Qt won't measure, so it's sized to the
+        widest button here. Then the text columns are divided around it, and
+        only then can the rows be measured, because a wrapped service name is
+        as tall as its column is narrow.
         """
         tree = self._rates_tree
-        total_height = tree.header().height() + 2 * tree.frameWidth()
         buy_width = 0
-
-        def measure(item) -> None:
-            nonlocal total_height, buy_width
-            widget_height = 0
-            for col in range(tree.columnCount()):
-                widget = tree.itemWidget(item, col)
-                if widget is not None:
-                    widget_height = max(widget_height, widget.sizeHint().height())
-            buy = tree.itemWidget(item, _RATE_COLUMN_COUNT - 1)
+        for item in _rate_rows(tree):
+            buy = _buy_button(tree, item)
             if buy is not None:
                 buy_width = max(buy_width, buy.sizeHint().width())
-            if widget_height == 0:
-                # A carrier header has no widgets; size it to its text.
-                widget_height = tree.fontMetrics().height()
-            # +8 so a row's widget isn't flush against its borders, and so the
-            # (slightly generous) total never underestimates and clips a row.
-            total_height += widget_height + 8
-
-        for i in range(tree.topLevelItemCount()):
-            top = tree.topLevelItem(i)
-            measure(top)
-            if top.isExpanded():
-                for j in range(top.childCount()):
-                    measure(top.child(j))
-
         if buy_width:
-            tree.setColumnWidth(_RATE_COLUMN_COUNT - 1, buy_width + 16)
-        # After the Buy column, because it is one of the fixed costs the text
-        # columns are divided around.
+            tree.setColumnWidth(_RATE_COL_BUY, buy_width + 20)
         _fit_rate_columns(tree)
-        tree.setFixedHeight(total_height + 2)
+        rows = _fit_rate_rows(tree)
+        tree.setFixedHeight(tree.header().sizeHint().height() + rows + 2 * tree.frameWidth() + 2)
+
+    def eventFilter(self, watched, event) -> bool:
+        tree = getattr(self, "_rates_tree", None)
+        if (
+            watched is tree
+            and event.type() == QEvent.Type.Resize
+            and tree.width() != self._rates_tree_width
+        ):
+            # Width only: setFixedHeight in the resize below is itself a resize,
+            # and re-running on it would loop.
+            # Deferred: an event filter runs before the tree's own resize
+            # handling, so the viewport still has its old width at this point.
+            self._rates_tree_width = tree.width()
+            if tree.topLevelItemCount():
+                QTimer.singleShot(0, self, self._resize_rates_tree_to_content)
+        return super().eventFilter(watched, event)
 
     def _build_result_group(self) -> QGroupBox:
-        group = QGroupBox(tr("create_shipment.result_group"))
+        """The bought label: preview beside the tracking number and what to do
+        next. Hidden until a purchase succeeds, then scrolled to (_reveal_result).
 
-        # The label itself, drawn in-app. Previously this group only offered
-        # "open in browser" / "save as PDF", so you never actually saw what
-        # you had just paid for without leaving the app.
+        This replaces a "Label purchased successfully" dialog that said nothing
+        the page should not have shown, and a raw S3 address nobody can use.
+        """
+        group = QGroupBox(tr("create_shipment.result_group"))
+        self._result_group = group
+
+        # The label itself, drawn in-app, at a fixed 4x6 shape and pinned to the
+        # top, so it is on screen as soon as the panel is.
         self._label_preview = QLabel(tr("create_shipment.preview_placeholder"))
-        self._label_preview.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._label_preview.setAlignment(
+            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop
+        )
         self._label_preview.setWordWrap(True)
-        self._label_preview.setMinimumHeight(260)
+        self._label_preview.setFixedSize(240, 360)
         self._label_preview.setStyleSheet(
             f"color: {TEXT_MUTED}; border: 1px dashed #d9dee5; border-radius: 8px; padding: 8px;"
         )
 
-        self._result_label = QLabel(tr("create_shipment.no_label_yet"))
+        self._result_heading = QLabel(f"<h3>{tr('create_shipment.purchased_body')}</h3>")
+        self._result_label = QLabel("")
         self._result_label.setWordWrap(True)
+        # A tracking number is something people copy into an email.
+        self._result_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
 
-        self._open_label_btn = QPushButton(tr("create_shipment.open_label_button"))
-        self._open_label_btn.setEnabled(False)
-        self._open_label_btn.clicked.connect(self._on_open_label)
-
+        self._print_label_btn = QPushButton(tr("create_shipment.print_label_button"))
+        self._print_label_btn.clicked.connect(self._on_print_label)
         self._save_label_btn = QPushButton(tr("create_shipment.save_label_button"))
         self._save_label_btn.setEnabled(False)
         self._save_label_btn.clicked.connect(self._on_save_label)
+        self._open_label_btn = QPushButton(tr("create_shipment.open_label_button"))
+        self._open_label_btn.setEnabled(False)
+        self._open_label_btn.clicked.connect(self._on_open_label)
+        self._track_btn = QPushButton(tr("create_shipment.track_button"))
+        self._track_btn.clicked.connect(self.tracking_requested.emit)
 
-        button_row = QHBoxLayout()
-        button_row.addWidget(self._open_label_btn)
-        button_row.addWidget(self._save_label_btn)
-        button_row.addStretch(1)
+        details = QVBoxLayout()
+        details.addWidget(self._result_heading)
+        details.addWidget(self._result_label)
+        for button in (self._print_label_btn, self._save_label_btn,
+                       self._open_label_btn, self._track_btn):
+            row = QHBoxLayout()
+            row.addWidget(button)
+            row.addStretch(1)
+            details.addLayout(row)
+        details.addStretch(1)
 
-        layout = QVBoxLayout()
-        layout.addWidget(self._label_preview, stretch=1)
-        layout.addWidget(self._result_label)
-        layout.addLayout(button_row)
+        layout = QHBoxLayout()
+        layout.addWidget(self._label_preview, alignment=Qt.AlignmentFlag.AlignTop)
+        layout.addLayout(details, stretch=1)
         group.setLayout(layout)
+        group.setVisible(False)
         return group
+
+    def _reveal_result(self) -> None:
+        """Scroll the page so the result panel's top is at the top of the view.
+
+        The Buy button that was just clicked can be thousands of pixels down an
+        85-row tree. Repeated one turn of the event loop later, because the panel
+        has only just been shown and its position settles once the layout runs.
+        """
+        def scroll() -> None:
+            self._content.layout().activate()
+            top = self._result_group.mapTo(self._content, QPoint(0, 0)).y()
+            self._scroll.verticalScrollBar().setValue(max(0, top - 8))
+
+        scroll()
+        QTimer.singleShot(0, self, scroll)
 
     def _load_label_preview(self, url: str) -> None:
         """Fetch and draw the purchased label. Qt has no PDF engine, so a PDF
         label falls back to the open/save buttons with a note."""
-        if not url.lower().split("?")[0].endswith(_PREVIEWABLE_SUFFIXES):
+        if not _is_previewable(url):
             self._label_preview.setText(tr("create_shipment.preview_unavailable"))
             return
 
@@ -1583,15 +1797,41 @@ class CreateShipmentView(QWidget):
         )
 
     def refresh_address_choices(self) -> None:
-        self._from_combo.clear()
-        self._to_combo.clear()
+        """Reload the saved addresses into From and To.
+
+        From starts on the first address, which list_addresses orders
+        favourites first, so it is the sender a user has marked as theirs. To
+        starts EMPTY. Both used to start on that same first address, so the first
+        quote a new customer saw was for posting a parcel to themselves, with
+        live Buy buttons; guessing "the other address" instead would still be a
+        guess, and a wrong guess is a label addressed to the wrong person. An
+        empty To costs one click and cannot be bought from by accident.
+
+        This runs every time the page is shown, so whatever the user already
+        chose is kept when it still exists. Rebuilding the lists used to reset
+        both to the first address on every visit, and throw the rates away.
+        """
+        previous_from = self._from_combo.currentData()
+        previous_to = self._to_combo.currentData()
         records = list_addresses()
         self._address_by_id = {rec.id: rec for rec in records}
-        for rec in records:
-            display = address_choice_label(rec)
-            self._from_combo.addItem(display, rec.id)
-            self._to_combo.addItem(display, rec.id)
+        for combo in (self._from_combo, self._to_combo):
+            combo.blockSignals(True)
+            combo.clear()
+            for rec in records:
+                combo.addItem(address_choice_label(rec), rec.id)
+        self._from_combo.setCurrentIndex(
+            max(self._from_combo.findData(previous_from), 0) if records else -1
+        )
+        # findData returns -1 for nothing chosen, which is the empty placeholder.
+        self._to_combo.setCurrentIndex(self._to_combo.findData(previous_to))
+        for combo in (self._from_combo, self._to_combo):
+            combo.blockSignals(False)
         self._update_customs_visibility()
+        if (self._from_combo.currentData(), self._to_combo.currentData()) != (
+            previous_from, previous_to
+        ):
+            self._invalidate_rates()
 
     def _on_signature_changed(self, *_args) -> None:
         """Signature level changes which services carriers quote, so any rates
@@ -1670,6 +1910,9 @@ class CreateShipmentView(QWidget):
         match. Starting one supersedes any request still in flight."""
         self._rates_generation += 1
         self._rating_in_flight = True
+        # A new quote is a new shipment. The last label stays in History; left
+        # here it would sit above rates it has nothing to do with.
+        self._result_group.setVisible(False)
         self._get_rates_btn.setEnabled(False)
         self._get_rates_btn.setText(tr("create_shipment.fetching_rates_button"))
         return self._rates_generation
@@ -1697,12 +1940,31 @@ class CreateShipmentView(QWidget):
 
         from_id = self._from_combo.currentData()
         to_id = self._to_combo.currentData()
-        if not from_id or not to_id:
+        if self._from_combo.count() < 2 or not from_id:
             QMessageBox.warning(
                 self,
                 tr("create_shipment.missing_addresses_title"),
                 tr("create_shipment.missing_addresses_body"),
             )
+            return
+        if not to_id:
+            # There are addresses to choose from; the user has not chosen one.
+            # "Verify at least two addresses first" would send them to the
+            # Address Book for nothing.
+            QMessageBox.warning(
+                self,
+                tr("create_shipment.missing_addresses_title"),
+                tr("create_shipment.missing_recipient_body"),
+            )
+            self._to_combo.setFocus()
+            return
+        if from_id == to_id:
+            QMessageBox.warning(
+                self,
+                tr("create_shipment.same_address_title"),
+                tr("create_shipment.same_address_body"),
+            )
+            self._to_combo.setFocus()
             return
 
         customs_info = None
@@ -1803,18 +2065,35 @@ class CreateShipmentView(QWidget):
         self._current_shipment = shipment
         self._label_bought = False
 
-        all_rates = sorted(getattr(shipment, "rates", None) or [], key=_rate_sort_key)
+        all_rates = sorted(getattr(shipment, "rates", None) or [], key=rate_rules.sort_key)
         # Drop non-purchasable placeholder rates (e.g. Royal Mail V3 catalogue
         # services that don't apply to the route, priced at 0.01). Account-billed
         # Royal Mail rates sit below the threshold too but ARE buyable, so
-        # _is_placeholder_rate keeps them. If filtering would empty the list,
+        # is_placeholder_rate keeps them. If filtering would empty the list,
         # fall back to showing everything so a genuine all-low-cost result is
         # never hidden.
-        real_rates = [r for r in all_rates if not _is_placeholder_rate(r)]
+        real_rates = [r for r in all_rates if not rate_rules.is_placeholder_rate(r)]
         rates = real_rates or all_rates
         self._rates = rates
-        self._cheapest_id = _cheapest_rate_id(rates)
-        self._fastest_id = _fastest_rate_id(rates)
+        # Badges and carrier order are judged in one currency, the sender's when
+        # anything is quoted in it (see rate_rules.comparison_currency).
+        self._rate_currency = rate_rules.comparison_currency(
+            rates, preferred=self._sender_currency()
+        )
+        self._declined_carriers = _message_carriers(shipment)
+        self._cheapest_id = rate_rules.cheapest_rate_id(rates, currency=self._rate_currency)
+        self._fastest_id = rate_rules.fastest_rate_id(rates, currency=self._rate_currency)
+        currencies = {
+            (getattr(r, "currency", "") or "").upper()
+            for r in rates if rate_rules.is_priced(r)
+        }
+        if self._rate_currency and len(currencies) > 1:
+            self._currency_note.setText(
+                tr("create_shipment.badges_currency_note", currency=self._rate_currency)
+            )
+        else:
+            self._currency_note.setText("")
+        self._currency_note.setVisible(bool(self._currency_note.text()))
 
         self._quote_only_note.setVisible(self._quote_only)
         # Offer only the carriers that quoted, then honour the carrier implied
@@ -1834,8 +2113,7 @@ class CreateShipmentView(QWidget):
         # call succeeded, so this is not an error — but without it a carrier
         # just goes missing from the table with no explanation at all.
         notes = carrier_messages(shipment)
-        self._carrier_notes_label.setText("\n".join(notes))
-        self._carrier_notes_label.setVisible(bool(notes))
+        self._show_carrier_notes(notes)
 
         if not rates:
             body = tr("create_shipment.no_rates_body")
@@ -1844,6 +2122,45 @@ class CreateShipmentView(QWidget):
             QMessageBox.information(
                 self, tr("create_shipment.no_rates_title"), body
             )
+
+    def _sender_currency(self) -> str | None:
+        """The sender's own currency, or None when the country is not one the
+        customs table knows (then the majority of quotes decides)."""
+        if self._mode_zip_radio.isChecked():
+            country = self._from_country_combo.currentData()
+        else:
+            record = self._address_by_id.get(self._from_combo.currentData())
+            country = getattr(record, "country", None)
+        return customs.CURRENCY_BY_COUNTRY.get((country or "").upper())
+
+    def _show_carrier_notes(self, notes: list[str]) -> None:
+        carriers: list[str] = []
+        for carrier in getattr(self, "_declined_carriers", ()):
+            name = self._carrier_display_name(carrier)
+            if name not in carriers:
+                carriers.append(name)
+        if notes and carriers:
+            self._carrier_notes_summary.setText(
+                tr("create_shipment.carrier_notes_summary", carriers=", ".join(carriers))
+            )
+        else:
+            self._carrier_notes_summary.setText("")
+        self._carrier_notes_label.setText("\n".join(notes))
+        # With no carrier named there is nothing to summarise, so the notes
+        # themselves are the only explanation and are shown as they are.
+        summarised = bool(self._carrier_notes_summary.text())
+        self._carrier_notes_row.setVisible(summarised)
+        self._carrier_notes_toggle.blockSignals(True)
+        self._carrier_notes_toggle.setChecked(False)
+        self._carrier_notes_toggle.setText(tr("create_shipment.carrier_notes_show"))
+        self._carrier_notes_toggle.blockSignals(False)
+        self._carrier_notes_label.setVisible(bool(notes) and not summarised)
+
+    def _on_carrier_notes_toggled(self, shown: bool) -> None:
+        self._carrier_notes_label.setVisible(shown)
+        self._carrier_notes_toggle.setText(
+            tr("create_shipment.carrier_notes_hide" if shown else "create_shipment.carrier_notes_show")
+        )
 
     def _on_rates_failed(self, exc: Exception) -> None:
         self._end_rating()
@@ -1908,34 +2225,46 @@ class CreateShipmentView(QWidget):
 
         postage_label = getattr(shipment, "postage_label", None)
         label_url = getattr(postage_label, "label_url", None) if postage_label else None
-        tracking_code = getattr(shipment, "tracking_code", "")
+        tracking_code = getattr(shipment, "tracking_code", "") or ""
 
+        self._result_label.setText(
+            tr("create_shipment.tracking_number", tracking_code=tracking_code)
+            if tracking_code else ""
+        )
+        self._result_label.setVisible(bool(tracking_code))
+        self._track_btn.setVisible(bool(tracking_code))
         if label_url:
-            self._result_label.setText(
-                tr(
-                    "create_shipment.purchased_result_text",
-                    tracking_code=tracking_code,
-                    label_url=label_url,
-                )
-            )
             self._open_label_btn.setEnabled(True)
             self._save_label_btn.setEnabled(True)
             self._pending_label_url = label_url
             self._pending_label_file_type = getattr(postage_label, "label_file_type", None)
+            # The print sheet lays out label images; a PDF or thermal-printer
+            # label is opened or saved instead.
+            self._print_label_btn.setVisible(_is_previewable(label_url))
             self._load_label_preview(label_url)
         else:
-            self._result_label.setText(tr("create_shipment.purchased_no_label"))
-            self._label_preview.setText(tr("create_shipment.preview_placeholder"))
+            self._pending_label_url = None
+            self._open_label_btn.setEnabled(False)
+            self._save_label_btn.setEnabled(False)
+            self._print_label_btn.setVisible(False)
+            self._label_preview.setText(tr("create_shipment.purchased_no_label"))
 
-        QMessageBox.information(
-            self, tr("create_shipment.purchased_title"), tr("create_shipment.purchased_body")
-        )
+        # In place of a modal "Label purchased successfully": the panel says the
+        # same thing, and closing a dialog left the customer looking at the Buy
+        # button they had just pressed rather than at the label.
+        self._result_group.setVisible(True)
+        self._reveal_result()
 
         # A bought label is the moment of satisfaction, so it is where the review
         # prompt belongs. Both calls are no-ops on builds with no storefront, and
         # every other gate is applied inside them.
         note_successful_shipment()
         schedule_review_prompt(self)
+
+    def _on_print_label(self) -> None:
+        url = getattr(self, "_pending_label_url", None)
+        if url:
+            PrintSheetDialog([url], self).exec()
 
     def _on_open_label(self) -> None:
         if getattr(self, "_pending_label_url", None):

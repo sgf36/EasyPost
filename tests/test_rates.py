@@ -90,23 +90,103 @@ def test_module_does_not_import_qt():
     assert result.returncode == 0, result.stderr
 
 
-# The Create Shipment view still carries private copies of these rules; a
-# follow-up switches it to app.services.rates. Until then this stops the two
-# drifting apart unnoticed.
-PARITY_CASES = [
-    rate("a", "USPS", "7.04"), rate("b", "USPS", "0.01"), rate("c", "RoyalMailV3", "0.01"),
-    rate("d", "RoyalMail", "0.019"), rate("e", "RoyalMailV3", "5.10"), rate("f", "UPS", None),
-    rate("g", "FedEx", "abc"), rate("h", "DHL", "0.02"), rate("i", "RoyalMail", ""),
+def rated(rid, carrier, amount, currency, days=None):
+    r = rate(rid, carrier=carrier, amount=amount, currency=currency)
+    r.delivery_days = days
+    return r
+
+
+# The shape of a real US to US quote from an account with Royal Mail connected
+# as well: Royal Mail answers in pounds, with one real price and the rest of its
+# catalogue billed to the account, and none of it can be bought for this route.
+US_ROUTE = [
+    rated("rm_48", "RoyalMailV3", "3.25", "GBP", 2),
+    rated("rm_billed", "RoyalMailV3", "0.01", "GBP", 1),
+    rated("usps_ga", "USPS", "7.04", "USD", 2),
+    rated("usps_exp", "USPS", "39.05", "USD", 1),
+    rated("fedex_ground", "FedExDefault", "7.01", "USD", 3),
+    rated("ups_ground", "UPSDAP", "16.75", "USD", 2),
 ]
 
 
-def test_view_private_copies_agree_with_the_service():
-    view = pytest.importorskip("app.ui.views.create_shipment_view")
-    if not hasattr(view, "_is_account_billed"):
-        pytest.skip("the view now uses app.services.rates; delete this test")
-    for case in PARITY_CASES:
-        assert view._is_account_billed(case) == rates.is_account_billed(case), case
-        assert view._is_placeholder_rate(case) == rates.is_placeholder_rate(case), case
-    assert view._cheapest_rate_id(PARITY_CASES) == rates.cheapest_rate_id(PARITY_CASES)
-    assert view._MIN_REAL_RATE == rates.MIN_REAL_RATE
-    assert set(view._ACCOUNT_BILLED_CARRIERS) == set(rates.ACCOUNT_BILLED_CARRIERS)
+def test_cheapest_never_compares_across_currencies():
+    # 3.25 GBP is a smaller number than 7.01 USD, and that is all it is.
+    assert rates.cheapest_rate_id(US_ROUTE) == "fedex_ground"
+
+
+def test_comparison_currency_is_the_majority_of_real_quotes():
+    assert rates.comparison_currency(US_ROUTE) == "USD"
+
+
+def test_the_senders_currency_wins_when_anything_is_quoted_in_it():
+    assert rates.comparison_currency(US_ROUTE, preferred="GBP") == "GBP"
+    assert rates.cheapest_rate_id(US_ROUTE, preferred="gbp") == "rm_48"
+
+
+def test_a_preferred_currency_nobody_quoted_in_falls_back_to_the_majority():
+    assert rates.comparison_currency(US_ROUTE, preferred="EUR") == "USD"
+
+
+def test_markers_do_not_vote_for_a_currency():
+    # Sixty account-billed Royal Mail rows must not outvote three real quotes.
+    offered = [rated(f"rm{i}", "RoyalMailV3", "0.01", "GBP") for i in range(60)]
+    offered += [rated("usps", "USPS", "7.04", "USD"), rated("ups", "UPSDAP", "9.00", "USD")]
+    assert rates.comparison_currency(offered) == "USD"
+
+
+def test_comparison_currency_is_none_when_nothing_is_priced():
+    assert rates.comparison_currency([rated("rm", "RoyalMail", "0.01", "GBP")]) is None
+    assert rates.comparison_currency([]) is None
+
+
+def test_comparison_currency_tie_is_stable():
+    offered = [rated("a", "USPS", "5.00", "USD"), rated("b", "RoyalMailV3", "4.00", "GBP")]
+    assert rates.comparison_currency(offered) == "GBP"
+    assert rates.comparison_currency(list(reversed(offered))) == "GBP"
+
+
+def test_an_explicit_currency_is_honoured():
+    assert rates.cheapest_rate_id(US_ROUTE, currency="GBP") == "rm_48"
+
+
+def test_placeholders_are_never_cheapest():
+    offered = [rated("ph", "USPS", "0.01", "USD"), rated("real", "USPS", "8.00", "USD")]
+    assert rates.cheapest_rate_id(offered) == "real"
+
+
+def test_fastest_is_judged_among_the_same_rates_as_cheapest():
+    # The account-billed Royal Mail row claims one day, as does USPS Express.
+    # Only the one that can be bought on this route is recommended.
+    assert rates.fastest_rate_id(US_ROUTE) == "usps_exp"
+
+
+def test_fastest_ignores_rates_with_no_estimate():
+    offered = [rated("slow", "USPS", "5", "USD", 5), rated("none", "USPS", "4", "USD"),
+               rated("quick", "USPS", "9", "USD", 1)]
+    assert rates.fastest_rate_id(offered) == "quick"
+
+
+def test_fastest_is_none_when_nobody_quoted_days():
+    assert rates.fastest_rate_id([rated("a", "USPS", "5", "USD")]) is None
+    assert rates.fastest_rate_id([]) is None
+
+
+@pytest.mark.parametrize("value, expected", [(3, 3), ("2", 2), (None, None), ("soon", None)])
+def test_delivery_days(value, expected):
+    assert rates.delivery_days(SimpleNamespace(delivery_days=value)) == expected
+
+
+def test_carriers_that_cannot_quote_in_the_routes_currency_do_not_lead():
+    order = rates.order_carriers(US_ROUTE, currency="USD")
+    assert order == ["FedExDefault", "USPS", "UPSDAP", "RoyalMailV3"]
+
+
+def test_carriers_with_only_markers_go_last():
+    offered = [rated("rm", "RoyalMailV3", "0.01", "GBP"), rated("evri", "Evri", "3.20", "GBP"),
+               rated("dpd", "DPDUK", "6.50", "EUR")]
+    assert rates.order_carriers(offered, currency="GBP") == ["Evri", "DPDUK", "RoyalMailV3"]
+
+
+def test_a_carrier_that_reported_a_problem_sorts_after_one_that_did_not():
+    offered = [rated("fx", "FedEx", "5.00", "USD"), rated("ups", "UPSDAP", "9.00", "USD")]
+    assert rates.order_carriers(offered, currency="USD", declined=["FedEx"]) == ["UPSDAP", "FedEx"]

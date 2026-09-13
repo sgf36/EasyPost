@@ -213,6 +213,9 @@ class MainWindow(QMainWindow):
         self._dashboard_view.history_requested.connect(
             lambda: self._show_view(self._history_view)
         )
+        self._create_shipment_view.tracking_requested.connect(
+            lambda: self._show_view(self._tracking_view)
+        )
 
     def _show_view(self, view: QWidget) -> None:
         """Open a page by selecting its sidebar entry, so the sidebar highlight
