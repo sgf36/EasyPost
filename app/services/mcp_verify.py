@@ -23,8 +23,19 @@ import re
 from typing import Optional
 
 from app.core.client import client_manager
+from app.services.rates import is_account_billed, is_placeholder_rate, rate_amount
 
 _CONTROL = re.compile(r"[\x00-\x1f\x7f]")
+
+
+def _refuse_placeholder(rate, rate_id: str) -> None:
+    """A catalogue placeholder cannot be bought, and its 0.01 would sail under
+    every ceiling, so it is never queued for a person to approve."""
+    if is_placeholder_rate(rate):
+        raise ValueError(
+            f"Rate {rate_id} is a catalogue placeholder priced at {getattr(rate, 'rate', '?')}, "
+            "not a real quote, and cannot be bought. Choose another rate."
+        )
 
 
 def clean(value, limit: int = 120) -> str:
@@ -72,11 +83,8 @@ def verify_shipment_purchase(shipment_id: str, rate_id: str) -> tuple[dict, Opti
             "Refusing to buy a rate that does not belong to this shipment."
         )
 
-    amount = None
-    try:
-        amount = float(getattr(match, "rate", None))
-    except (TypeError, ValueError):
-        amount = None
+    _refuse_placeholder(match, rate_id)
+    amount = rate_amount(match)
 
     summary = {
         "kind": "shipment",
@@ -86,6 +94,9 @@ def verify_shipment_purchase(shipment_id: str, rate_id: str) -> tuple[dict, Opti
         "price": clean(getattr(match, "rate", None), 20),
         "currency": clean(getattr(match, "currency", None), 10),
         "delivery_days": clean(getattr(match, "delivery_days", None), 10),
+        # Decided here, from the rate EasyPost returned, so the ceilings and
+        # the approval card never have to reinterpret a bare 0.01.
+        "account_billed": is_account_billed(match),
         "to": _address_line(getattr(shipment, "to_address", None)),
         "from": _address_line(getattr(shipment, "from_address", None)),
         "mode": client_manager.active_mode,
@@ -121,10 +132,8 @@ def verify_pickup_purchase(pickup_id: str, rate_id: str) -> tuple[dict, Optional
         raise ValueError(
             f"Rate {rate_id} is not one of the pickup rates on {pickup_id}."
         )
-    try:
-        amount = float(getattr(match, "rate", None))
-    except (TypeError, ValueError):
-        amount = None
+    _refuse_placeholder(match, rate_id)
+    amount = rate_amount(match)
     summary = {
         "kind": "pickup",
         "pickup_id": clean(pickup_id, 40),
@@ -132,6 +141,7 @@ def verify_pickup_purchase(pickup_id: str, rate_id: str) -> tuple[dict, Optional
         "service": clean(getattr(match, "service", None), 60),
         "price": clean(getattr(match, "rate", None), 20),
         "currency": clean(getattr(match, "currency", None), 10),
+        "account_billed": is_account_billed(match),
         "mode": client_manager.active_mode,
     }
     return summary, amount, summary["currency"] or None

@@ -14,6 +14,7 @@ import json
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QCheckBox,
+    QComboBox,
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
@@ -44,8 +45,12 @@ from app.core.mcp_relay_client import (
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
 from app.services.mcp_runner import execute_approved
-from app.ui.theme import TEXT_MUTED
+from app.ui.theme import DANGER, TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
+
+# Offered for the limit currency. Codes, not names: they read the same in every
+# locale. A value saved outside this list is kept and added to it.
+_LIMIT_CURRENCIES = ("USD", "GBP", "EUR", "CAD", "AUD")
 
 
 class ConnectAgentsView(QWidget):
@@ -256,9 +261,19 @@ class ConnectAgentsView(QWidget):
         self._daily_limit.setValue(settings.mcp_daily_limit)
         self._daily_limit.valueChanged.connect(self._on_settings_changed)
 
+        self._limit_currency = QComboBox()
+        current = mcp_approvals.limit_currency(settings)
+        codes = list(_LIMIT_CURRENCIES)
+        if current not in codes:
+            codes.append(current)
+        self._limit_currency.addItems(codes)
+        self._limit_currency.setCurrentText(current)
+        self._limit_currency.currentTextChanged.connect(self._on_settings_changed)
+
         limits = QFormLayout()
         limits.addRow(tr("connect_agents.max_purchase_label"), self._max_purchase)
         limits.addRow(tr("connect_agents.daily_limit_label"), self._daily_limit)
+        limits.addRow(tr("connect_agents.limit_currency_label"), self._limit_currency)
 
         explain = QLabel(tr("connect_agents.safety_explainer"))
         explain.setWordWrap(True)
@@ -278,6 +293,7 @@ class ConnectAgentsView(QWidget):
         settings.mcp_allow_spending = self._spending_check.isChecked()
         settings.mcp_max_purchase = self._max_purchase.value()
         settings.mcp_daily_limit = self._daily_limit.value()
+        settings.mcp_limit_currency = self._limit_currency.currentText()
         save_settings(settings)
         self._spending_check.setEnabled(settings.mcp_enabled)
         # The remote-access opt-in only makes sense while AI access is on.
@@ -448,11 +464,17 @@ class ConnectAgentsView(QWidget):
 
         # Every value here came from EasyPost via mcp_verify, not from the
         # agent. That is the whole point of the dialog.
+        if summary.get("account_billed"):
+            # The 0.01 on the rate is a marker, not the price; showing it as an
+            # amount is how a tired approver reads a Special Delivery label as
+            # costing a penny.
+            amount_text = tr("create_shipment.billed_to_account")
+        else:
+            amount_text = f"{summary.get('price', '—')} {summary.get('currency', '')}"
         lines = [
             f"<b>{tr('connect_agents.field_carrier')}:</b> {summary.get('carrier', '—')} "
             f"{summary.get('service', '')}",
-            f"<b>{tr('connect_agents.field_amount')}:</b> {summary.get('price', '—')} "
-            f"{summary.get('currency', '')}",
+            f"<b>{tr('connect_agents.field_amount')}:</b> {amount_text}",
             f"<b>{tr('connect_agents.field_to')}:</b> {summary.get('to', '—')}",
             f"<b>{tr('connect_agents.field_from')}:</b> {summary.get('from', '—')}",
             f"<b>{tr('connect_agents.field_mode')}:</b> {summary.get('mode', '—')}",
@@ -463,6 +485,13 @@ class ConnectAgentsView(QWidget):
         provenance = QLabel(tr("connect_agents.verified_note"))
         provenance.setWordWrap(True)
         provenance.setStyleSheet(f"color: {TEXT_MUTED}; font-size: 11px;")
+
+        unchecked = self._unchecked_reason_text(request, summary.get(mcp_approvals.UNCHECKED_KEY))
+        unchecked_label = None
+        if unchecked:
+            unchecked_label = QLabel(unchecked)
+            unchecked_label.setWordWrap(True)
+            unchecked_label.setStyleSheet(f"color: {DANGER};")
 
         approve = QPushButton(tr("connect_agents.approve_button"))
         approve.setObjectName("primary")
@@ -477,33 +506,89 @@ class ConnectAgentsView(QWidget):
 
         layout = QVBoxLayout()
         layout.addWidget(detail)
+        if unchecked_label is not None:
+            layout.addWidget(unchecked_label)
         layout.addWidget(provenance)
         layout.addLayout(buttons)
         card.setLayout(layout)
         return card
 
+    def _unchecked_reason_text(self, request, reason) -> str:
+        """Why the spending limits could not check this request, in words."""
+        summary = request.summary or {}
+        if reason == mcp_approvals.UNCHECKED_ACCOUNT_BILLED:
+            return tr("connect_agents.unchecked_account_billed",
+                      carrier=summary.get("carrier", "?"))
+        if reason == mcp_approvals.UNCHECKED_CURRENCY:
+            return tr("connect_agents.unchecked_currency",
+                      currency=request.currency or summary.get("currency") or "?",
+                      limit_currency=mcp_approvals.limit_currency(load_settings()))
+        return ""
+
     def _on_approve(self, request) -> None:
+        reason = (request.summary or {}).get(mcp_approvals.UNCHECKED_KEY)
+        if not self._confirm_spend(request, reason):
+            return
+        self._run_approval(request, acknowledge_unchecked=bool(reason))
+
+    def _confirm_spend(self, request, reason) -> bool:
+        summary = request.summary or {}
+        if reason:
+            # A different question, not a footnote: the person is agreeing to
+            # a purchase no limit has measured, and has to be told so.
+            body = tr("connect_agents.confirm_unchecked_body",
+                      carrier=summary.get("carrier", "?"),
+                      mode=summary.get("mode", "?"),
+                      reason=self._unchecked_reason_text(request, reason))
+        else:
+            body = tr("connect_agents.confirm_spend_body",
+                      amount=summary.get("price", "?"),
+                      currency=summary.get("currency", ""),
+                      carrier=summary.get("carrier", "?"),
+                      mode=summary.get("mode", "?"))
         confirm = QMessageBox.question(
             self,
             tr("connect_agents.confirm_spend_title"),
-            tr("connect_agents.confirm_spend_body",
-               amount=request.summary.get("price", "?"),
-               currency=request.summary.get("currency", ""),
-               carrier=request.summary.get("carrier", "?"),
-               mode=request.summary.get("mode", "?")),
+            body,
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
-        if confirm != QMessageBox.StandardButton.Yes:
-            return
-        self._pending_task = run_async(lambda r=request: execute_approved(r.id), self)
-        self._pending_task.succeeded.connect(lambda _r: self.refresh_approvals())
+        return confirm == QMessageBox.StandardButton.Yes
+
+    def _run_approval(self, request, *, acknowledge_unchecked: bool) -> None:
+        self._pending_task = run_async(
+            lambda r=request, ack=acknowledge_unchecked: execute_approved(
+                r.id, acknowledge_unchecked=ack
+            ),
+            self,
+        )
+        self._pending_task.succeeded.connect(self._on_approval_finished)
         self._pending_task.failed.connect(
-            lambda exc: QMessageBox.critical(self, tr("common.error"), str(exc))
+            lambda exc, r=request: self._on_approval_failed(r, exc)
         )
 
+    def _on_approval_finished(self, result) -> None:
+        warning = (result or {}).get("warning")
+        if warning:
+            QMessageBox.warning(self, tr("connect_agents.result_title"),
+                                tr("connect_agents.bought_not_saved", error=warning))
+        self.refresh_approvals()
+
+    def _on_approval_failed(self, request, exc) -> None:
+        if isinstance(exc, mcp_approvals.CeilingNotChecked):
+            # Queued before the reason was recorded on the request, or the
+            # limit currency changed since. Nothing was bought; ask properly.
+            self.refresh_approvals()
+            if self._confirm_spend(request, exc.reason):
+                self._run_approval(request, acknowledge_unchecked=True)
+            return
+        self.refresh_approvals()
+        QMessageBox.critical(self, tr("common.error"), str(exc))
+
     def _on_reject(self, request) -> None:
-        mcp_approvals.set_status(request.id, "rejected")
+        # Conditional, so a Reject clicked while that purchase is already
+        # running cannot relabel a bought label as rejected.
+        mcp_approvals.reject_if_pending(request.id)
         self.refresh_approvals()
 
     # ----------------------------------------------------------------- public

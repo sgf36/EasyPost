@@ -94,14 +94,14 @@ def test_per_purchase_ceiling_refuses_rather_than_prompting():
     with patch("app.core.mcp_approvals.client_manager") as cm:
         cm.active_mode = "production"
         with pytest.raises(SpendLimitExceeded, match="per-purchase limit"):
-            check_ceilings(120.0, settings)
+            check_ceilings(120.0, settings, "USD")
 
 
 def test_amount_under_the_ceiling_is_allowed_through():
     settings = AppSettings(mcp_max_purchase=50.0, mcp_daily_limit=0)
     with patch("app.core.mcp_approvals.client_manager") as cm:
         cm.active_mode = "production"
-        check_ceilings(49.99, settings)  # must not raise
+        check_ceilings(49.99, settings, "USD")  # must not raise
 
 
 def test_daily_ceiling_accounts_for_what_was_already_spent():
@@ -110,13 +110,16 @@ def test_daily_ceiling_accounts_for_what_was_already_spent():
          patch("app.core.mcp_approvals.spent_today", return_value=95.0):
         cm.active_mode = "production"
         with pytest.raises(SpendLimitExceeded, match="daily limit"):
-            check_ceilings(20.0, settings)
+            check_ceilings(20.0, settings, "USD")
 
 
-def test_unknown_amount_does_not_bypass_into_an_exception():
-    # A rate whose price could not be parsed still needs human approval, but
-    # should not crash the ceiling check.
-    check_ceilings(None, AppSettings(mcp_max_purchase=10.0, mcp_daily_limit=10.0))
+def test_unknown_amount_is_refused_rather_than_let_through():
+    # A price that cannot be read cannot be held against a limit. Letting it
+    # through made every ceiling optional for any rate with a malformed price.
+    with patch("app.core.mcp_approvals.client_manager") as cm:
+        cm.active_mode = "production"
+        with pytest.raises(SpendLimitExceeded, match="could not be read"):
+            check_ceilings(None, AppSettings(mcp_max_purchase=10.0, mcp_daily_limit=10.0), "USD")
 
 
 # ------------------------------------------------------------------ approvals

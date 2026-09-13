@@ -46,6 +46,7 @@ from app.services import pickups as pickup_svc
 from app.services import shipments as ship_svc
 from app.services import tracking as track_svc
 from app.services.mcp_verify import verify_pickup_purchase, verify_refund, verify_shipment_purchase
+from app.services.rates import is_account_billed
 
 mcp = FastMCP("easypost-desktop")
 
@@ -99,7 +100,10 @@ def get_status() -> str:
             "spending_allowed": settings.mcp_allow_spending,
             "max_per_purchase": settings.mcp_max_purchase,
             "daily_limit": settings.mcp_daily_limit,
-            "spent_today": mcp_approvals.spent_today(client_manager.active_mode),
+            "limit_currency": mcp_approvals.limit_currency(settings),
+            "spent_today": mcp_approvals.spent_today(
+                client_manager.active_mode, mcp_approvals.limit_currency(settings)
+            ),
         }
     )
 
@@ -185,7 +189,8 @@ def quote_by_postal_code(from_postal_code: str, to_postal_code: str, weight_oz: 
     )
     rates = [
         {"id": r.id, "carrier": r.carrier, "service": r.service,
-         "rate": r.rate, "currency": r.currency, "delivery_days": r.delivery_days}
+         "rate": r.rate, "currency": r.currency, "delivery_days": r.delivery_days,
+         "billed_to_account_later": is_account_billed(r)}
         for r in (getattr(shipment, "rates", None) or [])
     ]
     mcp_approvals.audit("quote_by_postal_code",
@@ -205,7 +210,8 @@ def shop_rates(to_address_id: str, from_address_id: str, weight_oz: float,
     )
     rates = [
         {"id": r.id, "carrier": r.carrier, "service": r.service,
-         "rate": r.rate, "currency": r.currency, "delivery_days": r.delivery_days}
+         "rate": r.rate, "currency": r.currency, "delivery_days": r.delivery_days,
+         "billed_to_account_later": is_account_billed(r)}
         for r in (getattr(shipment, "rates", None) or [])
     ]
     mcp_approvals.audit("shop_rates", {"to": to_address_id, "from": from_address_id},
@@ -226,11 +232,19 @@ def _file_request(action: str, args: dict, verifier) -> str:
     # human will see is derived here, not from what the agent asserted.
     summary, amount, currency = verifier()
 
-    try:
-        mcp_approvals.check_ceilings(amount, settings)
-    except mcp_approvals.SpendLimitExceeded as exc:
-        mcp_approvals.audit(action, args, f"refused: {exc}")
-        raise PermissionError(str(exc)) from exc
+    if action not in mcp_approvals.NON_CHARGING_ACTIONS:
+        try:
+            reason = mcp_approvals.assess_ceilings(
+                amount, settings, currency, account_billed=bool(summary.get("account_billed"))
+            )
+        except mcp_approvals.SpendLimitExceeded as exc:
+            mcp_approvals.audit(action, args, f"refused: {exc}")
+            raise PermissionError(str(exc)) from exc
+        # Queued, not refused: Royal Mail account billing and a second currency
+        # are legitimate. The reason travels with the request so the approver is
+        # told the limits did not cover it, and approval insists on that.
+        if reason:
+            summary[mcp_approvals.UNCHECKED_KEY] = reason
 
     request = mcp_approvals.create_request(action, args, summary, amount, currency)
     mcp_approvals.audit(action, args, f"queued {request.id}")

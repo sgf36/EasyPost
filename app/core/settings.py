@@ -63,6 +63,11 @@ class AppSettings:
     mcp_allow_spending: bool = False
     mcp_max_purchase: float = 50.0
     mcp_daily_limit: float = 200.0
+    # The currency both ceilings are measured in. A purchase priced in any
+    # other currency is never converted: it is queued as unchecked and needs
+    # the approver to accept that. The default is only a starting point: if it
+    # is wrong for an account, purchases are asked about, never let through.
+    mcp_limit_currency: str = "USD"
     # The newest release the user has dismissed the "update available" banner
     # for (direct-download builds only — see app/core/update_check.py). The
     # banner reappears only once a version *newer than this* ships, so a
