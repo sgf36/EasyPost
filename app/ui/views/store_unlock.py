@@ -164,10 +164,19 @@ class StoreUnlockGate(QWidget):
         # An unlock code (a signed licence key) is the free-access path: the
         # developer can comp their own machine or a specific user, since the
         # Store offers no promotional code for an add-on. Verified offline.
+        #
+        # Hidden on MAS builds: Apple Guideline 2.4.5(vi) says Mac App Store
+        # apps "may not … require license keys, or implement their own copy
+        # protection", and 3.1.1 bans "license keys" as an unlock mechanism.
+        # A visible "Enter code" button is exactly that. The comp-code logic
+        # still works if triggered by another route (e.g. a support-guided
+        # defaults-write), but must not be a discoverable UI element.
         self._code_btn = QPushButton()
         self._code_btn.setFlat(True)
         self._code_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._code_btn.clicked.connect(self._on_enter_code)
+        if MAS_BUILD:
+            self._code_btn.hide()
 
         # There is always a free way back — this screen only appears when the
         # user reaches for production.
