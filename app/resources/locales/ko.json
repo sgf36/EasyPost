@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "터널 시작 중…",
   "settings.webhook_status_stopped": "실행되지 않음. 추적은 계속해서 5분마다 폴링을 통해 업데이트됩니다.",
   "setup_wizard.account_help": "아직 EasyPost 계정이 없으신가요? <a href=\"{signup_url}\">무료로 만드세요</a>. 이미 계정이 있으신가요? 키는 <a href=\"{keys_url}\">Account settings → API Keys</a>에 있습니다.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "저장하고 계속하기",
   "setup_wizard.key_required_body": "계속하려면 API 키(테스트 또는 프로덕션)를 하나 이상 입력하십시오.",
   "setup_wizard.key_required_title": "API 키 필요",

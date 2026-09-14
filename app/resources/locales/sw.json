@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Inaanzisha handaki…",
   "settings.webhook_status_stopped": "Haifanyi kazi. Ufuatiliaji bado unasasishwa kupitia polling kila dakika 5.",
   "setup_wizard.account_help": "Bado huna akaunti ya EasyPost? <a href=\"{signup_url}\">Fungua moja bila malipo</a>. Tayari unayo? Funguo zako ziko chini ya <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Hifadhi na uendelee",
   "setup_wizard.key_required_body": "Weka angalau funguo moja ya API (jaribio au uzalishaji) ili kuendelea.",
   "setup_wizard.key_required_title": "Funguo ya API inahitajika",

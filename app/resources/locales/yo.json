@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Ń bẹ̀rẹ̀ oju eefin…",
   "settings.webhook_status_stopped": "Kò ń ṣiṣẹ́. Ìtọpasẹ̀ ṣì ń ṣe ìmúdójú nípasẹ̀ polling ní gbogbo ìṣẹ́jú 5.",
   "setup_wizard.account_help": "Ṣé o kò tíì ní àkàǹtì EasyPost? <a href=\"{signup_url}\">Ṣẹ̀dá ọ̀kan lọ́fẹ̀ẹ́</a>. Ṣé o ti ní ọ̀kan? Àwọn kọ́kọ́rọ́ rẹ wà lábẹ́ <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Fi pamọ́ kí o sì tẹ̀síwájú",
   "setup_wizard.key_required_body": "Tẹ kọ́kọ́rọ́ API kan ó kéré jù (ìdánwò tàbí ìṣelọ́pọ̀) sí i láti tẹ̀síwájú.",
   "setup_wizard.key_required_title": "A nílò kọ́kọ́rọ́ API",

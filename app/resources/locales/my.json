@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Tunnel စတင်နေသည်…",
   "settings.webhook_status_stopped": "မလုပ်ဆောင်ပါ။ ခြေရာခံမှုကို ၅ မိနစ်တိုင်း polling ဖြင့် ဆက်လက်အပ်ဒိတ်လုပ်ပါမည်။",
   "setup_wizard.account_help": "EasyPost အကောင့် မရှိသေးပါသလား။ <a href=\"{signup_url}\">အခမဲ့ ဖန်တီးပါ</a>။ အကောင့်ရှိပြီးသားလား။ သင်၏ ကီးများကို <a href=\"{keys_url}\">Account settings → API Keys</a> အောက်တွင် တွေ့နိုင်ပါသည်။",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "သိမ်းဆည်းပြီး ဆက်လက်လုပ်ဆောင်ရန်",
   "setup_wizard.key_required_body": "ဆက်လက်လုပ်ဆောင်ရန် အနည်းဆုံး API သော့တစ်ခု (စမ်းသပ် သို့မဟုတ် ထုတ်လုပ်မှု) ကို ထည့်သွင်းပါ။",
   "setup_wizard.key_required_title": "API သော့ လိုအပ်သည်",

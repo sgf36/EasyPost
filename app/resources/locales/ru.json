@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Запуск туннеля…",
   "settings.webhook_status_stopped": "Не запущено. Отслеживание по-прежнему обновляется через опрос каждые 5 минут.",
   "setup_wizard.account_help": "Ещё нет аккаунта EasyPost? <a href=\"{signup_url}\">Создайте его бесплатно</a>. Аккаунт уже есть? Ключи находятся в разделе <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Сохранить и продолжить",
   "setup_wizard.key_required_body": "Введите хотя бы один ключ API (тестовый или production), чтобы продолжить.",
   "setup_wizard.key_required_title": "Требуется ключ API",

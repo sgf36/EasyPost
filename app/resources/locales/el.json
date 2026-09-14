@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Έναρξη tunnel…",
   "settings.webhook_status_stopped": "Δεν εκτελείται. Η παρακολούθηση συνεχίζει να ενημερώνεται μέσω polling κάθε 5 λεπτά.",
   "setup_wizard.account_help": "Δεν έχετε ακόμη λογαριασμό EasyPost; <a href=\"{signup_url}\">Δημιουργήστε έναν δωρεάν</a>. Έχετε ήδη; Τα κλειδιά σας βρίσκονται στην ενότητα <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Αποθήκευση και συνέχεια",
   "setup_wizard.key_required_body": "Εισαγάγετε τουλάχιστον ένα κλειδί API (δοκιμής ή παραγωγής) για να συνεχίσετε.",
   "setup_wizard.key_required_title": "Απαιτείται κλειδί API",

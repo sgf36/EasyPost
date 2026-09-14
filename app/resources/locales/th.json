@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "กำลังเริ่มต้นทันเนล…",
   "settings.webhook_status_stopped": "ไม่ทำงาน ระบบติดตามยังคงอัปเดตผ่านการโพลทุก 5 นาที",
   "setup_wizard.account_help": "ยังไม่มีบัญชี EasyPost ใช่ไหม <a href=\"{signup_url}\">สร้างบัญชีฟรี</a> มีบัญชีอยู่แล้วใช่ไหม คีย์ของคุณอยู่ที่ <a href=\"{keys_url}\">Account settings → API Keys</a>",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "บันทึกและดำเนินการต่อ",
   "setup_wizard.key_required_body": "กรุณากรอกคีย์ API อย่างน้อยหนึ่งรายการ (ทดสอบหรือใช้งานจริง) เพื่อดำเนินการต่อ",
   "setup_wizard.key_required_title": "ต้องระบุคีย์ API",

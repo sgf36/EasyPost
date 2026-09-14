@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "ටනල් ආරම්භ කරමින්…",
   "settings.webhook_status_stopped": "ක්‍රියාත්මක නොවේ. ලුහුබැඳීම තවමත් සෑම මිනිත්තු 5කට වරක් polling හරහා යාවත්කාලීන වේ.",
   "setup_wizard.account_help": "තවම EasyPost ගිණුමක් නැද්ද? <a href=\"{signup_url}\">නොමිලේ එකක් සාදන්න</a>. දැනටමත් ගිණුමක් තිබේද? ඔබේ යතුරු <a href=\"{keys_url}\">Account settings → API Keys</a> යටතේ ඇත.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "සුරකින්න සහ ඉදිරියට යන්න",
   "setup_wizard.key_required_body": "ඉදිරියට යාමට අවම වශයෙන් එක් API යතුරක් (පරීක්ෂණ හෝ නිෂ්පාදන) ඇතුළත් කරන්න.",
   "setup_wizard.key_required_title": "API යතුර අවශ්‍යයි",

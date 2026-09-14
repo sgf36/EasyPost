@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Startar tunnel…",
   "settings.webhook_status_stopped": "Körs inte. Spårningen uppdateras fortfarande via polling var 5:e minut.",
   "setup_wizard.account_help": "Har du inget EasyPost-konto än? <a href=\"{signup_url}\">Skapa ett kostnadsfritt</a>. Har du redan ett? Dina nycklar finns under <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Spara och fortsätt",
   "setup_wizard.key_required_body": "Ange minst en API-nyckel (test eller produktion) för att fortsätta.",
   "setup_wizard.key_required_title": "API-nyckel krävs",

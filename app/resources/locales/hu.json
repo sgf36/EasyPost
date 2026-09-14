@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Alagút indítása…",
   "settings.webhook_status_stopped": "Nem fut. A követés továbbra is 5 percenkénti lekérdezéssel frissül.",
   "setup_wizard.account_help": "Még nincs EasyPost-fiókja? <a href=\"{signup_url}\">Hozzon létre egyet ingyen</a>. Már van? A kulcsait itt találja: <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Mentés és folytatás",
   "setup_wizard.key_required_body": "A folytatáshoz adjon meg legalább egy API-kulcsot (teszt vagy éles).",
   "setup_wizard.key_required_title": "API-kulcs szükséges",

@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Na-amalite tunnel…",
   "settings.webhook_status_stopped": "Anaghị arụ ọrụ. Nleba anya ka na-emelite site na nyocha kwa nkeji 5.",
   "setup_wizard.account_help": "Ị nweghị akaụntụ EasyPost ka? <a href=\"{signup_url}\">Mepụta otu n'efu</a>. Ị nweelarị otu? Igodo gị dị n'okpuru <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Chekwaa ma gaa n'ihu",
   "setup_wizard.key_required_body": "Tinye opekata mpe otu igodo API (nnwale ma ọ bụ mmepụta) iji gaa n'ihu.",
   "setup_wizard.key_required_title": "Achọrọ Igodo API",
