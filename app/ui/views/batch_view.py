@@ -6,7 +6,6 @@ shipments come back with ``rates: []`` and ``selected_rate: None``, and
 carrier and service are declared up front through the ServicePicker instead.
 """
 
-import webbrowser
 from pathlib import Path
 
 from PySide6.QtCore import QTimer
@@ -56,6 +55,7 @@ from app.services.batches import (
 )
 from app.services.label_sheets import build_combined_labels
 from app.services.packages import predefined_package_choices
+from app.ui.open_file import open_label
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
@@ -700,7 +700,7 @@ class BatchView(QWidget):
                 )
                 == QMessageBox.StandardButton.Yes
             ):
-                webbrowser.open(label_url)
+                open_label(label_url)
 
     def _on_buy_batch(self) -> None:
         if not self._current_batch:
@@ -838,7 +838,7 @@ class BatchView(QWidget):
                 tr("batch_shipments.export_sheet_title"),
                 tr("print_sheet.some_failed", failed=len(result.failed)),
             )
-        webbrowser.open(Path(path).as_uri())
+        open_label(path)
 
     def _generate_labels_remote(self) -> None:
         """Ask EasyPost to merge the labels — the fallback path."""
