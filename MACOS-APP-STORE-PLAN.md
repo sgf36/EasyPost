@@ -216,8 +216,7 @@ lets us **drop** `network.server`, tightening the sandbox):
 |---|---|
 | `com.apple.security.app-sandbox` | required for MAS |
 | `com.apple.security.network.client` | EasyPost API, USITC HTS, StoreKit, push/MCP relay |
-| `com.apple.security.files.user-selected.read-write` | open a CSV, save a label to a chosen folder |
-| `com.apple.security.files.downloads.read-write` | optional: drop labels straight into `~/Downloads` |
+| `com.apple.security.files.user-selected.read-write` | open a CSV, save a label to a chosen folder (Powerbox covers ~/Downloads when the user picks it) |
 | `com.apple.security.print` | print labels |
 | `keychain-access-groups` | Keychain credential storage (and sharing with the MCP companion, route 3.2b) |
 | `com.apple.security.application-groups` | only if the MCP companion (3.2b) shares the container |

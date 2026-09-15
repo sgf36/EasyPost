@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "ಟನಲ್ ಪ್ರಾರಂಭಿಸಲಾಗುತ್ತಿದೆ…",
   "settings.webhook_status_stopped": "ಚಾಲನೆಯಲ್ಲಿಲ್ಲ. ಟ್ರ್ಯಾಕಿಂಗ್ ಇನ್ನೂ ಪ್ರತಿ 5 ನಿಮಿಷಗಳಿಗೊಮ್ಮೆ ಪೋಲಿಂಗ್ ಮೂಲಕ ಅಪ್‌ಡೇಟ್ ಆಗುತ್ತದೆ.",
   "setup_wizard.account_help": "ಇನ್ನೂ EasyPost ಖಾತೆ ಇಲ್ಲವೇ? <a href=\"{signup_url}\">ಉಚಿತವಾಗಿ ಒಂದನ್ನು ರಚಿಸಿ</a>. ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ? ನಿಮ್ಮ ಕೀಲಿಗಳು <a href=\"{keys_url}\">Account settings → API Keys</a> ಅಡಿಯಲ್ಲಿವೆ.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "ಉಳಿಸಿ ಮತ್ತು ಮುಂದುವರಿಸಿ",
   "setup_wizard.key_required_body": "ಮುಂದುವರಿಯಲು ಕನಿಷ್ಠ ಒಂದು API ಕೀ (ಟೆಸ್ಟ್ ಅಥವಾ ಪ್ರೊಡಕ್ಷನ್) ನಮೂದಿಸಿ.",
   "setup_wizard.key_required_title": "API ಕೀ ಅಗತ್ಯವಿದೆ",

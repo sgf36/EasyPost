@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "ٹنل شروع ہو رہی ہے…",
   "settings.webhook_status_stopped": "چل نہیں رہا۔ ٹریکنگ اب بھی ہر 5 منٹ میں پولنگ کے ذریعے اپ ڈیٹ ہوتی ہے۔",
   "setup_wizard.account_help": "ابھی تک EasyPost اکاؤنٹ نہیں ہے؟ <a href=\"{signup_url}\">مفت اکاؤنٹ بنائیں</a>۔ پہلے سے اکاؤنٹ ہے؟ آپ کی کلیدیں <a href=\"{keys_url}\">Account settings → API Keys</a> میں موجود ہیں۔",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "محفوظ کریں اور جاری رکھیں",
   "setup_wizard.key_required_body": "جاری رکھنے کے لیے کم از کم ایک API کلید (ٹیسٹ یا پروڈکشن) درج کریں۔",
   "setup_wizard.key_required_title": "API کلید درکار ہے",

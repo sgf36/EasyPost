@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "ଟନେଲ ଆରମ୍ଭ ହେଉଛି…",
   "settings.webhook_status_stopped": "ଚାଲୁ ନାହିଁ। ଟ୍ରାକିଙ୍ଗ ପ୍ରତି ୫ ମିନିଟରେ ପୋଲିଂ ମାଧ୍ୟମରେ ଅପଡେଟ ହେଉଛି।",
   "setup_wizard.account_help": "ଏପର୍ଯ୍ୟନ୍ତ EasyPost ଆକାଉଣ୍ଟ ନାହିଁ କି? <a href=\"{signup_url}\">ମାଗଣାରେ ଗୋଟିଏ ତିଆରି କରନ୍ତୁ</a>। ପୂର୍ବରୁ ଆକାଉଣ୍ଟ ଅଛି କି? ଆପଣଙ୍କ କୀ <a href=\"{keys_url}\">Account settings → API Keys</a> ରେ ଅଛି।",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "ସେଭ୍ କରି ଜାରି ରଖନ୍ତୁ",
   "setup_wizard.key_required_body": "ଜାରି ରଖିବାକୁ ଅତିକମରେ ଗୋଟିଏ API କି (ଟେଷ୍ଟ କିମ୍ବା ପ୍ରୋଡକ୍ସନ) ଦିଅନ୍ତୁ।",
   "setup_wizard.key_required_title": "API କି ଆବଶ୍ୟକ",

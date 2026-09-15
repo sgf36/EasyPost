@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Запуск тунелю…",
   "settings.webhook_status_stopped": "Не запущено. Відстеження й надалі оновлюється через опитування кожні 5 хвилин.",
   "setup_wizard.account_help": "Ще не маєте облікового запису EasyPost? <a href=\"{signup_url}\">Створіть його безкоштовно</a>. Уже маєте? Ваші ключі знаходяться в розділі <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Зберегти й продовжити",
   "setup_wizard.key_required_body": "Введіть принаймні один ключ API (тестовий або робочий), щоб продовжити.",
   "setup_wizard.key_required_title": "Потрібен ключ API",

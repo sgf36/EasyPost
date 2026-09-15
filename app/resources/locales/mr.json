@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "बोगदा सुरू होत आहे…",
   "settings.webhook_status_stopped": "सुरू नाही. ट्रॅकिंग अजूनही दर 5 मिनिटांनी पोलिंगद्वारे अपडेट होते.",
   "setup_wizard.account_help": "अद्याप EasyPost खाते नाही? <a href=\"{signup_url}\">विनामूल्य खाते तयार करा</a>. आधीच खाते आहे? तुमच्या की <a href=\"{keys_url}\">Account settings → API Keys</a> येथे आहेत.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "जतन करा आणि पुढे जा",
   "setup_wizard.key_required_body": "पुढे जाण्यासाठी किमान एक API की (टेस्ट किंवा प्रॉडक्शन) प्रविष्ट करा.",
   "setup_wizard.key_required_title": "API की आवश्यक",

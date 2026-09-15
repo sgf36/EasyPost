@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Miwiti tunnel…",
   "settings.webhook_status_stopped": "Ora mlaku. Pelacakan isih dianyari liwat polling saben 5 menit.",
   "setup_wizard.account_help": "Durung duwe akun EasyPost? <a href=\"{signup_url}\">Gawe akun gratis</a>. Wis duwe? Kunci sampeyan ana ing <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Simpen lan terusake",
   "setup_wizard.key_required_body": "Lebokake paling sethithik siji kunci API (uji utawa produksi) kanggo nerusake.",
   "setup_wizard.key_required_title": "Kunci API dibutuhake",

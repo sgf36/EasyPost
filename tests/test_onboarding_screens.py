@@ -194,6 +194,31 @@ def test_setup_shows_real_key_prefixes_and_a_route_to_an_account(qt_app):
     assert f'href="{EASYPOST_API_KEYS_URL}"' in help_text
 
 
+def test_mas_setup_shows_plain_text_urls_not_clickable_links(qt_app, monkeypatch):
+    """On MAS builds, the setup wizard must not open a browser (Guideline 4).
+    The EasyPost URLs are displayed as selectable plain text instead."""
+    import app.ui.views.setup_wizard as sw
+    from app.ui.views.setup_wizard import (
+        EASYPOST_API_KEYS_URL,
+        EASYPOST_SIGNUP_URL,
+        SetupWizard,
+    )
+
+    monkeypatch.setattr(sw, "MAS_BUILD", True)
+    wizard = SetupWizard()
+    help_text = wizard._account_help_label.text()
+    # Must contain the bare URLs (not wrapped in <a> tags)
+    assert EASYPOST_SIGNUP_URL in help_text
+    assert EASYPOST_API_KEYS_URL in help_text
+    # Must NOT contain HTML link markup
+    assert "<a " not in help_text
+    assert "href=" not in help_text
+    # Must be plain-text format, not rich text
+    from PySide6.QtCore import Qt
+
+    assert wizard._account_help_label.textFormat() == Qt.TextFormat.PlainText
+
+
 def test_every_catalogue_keeps_both_account_links_and_the_prefixes():
     for code, _english, _native in SUPPORTED_LOCALES:
         catalogue = _catalogue(code)
@@ -317,6 +342,16 @@ def test_the_mac_gate_describes_multi_seat_licensing_without_linking_out(qt_app,
     assert "<a" not in label.text()
     gate._on_multi_seat()
     assert opened == []
+
+
+def test_the_mac_gate_hides_the_enter_code_button(qt_app, monkeypatch):
+    """Guideline 2.4.5(vi) and 3.1.1 prohibit licence-key entry in MAS apps.
+    The button must be hidden on MAS builds but visible on Store builds."""
+    gate_mas, _s1, _o1 = _gate(qt_app, monkeypatch, mas_build=True)
+    assert gate_mas._code_btn.isHidden()
+
+    gate_store, _s2, _o2 = _gate(qt_app, monkeypatch, mas_build=False)
+    assert not gate_store._code_btn.isHidden()
 
 
 def test_the_unlock_gate_shows_the_store_price_only_when_the_store_gives_one(qt_app, monkeypatch):

@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "ਟਨਲ ਸ਼ੁਰੂ ਹੋ ਰਹੀ ਹੈ…",
   "settings.webhook_status_stopped": "ਚੱਲ ਨਹੀਂ ਰਿਹਾ। ਟਰੈਕਿੰਗ ਹਰ 5 ਮਿੰਟਾਂ ਵਿੱਚ ਪੋਲਿੰਗ ਰਾਹੀਂ ਅਜੇ ਵੀ ਅੱਪਡੇਟ ਹੁੰਦੀ ਹੈ।",
   "setup_wizard.account_help": "ਅਜੇ ਤੱਕ EasyPost ਖਾਤਾ ਨਹੀਂ ਹੈ? <a href=\"{signup_url}\">ਮੁਫ਼ਤ ਵਿੱਚ ਇੱਕ ਬਣਾਓ</a>। ਪਹਿਲਾਂ ਹੀ ਖਾਤਾ ਹੈ? ਤੁਹਾਡੀਆਂ ਕੁੰਜੀਆਂ <a href=\"{keys_url}\">Account settings → API Keys</a> ਹੇਠ ਹਨ।",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "ਸੰਭਾਲੋ ਅਤੇ ਜਾਰੀ ਰੱਖੋ",
   "setup_wizard.key_required_body": "ਜਾਰੀ ਰੱਖਣ ਲਈ ਘੱਟੋ-ਘੱਟ ਇੱਕ API ਕੁੰਜੀ (ਟੈਸਟ ਜਾਂ ਉਤਪਾਦਨ) ਦਰਜ ਕਰੋ।",
   "setup_wizard.key_required_title": "API ਕੁੰਜੀ ਲੋੜੀਂਦੀ ਹੈ",

@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Iyaqala ithane…",
   "settings.webhook_status_stopped": "Ayisebenzi. Ukulandelela kusalungiswa nge-polling njalo ngemizuzu emi-5.",
   "setup_wizard.account_help": "Awukabi nayo i-akhawunti ye-EasyPost? <a href=\"{signup_url}\">Yakha eyodwa mahhala</a>. Usunayo? Okhiye bakho batholakala ngaphansi kwe-<a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Gcina bese uqhubeka",
   "setup_wizard.key_required_body": "Faka okungenani ikhiya le-API elilodwa (lokuhlola noma lokusebenza) ukuze uqhubeke.",
   "setup_wizard.key_required_title": "Ikhiya le-API liyadingeka",

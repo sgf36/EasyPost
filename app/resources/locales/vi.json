@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Đang khởi động đường hầm…",
   "settings.webhook_status_stopped": "Không chạy. Việc theo dõi vẫn được cập nhật qua polling mỗi 5 phút.",
   "setup_wizard.account_help": "Chưa có tài khoản EasyPost? <a href=\"{signup_url}\">Tạo tài khoản miễn phí</a>. Đã có tài khoản? Khóa của bạn nằm ở <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Lưu và tiếp tục",
   "setup_wizard.key_required_body": "Nhập ít nhất một khóa API (thử nghiệm hoặc sản xuất) để tiếp tục.",
   "setup_wizard.key_required_title": "Cần có khóa API",

@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "టన్నెల్ ప్రారంభమవుతోంది…",
   "settings.webhook_status_stopped": "నడవడం లేదు. ట్రాకింగ్ ఇప్పటికీ ప్రతి 5 నిమిషాలకు పోలింగ్ ద్వారా అప్‌డేట్ అవుతుంది.",
   "setup_wizard.account_help": "ఇంకా EasyPost ఖాతా లేదా? <a href=\"{signup_url}\">ఉచితంగా ఒకటి సృష్టించండి</a>. ఇప్పటికే ఖాతా ఉందా? మీ కీలు <a href=\"{keys_url}\">Account settings → API Keys</a> కింద ఉన్నాయి.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "సేవ్ చేసి కొనసాగించండి",
   "setup_wizard.key_required_body": "కొనసాగించడానికి కనీసం ఒక API కీని (టెస్ట్ లేదా ప్రొడక్షన్) నమోదు చేయండి.",
   "setup_wizard.key_required_title": "API కీ అవసరం",

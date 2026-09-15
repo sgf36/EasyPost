@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "جارٍ بدء النفق…",
   "settings.webhook_status_stopped": "غير قيد التشغيل. لا يزال التتبع يُحدَّث عبر الاستطلاع كل 5 دقائق.",
   "setup_wizard.account_help": "ليس لديك حساب EasyPost بعد؟ <a href=\"{signup_url}\">أنشئ حسابًا مجانًا</a>. هل لديك حساب بالفعل؟ ستجد مفاتيحك ضمن <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "حفظ ومتابعة",
   "setup_wizard.key_required_body": "أدخل مفتاح API واحداً على الأقل (اختبار أو إنتاج) للمتابعة.",
   "setup_wizard.key_required_title": "مفتاح API مطلوب",

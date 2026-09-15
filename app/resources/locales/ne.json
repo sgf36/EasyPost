@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "टनेल सुरु हुँदै…",
   "settings.webhook_status_stopped": "चलिरहेको छैन। ट्र्याकिङ अझै पनि हरेक ५ मिनेटमा पोलिङ मार्फत अपडेट हुन्छ।",
   "setup_wizard.account_help": "अहिलेसम्म EasyPost खाता छैन? <a href=\"{signup_url}\">नि:शुल्क खाता बनाउनुहोस्</a>। पहिले नै खाता छ? तपाईंका कुञ्जीहरू <a href=\"{keys_url}\">Account settings → API Keys</a> अन्तर्गत छन्।",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "सुरक्षित गरी जारी राख्नुहोस्",
   "setup_wizard.key_required_body": "जारी राख्न कम्तीमा एउटा API कुञ्जी (परीक्षण वा उत्पादन) प्रविष्ट गर्नुहोस्।",
   "setup_wizard.key_required_title": "API कुञ्जी आवश्यक",

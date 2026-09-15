@@ -301,7 +301,6 @@ v1 means **no** `network.server` is needed:
   <key>com.apple.security.app-sandbox</key><true/>
   <key>com.apple.security.network.client</key><true/>
   <key>com.apple.security.files.user-selected.read-write</key><true/>
-  <key>com.apple.security.files.downloads.read-write</key><true/>
   <key>com.apple.security.print</key><true/>
 </dict></plist>
 ```

@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.config import MODE_PRODUCTION, MODE_TEST
+from app.config import MAS_BUILD, MODE_PRODUCTION, MODE_TEST
 from app.core.credential_store import Credentials, save_credentials
 from app.core.settings import load_settings, save_settings
 from app.i18n import SUPPORTED_LOCALES, is_rtl, tr
@@ -83,9 +83,20 @@ class SetupWizard(QWidget):
         # asks for something they cannot find.
         self._account_help_label = QLabel()
         self._account_help_label.setWordWrap(True)
-        self._account_help_label.setTextFormat(Qt.TextFormat.RichText)
-        self._account_help_label.setOpenExternalLinks(False)
-        self._account_help_label.linkActivated.connect(self._on_help_link)
+        if MAS_BUILD:
+            # Apple rejects MAS apps that open the default browser for sign-in
+            # or account creation (Guideline 4 — Design). On the MAS build the
+            # URLs are shown as selectable plain text the user can copy, instead
+            # of clickable links that launch Safari.
+            self._account_help_label.setTextFormat(Qt.TextFormat.PlainText)
+            self._account_help_label.setTextInteractionFlags(
+                Qt.TextInteractionFlag.TextSelectableByMouse
+                | Qt.TextInteractionFlag.TextSelectableByKeyboard
+            )
+        else:
+            self._account_help_label.setTextFormat(Qt.TextFormat.RichText)
+            self._account_help_label.setOpenExternalLinks(False)
+            self._account_help_label.linkActivated.connect(self._on_help_link)
 
         self._test_first_label = QLabel()
         self._test_first_label.setWordWrap(True)
@@ -171,13 +182,25 @@ class SetupWizard(QWidget):
     def _apply_translations(self) -> None:
         self._title_label.setText(tr("setup_wizard.title"))
         self._subtitle_label.setText(tr("setup_wizard.subtitle"))
-        self._account_help_label.setText(
-            tr(
-                "setup_wizard.account_help",
-                signup_url=EASYPOST_SIGNUP_URL,
-                keys_url=EASYPOST_API_KEYS_URL,
+        if MAS_BUILD:
+            # Plain-text fallback: the catalogue string contains <a> tags that
+            # would render as literal angle-bracket noise in PlainText mode, so
+            # use a dedicated key that carries bare URLs instead.
+            self._account_help_label.setText(
+                tr(
+                    "setup_wizard.account_help_plain",
+                    signup_url=EASYPOST_SIGNUP_URL,
+                    keys_url=EASYPOST_API_KEYS_URL,
+                )
             )
-        )
+        else:
+            self._account_help_label.setText(
+                tr(
+                    "setup_wizard.account_help",
+                    signup_url=EASYPOST_SIGNUP_URL,
+                    keys_url=EASYPOST_API_KEYS_URL,
+                )
+            )
         self._test_first_label.setText(tr("setup_wizard.test_first_hint"))
         self._language_label.setText(tr("settings.language_group_title") + ":")
         self._test_key_input.setPlaceholderText(tr("setup_wizard.test_key_placeholder"))

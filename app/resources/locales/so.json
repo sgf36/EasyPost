@@ -638,6 +638,7 @@
   "settings.webhook_status_starting": "Tunnel-ka waa la bilaabayaa…",
   "settings.webhook_status_stopped": "Ma shaqaynayo. La socodku wuxuu weli ku cusboonaysiinayaa polling mar kasta oo 5 daqiiqo ah.",
   "setup_wizard.account_help": "Weli ma haysatid akoon EasyPost? <a href=\"{signup_url}\">Mid bilaash ah samee</a>. Mid ma haysataa? Furayaashaadu waxay ku jiraan <a href=\"{keys_url}\">Account settings → API Keys</a>.",
+  "setup_wizard.account_help_plain": "No EasyPost account yet? Create one free at {signup_url}. Already have one? Your keys are under Account settings → API Keys at {keys_url}.",
   "setup_wizard.continue_button": "Kaydi oo sii wad",
   "setup_wizard.key_required_body": "Geli ugu yaraan hal furaha API (tijaabo ama dhab ah) si aad u sii wadato.",
   "setup_wizard.key_required_title": "Furaha API waa Lagama Maarmaan",
