@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Ana loda jerin kamfanonin jigilar kaya…",
   "batch_shipments.choose_csv_button": "Zaɓi fayil…",
   "batch_shipments.choose_csv_dialog_title": "Zaɓi fayil ɗin batch",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Kurakurai",
   "batch_shipments.col_line": "Layi",
   "batch_shipments.col_parcel": "Kunshin",

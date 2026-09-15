@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Katalog der Versanddienstleister wird geladen…",
   "batch_shipments.choose_csv_button": "Datei auswählen…",
   "batch_shipments.choose_csv_dialog_title": "Stapeldatei auswählen",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Fehler",
   "batch_shipments.col_line": "Zeile",
   "batch_shipments.col_parcel": "Paket",

@@ -154,7 +154,44 @@ def test_origin_country_defaults_to_the_sender():
 def test_blank_tariff_number_is_omitted_not_nulled():
     row = _validate_row(2, _customs_row(customs_hs_tariff=""), from_country="GB")
     params = _row_to_shipment_params(row, "adr_1", from_country="GB", declaration=DECLARATION)
-    assert "hs_tariff_number" not in params["customs_info"]["customs_items"][0]
+    item = params["customs_info"]["customs_items"][0]
+    assert "hs_tariff_number" not in item
+    assert "code" not in item
+
+
+def test_tariff_number_is_also_sent_as_code():
+    """DHL eCS maps its tariff requirement to ``code``, not ``hs_tariff_number``."""
+    row = _validate_row(2, _customs_row(customs_hs_tariff="610910"), from_country="GB")
+    params = _row_to_shipment_params(row, "adr_1", from_country="GB", declaration=DECLARATION)
+    item = params["customs_info"]["customs_items"][0]
+    assert item["hs_tariff_number"] == "610910"
+    assert item["code"] == "610910"
+
+
+def test_per_row_carrier_service_overrides_batch_defaults():
+    fields = _customs_row()
+    fields["carrier"] = "DhlEcs"
+    fields["service"] = "DhlEcsParcel"
+    row = _validate_row(2, fields, from_country="GB")
+    params = _row_to_shipment_params(
+        row, "adr_1", carrier="RoyalMailV3", service="InternationalStandard",
+        from_country="GB", declaration=DECLARATION,
+    )
+    assert params["carrier"] == "DhlEcs"
+    assert params["service"] == "DhlEcsParcel"
+
+
+def test_empty_per_row_carrier_falls_back_to_batch_default():
+    fields = _customs_row()
+    fields["carrier"] = ""
+    fields["service"] = ""
+    row = _validate_row(2, fields, from_country="GB")
+    params = _row_to_shipment_params(
+        row, "adr_1", carrier="RoyalMailV3", service="InternationalStandard",
+        from_country="GB", declaration=DECLARATION,
+    )
+    assert params["carrier"] == "RoyalMailV3"
+    assert params["service"] == "InternationalStandard"
 
 
 def test_creating_an_international_batch_without_a_declaration_is_refused():

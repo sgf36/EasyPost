@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "သယ်ယူပို့ဆောင်သူ စာရင်းကို ဖွင့်နေသည်…",
   "batch_shipments.choose_csv_button": "ဖိုင်ရွေးပါ…",
   "batch_shipments.choose_csv_dialog_title": "အသုတ်ဖိုင်ရွေးပါ",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "အမှားများ",
   "batch_shipments.col_line": "လိုင်း",
   "batch_shipments.col_parcel": "ပါဆယ်",

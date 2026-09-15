@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "භාරදෙන සමාගම් නාමාවලිය පූරණය වෙමින්…",
   "batch_shipments.choose_csv_button": "ගොනුව තෝරන්න…",
   "batch_shipments.choose_csv_dialog_title": "කණ්ඩ ගොනුව තෝරන්න",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "දෝෂ",
   "batch_shipments.col_line": "පේළිය",
   "batch_shipments.col_parcel": "පාර්සලය",

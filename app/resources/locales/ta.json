@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "கேரியர் பட்டியல் ஏற்றப்படுகிறது…",
   "batch_shipments.choose_csv_button": "கோப்பைத் தேர்ந்தெடுக்கவும்…",
   "batch_shipments.choose_csv_dialog_title": "தொகுதிக் கோப்பைத் தேர்ந்தெடுக்கவும்",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "பிழைகள்",
   "batch_shipments.col_line": "வரி",
   "batch_shipments.col_parcel": "பார்சல்",

@@ -66,6 +66,12 @@ CSV_COLUMNS = [
     "customs_value",
     "customs_hs_tariff",
     "customs_origin_country",
+    # Per-row carrier and service override. When blank, the batch-level
+    # selection from the ServicePicker applies. When set, the row ships by
+    # its own carrier/service — which is what lets a single spreadsheet mix
+    # Royal Mail domestic rows with DHL eCS international ones.
+    "carrier",
+    "service",
 ]
 
 # Needed on any row whose destination country differs from the sender's. Sending
@@ -121,6 +127,7 @@ _SAMPLE_ROW = {
     "customs_description": "Cotton t-shirt", "customs_quantity": "1",
     "customs_value": "12.50", "customs_hs_tariff": "610910",
     "customs_origin_country": "GB",
+    "carrier": "", "service": "",
 }
 
 
@@ -449,10 +456,17 @@ def _row_to_shipment_params(
     # you. The carrier and service must be declared here, at creation time, or
     # every shipment fails at purchase with "A carrier and service must be
     # provided to purchase through a Batch."
-    if carrier:
-        params["carrier"] = carrier
-    if service:
-        params["service"] = service
+    #
+    # Per-row values override the batch-level defaults, so a single spreadsheet
+    # can mix carriers (e.g. Royal Mail domestic + DHL eCS international).
+    row_carrier = f.get("carrier", "").strip()
+    row_service = f.get("service", "").strip()
+    effective_carrier = row_carrier or carrier
+    effective_service = row_service or service
+    if effective_carrier:
+        params["carrier"] = effective_carrier
+    if effective_service:
+        params["service"] = effective_service
     # Documented alongside carrier/service. EasyPost accepted a batch without it
     # in testing, but a stale or wrong id is a hard error rather than a silent
     # skip, so it is sent only when known.
@@ -542,14 +556,14 @@ def create_batch(
     from_country: Optional[str] = None,
     declaration: Optional[dict] = None,
 ):
-    """Create a batch. ``carrier`` and ``service`` are required to buy it later
-    (see :func:`_row_to_shipment_params`); a batch created without them can be
-    created but never purchased.
+    """Create a batch. ``carrier`` and ``service`` are the batch-level defaults,
+    overridden by per-row ``carrier``/``service`` columns in the spreadsheet.
+    Every row must end up with a carrier and service — either its own or the
+    batch default — or it fails at purchase.
 
-    ``from_country`` and ``declaration`` carry the customs details for a batch
-    that crosses a border. Both are refused up front rather than half-built: a
-    batch is not amendable, so an international shipment created without a
-    declaration is dead on arrival and has already consumed a batch."""
+    ``from_country`` and ``declaration`` carry the customs details for rows
+    that cross a border. A declaration is required when any row is
+    international; domestic rows ignore it."""
     valid_rows = [r for r in rows if r.is_valid]
     if not valid_rows:
         raise ValueError("No valid rows to submit.")

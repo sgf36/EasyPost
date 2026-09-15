@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Memuatkan katalog syarikat penghantaran…",
   "batch_shipments.choose_csv_button": "Pilih fail…",
   "batch_shipments.choose_csv_dialog_title": "Pilih fail kelompok",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Ralat",
   "batch_shipments.col_line": "Baris",
   "batch_shipments.col_parcel": "Bungkusan",

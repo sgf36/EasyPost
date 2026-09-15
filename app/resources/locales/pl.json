@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Wczytywanie katalogu przewoźników…",
   "batch_shipments.choose_csv_button": "Wybierz plik…",
   "batch_shipments.choose_csv_dialog_title": "Wybierz plik wsadowy",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Błędy",
   "batch_shipments.col_line": "Wiersz",
   "batch_shipments.col_parcel": "Paczka",

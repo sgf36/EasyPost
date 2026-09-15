@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Učitavanje kataloga dostavljača…",
   "batch_shipments.choose_csv_button": "Odaberi datoteku…",
   "batch_shipments.choose_csv_dialog_title": "Odaberi skupnu datoteku",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Pogreške",
   "batch_shipments.col_line": "Redak",
   "batch_shipments.col_parcel": "Paket",

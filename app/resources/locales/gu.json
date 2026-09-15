@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "કેરિયર કેટલોગ લોડ થઈ રહ્યો છે…",
   "batch_shipments.choose_csv_button": "ફાઈલ પસંદ કરો…",
   "batch_shipments.choose_csv_dialog_title": "બેચ ફાઈલ પસંદ કરો",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "ભૂલો",
   "batch_shipments.col_line": "લાઇન",
   "batch_shipments.col_parcel": "પાર્સલ",

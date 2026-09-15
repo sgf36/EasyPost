@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "క్యారియర్ కేటలాగ్ లోడ్ అవుతోంది…",
   "batch_shipments.choose_csv_button": "ఫైల్‌ను ఎంచుకోండి…",
   "batch_shipments.choose_csv_dialog_title": "బ్యాచ్ ఫైల్‌ను ఎంచుకోండి",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "లోపాలు",
   "batch_shipments.col_line": "లైన్",
   "batch_shipments.col_parcel": "పార్సెల్",

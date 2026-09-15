@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Inapakia katalogi ya kampuni za usafirishaji…",
   "batch_shipments.choose_csv_button": "Chagua faili…",
   "batch_shipments.choose_csv_dialog_title": "Chagua faili la kundi",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Makosa",
   "batch_shipments.col_line": "Mstari",
   "batch_shipments.col_parcel": "Kifurushi",

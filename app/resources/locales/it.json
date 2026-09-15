@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Caricamento del catalogo dei corrieri…",
   "batch_shipments.choose_csv_button": "Scegli file…",
   "batch_shipments.choose_csv_dialog_title": "Scegli file batch",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Errori",
   "batch_shipments.col_line": "Riga",
   "batch_shipments.col_parcel": "Pacco",

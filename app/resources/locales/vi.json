@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Đang tải danh mục đơn vị vận chuyển…",
   "batch_shipments.choose_csv_button": "Chọn tệp…",
   "batch_shipments.choose_csv_dialog_title": "Chọn tệp lô",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Lỗi",
   "batch_shipments.col_line": "Dòng",
   "batch_shipments.col_parcel": "Kiện hàng",

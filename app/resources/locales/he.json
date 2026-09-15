@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "טוען את קטלוג חברות השילוח…",
   "batch_shipments.choose_csv_button": "בחירת קובץ…",
   "batch_shipments.choose_csv_dialog_title": "בחירת קובץ אצווה",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "שגיאות",
   "batch_shipments.col_line": "שורה",
   "batch_shipments.col_parcel": "חבילה",

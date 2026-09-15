@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "กำลังโหลดรายการผู้ให้บริการขนส่ง…",
   "batch_shipments.choose_csv_button": "เลือกไฟล์…",
   "batch_shipments.choose_csv_dialog_title": "เลือกไฟล์แบตช์",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "ข้อผิดพลาด",
   "batch_shipments.col_line": "บรรทัด",
   "batch_shipments.col_parcel": "พัสดุ",

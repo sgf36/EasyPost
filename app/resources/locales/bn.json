@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "ক্যারিয়ার ক্যাটালগ লোড হচ্ছে…",
   "batch_shipments.choose_csv_button": "ফাইল নির্বাচন করুন…",
   "batch_shipments.choose_csv_dialog_title": "ব্যাচ ফাইল নির্বাচন করুন",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "ত্রুটি",
   "batch_shipments.col_line": "লাইন",
   "batch_shipments.col_parcel": "পার্সেল",

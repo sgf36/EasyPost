@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "در حال بارگذاری فهرست شرکت‌های حمل‌ونقل…",
   "batch_shipments.choose_csv_button": "انتخاب فایل…",
   "batch_shipments.choose_csv_dialog_title": "انتخاب فایل دسته‌ای",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "خطاها",
   "batch_shipments.col_line": "خط",
   "batch_shipments.col_parcel": "بسته",

@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Načítání katalogu dopravců…",
   "batch_shipments.choose_csv_button": "Vybrat soubor…",
   "batch_shipments.choose_csv_dialog_title": "Vyberte dávkový soubor",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Chyby",
   "batch_shipments.col_line": "Řádek",
   "batch_shipments.col_parcel": "Balík",

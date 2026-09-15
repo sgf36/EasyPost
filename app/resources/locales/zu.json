@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Ilayisha ikhathalogu yezinkampani ezithuthayo…",
   "batch_shipments.choose_csv_button": "Khetha ifayela…",
   "batch_shipments.choose_csv_dialog_title": "Khetha ifayela leqoqo",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Amaphutha",
   "batch_shipments.col_line": "Umugqa",
   "batch_shipments.col_parcel": "Iphakethe",

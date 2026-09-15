@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "배송업체 목록을 불러오는 중…",
   "batch_shipments.choose_csv_button": "파일 선택…",
   "batch_shipments.choose_csv_dialog_title": "배치 파일 선택",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "오류",
   "batch_shipments.col_line": "줄",
   "batch_shipments.col_parcel": "소포",

@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Se încarcă catalogul de transportatori…",
   "batch_shipments.choose_csv_button": "Alegeți fișierul…",
   "batch_shipments.choose_csv_dialog_title": "Alegeți fișierul de lot",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Erori",
   "batch_shipments.col_line": "Linie",
   "batch_shipments.col_parcel": "Colet",

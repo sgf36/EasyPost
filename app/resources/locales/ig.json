@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Na-ebudata ndekọ kompanị mbunye…",
   "batch_shipments.choose_csv_button": "Họrọ faịlụ…",
   "batch_shipments.choose_csv_dialog_title": "Họrọ faịlụ ogbe",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Njehie",
   "batch_shipments.col_line": "Ahịrị",
   "batch_shipments.col_parcel": "Ngwongwo",
