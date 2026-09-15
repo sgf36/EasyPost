@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Tashuvchilar katalogi yuklanmoqda…",
   "batch_shipments.choose_csv_button": "Faylni tanlang…",
   "batch_shipments.choose_csv_dialog_title": "Paket faylini tanlang",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Xatolar",
   "batch_shipments.col_line": "Qator",
   "batch_shipments.col_parcel": "Pochta jo'natmasi",

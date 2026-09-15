@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "കാരിയർ കാറ്റലോഗ് ലോഡ് ചെയ്യുന്നു…",
   "batch_shipments.choose_csv_button": "ഫയൽ തിരഞ്ഞെടുക്കുക…",
   "batch_shipments.choose_csv_dialog_title": "ബാച്ച് ഫയൽ തിരഞ്ഞെടുക്കുക",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "പിശകുകൾ",
   "batch_shipments.col_line": "വരി",
   "batch_shipments.col_parcel": "പാഴ്സൽ",

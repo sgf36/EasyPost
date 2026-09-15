@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Cargando el catálogo de transportistas…",
   "batch_shipments.choose_csv_button": "Elegir archivo…",
   "batch_shipments.choose_csv_dialog_title": "Elegir archivo de lote",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Errores",
   "batch_shipments.col_line": "Línea",
   "batch_shipments.col_parcel": "Paquete",

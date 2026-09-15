@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Mbukak katalog kurir…",
   "batch_shipments.choose_csv_button": "Pilih berkas…",
   "batch_shipments.choose_csv_dialog_title": "Pilih berkas batch",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Kesalahan",
   "batch_shipments.col_line": "Baris",
   "batch_shipments.col_parcel": "Paket",

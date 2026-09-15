@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Loading the carrier catalogue…",
   "batch_shipments.choose_csv_button": "Choose file…",
   "batch_shipments.choose_csv_dialog_title": "Choose batch file",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Errors",
   "batch_shipments.col_line": "Line",
   "batch_shipments.col_parcel": "Parcel",

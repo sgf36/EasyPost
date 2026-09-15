@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Загрузка каталога перевозчиков…",
   "batch_shipments.choose_csv_button": "Выбрать файл…",
   "batch_shipments.choose_csv_dialog_title": "Выбор пакетного файла",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Ошибки",
   "batch_shipments.col_line": "Строка",
   "batch_shipments.col_parcel": "Посылка",

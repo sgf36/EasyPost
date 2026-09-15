@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "କେରିଅର୍ କାଟାଲଗ୍ ଲୋଡ୍ ହେଉଛି…",
   "batch_shipments.choose_csv_button": "ଫାଇଲ୍ ବାଛନ୍ତୁ…",
   "batch_shipments.choose_csv_dialog_title": "ବ୍ୟାଚ୍ ଫାଇଲ୍ ବାଛନ୍ତୁ",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "ତ୍ରୁଟି",
   "batch_shipments.col_line": "ଧାଡ଼ି",
   "batch_shipments.col_parcel": "ପାର୍ସେଲ୍",

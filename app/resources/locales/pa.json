@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "ਕੈਰੀਅਰ ਕੈਟਾਲਾਗ ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ…",
   "batch_shipments.choose_csv_button": "ਫ਼ਾਈਲ ਚੁਣੋ…",
   "batch_shipments.choose_csv_dialog_title": "ਬੈਚ ਫ਼ਾਈਲ ਚੁਣੋ",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "ਗਲਤੀਆਂ",
   "batch_shipments.col_line": "ਲਾਈਨ",
   "batch_shipments.col_parcel": "ਪਾਰਸਲ",

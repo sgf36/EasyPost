@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "正在加载承运商目录…",
   "batch_shipments.choose_csv_button": "选择文件…",
   "batch_shipments.choose_csv_dialog_title": "选择批处理文件",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "错误",
   "batch_shipments.col_line": "行号",
   "batch_shipments.col_parcel": "包裹",

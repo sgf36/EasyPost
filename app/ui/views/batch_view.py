@@ -179,11 +179,12 @@ class BatchView(QWidget):
 
     def _build_preview_group(self) -> QGroupBox:
         group = QGroupBox(tr("batch_shipments.preview_group_title"))
-        self._preview_table = QTableWidget(0, 4)
+        self._preview_table = QTableWidget(0, 5)
         self._preview_table.setHorizontalHeaderLabels([
             tr("batch_shipments.col_line"),
             tr("batch_shipments.col_to"),
             tr("batch_shipments.col_parcel"),
+            tr("batch_shipments.col_carrier_service"),
             tr("batch_shipments.col_errors"),
         ])
         self._preview_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
@@ -487,30 +488,41 @@ class BatchView(QWidget):
                     f"{row.fields.get('length','')}x{row.fields.get('width','')}"
                     f"x{row.fields.get('height','')} / {row.fields.get('weight','')}oz"
                 )
+            row_carrier = row.fields.get("carrier", "").strip()
+            row_service = row.fields.get("service", "").strip()
+            carrier_service = f"{row_carrier} / {row_service}" if row_carrier or row_service else ""
             self._preview_table.setItem(row_idx, 0, QTableWidgetItem(str(row.line_number)))
             self._preview_table.setItem(row_idx, 1, QTableWidgetItem(to_summary))
             self._preview_table.setItem(row_idx, 2, QTableWidgetItem(parcel_summary))
-            self._preview_table.setItem(row_idx, 3, QTableWidgetItem("; ".join(row.errors)))
+            self._preview_table.setItem(row_idx, 3, QTableWidgetItem(carrier_service))
+            self._preview_table.setItem(row_idx, 4, QTableWidgetItem("; ".join(row.errors)))
 
         self._valid_row_count = valid_count
         self._update_create_enabled()
 
+    def _all_rows_have_carrier_service(self) -> bool:
+        """True when every valid row specifies its own carrier and service."""
+        return all(
+            r.fields.get("carrier", "").strip() and r.fields.get("service", "").strip()
+            for r in self._parsed_rows if r.is_valid
+        )
+
     def _update_create_enabled(self) -> None:
-        """A batch can only be created once there is something to ship AND a
-        service to ship it by — without the latter the batch is created and then
-        cannot be bought at all, so the button stays disabled rather than
-        producing a dead batch."""
+        """A batch can only be created once there is something to ship AND
+        every row will have a carrier/service — either from the picker or from
+        the row's own columns."""
         rows_ready = getattr(self, "_valid_row_count", 0) > 0
-        # An international batch also needs its declaration signed. Without it
-        # the batch is created and every label fails at purchase, so the button
-        # stays disabled rather than producing a batch that cannot be bought —
-        # the same reasoning as the service picker above.
         declaration = self._declaration()
         customs_ready = declaration is None or (
             bool(declaration["customs_signer"]) and self._customs_certify_checkbox.isChecked()
         )
+        # The picker provides the fallback carrier/service. When every row
+        # carries its own, the picker is not needed.
+        service_ready = self._service_picker.is_complete() or (
+            rows_ready and self._all_rows_have_carrier_service()
+        )
         self._create_batch_btn.setEnabled(
-            rows_ready and self._service_picker.is_complete() and customs_ready
+            rows_ready and service_ready and customs_ready
         )
         # Rating needs a sender and a valid row, and an international one needs
         # its declaration too — the rated shipment carries the same customs_info
@@ -528,7 +540,7 @@ class BatchView(QWidget):
             return
 
         selection = self._service_picker.selection()
-        if selection is None:
+        if selection is None and not self._all_rows_have_carrier_service():
             QMessageBox.warning(
                 self,
                 tr("batch_shipments.missing_service_title"),
@@ -545,10 +557,10 @@ class BatchView(QWidget):
             lambda: create_batch(
                 from_id,
                 self._parsed_rows,
-                carrier=selection.carrier,
-                service=selection.service,
-                delivery_confirmation=selection.delivery_confirmation,
-                insurance=selection.insurance,
+                carrier=selection.carrier if selection else None,
+                service=selection.service if selection else None,
+                delivery_confirmation=selection.delivery_confirmation if selection else None,
+                insurance=selection.insurance if selection else None,
                 from_country=self._from_country(),
                 declaration=self._declaration(),
             ),

@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Vervoerderscatalogus laden…",
   "batch_shipments.choose_csv_button": "Bestand kiezen…",
   "batch_shipments.choose_csv_dialog_title": "Batchbestand kiezen",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Fouten",
   "batch_shipments.col_line": "Regel",
   "batch_shipments.col_parcel": "Pakket",

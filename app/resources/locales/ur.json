@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "کیریئر کیٹلاگ لوڈ ہو رہا ہے…",
   "batch_shipments.choose_csv_button": "فائل منتخب کریں…",
   "batch_shipments.choose_csv_dialog_title": "بیچ فائل منتخب کریں",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "خرابیاں",
   "batch_shipments.col_line": "لائن",
   "batch_shipments.col_parcel": "پارسل",

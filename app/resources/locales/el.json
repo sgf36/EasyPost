@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Φόρτωση καταλόγου μεταφορέων…",
   "batch_shipments.choose_csv_button": "Επιλογή αρχείου…",
   "batch_shipments.choose_csv_dialog_title": "Επιλογή αρχείου παρτίδας",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Σφάλματα",
   "batch_shipments.col_line": "Γραμμή",
   "batch_shipments.col_parcel": "Δέμα",

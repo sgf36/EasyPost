@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Liiska shirkadaha gaadiidka waa la soo raraya…",
   "batch_shipments.choose_csv_button": "Dooro fayl…",
   "batch_shipments.choose_csv_dialog_title": "Dooro faylka kooxda",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Khaladaad",
   "batch_shipments.col_line": "Xariiq",
   "batch_shipments.col_parcel": "Xirmo",

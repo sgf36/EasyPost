@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "配送業者カタログを読み込んでいます…",
   "batch_shipments.choose_csv_button": "ファイルを選択…",
   "batch_shipments.choose_csv_dialog_title": "バッチファイルを選択",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "エラー",
   "batch_shipments.col_line": "行",
   "batch_shipments.col_parcel": "荷物",

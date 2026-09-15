@@ -93,6 +93,8 @@ def customs_item(
     # supplied, and some carriers treat the two differently.
     if hs_tariff_number:
         item["hs_tariff_number"] = hs_tariff_number
+        # DHL eCS maps its tariff requirement to `code`, not `hs_tariff_number`.
+        item["code"] = hs_tariff_number
     return item
 
 

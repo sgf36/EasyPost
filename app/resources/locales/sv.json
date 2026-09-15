@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Läser in transportörskatalogen…",
   "batch_shipments.choose_csv_button": "Välj fil…",
   "batch_shipments.choose_csv_dialog_title": "Välj batchfil",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Fel",
   "batch_shipments.col_line": "Rad",
   "batch_shipments.col_parcel": "Paket",

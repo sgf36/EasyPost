@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "የአጓጓዦች ካታሎግ በመጫን ላይ…",
   "batch_shipments.choose_csv_button": "ፋይል ይምረጡ…",
   "batch_shipments.choose_csv_dialog_title": "የጅምላ ፋይል ይምረጡ",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "ስህተቶች",
   "batch_shipments.col_line": "መስመር",
   "batch_shipments.col_parcel": "እቃ",

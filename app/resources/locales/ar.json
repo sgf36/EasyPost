@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "جارٍ تحميل كتالوج شركات الشحن…",
   "batch_shipments.choose_csv_button": "اختيار ملف…",
   "batch_shipments.choose_csv_dialog_title": "اختيار ملف الدُّفعة",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "الأخطاء",
   "batch_shipments.col_line": "السطر",
   "batch_shipments.col_parcel": "الطرد",

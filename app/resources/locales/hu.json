@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "Szállítói katalógus betöltése…",
   "batch_shipments.choose_csv_button": "Fájl kiválasztása…",
   "batch_shipments.choose_csv_dialog_title": "Kötegfájl kiválasztása",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "Hibák",
   "batch_shipments.col_line": "Sor",
   "batch_shipments.col_parcel": "Csomag",

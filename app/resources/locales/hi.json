@@ -73,6 +73,7 @@
   "batch_shipments.catalogue_loading": "कैरियर कैटलॉग लोड हो रहा है…",
   "batch_shipments.choose_csv_button": "फ़ाइल चुनें…",
   "batch_shipments.choose_csv_dialog_title": "बैच फ़ाइल चुनें",
+  "batch_shipments.col_carrier_service": "Carrier / Service",
   "batch_shipments.col_errors": "त्रुटियां",
   "batch_shipments.col_line": "पंक्ति",
   "batch_shipments.col_parcel": "पार्सल",
