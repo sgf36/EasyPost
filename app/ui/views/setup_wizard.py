@@ -117,11 +117,11 @@ class SetupWizard(QWidget):
         language_row.addWidget(self._language_combo, stretch=1)
 
         self._test_key_input = QLineEdit()
-        self._test_key_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self._test_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self._test_key_input.setMinimumHeight(30)
 
         self._prod_key_input = QLineEdit()
-        self._prod_key_input.setEchoMode(QLineEdit.EchoMode.Password)
+        self._prod_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self._prod_key_input.setMinimumHeight(30)
 
         self._form = QFormLayout()
@@ -227,7 +227,7 @@ class SetupWizard(QWidget):
         QDesktopServices.openUrl(QUrl(url))
 
     def _toggle_visibility(self, checked: bool) -> None:
-        mode = QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.Password
+        mode = QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.PasswordEchoOnEdit
         self._test_key_input.setEchoMode(mode)
         self._prod_key_input.setEchoMode(mode)
 
