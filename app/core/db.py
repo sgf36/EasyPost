@@ -213,6 +213,22 @@ CREATE TABLE IF NOT EXISTS mcp_approvals (
     decided_at TEXT
 );
 
+-- Royal Mail ScanForms (manifests). A ScanForm groups purchased shipments
+-- sharing the same origin address into a manifest document with a scannable
+-- barcode the pickup driver scans at collection. Immutable once created.
+CREATE TABLE IF NOT EXISTS scan_forms (
+    id TEXT PRIMARY KEY,
+    mode TEXT NOT NULL,
+    status TEXT,
+    message TEXT,
+    address TEXT,
+    tracking_codes TEXT,
+    form_url TEXT,
+    batch_id TEXT,
+    num_shipments INTEGER,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
 -- Append-only record of every MCP tool invocation. Deliberately separate from
 -- approvals: read-only calls never create an approval, but still need to be
 -- auditable after the fact.

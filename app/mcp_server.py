@@ -42,6 +42,7 @@ from app.core.settings import load_settings
 from app.services import addresses as addr_svc
 from app.services import claims as claims_svc
 from app.services import hts_lookup as hts_svc
+from app.services import manifests as manifest_svc
 from app.services import pickups as pickup_svc
 from app.services import shipments as ship_svc
 from app.services import tracking as track_svc
@@ -163,6 +164,54 @@ def list_pickups() -> str:
     rows = [r.__dict__ for r in pickup_svc.list_pickups()]
     mcp_approvals.audit("list_pickups", {}, f"{len(rows)} rows")
     return _ok(rows, untrusted=True)
+
+
+@mcp.tool()
+def list_manifests() -> str:
+    """ScanForms (manifests) created locally for the active mode."""
+    _guard()
+    rows = [r.__dict__ for r in manifest_svc.list_local_scan_forms()]
+    mcp_approvals.audit("list_manifests", {}, f"{len(rows)} rows")
+    return _ok(rows)
+
+
+@mcp.tool()
+def list_manifestable_shipments() -> str:
+    """Purchased shipments eligible for manifesting (not yet in a ScanForm)."""
+    _guard()
+    rows = manifest_svc.manifestable_shipment_ids()
+    mcp_approvals.audit("list_manifestable_shipments", {}, f"{len(rows)} rows")
+    return _ok(rows, untrusted=True)
+
+
+@mcp.tool()
+def create_manifest(shipment_ids: list[str]) -> str:
+    """Create a ScanForm (manifest) for purchased shipments. Free — costs nothing."""
+    _guard()
+    scan_form = manifest_svc.create_scan_form(shipment_ids)
+    manifest_svc.save_scan_form_locally(scan_form)
+    mcp_approvals.audit("create_manifest", {"shipment_ids": shipment_ids}, f"sf {scan_form.id}")
+    return _ok({
+        "scan_form_id": scan_form.id,
+        "status": getattr(scan_form, "status", None),
+        "form_url": getattr(scan_form, "form_url", None),
+    })
+
+
+@mcp.tool()
+def get_manifest(scan_form_id: str) -> str:
+    """Retrieve a ScanForm by ID and update the local record."""
+    _guard()
+    scan_form = manifest_svc.retrieve_scan_form(scan_form_id)
+    manifest_svc.save_scan_form_locally(scan_form)
+    mcp_approvals.audit("get_manifest", {"scan_form_id": scan_form_id}, "ok")
+    return _ok({
+        "scan_form_id": scan_form.id,
+        "status": getattr(scan_form, "status", None),
+        "form_url": getattr(scan_form, "form_url", None),
+        "tracking_codes": getattr(scan_form, "tracking_codes", None),
+        "address": str(getattr(scan_form, "address", None)),
+    })
 
 
 @mcp.tool()
