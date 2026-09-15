@@ -1,6 +1,5 @@
 """Shipment history: browse purchased labels, open them, request refunds."""
 
-import webbrowser
 from functools import partial
 
 from PySide6.QtWidgets import (
@@ -40,6 +39,7 @@ from app.services.shipments import (
     refresh_refund_status,
     save_shipment_locally,
 )
+from app.ui.open_file import open_label
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
@@ -165,7 +165,7 @@ class HistoryView(QWidget):
 
             if rec.label_url:
                 open_btn = QPushButton(tr("history.open_label_button"))
-                open_btn.clicked.connect(partial(webbrowser.open, rec.label_url))
+                open_btn.clicked.connect(partial(open_label, rec.label_url))
                 actions_layout.addWidget(open_btn)
 
             insure_btn = QPushButton(

@@ -13,7 +13,9 @@
                                     polling under MAS_BUILD).
     files.user-selected.read-write  Label save via an NSSavePanel / Qt save
                                     dialog (user picks the location).
-    files.downloads.read-write      Default label destination (~/Downloads).
+                                    Powerbox access covers ~/Downloads when
+                                    the user picks it in the dialog — no
+                                    separate downloads entitlement needed.
     print                           Printing labels (PNG/PDF/ZPL/EPL).
 
   Deliberately absent: no cloudflared/tunnel (2.5.2), no arbitrary file access,
@@ -35,8 +37,6 @@
   <key>com.apple.security.network.client</key>
   <true/>
   <key>com.apple.security.files.user-selected.read-write</key>
-  <true/>
-  <key>com.apple.security.files.downloads.read-write</key>
   <true/>
   <key>com.apple.security.print</key>
   <true/>

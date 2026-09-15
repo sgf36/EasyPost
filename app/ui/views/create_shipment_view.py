@@ -1,6 +1,5 @@
 """Create a shipment, shop rates, buy a label, and save/open it."""
 
-import webbrowser
 from functools import partial
 
 import requests
@@ -56,6 +55,7 @@ from app.services.shipments import (
     save_shipment_locally,
 )
 from app.core.review_prompt import mark_session_friction, note_successful_shipment
+from app.ui.open_file import open_label
 from app.ui.theme import TEXT_MUTED
 from app.ui.widgets.async_worker import run_async
 from app.ui.widgets.carrier_combo import CarrierCombo
@@ -2268,7 +2268,7 @@ class CreateShipmentView(QWidget):
 
     def _on_open_label(self) -> None:
         if getattr(self, "_pending_label_url", None):
-            webbrowser.open(self._pending_label_url)
+            open_label(self._pending_label_url)
 
     def _on_save_label(self) -> None:
         url = getattr(self, "_pending_label_url", None)
