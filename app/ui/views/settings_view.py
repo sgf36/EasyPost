@@ -60,13 +60,16 @@ class SettingsView(QWidget):
         title = QLabel(tr("settings.title"))
 
         self._test_key_input = QLineEdit()
-        self._test_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self._prod_key_input = QLineEdit()
-        self._prod_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        if not MAS_BUILD:
+            self._test_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+            self._prod_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
 
         show_keys_btn = QPushButton(tr("settings.show_keys_button"))
         show_keys_btn.setCheckable(True)
         show_keys_btn.toggled.connect(self._toggle_visibility)
+        if MAS_BUILD:
+            show_keys_btn.hide()
 
         form = QFormLayout()
         form.addRow(tr("settings.test_key_label"), self._test_key_input)
@@ -403,6 +406,8 @@ class SettingsView(QWidget):
             field.setPlaceholderText(self._STORED_MASK if stored else "")
 
     def _toggle_visibility(self, checked: bool) -> None:
+        if MAS_BUILD:
+            return
         mode = QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.PasswordEchoOnEdit
         self._test_key_input.setEchoMode(mode)
         self._prod_key_input.setEchoMode(mode)
