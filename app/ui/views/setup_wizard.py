@@ -117,12 +117,18 @@ class SetupWizard(QWidget):
         language_row.addWidget(self._language_combo, stretch=1)
 
         self._test_key_input = QLineEdit()
-        self._test_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self._test_key_input.setMinimumHeight(30)
 
         self._prod_key_input = QLineEdit()
-        self._prod_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
         self._prod_key_input.setMinimumHeight(30)
+
+        # macOS 27 (Tahoe) blocks keyboard input in Qt's Password and
+        # PasswordEchoOnEdit modes — both trip the new secure-text-input
+        # system. MAS builds run only on macOS, so leave the fields in
+        # Normal mode there. Other platforms keep the masked echo.
+        if not MAS_BUILD:
+            self._test_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+            self._prod_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
 
         self._form = QFormLayout()
         self._form.setSpacing(10)
@@ -136,6 +142,8 @@ class SetupWizard(QWidget):
         self._show_keys_btn.setCheckable(True)
         self._show_keys_btn.setFlat(True)
         self._show_keys_btn.toggled.connect(self._toggle_visibility)
+        if MAS_BUILD:
+            self._show_keys_btn.hide()
 
         self._continue_btn = QPushButton()
         self._continue_btn.setObjectName("continueButton")
@@ -227,6 +235,8 @@ class SetupWizard(QWidget):
         QDesktopServices.openUrl(QUrl(url))
 
     def _toggle_visibility(self, checked: bool) -> None:
+        if MAS_BUILD:
+            return
         mode = QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.PasswordEchoOnEdit
         self._test_key_input.setEchoMode(mode)
         self._prod_key_input.setEchoMode(mode)
