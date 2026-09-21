@@ -2,6 +2,7 @@
 
 import sys
 
+from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
@@ -20,6 +21,12 @@ def main() -> int:
         app.setWindowIcon(QIcon(str(ICON_PATH)))
     window = MainWindow()
     window.show()
+    window.activateWindow()
+    window.raise_()
+    # macOS Tahoe silently drops window activation on launch due to
+    # anti-focus-stealing measures.  Re-activate after the event loop
+    # has processed the initial paint so the window becomes key.
+    QTimer.singleShot(200, window.ensure_active)
     return app.exec()
 
 

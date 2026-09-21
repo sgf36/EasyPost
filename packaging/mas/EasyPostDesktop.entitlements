@@ -18,11 +18,22 @@
                                     separate downloads entitlement needed.
     print                           Printing labels (PNG/PDF/ZPL/EPL).
 
+    cs.allow-jit                    PySide6/Qt and the pyobjc bridge generate
+                                    native trampolines and use MAP_JIT on Apple
+                                    Silicon. Without this, the Hardened Runtime
+                                    (--options runtime) silently blocks text-input
+                                    integration on macOS 27+.  The direct-download
+                                    entitlements already carry it.
+    cs.allow-unsigned-executable-   Same code paths occasionally need W^X memory
+    memory                          that predates the MAP_JIT API.  Also present
+                                    in the direct-download entitlements.
+
   Deliberately absent: no cloudflared/tunnel (2.5.2), no arbitrary file access,
   no subprocess-spawned binaries (ioreg/MCP CLI) — the MAS build must not rely on
-  any of them. Add keychain-access-groups ONLY if the keyring→Keychain items
-  fail under the sandbox; the app's own items usually work without an explicit
-  group, so leave it out until testing proves otherwise.
+  any of them. cs.disable-library-validation is NOT available for sandbox/MAS.
+  Add keychain-access-groups ONLY if the keyring→Keychain items fail under the
+  sandbox; the app's own items usually work without an explicit group, so leave
+  it out until testing proves otherwise.
 -->
 <plist version="1.0">
 <dict>
@@ -39,6 +50,10 @@
   <key>com.apple.security.files.user-selected.read-write</key>
   <true/>
   <key>com.apple.security.print</key>
+  <true/>
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
   <true/>
 </dict>
 </plist>
