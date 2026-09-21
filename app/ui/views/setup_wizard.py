@@ -6,7 +6,7 @@ anywhere else. Either key may be left blank and added later from Settings,
 but at least one is required to finish setup.
 """
 
-from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtCore import Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QComboBox,
@@ -122,10 +122,10 @@ class SetupWizard(QWidget):
         self._prod_key_input = QLineEdit()
         self._prod_key_input.setMinimumHeight(30)
 
-        # macOS 27 (Tahoe) blocks keyboard input in Qt's Password and
-        # PasswordEchoOnEdit modes — both trip the new secure-text-input
-        # system. MAS builds run only on macOS, so leave the fields in
-        # Normal mode there. Other platforms keep the masked echo.
+        # macOS Tahoe blocks keyboard input in Qt's Password and
+        # PasswordEchoOnEdit modes when combined with the sandbox.
+        # MAS builds run only on macOS, so leave the fields in Normal
+        # mode there.  Other platforms keep the masked echo.
         if not MAS_BUILD:
             self._test_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
             self._prod_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
@@ -186,6 +186,25 @@ class SetupWizard(QWidget):
         )
 
         self._apply_translations()
+
+    # -- Focus management --------------------------------------------------
+
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        # Delayed so the activation in main.py lands first.
+        QTimer.singleShot(150, self.focus_first_field)
+
+    def focus_first_field(self) -> None:
+        """Activate the parent window and focus the first key field.
+
+        Called from ``MainWindow.ensure_active`` and from ``showEvent``
+        so that keyboard input works even when macOS Tahoe silently
+        drops the initial window activation.
+        """
+        window = self.window()
+        if window:
+            window.activateWindow()
+        self._test_key_input.setFocus(Qt.FocusReason.OtherFocusReason)
 
     def _apply_translations(self) -> None:
         self._title_label.setText(tr("setup_wizard.title"))

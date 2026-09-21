@@ -533,6 +533,38 @@ class MainWindow(QMainWindow):
         if relay_should_run(load_settings()):
             self._pending_relay_task = run_async(relay_client.start, self)
 
+    def ensure_active(self) -> None:
+        """Force the window to become the key window and deliver keyboard
+        focus to the visible input field.
+
+        macOS Tahoe (26.x) added anti-focus-stealing measures that silently
+        prevent ``activateIgnoringOtherApps:`` from working when the app is
+        launched from Finder / the Dock / an external process.  Qt uses that
+        deprecated API internally, so the window can appear on screen without
+        actually receiving keyboard input.  This method retries activation
+        through every available path.
+        """
+        self.activateWindow()
+        self.raise_()
+        handle = self.windowHandle()
+        if handle:
+            handle.requestActivate()
+        # Native Cocoa activation — the modern ``activate()`` (macOS 14+)
+        # is not throttled the way the legacy call is on Tahoe.
+        try:
+            import objc
+
+            ns_app = objc.lookUpClass("NSApplication").sharedApplication()
+            try:
+                ns_app.activate()
+            except AttributeError:
+                ns_app.activateIgnoringOtherApps_(True)
+        except Exception:
+            pass
+        current = self._root_stack.currentWidget()
+        if current is self._setup_wizard:
+            self._setup_wizard.focus_first_field()
+
     def _maybe_resume_webhook(self) -> None:
         """Re-starts the webhook push-update tunnel on launch if it was
         left enabled last session (see app/core/webhook_manager.py) —
