@@ -21,8 +21,8 @@
     cs.allow-jit                    PySide6/Qt and the pyobjc bridge generate
                                     native trampolines and use MAP_JIT on Apple
                                     Silicon. Without this, the Hardened Runtime
-                                    (--options runtime) silently blocks text-input
-                                    integration on macOS 27+.  The direct-download
+                                    flag silently blocks text-input integration
+                                    on macOS 27+.  The direct-download
                                     entitlements already carry it.
     cs.allow-unsigned-executable-   Same code paths occasionally need W^X memory
     memory                          that predates the MAP_JIT API.  Also present
