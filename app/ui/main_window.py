@@ -537,28 +537,31 @@ class MainWindow(QMainWindow):
         """Force the window to become the key window and deliver keyboard
         focus to the visible input field.
 
-        macOS Tahoe (26.x) added anti-focus-stealing measures that silently
-        prevent ``activateIgnoringOtherApps:`` from working when the app is
-        launched from Finder / the Dock / an external process.  Qt uses that
-        deprecated API internally, so the window can appear on screen without
-        actually receiving keyboard input.  This method retries activation
-        through every available path.
+        macOS Tahoe (26.x) and Golden Gate (27.x) silently prevent windows
+        from becoming key on launch.  This method uses every available path:
+        Qt-level activation, NSApplication activation, and direct
+        NSWindow.makeKeyAndOrderFront to ensure keyboard events arrive.
         """
         self.activateWindow()
         self.raise_()
         handle = self.windowHandle()
         if handle:
             handle.requestActivate()
-        # Native Cocoa activation — the modern ``activate()`` (macOS 14+)
-        # is not throttled the way the legacy call is on Tahoe.
         try:
-            import objc
+            import objc  # type: ignore[import-untyped]
 
             ns_app = objc.lookUpClass("NSApplication").sharedApplication()
             try:
                 ns_app.activate()
             except AttributeError:
                 ns_app.activateIgnoringOtherApps_(True)
+            ns_window = ns_app.keyWindow() or ns_app.mainWindow()
+            if not ns_window:
+                windows = ns_app.orderedWindows()
+                if windows and windows.count() > 0:
+                    ns_window = windows.objectAtIndex_(0)
+            if ns_window:
+                ns_window.makeKeyAndOrderFront_(None)
         except Exception:
             pass
         current = self._root_stack.currentWidget()

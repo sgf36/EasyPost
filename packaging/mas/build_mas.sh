@@ -71,6 +71,12 @@ merge_key LSMinimumSystemVersion      string  "$(/usr/libexec/PlistBuddy -c 'Pri
 merge_key LSApplicationCategoryType   string  "$(/usr/libexec/PlistBuddy -c 'Print :LSApplicationCategoryType' "$plist_additions")"
 merge_key NSHumanReadableCopyright     string  "$(/usr/libexec/PlistBuddy -c 'Print :NSHumanReadableCopyright' "$plist_additions")"
 merge_key ITSAppUsesNonExemptEncryption bool  "$(/usr/libexec/PlistBuddy -c 'Print :ITSAppUsesNonExemptEncryption' "$plist_additions")"
+# PyInstaller writes LSBackgroundOnly=true by default, which registers the
+# process as a daemon.  macOS never delivers keyboard events to a daemon's
+# windows.  NSPrincipalClass is needed for the Cocoa event loop to start.
+merge_key NSPrincipalClass          string  NSApplication
+merge_key LSBackgroundOnly          bool    false
+merge_key NSHighResolutionCapable   bool    true
 cp "$PROVISION_PROFILE" "$app_path/Contents/embedded.provisionprofile"
 
 # MAS reaches AI clients through the remote relay, served IN-PROCESS by the GUI

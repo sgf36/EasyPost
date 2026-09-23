@@ -34,5 +34,16 @@
   <string>© Spencer Fields. Not affiliated with EasyPost.</string>
   <key>ITSAppUsesNonExemptEncryption</key>
   <false/>
+  <!-- PyInstaller writes LSBackgroundOnly=true by default, registering the
+       process as a daemon that cannot become the foreground app.  macOS never
+       delivers keyboard events to a daemon's windows, which causes the setup
+       wizard's API key fields to ignore all typing.  Overriding to false and
+       setting NSPrincipalClass lets the Cocoa event loop run normally. -->
+  <key>NSPrincipalClass</key>
+  <string>NSApplication</string>
+  <key>LSBackgroundOnly</key>
+  <false/>
+  <key>NSHighResolutionCapable</key>
+  <true/>
 </dict>
 </plist>

@@ -91,8 +91,8 @@ class SetupWizard(QWidget):
             self._account_help_label.setTextFormat(Qt.TextFormat.PlainText)
             self._account_help_label.setTextInteractionFlags(
                 Qt.TextInteractionFlag.TextSelectableByMouse
-                | Qt.TextInteractionFlag.TextSelectableByKeyboard
             )
+            self._account_help_label.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         else:
             self._account_help_label.setTextFormat(Qt.TextFormat.RichText)
             self._account_help_label.setOpenExternalLinks(False)
@@ -129,6 +129,14 @@ class SetupWizard(QWidget):
         if not MAS_BUILD:
             self._test_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
             self._prod_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+
+        if MAS_BUILD:
+            self._test_key_input.setAttribute(
+                Qt.WidgetAttribute.WA_InputMethodEnabled, True
+            )
+            self._prod_key_input.setAttribute(
+                Qt.WidgetAttribute.WA_InputMethodEnabled, True
+            )
 
         self._form = QFormLayout()
         self._form.setSpacing(10)
