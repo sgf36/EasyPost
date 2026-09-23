@@ -211,4 +211,9 @@ if sys.platform == "darwin":
         name="EasyPostDesktop.app",
         icon=str(icons_dir / "app_icon.icns"),
         bundle_identifier="com.spencerfields.easypostdesktop",
+        info_plist={
+            'NSPrincipalClass': 'NSApplication',
+            'LSBackgroundOnly': False,
+            'NSHighResolutionCapable': True,
+        },
     )
