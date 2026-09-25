@@ -2279,13 +2279,13 @@ class CreateShipmentView(QWidget):
         sid = self._current_shipment.id
         self._manifest_btn.setEnabled(False)
         self._pending_task = run_async(lambda: create_manifest([sid]), self)
-        self._pending_task.succeeded.connect(lambda sf: self._on_manifest_done(sf, [sid]))
+        self._pending_task.succeeded.connect(lambda result: self._on_manifest_done(result, [sid]))
         self._pending_task.failed.connect(self._on_manifest_error)
 
-    def _on_manifest_done(self, scan_form, ids: list[str]) -> None:
-        save_manifest_locally(scan_form, ids)
-        form_url = getattr(scan_form, "form_url", None)
-        if form_url:
+    def _on_manifest_done(self, result, ids: list[str]) -> None:
+        save_manifest_locally(result.scan_form, ids, result.local_pdf_path)
+        path_to_open = result.local_pdf_path or getattr(result.scan_form, "form_url", None)
+        if path_to_open:
             reply = QMessageBox.question(
                 self,
                 tr("create_shipment.manifest_created_title"),
@@ -2293,7 +2293,7 @@ class CreateShipmentView(QWidget):
                 QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
             )
             if reply == QMessageBox.StandardButton.Open:
-                open_label(form_url)
+                open_label(path_to_open)
         else:
             QMessageBox.information(
                 self,

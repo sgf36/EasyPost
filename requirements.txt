@@ -15,6 +15,13 @@ Pillow>=10.0.0
 # template carries a data-validation dropdown of carrier package codes, which a
 # flat CSV cannot express; imports still accept either format. Runtime.
 openpyxl>=3.1.0
+# Generates corrected Royal Mail manifest PDFs with the actual customer name
+# and service descriptions — EasyPost's version shows their own name.
+# reportlab renders the text, tables and Code 128 barcode; pypdf extracts
+# the Intersoft order reference from the original EasyPost PDF so the barcode
+# Royal Mail scans at collection is preserved (app/core/manifest_pdf.py).
+reportlab>=4.0
+pypdf>=4.0
 # Cap below 2.0: the 2.x SDK renamed/removed mcp.server.fastmcp (which
 # app/mcp_server.py and the relay transport bridge use). Stay on the 1.x API.
 mcp>=1.28.0,<2

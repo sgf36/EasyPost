@@ -262,6 +262,7 @@ _COLUMN_MIGRATIONS = [
     # this is what makes the backfill look at each of them once.
     ("batches", "shipments_recorded", "INTEGER NOT NULL DEFAULT 0"),
     ("shipments", "scan_form_id", "TEXT"),
+    ("scan_forms", "local_form_path", "TEXT"),
 ]
 
 
