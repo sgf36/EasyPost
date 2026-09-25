@@ -880,15 +880,15 @@ class BatchView(QWidget):
             return
         self._manifest_btn.setEnabled(False)
         self._pending_task = run_async(lambda: create_manifest(ids), self)
-        self._pending_task.succeeded.connect(lambda sf: self._on_manifest_created(sf, ids))
+        self._pending_task.succeeded.connect(lambda result: self._on_manifest_created(result, ids))
         self._pending_task.failed.connect(self._on_manifest_failed)
 
-    def _on_manifest_created(self, scan_form, shipment_ids: list[str]) -> None:
+    def _on_manifest_created(self, result, shipment_ids: list[str]) -> None:
         self._manifest_btn.setEnabled(True)
-        save_manifest_locally(scan_form, shipment_ids)
-        form_url = getattr(scan_form, "form_url", None)
+        save_manifest_locally(result.scan_form, shipment_ids, result.local_pdf_path)
+        path_to_open = result.local_pdf_path or getattr(result.scan_form, "form_url", None)
         count = len(shipment_ids)
-        if form_url:
+        if path_to_open:
             reply = QMessageBox.question(
                 self,
                 tr("batch_shipments.manifest_created_title"),
@@ -896,7 +896,7 @@ class BatchView(QWidget):
                 QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
             )
             if reply == QMessageBox.StandardButton.Open:
-                open_label(form_url)
+                open_label(path_to_open)
         else:
             QMessageBox.information(
                 self,

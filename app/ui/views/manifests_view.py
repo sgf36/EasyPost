@@ -20,6 +20,7 @@ from app.i18n import tr
 from app.services.formatting import display_carrier, display_service
 from app.services.manifests import (
     ManifestError,
+    ManifestResult,
     create_manifest,
     list_manifests,
     save_manifest_locally,
@@ -160,9 +161,10 @@ class ManifestsView(QWidget):
             actions = QWidget()
             actions_layout = QHBoxLayout(actions)
             actions_layout.setContentsMargins(0, 0, 0, 0)
-            if m.form_url:
+            manifest_path = m.local_form_path or m.form_url
+            if manifest_path:
                 dl_btn = QPushButton(tr("manifests.download_button"))
-                dl_btn.clicked.connect(partial(open_label, m.form_url))
+                dl_btn.clicked.connect(partial(open_label, manifest_path))
                 actions_layout.addWidget(dl_btn)
             self._hist_table.setCellWidget(row, len(_HISTORY_COLS) - 1, actions)
 
@@ -189,16 +191,16 @@ class ManifestsView(QWidget):
         ids = [s.id for s in selected]
         self._create_btn.setEnabled(False)
         self._pending_task = run_async(lambda: create_manifest(ids), self)
-        self._pending_task.succeeded.connect(lambda sf: self._on_manifest_created(sf, ids))
+        self._pending_task.succeeded.connect(lambda result: self._on_manifest_created(result, ids))
         self._pending_task.failed.connect(self._on_manifest_failed)
 
-    def _on_manifest_created(self, scan_form, shipment_ids: list[str]) -> None:
+    def _on_manifest_created(self, result: ManifestResult, shipment_ids: list[str]) -> None:
         self._create_btn.setEnabled(True)
-        save_manifest_locally(scan_form, shipment_ids)
+        save_manifest_locally(result.scan_form, shipment_ids, result.local_pdf_path)
         self._refresh_all()
 
-        form_url = getattr(scan_form, "form_url", None)
-        if form_url:
+        path_to_open = result.local_pdf_path or getattr(result.scan_form, "form_url", None)
+        if path_to_open:
             reply = QMessageBox.question(
                 self,
                 tr("manifests.created_title"),
@@ -206,7 +208,7 @@ class ManifestsView(QWidget):
                 QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
             )
             if reply == QMessageBox.StandardButton.Open:
-                open_label(form_url)
+                open_label(path_to_open)
         else:
             QMessageBox.information(
                 self,
