@@ -32,6 +32,7 @@ from app.services.insurance import (
     is_pending,
     validate_amount,
 )
+from app.services.manifests import create_manifest, save_manifest_locally
 from app.services.shipments import (
     is_refund_pending,
     list_shipments,
@@ -51,6 +52,7 @@ _COLUMN_KEYS = [
     "history.column_service",
     "history.column_rate",
     "history.column_status",
+    "history.column_manifest",
     "history.column_insured",
     "history.column_refund_status",
     None,
@@ -105,10 +107,13 @@ class HistoryView(QWidget):
         reload_btn.clicked.connect(self.refresh_table)
         export_btn = QPushButton(tr("history.export_sheet_button"))
         export_btn.clicked.connect(self._on_export_sheet)
+        manifest_btn = QPushButton(tr("history.create_manifest_button"))
+        manifest_btn.clicked.connect(self._on_create_manifest)
 
         buttons = QHBoxLayout()
         buttons.addWidget(reload_btn)
         buttons.addWidget(export_btn)
+        buttons.addWidget(manifest_btn)
         buttons.addStretch(1)
 
         layout = QVBoxLayout()
@@ -148,6 +153,7 @@ class HistoryView(QWidget):
                 display_service(rec.service or ""),
                 format_money(rec.rate_amount, rec.rate_currency) if rec.rate_amount else "",
                 display_status(rec.status),
+                "✓" if rec.scan_form_id else "—",
                 # Insurance is always US dollars whatever the shipment is priced
                 # in (see services/insurance.py), so this column cannot borrow
                 # the rate's currency — and a bare figure beside "3.85 GBP" in
@@ -271,3 +277,56 @@ class HistoryView(QWidget):
         QMessageBox.information(
             self, tr("history.refund_status_title"), tr("history.refund_status_body", status=status)
         )
+
+    def _on_create_manifest(self) -> None:
+        rows = sorted({idx.row() for idx in self._table.selectionModel().selectedRows()})
+        selected = [self._records[r] for r in rows if r < len(self._records)]
+        eligible = [s for s in selected if s.tracking_code and not s.scan_form_id]
+        if not eligible:
+            QMessageBox.information(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.manifest_none_selected"),
+            )
+            return
+
+        carriers = {s.carrier for s in eligible if s.carrier}
+        if len(carriers) > 1:
+            QMessageBox.warning(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.manifest_mixed_carrier"),
+            )
+            return
+
+        ids = [s.id for s in eligible]
+        self._pending_task = run_async(lambda: create_manifest(ids), self)
+        self._pending_task.succeeded.connect(lambda sf: self._on_manifest_created(sf, ids))
+        self._pending_task.failed.connect(
+            lambda exc: QMessageBox.critical(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.manifest_failed_body", error=format_api_error(exc)),
+            )
+        )
+
+    def _on_manifest_created(self, scan_form, shipment_ids: list[str]) -> None:
+        save_manifest_locally(scan_form, shipment_ids)
+        self.refresh_table()
+        form_url = getattr(scan_form, "form_url", None)
+        count = len(shipment_ids)
+        if form_url:
+            reply = QMessageBox.question(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.manifest_created_body", count=count),
+                QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
+            )
+            if reply == QMessageBox.StandardButton.Open:
+                open_label(form_url)
+        else:
+            QMessageBox.information(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.manifest_created_body", count=count),
+            )

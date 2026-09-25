@@ -47,6 +47,7 @@ from app.services.packages import (
     list_saved_packages,
     save_package,
 )
+from app.services.manifests import create_manifest, save_manifest_locally
 from app.services.tracking import track_shipment
 from app.services.shipments import (
     buy_shipment,
@@ -1732,12 +1733,14 @@ class CreateShipmentView(QWidget):
         self._open_label_btn.clicked.connect(self._on_open_label)
         self._track_btn = QPushButton(tr("create_shipment.track_button"))
         self._track_btn.clicked.connect(self.tracking_requested.emit)
+        self._manifest_btn = QPushButton(tr("create_shipment.manifest_button"))
+        self._manifest_btn.clicked.connect(self._on_manifest_shipment)
 
         details = QVBoxLayout()
         details.addWidget(self._result_heading)
         details.addWidget(self._result_label)
         for button in (self._print_label_btn, self._save_label_btn,
-                       self._open_label_btn, self._track_btn):
+                       self._open_label_btn, self._track_btn, self._manifest_btn):
             row = QHBoxLayout()
             row.addWidget(button)
             row.addStretch(1)
@@ -2269,6 +2272,42 @@ class CreateShipmentView(QWidget):
     def _on_open_label(self) -> None:
         if getattr(self, "_pending_label_url", None):
             open_label(self._pending_label_url)
+
+    def _on_manifest_shipment(self) -> None:
+        if not self._current_shipment:
+            return
+        sid = self._current_shipment.id
+        self._manifest_btn.setEnabled(False)
+        self._pending_task = run_async(lambda: create_manifest([sid]), self)
+        self._pending_task.succeeded.connect(lambda sf: self._on_manifest_done(sf, [sid]))
+        self._pending_task.failed.connect(self._on_manifest_error)
+
+    def _on_manifest_done(self, scan_form, ids: list[str]) -> None:
+        save_manifest_locally(scan_form, ids)
+        form_url = getattr(scan_form, "form_url", None)
+        if form_url:
+            reply = QMessageBox.question(
+                self,
+                tr("create_shipment.manifest_created_title"),
+                tr("create_shipment.manifest_created_body"),
+                QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
+            )
+            if reply == QMessageBox.StandardButton.Open:
+                open_label(form_url)
+        else:
+            QMessageBox.information(
+                self,
+                tr("create_shipment.manifest_created_title"),
+                tr("create_shipment.manifest_created_body"),
+            )
+
+    def _on_manifest_error(self, exc: Exception) -> None:
+        self._manifest_btn.setEnabled(True)
+        QMessageBox.critical(
+            self,
+            tr("create_shipment.manifest_created_title"),
+            tr("create_shipment.manifest_failed_body", error=format_api_error(exc)),
+        )
 
     def _on_save_label(self) -> None:
         url = getattr(self, "_pending_label_url", None)

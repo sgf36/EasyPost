@@ -39,6 +39,7 @@ from app.ui.views.dashboard_view import DashboardView
 from app.ui.views.history_view import HistoryView
 from app.ui.views.hts_lookup_view import HtsLookupView
 from app.ui.views.insurance_view import InsuranceView
+from app.ui.views.manifests_view import ManifestsView
 from app.ui.views.license_gate import LicenseGate
 from app.ui.views.pair_mobile_view import PairMobileView
 from app.ui.views.store_unlock import StoreUnlockGate
@@ -182,6 +183,7 @@ class MainWindow(QMainWindow):
         self._pickups_view = PickupsView()
         self._claims_view = ClaimsView()
         self._batch_view = BatchView()
+        self._manifests_view = ManifestsView()
         self._reports_view = ReportsView()
         self._hts_lookup_view = HtsLookupView()
         self._pair_mobile_view = PairMobileView()
@@ -270,6 +272,11 @@ class MainWindow(QMainWindow):
                         "main_window.nav_batch_shipments",
                         self._batch_view,
                         self._batch_view.on_show,
+                    ),
+                    (
+                        "main_window.nav_manifests",
+                        self._manifests_view,
+                        self._manifests_view.on_show,
                     ),
                     (
                         "main_window.nav_address_book",

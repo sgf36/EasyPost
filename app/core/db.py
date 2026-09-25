@@ -194,6 +194,20 @@ CREATE TABLE IF NOT EXISTS service_levels_cache (
     cached_at TEXT DEFAULT (datetime('now'))
 );
 
+-- Carrier manifests (EasyPost ScanForms). A manifest groups purchased
+-- shipments for end-of-day closeout — Royal Mail requires one before
+-- collection. tracking_codes is a JSON array of the tracking codes covered.
+CREATE TABLE IF NOT EXISTS scan_forms (
+    id TEXT PRIMARY KEY,
+    mode TEXT NOT NULL,
+    status TEXT,
+    form_url TEXT,
+    tracking_codes TEXT,
+    shipment_count INTEGER,
+    message TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
 -- Spend requests raised by an AI agent over MCP, awaiting human approval in
 -- the desktop app. Nothing here is trusted: `summary_json` is re-fetched from
 -- EasyPost at approval time rather than taken from whatever the agent said,
@@ -247,6 +261,7 @@ _COLUMN_MIGRATIONS = [
     # recording waited for the purchase to settle never reached History, and
     # this is what makes the backfill look at each of them once.
     ("batches", "shipments_recorded", "INTEGER NOT NULL DEFAULT 0"),
+    ("shipments", "scan_form_id", "TEXT"),
 ]
 
 
