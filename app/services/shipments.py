@@ -263,6 +263,7 @@ class ShipmentRecord:
     label_url: Optional[str]
     insured_amount: Optional[str]
     refund_status: Optional[str]
+    scan_form_id: Optional[str] = None
 
 
 _SHIPMENT_FIELDS = [f for f in ShipmentRecord.__dataclass_fields__]

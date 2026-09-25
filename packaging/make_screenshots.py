@@ -226,6 +226,32 @@ def _seed_database(db_path: Path) -> None:
                  "available_for_pickup", None, "2026-08-13"),
             ],
         )
+        # Manifests (scan forms) — two already-created, so the history table
+        # has content. Three Royal Mail shipments are linked to the first.
+        import json
+        cur.executemany(
+            "INSERT OR REPLACE INTO scan_forms (id, mode, status, form_url,"
+            " tracking_codes, shipment_count, message)"
+            " VALUES (?,?,?,?,?,?,?)",
+            [
+                ("sf_demo1", MODE, "created",
+                 "https://easypost-files.s3.us-west-2.amazonaws.com/demo/scanform.pdf",
+                 json.dumps(["AA000000001GB", "AA000000002GB", "AA000000003GB"]),
+                 3, None),
+                ("sf_demo2", MODE, "created",
+                 "https://easypost-files.s3.us-west-2.amazonaws.com/demo/scanform2.pdf",
+                 json.dumps(["EZ1000000002"]),
+                 1, None),
+            ],
+        )
+        cur.execute(
+            "UPDATE shipments SET scan_form_id = 'sf_demo1' "
+            "WHERE id IN ('shp_demo1', 'shp_demo3', 'shp_demo8')"
+        )
+        cur.execute(
+            "UPDATE shipments SET scan_form_id = 'sf_demo2' "
+            "WHERE id = 'shp_demo4'"
+        )
 
 
 # Deliberately not a valid key shape, so an accidental network call fails loudly
@@ -1010,6 +1036,7 @@ def main() -> int:
     from app.ui.views.create_shipment_view import CreateShipmentView
     from app.ui.views.history_view import HistoryView
     from app.ui.views.hts_lookup_view import HtsLookupView
+    from app.ui.views.manifests_view import ManifestsView
     from app.ui.views.tracking_view import TrackingView
 
     pages = [
@@ -1018,6 +1045,7 @@ def main() -> int:
         ("03-tracking", TrackingView),
         ("04-history", HistoryView),
         ("05-hts-lookup", HtsLookupView),
+        ("06-manifests", ManifestsView),
     ]
 
     # Enforced, not merely intended: a page whose module is on the forbidden

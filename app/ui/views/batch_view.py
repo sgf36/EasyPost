@@ -54,6 +54,7 @@ from app.services.batches import (
     write_xlsx_template,
 )
 from app.services.label_sheets import build_combined_labels
+from app.services.manifests import create_manifest, save_manifest_locally
 from app.services.packages import predefined_package_choices
 from app.ui.open_file import open_label
 from app.ui.widgets.async_worker import run_async
@@ -342,6 +343,10 @@ class BatchView(QWidget):
         self._export_sheet_btn.setEnabled(False)
         self._export_sheet_btn.clicked.connect(self._on_export_sheet)
 
+        self._manifest_btn = QPushButton(tr("batch_shipments.manifest_button"))
+        self._manifest_btn.setEnabled(False)
+        self._manifest_btn.clicked.connect(self._on_manifest)
+
         self._status_label = QLabel(tr("batch_shipments.no_batch_label"))
         self._status_label.setWordWrap(True)
 
@@ -363,6 +368,7 @@ class BatchView(QWidget):
             self._buy_batch_btn,
             self._generate_labels_btn,
             self._export_sheet_btn,
+            self._manifest_btn,
         )):
             row.addWidget(button, index // 3, index % 3)
 
@@ -698,6 +704,7 @@ class BatchView(QWidget):
         # EasyPost is still building the combined PDF, and asking for it again
         # mid-generation just restarts the wait.
         self._generate_labels_btn.setEnabled(state in ("purchased", "label_generated"))
+        self._manifest_btn.setEnabled(state in ("purchased", "label_generated"))
         # Once bought, each shipment carries its own label — offer the print
         # sheet, though the URLs have to be fetched before it can be enabled.
         self._fetch_label_urls(batch)
@@ -863,4 +870,44 @@ class BatchView(QWidget):
             lambda exc: QMessageBox.critical(
                 self, tr("common.error"), tr("batch_shipments.generate_labels_failed_body", error=format_api_error(exc))
             )
+        )
+
+    def _on_manifest(self) -> None:
+        if not self._current_batch:
+            return
+        ids = bought_shipment_ids(self._current_batch)
+        if not ids:
+            return
+        self._manifest_btn.setEnabled(False)
+        self._pending_task = run_async(lambda: create_manifest(ids), self)
+        self._pending_task.succeeded.connect(lambda sf: self._on_manifest_created(sf, ids))
+        self._pending_task.failed.connect(self._on_manifest_failed)
+
+    def _on_manifest_created(self, scan_form, shipment_ids: list[str]) -> None:
+        self._manifest_btn.setEnabled(True)
+        save_manifest_locally(scan_form, shipment_ids)
+        form_url = getattr(scan_form, "form_url", None)
+        count = len(shipment_ids)
+        if form_url:
+            reply = QMessageBox.question(
+                self,
+                tr("batch_shipments.manifest_created_title"),
+                tr("batch_shipments.manifest_created_body", count=count),
+                QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
+            )
+            if reply == QMessageBox.StandardButton.Open:
+                open_label(form_url)
+        else:
+            QMessageBox.information(
+                self,
+                tr("batch_shipments.manifest_created_title"),
+                tr("batch_shipments.manifest_created_body", count=count),
+            )
+
+    def _on_manifest_failed(self, exc: Exception) -> None:
+        self._manifest_btn.setEnabled(True)
+        QMessageBox.critical(
+            self,
+            tr("batch_shipments.manifest_created_title"),
+            tr("batch_shipments.manifest_failed_body", error=format_api_error(exc)),
         )
