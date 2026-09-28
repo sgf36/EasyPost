@@ -49,6 +49,12 @@ from app.services.packages import (
 )
 from app.services.manifests import create_manifest, save_manifest_locally
 from app.services.tracking import track_shipment
+from app.services.click_drop import (
+    buy_click_drop,
+    click_drop_configured,
+    fetch_services as fetch_cd_services,
+    save_click_drop_locally,
+)
 from app.services.shipments import (
     buy_shipment,
     create_rate_quote,
@@ -2118,6 +2124,8 @@ class CreateShipmentView(QWidget):
         notes = carrier_messages(shipment)
         self._show_carrier_notes(notes)
 
+        self._fetch_click_drop_rates()
+
         if not rates:
             body = tr("create_shipment.no_rates_body")
             if notes:
@@ -2125,6 +2133,164 @@ class CreateShipmentView(QWidget):
             QMessageBox.information(
                 self, tr("create_shipment.no_rates_title"), body
             )
+
+    # ── Click & Drop integration ───────────────────────────────────────
+
+    def _fetch_click_drop_rates(self) -> None:
+        """Fetch Click & Drop services after EasyPost rates are shown."""
+        if not click_drop_configured():
+            return
+        generation = self._rates_generation
+
+        if self._mode_zip_radio.isChecked():
+            country = (self._to_country_combo.currentData() or "GB").upper()
+            postcode = self._to_zip_input.text().strip()
+        else:
+            to_rec = self._address_by_id.get(self._to_combo.currentData())
+            if not to_rec:
+                return
+            country = (to_rec.country or "GB").upper()
+            postcode = to_rec.zip or ""
+
+        weight_g = int(self._weight_oz() * 28.3495) if self._weight_oz() else 0
+        task = run_async(
+            lambda: fetch_cd_services(
+                country_code=country,
+                postcode=postcode,
+                weight_grams=weight_g,
+            ),
+            self,
+        )
+        task.succeeded.connect(partial(self._on_cd_rates_received, generation))
+
+    def _on_cd_rates_received(self, generation: int, cd_rates: list) -> None:
+        if generation != self._rates_generation or not cd_rates:
+            return
+        merged = list(self._rates) + list(cd_rates)
+        real_rates = [r for r in merged if not rate_rules.is_placeholder_rate(r)]
+        self._rates = real_rates or merged
+        self._rate_currency = rate_rules.comparison_currency(
+            self._rates, preferred=self._sender_currency()
+        )
+        self._cheapest_id = rate_rules.cheapest_rate_id(
+            self._rates, currency=self._rate_currency
+        )
+        self._fastest_id = rate_rules.fastest_rate_id(
+            self._rates, currency=self._rate_currency
+        )
+        self._carrier_filter.blockSignals(True)
+        self._carrier_filter.set_carriers(carriers_present_in(self._rates))
+        self._carrier_filter.set_current_carrier(self._preferred_carrier)
+        self._carrier_filter.blockSignals(False)
+        self._carrier_filter_row.setVisible(self._carrier_filter.count() > 2)
+        self._render_rates()
+
+    def _buy_click_drop(self, rate) -> None:
+        self._set_purchase_in_flight(True)
+
+        description = tr(
+            "create_shipment.click_drop_buy_confirm",
+            service=getattr(rate, "service", ""),
+        )
+        if not confirm_if_production(self, description):
+            self._set_purchase_in_flight(False)
+            return
+
+        if self._mode_zip_radio.isChecked():
+            self._set_purchase_in_flight(False)
+            return
+
+        to_rec = self._address_by_id.get(self._to_combo.currentData())
+        from_rec = self._address_by_id.get(self._from_combo.currentData())
+        if not to_rec:
+            self._set_purchase_in_flight(False)
+            return
+
+        service_code = getattr(rate, "service_code", "")
+        recipient = {
+            "fullName": (to_rec.name or to_rec.company or "").strip(),
+            "companyName": (to_rec.company or "").strip(),
+            "addressLine1": (to_rec.street1 or "").strip(),
+            "addressLine2": (to_rec.street2 or "").strip(),
+            "addressLine3": "",
+            "city": (to_rec.city or "").strip(),
+            "county": (to_rec.state or "").strip(),
+            "postcode": (to_rec.zip or "").strip(),
+            "countryCode": (to_rec.country or "GB").upper(),
+            "phoneNumber": (to_rec.phone or "").strip(),
+            "emailAddress": (to_rec.email or "").strip(),
+        }
+
+        weight_g = int(self._weight_oz() * 28.3495) if self._weight_oz() else 0
+        packages = [{"weightInGrams": weight_g, "packageFormatIdentifier": "Parcel"}]
+
+        length = self._length_in()
+        width = self._width_in()
+        height = self._height_in()
+        if length and width and height:
+            packages[0]["heightInCm"] = round(height * 2.54, 1)
+            packages[0]["widthInCm"] = round(width * 2.54, 1)
+            packages[0]["depthInCm"] = round(length * 2.54, 1)
+
+        reference = self._reference_input.text().strip()
+        mode = client_manager.active_mode
+        to_str = f"{to_rec.name or to_rec.company or ''}, {to_rec.city or ''}"
+        from_str = (
+            f"{from_rec.name or from_rec.company or ''}, {from_rec.city or ''}"
+            if from_rec else ""
+        )
+
+        self._pending_task = run_async(
+            lambda: buy_click_drop(
+                service_code=service_code,
+                recipient=recipient,
+                packages=packages,
+                order_reference=reference,
+            ),
+            self,
+        )
+        self._pending_task.succeeded.connect(
+            partial(self._on_cd_bought, mode=mode, to_str=to_str, from_str=from_str)
+        )
+        self._pending_task.failed.connect(self._on_buy_failed)
+
+    def _on_cd_bought(
+        self, order, *, mode: str | None = None, to_str: str = "", from_str: str = ""
+    ) -> None:
+        self._label_bought = True
+        self._set_purchase_in_flight(False)
+        save_click_drop_locally(order, mode, to_address=to_str, from_address=from_str)
+
+        tracking_code = order.tracking_number or ""
+        self._result_label.setText(
+            tr("create_shipment.tracking_number", tracking_code=tracking_code)
+            if tracking_code else ""
+        )
+        self._result_label.setVisible(bool(tracking_code))
+        self._track_btn.setVisible(bool(tracking_code))
+
+        if order.label_pdf_path:
+            self._open_label_btn.setEnabled(True)
+            self._save_label_btn.setEnabled(True)
+            self._pending_label_url = order.label_pdf_path
+            self._pending_label_file_type = "pdf"
+            self._print_label_btn.setVisible(False)
+            self._label_preview.setText(
+                tr("create_shipment.click_drop_label_saved", path=order.label_pdf_path)
+            )
+        else:
+            self._pending_label_url = None
+            self._open_label_btn.setEnabled(False)
+            self._save_label_btn.setEnabled(False)
+            self._print_label_btn.setVisible(False)
+            self._label_preview.setText(tr("create_shipment.click_drop_no_label"))
+
+        self._result_group.setVisible(True)
+        self._reveal_result()
+        note_successful_shipment()
+        schedule_review_prompt(self)
+
+    # ── Currency / carrier helpers ───────────────────────────────────────
 
     def _sender_currency(self) -> str | None:
         """The sender's own currency, or None when the country is not one the
@@ -2172,7 +2338,12 @@ class CreateShipmentView(QWidget):
         )
 
     def _on_buy_clicked(self, rate) -> None:
-        if self._current_shipment is None or self._purchase_in_flight or self._label_bought:
+        if self._purchase_in_flight or self._label_bought:
+            return
+        if getattr(rate, "id", "").startswith("cd_"):
+            self._buy_click_drop(rate)
+            return
+        if self._current_shipment is None:
             return
         # Before the confirmation rather than after it: test mode has none, and a
         # second click would otherwise start a second purchase.
@@ -2331,10 +2502,15 @@ class CreateShipmentView(QWidget):
         if not path:
             return
         try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-            with open(path, "wb") as f:
-                f.write(response.content)
+            import os
+            if os.path.isfile(url):
+                import shutil
+                shutil.copy2(url, path)
+            else:
+                response = requests.get(url, timeout=30)
+                response.raise_for_status()
+                with open(path, "wb") as f:
+                    f.write(response.content)
             QMessageBox.information(
                 self, tr("create_shipment.saved_title"), tr("create_shipment.saved_body", path=path)
             )

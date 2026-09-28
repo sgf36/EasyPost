@@ -27,7 +27,7 @@ MIN_REAL_RATE = 0.02
 # Carriers that invoice postage to the account rather than charging the label
 # price up front. For these, a sub-MIN_REAL_RATE figure means "billed to
 # account" and the label genuinely can be bought.
-ACCOUNT_BILLED_CARRIERS = frozenset({"RoyalMail", "RoyalMailV3"})
+ACCOUNT_BILLED_CARRIERS = frozenset({"RoyalMail", "RoyalMailV3", "ClickDrop"})
 
 
 def rate_amount(rate) -> Optional[float]:

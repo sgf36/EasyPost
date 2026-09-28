@@ -39,6 +39,7 @@ def _stored(test_key="EZTK_stored_test", production_key="EZAK_stored_prod"):
         production_key=production_key,
         active_mode="test",
         has_mode=lambda mode: True,
+        click_drop_api_key=None,
     )
 
 

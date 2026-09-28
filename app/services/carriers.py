@@ -116,6 +116,7 @@ _CARRIER_DISPLAY_OVERRIDES = {
     "cslogistics": "CS Logistics",
     "sda": "SDA",
     "upsdap": "UPS DAP",
+    "clickdrop": "Royal Mail (Click & Drop)",
 }
 
 
