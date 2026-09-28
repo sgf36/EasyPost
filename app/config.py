@@ -5,7 +5,7 @@ from pathlib import Path
 
 import platformdirs
 
-APP_NAME = "EasyPost Desktop"
+APP_NAME = "Desktop Shipping for EasyPost"
 APP_DIR_NAME = "EasyPostDesktop"
 KEYRING_SERVICE_NAME = "EasyPostDesktop"
 
