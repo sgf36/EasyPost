@@ -6,12 +6,14 @@ shipments come back with ``rates: []`` and ``selected_rate: None``, and
 carrier and service are declared up front through the ServicePicker instead.
 """
 
+import logging
 from pathlib import Path
 
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QCompleter,
     QGridLayout,
     QFileDialog,
     QFormLayout,
@@ -53,6 +55,12 @@ from app.services.batches import (
     write_csv_template,
     write_xlsx_template,
 )
+from app.core.countries import to_alpha3
+from app.services.carriers import carrier_matches
+from app.services.click_drop import (
+    bulk_buy_click_drop,
+    save_click_drop_locally,
+)
 from app.services.label_sheets import build_combined_labels
 from app.services.manifests import create_manifest, save_manifest_locally
 from app.services.packages import predefined_package_choices
@@ -62,6 +70,8 @@ from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
 from app.ui.widgets.review_nudge import schedule_review_prompt
 from app.ui.widgets.service_picker import ServicePicker
+
+logger = logging.getLogger(__name__)
 
 # States EasyPost is still working through. Batch creation and purchase are both
 # asynchronous, so the app polls until the state settles rather than leaving the
@@ -157,15 +167,24 @@ class BatchView(QWidget):
         row = QHBoxLayout()
 
         self._from_combo = QComboBox()
-        # A combo will not shrink below the width of its longest address unless
-        # told it may, so in German — where "Vorlage herunterladen" and
-        # "Datei wählen…" are half again as long as their English labels — the
-        # row overflowed and cut the second button off the edge of the window.
-        # The address is the elastic part here; the buttons are not.
         self._from_combo.setMinimumContentsLength(12)
         self._from_combo.setSizeAdjustPolicy(
             QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon
         )
+        self._from_combo.setEditable(True)
+        self._from_combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        completer = self._from_combo.completer()
+        if completer is not None:
+            completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+            completer.setFilterMode(Qt.MatchFlag.MatchContains)
+            completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+        le = self._from_combo.lineEdit()
+        if le:
+            def _restore(c=self._from_combo):
+                idx = c.currentIndex()
+                if idx >= 0:
+                    c.setEditText(c.itemText(idx))
+            le.editingFinished.connect(_restore)
         template_btn = QPushButton(tr("batch_shipments.download_template_button"))
         template_btn.clicked.connect(self._on_download_template)
         browse_btn = QPushButton(tr("batch_shipments.choose_csv_button"))
@@ -555,6 +574,11 @@ class BatchView(QWidget):
             return
 
         self._selection = selection
+
+        if selection and carrier_matches(selection.carrier, "ClickDrop"):
+            self._on_create_cd_batch(selection)
+            return
+
         self._create_batch_btn.setEnabled(False)
         self._label_prompt_shown = False
         self._label_urls = []
@@ -594,6 +618,127 @@ class BatchView(QWidget):
         )
         self._refresh_status_btn.setEnabled(True)
         self._update_status_label(batch)
+
+    # -- Click & Drop batch --------------------------------------------------
+
+    def _on_create_cd_batch(self, selection) -> None:
+        """Click & Drop bulk: create + buy in one call (no async polling)."""
+        valid_rows = [r for r in self._parsed_rows if r.is_valid]
+        if not valid_rows:
+            return
+
+        description = tr(
+            "batch_shipments.confirm_buy_body",
+        )
+        if not confirm_if_production(self, description):
+            return
+
+        self._create_batch_btn.setEnabled(False)
+        self._label_prompt_shown = False
+        self._label_urls = []
+        self._export_sheet_btn.setEnabled(False)
+
+        from_rec = self._address_by_id.get(self._from_combo.currentData())
+        from_addr = None
+        if from_rec:
+            from_addr = {
+                "fullName": (from_rec.name or from_rec.company or "").strip(),
+                "companyName": (from_rec.company or "").strip(),
+                "addressLine1": (from_rec.street1 or "").strip(),
+                "addressLine2": (from_rec.street2 or "").strip(),
+                "addressLine3": "",
+                "city": (from_rec.city or "").strip(),
+                "county": (from_rec.state or "").strip(),
+                "postcode": (from_rec.zip or "").strip(),
+                "countryCode": to_alpha3((from_rec.country or "GB").upper()),
+            }
+
+        service_code = selection.service
+        self._pending_task = run_async(
+            lambda: bulk_buy_click_drop(
+                rows=valid_rows,
+                service_code=service_code,
+                from_address=from_addr,
+            ),
+            self,
+        )
+        self._pending_task.succeeded.connect(self._on_cd_batch_complete)
+        self._pending_task.failed.connect(
+            lambda exc: (
+                self._update_create_enabled(),
+                mark_session_friction(),
+                QMessageBox.critical(
+                    self, tr("common.error"),
+                    tr("batch_shipments.create_failed_body", error=format_api_error(exc)),
+                ),
+            )
+        )
+
+    def _on_cd_batch_complete(self, result) -> None:
+        self._update_create_enabled()
+        from app.core.client import client_manager
+        mode = client_manager.active_mode
+
+        label_paths: list[str] = []
+        for order in result.created:
+            to_str = ""
+            save_click_drop_locally(order, mode, to_address=to_str)
+            if order.label_pdf_path:
+                label_paths.append(order.label_pdf_path)
+            if order.tracking_number:
+                self._track_cd_order(order.tracking_number, mode)
+
+        self._label_urls = label_paths
+        self._export_sheet_btn.setEnabled(bool(label_paths))
+        self._generate_labels_btn.setEnabled(bool(label_paths))
+
+        created = len(result.created)
+        failed = len(result.failed)
+        status = tr(
+            "batch_shipments.status_label",
+            batch_id=f"cd-bulk",
+            state="purchased",
+            num_shipments=created,
+        )
+        if failed:
+            errors = []
+            for fo in result.failed:
+                msgs = [e.get("message", str(e)) for e in fo.get("errors", [])]
+                errors.append("; ".join(msgs) if msgs else str(fo))
+            status += "\n" + "\n".join(errors[:10])
+            mark_session_friction()
+
+        self._status_label.setText(status)
+        self._buy_batch_btn.setEnabled(False)
+        self._refresh_status_btn.setEnabled(False)
+
+        if not failed:
+            QMessageBox.information(
+                self, tr("batch_shipments.purchased_title"),
+                tr("batch_shipments.purchased_body"),
+            )
+            note_successful_shipment()
+            schedule_review_prompt(self)
+        else:
+            QMessageBox.warning(
+                self, tr("batch_shipments.purchase_problems_title"),
+                tr("batch_shipments.purchase_problems_body",
+                   details=f"{created} created, {failed} failed"),
+            )
+
+    def _track_cd_order(self, tracking_code: str, mode: str | None) -> None:
+        from app.services.tracking import create_tracker, save_tracker_locally
+
+        def _do_track():
+            tracker = create_tracker(tracking_code, carrier="RoyalMail")
+            save_tracker_locally(tracker, mode)
+
+        task = run_async(_do_track, self)
+        task.failed.connect(
+            lambda exc: logger.warning(
+                "Could not create tracker for CD batch %s: %s", tracking_code, exc
+            )
+        )
 
     def _on_refresh_status(self) -> None:
         if not self._current_batch:

@@ -21,8 +21,9 @@ def preferred_label_options() -> dict:
 
 def create_shipment(
     *,
-    to_address_id: str,
+    to_address_id: str = "",
     from_address_id: str,
+    to_address: Optional[dict] = None,
     weight: float,
     length: Optional[float] = None,
     width: Optional[float] = None,
@@ -32,9 +33,11 @@ def create_shipment(
     customs_info: Optional[dict] = None,
     delivery_confirmation: Optional[str] = None,
 ):
-    """Create a shipment and get back live carrier rates. References existing
-    verified addresses by EasyPost id rather than re-submitting full address
-    fields.
+    """Create a shipment and get back live carrier rates.
+
+    The recipient can be given as ``to_address_id`` (an EasyPost address id
+    from the address book) *or* ``to_address`` (a dict of address fields for
+    a new recipient entered inline).
 
     Exactly one of `predefined_package` (a carrier box/envelope code, e.g.
     "FedExPak" — see app/services/packages.py) or `length`/`width`/`height`
@@ -56,16 +59,13 @@ def create_shipment(
     else:
         parcel.update({"length": length, "width": width, "height": height})
 
-    # Merge the signature option into the user's label-format options rather
-    # than replacing them, and only when one is chosen (an empty value would
-    # otherwise clear whatever carriers default to).
     options = preferred_label_options()
     if delivery_confirmation:
         options["delivery_confirmation"] = delivery_confirmation
 
     client = client_manager.get_client()
     params = dict(
-        to_address={"id": to_address_id},
+        to_address=to_address if to_address else {"id": to_address_id},
         from_address={"id": from_address_id},
         parcel=parcel,
         reference=reference or None,

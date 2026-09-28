@@ -1,5 +1,6 @@
 """Create a shipment, shop rates, buy a label, and save/open it."""
 
+import logging
 from functools import partial
 
 import requests
@@ -8,6 +9,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
+    QCompleter,
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
@@ -36,7 +38,14 @@ from app.core.countries import COUNTRIES
 from app.core.errors import carrier_messages, format_api_error
 from app.core.settings import load_settings, save_settings
 from app.i18n import tr
-from app.services.addresses import address_choice_label, list_addresses
+from app.services.addresses import (
+    AddressRecord,
+    AddressVerificationError,
+    address_choice_label,
+    list_addresses,
+    save_address_locally,
+    verify_address,
+)
 from app.services.carriers import carriers_present_in, for_carrier
 from app.services.formatting import display_carrier, humanize_code
 from app.services import rates as rate_rules
@@ -55,6 +64,7 @@ from app.services.click_drop import (
     fetch_services as fetch_cd_services,
     save_click_drop_locally,
 )
+from app.core.countries import to_alpha3
 from app.services.shipments import (
     buy_shipment,
     create_rate_quote,
@@ -70,6 +80,8 @@ from app.ui.widgets.chips import badge
 from app.ui.widgets.print_sheet_dialog import PrintSheetDialog
 from app.ui.widgets.purchase_confirm import confirm_if_production
 from app.ui.widgets.review_nudge import schedule_review_prompt
+
+logger = logging.getLogger(__name__)
 
 # Carrier & service | Rate | Est. days | Buy. Rates are shown in a QTreeWidget
 # grouped by carrier: the carrier is a top-level (header) row and each service
@@ -100,16 +112,33 @@ _LABEL_FILE_TYPES = {
 }
 
 
-def _narrowable_combo() -> QComboBox:
-    """A combo whose longest entry does not set the page's minimum width.
+_NEW_RECIPIENT = "__new__"
 
-    An address choice reads "Label — street, city, state", and Qt sizes a combo
-    to its longest entry by default, so one long saved address widened the whole
-    page. The full text is still shown in the open list.
+
+def _narrowable_combo() -> QComboBox:
+    """A filterable combo whose longest entry does not set the page's width.
+
+    Editable with a substring-matching completer so the user can type to narrow
+    the dropdown.  Selecting from the popup commits the choice; if focus leaves
+    without a selection the display reverts to the previously chosen item.
     """
     combo = QComboBox()
     combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
     combo.setMinimumContentsLength(16)
+    combo.setEditable(True)
+    combo.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+    completer = combo.completer()
+    if completer is not None:
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        completer.setFilterMode(Qt.MatchFlag.MatchContains)
+        completer.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)
+    le = combo.lineEdit()
+    if le:
+        def _restore(c=combo):
+            idx = c.currentIndex()
+            if idx >= 0:
+                c.setEditText(c.itemText(idx))
+        le.editingFinished.connect(_restore)
     return combo
 
 
@@ -571,13 +600,16 @@ class CreateShipmentView(QWidget):
 
         self._from_combo = _narrowable_combo()
         self._to_combo = _narrowable_combo()
-        # Shown while no recipient is chosen, which is how a new shipment starts
-        # (see refresh_address_choices).
-        self._to_combo.setPlaceholderText(tr("create_shipment.to_placeholder"))
+        le = self._to_combo.lineEdit()
+        if le:
+            le.setPlaceholderText(tr("create_shipment.to_placeholder"))
         self._from_combo.currentIndexChanged.connect(self._update_customs_visibility)
         self._to_combo.currentIndexChanged.connect(self._update_customs_visibility)
+        self._to_combo.currentIndexChanged.connect(self._on_to_combo_changed)
         refresh_btn = QPushButton(tr("create_shipment.reload_button"))
         refresh_btn.clicked.connect(self.refresh_address_choices)
+
+        self._inline_recipient_widget = self._build_inline_recipient_form()
 
         # From and To on lines of their own. Side by side, with the reload
         # button, they needed 1,146px in Tamil.
@@ -588,7 +620,8 @@ class CreateShipmentView(QWidget):
         addr_grid.addWidget(self._from_combo, 0, 1)
         addr_grid.addWidget(QLabel(tr("create_shipment.to_label")), 1, 0)
         addr_grid.addWidget(self._to_combo, 1, 1)
-        addr_grid.addWidget(refresh_btn, 2, 1, alignment=Qt.AlignmentFlag.AlignLeft)
+        addr_grid.addWidget(self._inline_recipient_widget, 2, 0, 1, 2)
+        addr_grid.addWidget(refresh_btn, 3, 1, alignment=Qt.AlignmentFlag.AlignLeft)
         addr_grid.setColumnStretch(1, 1)
 
         mode_row = self._build_address_mode_row()
@@ -749,6 +782,46 @@ class CreateShipmentView(QWidget):
         row.addWidget(self._mode_full_radio)
         row.addWidget(self._mode_zip_radio)
         return row
+
+    def _build_inline_recipient_form(self) -> QWidget:
+        """Address fields for a new recipient entered directly on this page."""
+        widget = QWidget()
+        widget.setVisible(False)
+        form = QFormLayout(widget)
+        form.setContentsMargins(8, 4, 0, 4)
+        form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
+
+        self._inline_name = QLineEdit()
+        self._inline_company = QLineEdit()
+        self._inline_street1 = QLineEdit()
+        self._inline_street2 = QLineEdit()
+        self._inline_city = QLineEdit()
+        self._inline_state = QLineEdit()
+        self._inline_zip = QLineEdit()
+        self._inline_country = self._country_combo()
+        self._inline_phone = QLineEdit()
+        self._inline_email = QLineEdit()
+
+        form.addRow(tr("address_book.name_field"), self._inline_name)
+        form.addRow(tr("address_book.company_field"), self._inline_company)
+        form.addRow(tr("address_book.street1_field"), self._inline_street1)
+        form.addRow(tr("address_book.street2_field"), self._inline_street2)
+        form.addRow(tr("address_book.city_field"), self._inline_city)
+        form.addRow(tr("address_book.state_field"), self._inline_state)
+        form.addRow(tr("address_book.zip_field"), self._inline_zip)
+        form.addRow(tr("address_book.country_field"), self._inline_country)
+        form.addRow(tr("address_book.phone_field"), self._inline_phone)
+        form.addRow(tr("address_book.email_field"), self._inline_email)
+
+        self._save_to_book_cb = QCheckBox(tr("create_shipment.save_to_address_book"))
+        self._save_to_book_cb.setChecked(True)
+        form.addRow("", self._save_to_book_cb)
+
+        return widget
+
+    def _on_to_combo_changed(self) -> None:
+        is_new = self._to_combo.currentData() == _NEW_RECIPIENT
+        self._inline_recipient_widget.setVisible(is_new)
 
     def _build_zip_row(self) -> QWidget:
         self._from_zip_input = QLineEdit()
@@ -1198,9 +1271,32 @@ class CreateShipmentView(QWidget):
                 self._invalidate_rates()
                 return
 
+    def _get_to_record(self) -> AddressRecord | None:
+        """The recipient, from the address book or the inline form."""
+        to_id = self._to_combo.currentData()
+        if to_id == _NEW_RECIPIENT:
+            return AddressRecord(
+                id="",
+                mode="",
+                label=None,
+                name=self._inline_name.text().strip() or None,
+                company=self._inline_company.text().strip() or None,
+                street1=self._inline_street1.text().strip() or None,
+                street2=self._inline_street2.text().strip() or None,
+                city=self._inline_city.text().strip() or None,
+                state=self._inline_state.text().strip() or None,
+                zip=self._inline_zip.text().strip() or None,
+                country=self._inline_country.currentData() or None,
+                phone=self._inline_phone.text().strip() or None,
+                email=self._inline_email.text().strip() or None,
+                verified=False,
+                is_favorite=False,
+            )
+        return self._address_by_id.get(to_id)
+
     def _is_international(self) -> bool:
         from_rec = self._address_by_id.get(self._from_combo.currentData())
-        to_rec = self._address_by_id.get(self._to_combo.currentData())
+        to_rec = self._get_to_record()
         return customs.is_international(
             getattr(from_rec, "country", None), getattr(to_rec, "country", None)
         )
@@ -1829,6 +1925,9 @@ class CreateShipmentView(QWidget):
             combo.clear()
             for rec in records:
                 combo.addItem(address_choice_label(rec), rec.id)
+        self._to_combo.addItem(
+            tr("create_shipment.new_recipient_option"), _NEW_RECIPIENT
+        )
         self._from_combo.setCurrentIndex(
             max(self._from_combo.findData(previous_from), 0) if records else -1
         )
@@ -1836,6 +1935,7 @@ class CreateShipmentView(QWidget):
         self._to_combo.setCurrentIndex(self._to_combo.findData(previous_to))
         for combo in (self._from_combo, self._to_combo):
             combo.blockSignals(False)
+        self._on_to_combo_changed()
         self._update_customs_visibility()
         if (self._from_combo.currentData(), self._to_combo.currentData()) != (
             previous_from, previous_to
@@ -1913,6 +2013,14 @@ class CreateShipmentView(QWidget):
             line.textChanged.connect(self._invalidate_rates)
         self._customs_certify_checkbox.toggled.connect(self._invalidate_rates)
         self._mode_full_radio.toggled.connect(self._invalidate_rates)
+        for inline_line in (
+            self._inline_name, self._inline_company, self._inline_street1,
+            self._inline_street2, self._inline_city, self._inline_state,
+            self._inline_zip, self._inline_phone, self._inline_email,
+        ):
+            inline_line.textChanged.connect(self._invalidate_rates)
+        self._inline_country.currentIndexChanged.connect(self._invalidate_rates)
+        self._inline_country.currentIndexChanged.connect(self._update_customs_visibility)
 
     def _begin_rating(self) -> int:
         """Start a rating request and return the generation its reply must
@@ -1949,6 +2057,7 @@ class CreateShipmentView(QWidget):
 
         from_id = self._from_combo.currentData()
         to_id = self._to_combo.currentData()
+        inline = to_id == _NEW_RECIPIENT
         if self._from_combo.count() < 2 or not from_id:
             QMessageBox.warning(
                 self,
@@ -1957,9 +2066,6 @@ class CreateShipmentView(QWidget):
             )
             return
         if not to_id:
-            # There are addresses to choose from; the user has not chosen one.
-            # "Verify at least two addresses first" would send them to the
-            # Address Book for nothing.
             QMessageBox.warning(
                 self,
                 tr("create_shipment.missing_addresses_title"),
@@ -1967,7 +2073,17 @@ class CreateShipmentView(QWidget):
             )
             self._to_combo.setFocus()
             return
-        if from_id == to_id:
+
+        to_rec = self._get_to_record()
+        if inline:
+            if not (to_rec and to_rec.street1 and to_rec.city):
+                QMessageBox.warning(
+                    self,
+                    tr("create_shipment.missing_addresses_title"),
+                    tr("create_shipment.inline_missing_street_city"),
+                )
+                return
+        elif from_id == to_id:
             QMessageBox.warning(
                 self,
                 tr("create_shipment.same_address_title"),
@@ -1979,14 +2095,9 @@ class CreateShipmentView(QWidget):
         customs_info = None
         if self._is_international():
             from_rec = self._address_by_id.get(from_id)
-            to_rec = self._address_by_id.get(to_id)
             if not (from_rec.name or from_rec.company or "").strip() or not (
                 to_rec.name or to_rec.company or ""
             ).strip():
-                # Carriers require a name or company on both addresses for the
-                # customs declaration. EasyPost's error for this is buried in
-                # a generic 400 ("malformed syntax") unless the detailed
-                # errors list is surfaced — see app/core/errors.py.
                 QMessageBox.warning(
                     self,
                     tr("create_shipment.missing_name_title"),
@@ -1994,11 +2105,6 @@ class CreateShipmentView(QWidget):
                 )
                 return
             if not (from_rec.phone or "").strip() or not (to_rec.phone or "").strip():
-                # Carriers require a phone number on both addresses for an
-                # international label. USPS reports a useless generic 400 when
-                # it's missing rather than a clear validation error (DHL/FedEx
-                # do report it clearly) — catch it here instead of letting the
-                # user hit that opaque error at buy time.
                 QMessageBox.warning(
                     self,
                     tr("create_shipment.missing_phone_title"),
@@ -2019,13 +2125,27 @@ class CreateShipmentView(QWidget):
 
         package_data = self._package_combo.currentData()
         params = dict(
-            to_address_id=to_id,
             from_address_id=from_id,
             weight=self._weight_oz(),
             reference=self._reference_input.text().strip(),
             customs_info=customs_info,
             delivery_confirmation=self._signature_combo.currentData(),
         )
+        if inline:
+            params["to_address"] = {
+                "name": to_rec.name or None,
+                "company": to_rec.company or None,
+                "street1": to_rec.street1,
+                "street2": to_rec.street2 or None,
+                "city": to_rec.city,
+                "state": to_rec.state or None,
+                "zip": to_rec.zip or None,
+                "country": to_rec.country or "US",
+                "phone": to_rec.phone or None,
+                "email": to_rec.email or None,
+            }
+        else:
+            params["to_address_id"] = to_id
         if isinstance(package_data, tuple) and package_data[0] == "predefined":
             params["predefined_package"] = package_data[1].name
         else:
@@ -2146,7 +2266,7 @@ class CreateShipmentView(QWidget):
             country = (self._to_country_combo.currentData() or "GB").upper()
             postcode = self._to_zip_input.text().strip()
         else:
-            to_rec = self._address_by_id.get(self._to_combo.currentData())
+            to_rec = self._get_to_record()
             if not to_rec:
                 return
             country = (to_rec.country or "GB").upper()
@@ -2200,7 +2320,7 @@ class CreateShipmentView(QWidget):
             self._set_purchase_in_flight(False)
             return
 
-        to_rec = self._address_by_id.get(self._to_combo.currentData())
+        to_rec = self._get_to_record()
         from_rec = self._address_by_id.get(self._from_combo.currentData())
         if not to_rec:
             self._set_purchase_in_flight(False)
@@ -2216,21 +2336,22 @@ class CreateShipmentView(QWidget):
             "city": (to_rec.city or "").strip(),
             "county": (to_rec.state or "").strip(),
             "postcode": (to_rec.zip or "").strip(),
-            "countryCode": (to_rec.country or "GB").upper(),
+            "countryCode": to_alpha3((to_rec.country or "GB").upper()),
             "phoneNumber": (to_rec.phone or "").strip(),
             "emailAddress": (to_rec.email or "").strip(),
         }
 
         weight_g = int(self._weight_oz() * 28.3495) if self._weight_oz() else 0
-        packages = [{"weightInGrams": weight_g, "packageFormatIdentifier": "Parcel"}]
+        pkg_format = getattr(rate, "package_format", "") or "Parcel"
+        packages = [{"weightInGrams": weight_g, "packageFormatIdentifier": pkg_format}]
 
         length = self._length_in()
         width = self._width_in()
         height = self._height_in()
         if length and width and height:
-            packages[0]["heightInCm"] = round(height * 2.54, 1)
-            packages[0]["widthInCm"] = round(width * 2.54, 1)
-            packages[0]["depthInCm"] = round(length * 2.54, 1)
+            packages[0]["heightInMms"] = round(height * 25.4)
+            packages[0]["widthInMms"] = round(width * 25.4)
+            packages[0]["depthInMms"] = round(length * 25.4)
 
         reference = self._reference_input.text().strip()
         mode = client_manager.active_mode
@@ -2269,6 +2390,9 @@ class CreateShipmentView(QWidget):
         self._result_label.setVisible(bool(tracking_code))
         self._track_btn.setVisible(bool(tracking_code))
 
+        if tracking_code:
+            self._track_cd_shipment(tracking_code, mode)
+
         if order.label_pdf_path:
             self._open_label_btn.setEnabled(True)
             self._save_label_btn.setEnabled(True)
@@ -2287,8 +2411,61 @@ class CreateShipmentView(QWidget):
 
         self._result_group.setVisible(True)
         self._reveal_result()
+        self._maybe_save_inline_recipient()
         note_successful_shipment()
         schedule_review_prompt(self)
+
+    def _maybe_save_inline_recipient(self) -> None:
+        """If an inline recipient was entered and save-to-address-book is
+        ticked, verify + save it in the background after a purchase."""
+        if self._to_combo.currentData() != _NEW_RECIPIENT:
+            return
+        if not self._save_to_book_cb.isChecked():
+            return
+        rec = self._get_to_record()
+        if not rec or not rec.street1 or not rec.city:
+            return
+
+        def _do_save():
+            try:
+                addr = verify_address(
+                    name=rec.name or "",
+                    company=rec.company or "",
+                    street1=rec.street1,
+                    street2=rec.street2 or "",
+                    city=rec.city,
+                    state=rec.state or "",
+                    zip=rec.zip or "",
+                    country=rec.country or "US",
+                    phone=rec.phone or "",
+                    email=rec.email or "",
+                )
+                save_address_locally(addr, label=rec.name or rec.company, verified=True)
+            except AddressVerificationError as exc:
+                save_address_locally(exc.address, label=rec.name or rec.company, verified=False)
+            except Exception:
+                logger.warning("Could not save inline recipient to address book", exc_info=True)
+
+        task = run_async(_do_save, self)
+        task.succeeded.connect(lambda _: self.refresh_address_choices())
+
+    def _track_cd_shipment(self, tracking_code: str, mode: str | None) -> None:
+        """Create an EasyPost tracker for a Click & Drop shipment.
+
+        EasyPost can track any Royal Mail parcel by tracking number, so
+        Click & Drop purchases appear on the Tracking page alongside
+        EasyPost ones.  Best effort — the label is already bought.
+        """
+        from app.services.tracking import create_tracker, save_tracker_locally
+
+        def _do_track():
+            tracker = create_tracker(tracking_code, carrier="RoyalMail")
+            save_tracker_locally(tracker, mode)
+
+        task = run_async(_do_track, self)
+        task.failed.connect(
+            lambda exc: logger.warning("Could not create tracker for CD %s: %s", tracking_code, exc)
+        )
 
     # ── Currency / carrier helpers ───────────────────────────────────────
 
@@ -2429,9 +2606,8 @@ class CreateShipmentView(QWidget):
         self._result_group.setVisible(True)
         self._reveal_result()
 
-        # A bought label is the moment of satisfaction, so it is where the review
-        # prompt belongs. Both calls are no-ops on builds with no storefront, and
-        # every other gate is applied inside them.
+        self._maybe_save_inline_recipient()
+
         note_successful_shipment()
         schedule_review_prompt(self)
 
