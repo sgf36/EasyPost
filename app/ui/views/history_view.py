@@ -32,6 +32,10 @@ from app.services.insurance import (
     is_pending,
     validate_amount,
 )
+from app.services.click_drop import (
+    create_click_drop_manifest,
+    void_click_drop_order,
+)
 from app.services.manifests import create_manifest, save_manifest_locally
 from app.services.shipments import (
     is_refund_pending,
@@ -174,19 +178,26 @@ class HistoryView(QWidget):
                 open_btn.clicked.connect(partial(open_label, rec.label_url))
                 actions_layout.addWidget(open_btn)
 
-            insure_btn = QPushButton(
-                tr("history.insure_button")
-                if not rec.insured_amount
-                else tr("history.update_insurance_button")
-            )
-            insure_btn.clicked.connect(partial(self._on_insure_clicked, rec.id))
-            actions_layout.addWidget(insure_btn)
+            is_cd = rec.id.startswith("cd_") if rec.id else False
 
-            if not rec.refund_status:
+            if not is_cd:
+                insure_btn = QPushButton(
+                    tr("history.insure_button")
+                    if not rec.insured_amount
+                    else tr("history.update_insurance_button")
+                )
+                insure_btn.clicked.connect(partial(self._on_insure_clicked, rec.id))
+                actions_layout.addWidget(insure_btn)
+
+            if is_cd and not rec.refund_status:
+                void_btn = QPushButton(tr("history.void_order_button"))
+                void_btn.clicked.connect(partial(self._on_void_cd_clicked, rec.id))
+                actions_layout.addWidget(void_btn)
+            elif not is_cd and not rec.refund_status:
                 refund_btn = QPushButton(tr("history.request_refund_button"))
                 refund_btn.clicked.connect(partial(self._on_refund_clicked, rec.id))
                 actions_layout.addWidget(refund_btn)
-            elif is_refund_pending(rec.refund_status):
+            elif not is_cd and is_refund_pending(rec.refund_status):
                 check_btn = QPushButton(tr("history.check_refund_status_button"))
                 check_btn.clicked.connect(partial(self._on_check_refund_clicked, rec.id))
                 actions_layout.addWidget(check_btn)
@@ -278,10 +289,56 @@ class HistoryView(QWidget):
             self, tr("history.refund_status_title"), tr("history.refund_status_body", status=status)
         )
 
+    def _on_void_cd_clicked(self, shipment_id: str) -> None:
+        if not confirm_if_production(
+            self, tr("history.confirm_void_order")
+        ):
+            return
+        mark_session_friction()
+        order_id = int(shipment_id.removeprefix("cd_"))
+        self._pending_task = run_async(lambda: void_click_drop_order(order_id), self)
+        self._pending_task.succeeded.connect(lambda _: self._on_void_complete())
+        self._pending_task.failed.connect(
+            lambda exc: QMessageBox.critical(
+                self, tr("history.error_title"), tr("history.void_failed", error=format_api_error(exc))
+            )
+        )
+
+    def _on_void_complete(self) -> None:
+        self.refresh_table()
+        QMessageBox.information(
+            self,
+            tr("history.void_complete_title"),
+            tr("history.void_complete_body"),
+        )
+
     def _on_create_manifest(self) -> None:
         rows = sorted({idx.row() for idx in self._table.selectionModel().selectedRows()})
         selected = [self._records[r] for r in rows if r < len(self._records)]
-        eligible = [s for s in selected if s.tracking_code and not s.scan_form_id]
+
+        cd_eligible = [
+            s for s in selected
+            if (s.id or "").startswith("cd_") and s.tracking_code and not s.scan_form_id
+        ]
+        ep_eligible = [
+            s for s in selected
+            if s.tracking_code and not s.scan_form_id
+            and not (s.id or "").startswith("cd_")
+        ]
+
+        if cd_eligible and ep_eligible:
+            QMessageBox.warning(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.manifest_mixed_carrier"),
+            )
+            return
+
+        if cd_eligible:
+            self._on_create_cd_manifest()
+            return
+
+        eligible = ep_eligible
         if not eligible:
             QMessageBox.information(
                 self,
@@ -309,6 +366,35 @@ class HistoryView(QWidget):
                 tr("history.manifest_failed_body", error=format_api_error(exc)),
             )
         )
+
+    def _on_create_cd_manifest(self) -> None:
+        self._pending_task = run_async(create_click_drop_manifest, self)
+        self._pending_task.succeeded.connect(self._on_cd_manifest_created)
+        self._pending_task.failed.connect(
+            lambda exc: QMessageBox.critical(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.manifest_failed_body", error=format_api_error(exc)),
+            )
+        )
+
+    def _on_cd_manifest_created(self, result) -> None:
+        self.refresh_table()
+        if result.pdf_path:
+            reply = QMessageBox.question(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.cd_manifest_created_body"),
+                QMessageBox.StandardButton.Open | QMessageBox.StandardButton.Close,
+            )
+            if reply == QMessageBox.StandardButton.Open:
+                open_label(result.pdf_path)
+        else:
+            QMessageBox.information(
+                self,
+                tr("history.manifest_created_title"),
+                tr("history.cd_manifest_pending_body"),
+            )
 
     def _on_manifest_created(self, result, shipment_ids: list[str]) -> None:
         save_manifest_locally(result.scan_form, shipment_ids, result.local_pdf_path)
