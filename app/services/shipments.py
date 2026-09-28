@@ -265,6 +265,7 @@ class ShipmentRecord:
     refund_status: Optional[str]
     scan_form_id: Optional[str] = None
     created_at: Optional[str] = None
+    provider: Optional[str] = None
 
 
 _SHIPMENT_FIELDS = [f for f in ShipmentRecord.__dataclass_fields__]

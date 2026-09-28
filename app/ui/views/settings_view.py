@@ -101,6 +101,7 @@ class SettingsView(QWidget):
         layout.addWidget(self._prod_key_hint)
         layout.addLayout(form)
         layout.addLayout(button_row)
+        layout.addWidget(self._build_click_drop_group())
         layout.addWidget(self._build_label_group())
         layout.addWidget(self._build_language_group())
         # Real-time push (webhook tunnel) is disabled on the MAS build — the App
@@ -139,6 +140,76 @@ class SettingsView(QWidget):
         )
         box.addWidget(button, alignment=Qt.AlignLeft)
         return group
+
+    def _build_click_drop_group(self) -> QGroupBox:
+        group = QGroupBox(tr("settings.click_drop_group_title"))
+
+        self._cd_key_input = QLineEdit()
+        self._cd_key_input.setEchoMode(QLineEdit.EchoMode.PasswordEchoOnEdit)
+        self._cd_key_input.setPlaceholderText("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
+
+        cd_form = QFormLayout()
+        cd_form.addRow(tr("settings.click_drop_key_label"), self._cd_key_input)
+
+        cd_save_btn = QPushButton(tr("settings.click_drop_save_button"))
+        cd_save_btn.clicked.connect(self._on_click_drop_save)
+
+        cd_forget_btn = QPushButton(tr("settings.click_drop_forget_button"))
+        cd_forget_btn.clicked.connect(self._on_click_drop_forget)
+
+        cd_test_btn = QPushButton(tr("settings.click_drop_test_button"))
+        cd_test_btn.clicked.connect(self._on_click_drop_test)
+
+        cd_btn_row = QHBoxLayout()
+        cd_btn_row.addWidget(cd_test_btn)
+        cd_btn_row.addWidget(cd_forget_btn)
+        cd_btn_row.addStretch(1)
+        cd_btn_row.addWidget(cd_save_btn)
+
+        box = QVBoxLayout(group)
+        box.addLayout(cd_form)
+        box.addLayout(cd_btn_row)
+        return group
+
+    def _on_click_drop_save(self) -> None:
+        key = self._cd_key_input.text().strip()
+        creds = load_credentials()
+        if key:
+            creds.click_drop_api_key = key
+        save_credentials(creds)
+        QMessageBox.information(
+            self,
+            tr("settings.click_drop_saved_title"),
+            tr("settings.click_drop_saved_body"),
+        )
+
+    def _on_click_drop_forget(self) -> None:
+        creds = load_credentials()
+        creds.click_drop_api_key = None
+        save_credentials(creds)
+        self._cd_key_input.clear()
+        QMessageBox.information(
+            self,
+            tr("settings.click_drop_saved_title"),
+            tr("settings.click_drop_saved_body"),
+        )
+
+    def _on_click_drop_test(self) -> None:
+        from app.services.click_drop import test_connection
+        try:
+            result = test_connection()
+            version = result.get("release", "unknown") if isinstance(result, dict) else "unknown"
+            QMessageBox.information(
+                self,
+                tr("settings.click_drop_saved_title"),
+                tr("settings.click_drop_test_success", version=version),
+            )
+        except Exception as exc:
+            QMessageBox.warning(
+                self,
+                tr("common.error"),
+                tr("settings.click_drop_test_fail", error=str(exc)),
+            )
 
     def _build_label_group(self) -> QGroupBox:
         """Printed-label format and size.
@@ -404,6 +475,10 @@ class SettingsView(QWidget):
         ):
             field.clear()
             field.setPlaceholderText(self._STORED_MASK if stored else "")
+        self._cd_key_input.clear()
+        self._cd_key_input.setPlaceholderText(
+            self._STORED_MASK if creds.click_drop_api_key else ""
+        )
 
     def _toggle_visibility(self, checked: bool) -> None:
         if MAS_BUILD:

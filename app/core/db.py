@@ -208,6 +208,20 @@ CREATE TABLE IF NOT EXISTS scan_forms (
     created_at TEXT DEFAULT (datetime('now'))
 );
 
+-- Click & Drop orders. Stores the Click & Drop-specific fields that do not
+-- map onto the EasyPost-shaped shipments table. The matching shipments row
+-- uses id = "cd_{order_identifier}" so the two are joinable.
+CREATE TABLE IF NOT EXISTS click_drop_orders (
+    order_identifier INTEGER PRIMARY KEY,
+    mode TEXT NOT NULL,
+    order_reference TEXT,
+    service_code TEXT,
+    tracking_number TEXT,
+    label_pdf_path TEXT,
+    status TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+);
+
 -- Spend requests raised by an AI agent over MCP, awaiting human approval in
 -- the desktop app. Nothing here is trusted: `summary_json` is re-fetched from
 -- EasyPost at approval time rather than taken from whatever the agent said,
@@ -263,6 +277,7 @@ _COLUMN_MIGRATIONS = [
     ("batches", "shipments_recorded", "INTEGER NOT NULL DEFAULT 0"),
     ("shipments", "scan_form_id", "TEXT"),
     ("scan_forms", "local_form_path", "TEXT"),
+    ("shipments", "provider", "TEXT DEFAULT 'easypost'"),
 ]
 
 

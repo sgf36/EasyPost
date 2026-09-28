@@ -22,6 +22,7 @@ class Credentials:
     test_key: Optional[str] = None
     production_key: Optional[str] = None
     active_mode: str = MODE_TEST
+    click_drop_api_key: Optional[str] = None
 
     def key_for_mode(self, mode: str) -> Optional[str]:
         return self.production_key if mode == MODE_PRODUCTION else self.test_key
