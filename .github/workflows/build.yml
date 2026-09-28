@@ -377,7 +377,7 @@ jobs:
       # CI-AZURE-SIGNING-SETUP.md before changing any of the three.
       - name: Azure login (OIDC) for signing
         if: matrix.os == 'windows-latest' && vars.AZURE_SIGNING_READY == 'true' && github.event_name != 'pull_request'
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -505,7 +505,7 @@ jobs:
         locale: ${{ fromJSON(needs.locales.outputs.list) }}
     runs-on: ${{ matrix.target.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'

@@ -31,7 +31,7 @@ jobs:
       run:
         working-directory: server/paddle-license-webhook-worker
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       # node:sqlite is unflagged from Node 22.13; 24 matches local runs.
       - uses: actions/setup-node@v5
         with:
