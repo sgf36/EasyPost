@@ -13,7 +13,7 @@
     ProcessorArchitecture="x64" />
 
   <Properties>
-    <DisplayName>Easy-Post Desktop</DisplayName>
+    <DisplayName>Desktop Shipping Companion — for EasyPost</DisplayName>
     <PublisherDisplayName>SFields</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -51,7 +51,7 @@
   <Applications>
     <Application Id="EasyPostDesktop" Executable="EasyPostDesktop\EasyPostDesktop.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
-        DisplayName="Easy-Post Desktop"
+        DisplayName="Desktop Shipping Companion — for EasyPost"
         Description="Rate shopping, labels, tracking, and shipping tools for your own EasyPost account."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
