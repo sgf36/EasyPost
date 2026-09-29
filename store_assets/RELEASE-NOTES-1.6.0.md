@@ -1,10 +1,11 @@
-# Easy-Post Desktop — release notes 1.5.0
+# Easy-Post Desktop — release notes 1.6.0
 
 Covers everything since 1.3.2, which was the last published version on both
-stores. The version jump to 1.5.0 is deliberate: 1.4.0 was submitted to the Mac
-App Store but not to Partner Center, and the two stores now share a version.
+stores. The version jump to 1.6.0 is deliberate: 1.4.0 was submitted to the Mac
+App Store, 1.5.0 went live on the Microsoft Store, and 1.6.0 brings all three
+channels (Partner Center, Mac App Store, direct download) back in sync.
 
-## What is in 1.5.0 for a customer
+## What is in 1.6.0 for a customer
 
 **Royal Mail Click & Drop — ship with Royal Mail directly (#92).** A second
 carrier path alongside EasyPost. Enter a Click & Drop API key in Settings, and

@@ -56,6 +56,130 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 
+# ---------------------------------------------------------------------------
+# Font coverage check — catch missing glyphs before rendering, not after.
+#
+# When the CI runner lacks fonts for a locale's primary script (Bengali,
+# Telugu, …), Qt renders every native-script character as a tofu rectangle
+# (□). The resulting screenshots are useless, and the run looks green.
+#
+# _LOCALE_WRITING_SYSTEMS maps each supported locale to its Qt WritingSystem.
+# _check_font_coverage() queries QFontDatabase.families(writing_system) after
+# the QApplication exists, and fails the job immediately if no fonts are
+# available — so the error names the cause rather than producing bad images.
+# ---------------------------------------------------------------------------
+
+_LOCALE_WRITING_SYSTEMS: dict[str, str] = {
+    "am": None,  # Ethiopic — no matching Qt enum; skipped
+    "ar": "Arabic",
+    "bn": "Bengali",
+    "cs": "Latin",
+    "de": "Latin",
+    "el": "Greek",
+    "en": "Latin",
+    "es": "Latin",
+    "fa": "Arabic",
+    "fr": "Latin",
+    "gu": "Gujarati",
+    "ha": "Latin",
+    "he": "Hebrew",
+    "hi": "Devanagari",
+    "hr": "Latin",
+    "hu": "Latin",
+    "id": "Latin",
+    "ig": "Latin",
+    "it": "Latin",
+    "ja": "Japanese",
+    "jv": "Latin",
+    "kn": "Kannada",
+    "ko": "Korean",
+    "ml": "Malayalam",
+    "mr": "Devanagari",
+    "ms": "Latin",
+    "my": "Myanmar",
+    "ne": "Devanagari",
+    "nl": "Latin",
+    "or": "Oriya",
+    "pa": "Gurmukhi",
+    "pl": "Latin",
+    "pt": "Latin",
+    "ro": "Latin",
+    "ru": "Cyrillic",
+    "si": "Sinhala",
+    "so": "Latin",
+    "sv": "Latin",
+    "sw": "Latin",
+    "ta": "Tamil",
+    "te": "Telugu",
+    "th": "Thai",
+    "tr": "Latin",
+    "uk": "Cyrillic",
+    "ur": "Arabic",
+    "uz": "Latin",
+    "vi": "Vietnamese",
+    "yo": "Latin",
+    "zh": "SimplifiedChinese",
+    "zu": "Latin",
+}
+
+
+def _check_font_coverage(locale: str) -> list[str]:
+    """Verify the system has fonts for the locale's primary script.
+
+    Returns a list of problem descriptions (empty = all clear).  Must be
+    called after QApplication exists.
+    """
+    from PySide6.QtGui import QFontDatabase
+
+    ws_name = _LOCALE_WRITING_SYSTEMS.get(locale)
+    if ws_name is None:
+        return []
+
+    ws = getattr(QFontDatabase.WritingSystem, ws_name, None)
+    if ws is None:
+        return []
+
+    families = QFontDatabase.families(ws)
+    if not families:
+        return [
+            f"No fonts found for {ws_name} script (locale '{locale}'). "
+            f"Screenshots will contain tofu characters (□). "
+            f"Install a font covering this script on the runner."
+        ]
+    return []
+
+
+def audit_for_tofu(root: Path) -> list[str]:
+    """Post-render check: flag screenshots with suspiciously low complexity.
+
+    A belt-and-braces pass after the font check.  Opens each PNG and checks
+    that the content area has enough visual variation to contain real text.
+    Tofu characters compress into very uniform images, so an abnormally small
+    file relative to its pixel count is a warning sign.
+    """
+    from PIL import Image
+
+    problems = []
+    for png in sorted(root.rglob("*.png")):
+        img = Image.open(png)
+        pixel_count = img.width * img.height
+        file_bytes = png.stat().st_size
+        if pixel_count == 0:
+            problems.append(f"{png.name}: empty image")
+            continue
+        bits_per_pixel = (file_bytes * 8) / pixel_count
+        # Real screenshots with anti-aliased text and UI chrome compress to
+        # roughly 1–6 bits/pixel in PNG.  Pure tofu with uniform backgrounds
+        # compresses below 0.1.  A threshold of 0.15 catches obvious cases
+        # without false-positiving on sparse-but-real pages.
+        if bits_per_pixel < 0.15:
+            problems.append(
+                f"{png.name}: unusually low complexity "
+                f"({bits_per_pixel:.2f} bits/px) — may contain tofu text"
+            )
+    return problems
+
+
 # Store-required canvas sizes, in logical pixels, with the scale factor each is
 # rendered at. Apple and Microsoft both police these dimensions, so they are
 # produced exactly rather than resized afterwards.
@@ -1019,6 +1143,14 @@ def main() -> int:
 
     app = QApplication.instance() or QApplication([])
     print(f"Qt platform plugin: {app.platformName()}")
+
+    font_problems = _check_font_coverage(args.locale)
+    if font_problems:
+        for p in font_problems:
+            print(f"FONT ERROR: {p}")
+        sys.stdout.flush()
+        os._exit(3)
+
     if args.unseeded:
         from app.core.db import init_db
 
@@ -1126,6 +1258,13 @@ def main() -> int:
 
     shutil.rmtree(scratch, ignore_errors=True)
     print(f"{written} screenshot(s) written to {out_root}")
+
+    tofu_problems = audit_for_tofu(out_root)
+    if tofu_problems:
+        print(f"\n{len(tofu_problems)} screenshot(s) may have encoding issues:")
+        for p in tofu_problems:
+            print(f"  WARNING: {p}")
+
     sys.stdout.flush()
 
     # Leave immediately rather than unwinding Qt.
@@ -1137,7 +1276,8 @@ def main() -> int:
     # disk, but with a non-zero exit code that would fail the CI job for no
     # real reason. Every file is written and flushed by this point, so there is
     # nothing left to clean up.
-    os._exit(0 if written else 1)
+    exit_code = 0 if written and not tofu_problems else 1
+    os._exit(exit_code)
 
 
 def audit_for_secrets(root: Path) -> list[str]:

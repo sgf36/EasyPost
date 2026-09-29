@@ -77,3 +77,45 @@ def test_audit_flags_a_forbidden_capture(shots, tmp_path):
 def test_audit_allows_a_settings_capture(shots, tmp_path):
     (tmp_path / "en_9_settings.png").write_bytes(b"")
     assert shots.audit_for_secrets(tmp_path) == []
+
+
+# ── Font coverage and tofu detection ──────────────────────────────────────
+
+
+def test_locale_writing_system_mapping_covers_all_locales(shots):
+    """Every locale JSON must have an entry in the writing system mapping."""
+    locales_dir = REPO_ROOT / "app" / "resources" / "locales"
+    for f in sorted(locales_dir.glob("*.json")):
+        locale = f.stem
+        assert locale in shots._LOCALE_WRITING_SYSTEMS, (
+            f"Locale '{locale}' has no entry in _LOCALE_WRITING_SYSTEMS"
+        )
+
+
+def test_audit_for_tofu_flags_tiny_images(shots, tmp_path):
+    """A PNG with near-zero complexity should be flagged."""
+    from PIL import Image
+
+    img = Image.new("RGB", (400, 300), color=(255, 255, 255))
+    path = tmp_path / "blank.png"
+    img.save(str(path), "PNG")
+    problems = shots.audit_for_tofu(tmp_path)
+    assert len(problems) == 1
+    assert "blank.png" in problems[0]
+
+
+def test_audit_for_tofu_passes_complex_images(shots, tmp_path):
+    """A PNG with real visual content should pass."""
+    from PIL import Image, ImageDraw
+
+    img = Image.new("RGB", (400, 300), color=(245, 245, 245))
+    draw = ImageDraw.Draw(img)
+    for y in range(0, 300, 20):
+        for x in range(0, 400, 15):
+            draw.rectangle([x, y, x + 10, y + 12], fill=(50, 50, 50))
+    draw.text((20, 20), "Create Shipment", fill=(0, 0, 0))
+    draw.text((20, 50), "Royal Mail Click & Drop", fill=(0, 0, 0))
+    path = tmp_path / "good.png"
+    img.save(str(path), "PNG")
+    problems = shots.audit_for_tofu(tmp_path)
+    assert problems == []
