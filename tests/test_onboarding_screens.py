@@ -386,11 +386,14 @@ def test_the_windows_store_price_is_read_from_the_store_listing(monkeypatch):
     assert se.unlock_price() == "79,00 €"
 
 
-def test_no_price_is_invented_off_the_store():
+def test_no_price_is_invented_off_the_store(monkeypatch):
     import app.core.mac_store_entitlement as mse
     import app.core.store_entitlement as se
 
-    # Tests run unpackaged and without the store flags, so neither store answers.
+    # Force the store flags off so a leftover flag file from a packaging run
+    # does not cause the test to hit the real Store API.
+    monkeypatch.setattr(se, "STORE_BUILD", False)
+    monkeypatch.setattr(mse, "MAS_BUILD", False)
     assert se.unlock_price() is None
     assert mse.unlock_price() is None
 
