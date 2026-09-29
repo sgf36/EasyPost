@@ -130,7 +130,7 @@ def upload(token: str, name: str, dry_run: bool = False) -> bool:
         to_charset="UTF-8",
     )
 
-    if Path(name).suffix.lower() in EXECUTED_SUFFIXES:
+    if Path(name).suffix.lower() in EXECUTED_SUFFIXES or Path(name).name.startswith("."):
         ok, read_back = _verify_over_api(token, name, content)
     else:
         ok, read_back = _verify_over_https(name, content)
