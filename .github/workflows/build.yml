@@ -307,6 +307,38 @@ jobs:
 
           security delete-keychain "$KEYCHAIN"
 
+      # After altool uploads the binary, Apple processes it (2-10 min). This
+      # step polls until the build is VALID, sets the "What's New" text from
+      # store_assets/RELEASE-NOTES-*.md, and submits for App Review.
+      - name: Submit Mac App Store build for review
+        if: matrix.os == 'macos-latest' && env.HAS_MAS_SIGNING == 'true' && github.event_name != 'pull_request'
+        timeout-minutes: 20
+        env:
+          HAS_MAS_SIGNING: ${{ secrets.MAS_CERTIFICATE_P12_BASE64 != '' }}
+          ASC_API_KEY_P8_BASE64: ${{ secrets.ASC_API_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          APP_VERSION="$(python3 -c 'import re,pathlib; print(re.search(r"APP_VERSION\s*=\s*\"([^\"]+)\"", pathlib.Path("app/config.py").read_text()).group(1))')"
+
+          # Extract "What's New" copy from the release notes (the blockquoted
+          # section under "Copy for the store listings").
+          WHATS_NEW="$(python3 -c "
+          import pathlib, re
+          notes = pathlib.Path('store_assets/RELEASE-NOTES-' + '$APP_VERSION' + '.md').read_text()
+          m = re.search(r'## Copy for the store listings.*?\n((?:>.*\n?)+)', notes)
+          if not m:
+              raise SystemExit('No store-listing copy found in RELEASE-NOTES-$APP_VERSION.md')
+          print(re.sub(r'^> ?', '', m.group(1), flags=re.MULTILINE).strip())
+          ")"
+
+          python3 packaging/mas/submit_for_review.py \
+            --version "$APP_VERSION" \
+            --build-number "$BUILD_NUMBER" \
+            --whats-new "$WHATS_NEW"
+
       # Packages dist/EasyPostDesktop/ (the PyInstaller output above) into
       # dist/EasyPostDesktop.msix for Microsoft Store submission via Partner
       # Center — see packaging/build_msix.py and README.
