@@ -328,7 +328,7 @@ jobs:
           WHATS_NEW="$(python3 -c "
           import pathlib, re
           notes = pathlib.Path('store_assets/RELEASE-NOTES-' + '$APP_VERSION' + '.md').read_text()
-          m = re.search(r'## Copy for the store listings.*?\n((?:>.*\n?)+)', notes)
+          m = re.search(r'## Copy for the store listings.*?((?:^>.*\n?)+)', notes, re.DOTALL | re.MULTILINE)
           if not m:
               raise SystemExit('No store-listing copy found in RELEASE-NOTES-$APP_VERSION.md')
           print(re.sub(r'^> ?', '', m.group(1), flags=re.MULTILINE).strip())
