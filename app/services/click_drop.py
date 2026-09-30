@@ -12,13 +12,16 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from app.config import APP_DATA_DIR, ensure_app_data_dir
+import requests
+
+from app.config import APP_DATA_DIR, PAIR_PROXY_URL, ensure_app_data_dir
 from app.core import click_drop_client as api
 from app.core.click_drop_client import ClickDropError
 from app.core.client import client_manager
 from app.core.countries import to_alpha3
 from app.core.credential_store import load_credentials
 from app.core.db import db_cursor
+from app.core.settings import load_settings
 
 logger = logging.getLogger(__name__)
 
@@ -247,7 +250,7 @@ def buy_click_drop(
         Path(label_path).write_bytes(label_pdf)
 
     svc_name = service_code
-    return ClickDropOrder(
+    result = ClickDropOrder(
         order_identifier=order_id,
         tracking_number=tracking,
         label_pdf=label_pdf,
@@ -255,6 +258,15 @@ def buy_click_drop(
         service_code=service_code,
         service_name=svc_name,
     )
+    _sync_orders_to_proxy([{
+        "order_identifier": order_id,
+        "tracking_number": tracking,
+        "service_name": svc_name,
+        "order_reference": order_reference or "",
+        "status": "purchased",
+        "created_at": _iso_now(),
+    }])
+    return result
 
 
 # ── Local persistence ─────────────────────────────────────────────────
@@ -411,6 +423,15 @@ def bulk_buy_click_drop(
         ))
 
     failed_orders = (resp or {}).get("failedOrders", [])
+    if created_orders:
+        _sync_orders_to_proxy([{
+            "order_identifier": o.order_identifier,
+            "tracking_number": o.tracking_number,
+            "service_name": o.service_name,
+            "order_reference": "",
+            "status": "purchased",
+            "created_at": order_date,
+        } for o in created_orders])
     return BulkClickDropResult(created=created_orders, failed=failed_orders)
 
 
@@ -430,6 +451,14 @@ def void_click_drop_order(order_identifier: int) -> None:
             "UPDATE shipments SET refund_status = ? WHERE id = ?",
             ("voided", f"cd_{order_identifier}"),
         )
+    _sync_orders_to_proxy([{
+        "order_identifier": order_identifier,
+        "tracking_number": None,
+        "service_name": "",
+        "order_reference": "",
+        "status": "voided",
+        "created_at": _iso_now(),
+    }])
 
 
 # ── CD-specific manifest ────────────────────────────────────────
@@ -503,3 +532,25 @@ def get_click_drop_manifest(manifest_id: int) -> ClickDropManifest:
 def _iso_now() -> str:
     from datetime import datetime, timezone
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _sync_orders_to_proxy(orders: list[dict]) -> None:
+    """Push Click & Drop order summaries to the mobile proxy (fire-and-forget).
+
+    Silently swallows failures — the mobile companion seeing orders is a
+    convenience, not a gate on the desktop workflow.
+    """
+    if not orders:
+        return
+    key = load_credentials().production_key
+    license_key = (load_settings().license_key or "").strip()
+    if not key or not license_key:
+        return
+    try:
+        requests.post(
+            f"{PAIR_PROXY_URL}/clickdrop/sync",
+            json={"license": license_key, "easypost_key": key, "orders": orders},
+            timeout=8,
+        )
+    except Exception:
+        logger.debug("Click & Drop proxy sync failed", exc_info=True)

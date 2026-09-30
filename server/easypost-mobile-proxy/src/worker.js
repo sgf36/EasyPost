@@ -425,6 +425,88 @@ async function handleProxy(request, env, url) {
   });
 }
 
+// ---- Click & Drop order sync ---------------------------------------------
+
+// Desktop → proxy. After buying or voiding a Click & Drop order, the desktop
+// pushes a summary here so the mobile companion can display it. Auth is the
+// same shape as /pair/revoke-all: a valid licence plus the EasyPost key (used
+// only for ownerHash, never stored). The Click & Drop API has no list-orders
+// endpoint, so D1 is the only way the phone can see these orders.
+async function handleClickDropSync(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "bad_json" }, 400);
+  }
+  const { license, easypost_key, orders } = body || {};
+  if (!easypost_key || !license || !Array.isArray(orders) || orders.length === 0) {
+    return json({ error: "missing_fields" }, 400);
+  }
+
+  const lic = await verifyLicense(license, env);
+  if (!lic) return json({ error: "invalid_license" }, 403);
+
+  const owner = await ownerHash(String(easypost_key));
+
+  const statements = orders.map((o) =>
+    env.PAIRING.prepare(
+      `INSERT OR REPLACE INTO click_drop_orders
+         (order_identifier, owner_hash, tracking_number, service_name, order_reference, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    ).bind(
+      o.order_identifier,
+      owner,
+      o.tracking_number || null,
+      o.service_name || "",
+      o.order_reference || null,
+      o.status || "purchased",
+      o.created_at || new Date().toISOString(),
+    ),
+  );
+  await env.PAIRING.batch(statements);
+
+  return json({ ok: true, synced: orders.length });
+}
+
+// Phone → proxy. Returns the Click & Drop orders that belong to the same
+// EasyPost account the phone is paired to, newest first.
+async function handleClickDropOrders(request, env) {
+  const deviceToken = bearerToken(request);
+  const kek = request.headers.get("x-ep-kek");
+  if (!deviceToken || !kek) return json({ error: "unauthenticated" }, 401);
+
+  const dev = await env.PAIRING.prepare(
+    `SELECT ciphertext, iv, revoked, owner_hash FROM devices WHERE device_token = ?`,
+  )
+    .bind(deviceToken)
+    .first();
+  if (!dev || dev.revoked) return json({ error: "unauthenticated" }, 401);
+
+  // Verify the KEK is valid by decrypting — same check as handleProxy.
+  try {
+    await decryptWithKek(kek, dev.ciphertext, dev.iv);
+  } catch {
+    return json({ error: "bad_kek" }, 401);
+  }
+
+  if (!dev.owner_hash) {
+    return json({ orders: [] });
+  }
+
+  const rows = await env.PAIRING.prepare(
+    `SELECT order_identifier, tracking_number, service_name, order_reference, status, created_at
+       FROM click_drop_orders
+      WHERE owner_hash = ?
+      ORDER BY created_at DESC
+      LIMIT 200`,
+  )
+    .bind(dev.owner_hash)
+    .all();
+
+  return json({ orders: rows.results || [] });
+}
+
 // ---- router --------------------------------------------------------------
 
 export default {
@@ -448,6 +530,12 @@ export default {
     }
     if (request.method === "POST" && url.pathname === "/pair/revoke-all") {
       return handleRevokeAll(request, env);
+    }
+    if (request.method === "POST" && url.pathname === "/clickdrop/sync") {
+      return handleClickDropSync(request, env);
+    }
+    if (request.method === "GET" && url.pathname === "/clickdrop/orders") {
+      return handleClickDropOrders(request, env);
     }
     if (url.pathname === "/ep" || url.pathname.startsWith("/ep/")) {
       return handleProxy(request, env, url);
