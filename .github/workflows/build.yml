@@ -67,7 +67,27 @@ jobs:
 
       - name: Run tests
         shell: bash
-        run: python -m pytest tests/ -v
+        run: |
+          # PySide6/Qt can segfault during process-exit cleanup on macOS CI
+          # runners ("QObject: shared QObject was deleted directly", SIGSEGV
+          # exit 139) AFTER every test has already passed. The segfault exit
+          # code replaces pytest's own exit code, making a green run red.
+          #
+          # --junitxml is flushed before cleanup runs, so the XML captures
+          # the real result. The || true prevents the crash from failing the
+          # step; the Python check reads the XML and exits 1 only when tests
+          # actually failed. An incomplete XML (mid-run crash) fails the parse
+          # and exits 1, so real crashes are not masked.
+          python -m pytest tests/ -v --junitxml=test-results.xml || true
+          python -c "
+          import xml.etree.ElementTree as ET, sys
+          tree = ET.parse('test-results.xml')
+          suite = tree.find('.//testsuite')
+          failures = int(suite.attrib.get('failures', 0))
+          errors = int(suite.attrib.get('errors', 0))
+          if failures + errors:
+              sys.exit(1)
+          "
 
       # Direct-download builds (macOS .dmg) enforce the Paddle license gate by
       # bundling this flag file; the Windows leg omits it so the Microsoft Store
