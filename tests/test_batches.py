@@ -3,6 +3,7 @@ from openpyxl import load_workbook
 from app.services.batches import (
     CSV_COLUMNS,
     _row_to_shipment_params,
+    carrier_code_from_choice,
     parse_csv,
     parse_import,
     write_csv_template,
@@ -230,3 +231,121 @@ def test_xlsx_template_without_choices_has_no_package_dropdown(tmp_path):
     # Still a usable template.
     rows = parse_import(str(path))
     assert len(rows) == 1 and rows[0].is_valid
+
+
+# ---------------------------------------------------------------------------
+# Carrier / service per-row validation
+# ---------------------------------------------------------------------------
+
+
+def test_carrier_code_from_choice_strips_label():
+    assert carrier_code_from_choice("RoyalMailV3 — Royal Mail V3") == "RoyalMailV3"
+    assert carrier_code_from_choice("FedEx") == "FedEx"
+    assert carrier_code_from_choice("") == ""
+
+
+def test_carrier_without_service_is_flagged(tmp_path):
+    path = tmp_path / "half.csv"
+    header = ",".join(CSV_COLUMNS)
+    row = "Jane,,123 Main St,,Boston,MA,02110,US,,,10,6,4,16,,ref-1,,,,,,SomeCarrier,"
+    path.write_text(f"{header}\n{row}\n", encoding="utf-8")
+
+    rows = parse_csv(str(path))
+
+    assert not rows[0].is_valid
+    assert "service" in _flagged(rows[0])
+
+
+def test_service_without_carrier_is_flagged(tmp_path):
+    path = tmp_path / "half2.csv"
+    header = ",".join(CSV_COLUMNS)
+    row = "Jane,,123 Main St,,Boston,MA,02110,US,,,10,6,4,16,,ref-1,,,,,,,SomeService"
+    path.write_text(f"{header}\n{row}\n", encoding="utf-8")
+
+    rows = parse_csv(str(path))
+
+    assert not rows[0].is_valid
+    assert "carrier" in _flagged(rows[0])
+
+
+def test_both_carrier_and_service_no_error_when_empty(tmp_path):
+    """Rows without per-row carrier/service are valid (batch-level applies)."""
+    path = tmp_path / "none.csv"
+    header = ",".join(CSV_COLUMNS)
+    row = "Jane,,123 Main St,,Boston,MA,02110,US,,,10,6,4,16,,ref-1"
+    path.write_text(f"{header}\n{row}\n", encoding="utf-8")
+
+    rows = parse_csv(str(path))
+
+    assert rows[0].is_valid
+
+
+def test_per_row_carrier_service_passes_to_shipment_params():
+    from app.services.batches import BatchRow
+
+    row = BatchRow(
+        line_number=2,
+        fields={
+            "to_street1": "10 Downing St", "to_city": "London", "to_state": "",
+            "to_zip": "SW1A 2AA", "to_country": "GB", "weight": "3.5",
+            "predefined_package": "LETTER",
+            "carrier": "RoyalMailV3", "service": "RoyalMail2ndClassSignedFor",
+        },
+        errors=[],
+    )
+    params = _row_to_shipment_params(row, "adr_uk")
+    assert params["carrier"] == "RoyalMailV3"
+    assert params["service"] == "RoyalMail2ndClassSignedFor"
+
+
+def test_per_row_carrier_service_overrides_batch_level():
+    from app.services.batches import BatchRow
+
+    row = BatchRow(
+        line_number=2,
+        fields={
+            "to_street1": "10 Downing St", "to_city": "London", "to_state": "",
+            "to_zip": "SW1A 2AA", "to_country": "GB", "weight": "3.5",
+            "predefined_package": "LETTER",
+            "carrier": "DHLExpress", "service": "ExpressWorldwide",
+        },
+        errors=[],
+    )
+    params = _row_to_shipment_params(
+        row, "adr_uk", carrier="RoyalMailV3", service="RoyalMail1stClass",
+    )
+    assert params["carrier"] == "DHLExpress"
+    assert params["service"] == "ExpressWorldwide"
+
+
+def test_xlsx_template_has_carrier_dropdown(tmp_path):
+    path = tmp_path / "template.xlsx"
+    carriers = ["RoyalMailV3 — Royal Mail V3", "FedEx — FedEx"]
+    write_xlsx_template(str(path), carrier_dropdown=carriers)
+
+    wb = load_workbook(str(path))
+    carrier_dvs = [
+        dv for dv in wb["Recipients"].data_validations.dataValidation
+        if "Carriers" in dv.formula1
+    ]
+    assert len(carrier_dvs) == 1
+    opts = wb["Carriers"]
+    assert opts.sheet_state == "hidden"
+    listed = [row[0].value for row in opts.iter_rows(min_row=2)]
+    assert listed == carriers
+
+
+def test_xlsx_template_has_service_reference_sheet(tmp_path):
+    path = tmp_path / "template.xlsx"
+    ref = [
+        ("RoyalMailV3", "RoyalMail1stClass", "1st Class"),
+        ("RoyalMailV3", "RoyalMail2ndClass", "2nd Class"),
+    ]
+    write_xlsx_template(str(path), service_ref=ref)
+
+    wb = load_workbook(str(path))
+    assert "Service Reference" in wb.sheetnames
+    ref_ws = wb["Service Reference"]
+    rows = list(ref_ws.iter_rows(min_row=2, values_only=True))
+    assert rows[0] == ("RoyalMailV3", "RoyalMail1stClass", "1st Class")
+    assert rows[1] == ("RoyalMailV3", "RoyalMail2ndClass", "2nd Class")

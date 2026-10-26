@@ -21,6 +21,12 @@ from app.core.countries import COUNTRIES
 from app.core.customs import build_customs_info, currency_for, customs_item, is_international
 from app.core.db import db_cursor
 from app.i18n import tr
+from app.services.carriers import (
+    all_carrier_codes,
+    carrier_display_name,
+    carrier_is_known,
+    service_levels_for_carrier,
+)
 from app.services.packages import package_code_from_choice
 from app.services.shipments import preferred_label_options
 
@@ -116,6 +122,38 @@ def country_code_from_choice(value: str) -> str:
     """
     return (value or "").split("—")[0].strip().upper()
 
+def carrier_code_from_choice(value: str) -> str:
+    """Reduce a dropdown label ("RoyalMailV3 — Royal Mail V3") to its code.
+
+    A bare code typed straight into a CSV passes through unchanged, the same
+    contract as country_code_from_choice.
+    """
+    return (value or "").split("—")[0].strip()
+
+
+def carrier_choices() -> list[str]:
+    """Carrier dropdown labels for the xlsx template, built from the cached
+    catalogue. Returns "code — Display Name" pairs that
+    :func:`carrier_code_from_choice` strips back to the bare code."""
+    return [
+        f"{code} — {carrier_display_name(code)}"
+        for code in all_carrier_codes()
+    ]
+
+
+def service_reference_rows() -> list[tuple[str, str, str]]:
+    """(carrier_code, service_code, human_readable) for the xlsx reference sheet.
+
+    Every service the cached catalogue knows, grouped by carrier. The reference
+    sheet is visible (not hidden) so the user can look up valid service codes
+    before filling the service column."""
+    rows: list[tuple[str, str, str]] = []
+    for code in all_carrier_codes():
+        for svc in service_levels_for_carrier(code):
+            rows.append((code, svc.name, svc.human_readable or ""))
+    return rows
+
+
 _SAMPLE_ROW = {
     "to_name": "Jane Doe", "to_company": "", "to_street1": "123 Main St",
     "to_street2": "", "to_city": "Boston", "to_state": "MA", "to_zip": "02110",
@@ -138,16 +176,20 @@ def write_csv_template(path: str) -> None:
         writer.writerow([_SAMPLE_ROW[col] for col in CSV_COLUMNS])
 
 
-def write_xlsx_template(path: str, package_choices: Optional[list[str]] = None) -> None:
-    """Write the batch template as an Excel workbook with a package dropdown.
+def write_xlsx_template(
+    path: str,
+    package_choices: Optional[list[str]] = None,
+    carrier_dropdown: Optional[list[str]] = None,
+    service_ref: Optional[list[tuple[str, str, str]]] = None,
+) -> None:
+    """Write the batch template as an Excel workbook with dropdowns.
 
-    ``package_choices`` populates a data-validation list on every cell of the
-    ``predefined_package`` column, so the recipient sheet offers the carrier
-    package codes as a real dropdown rather than free text. The choices are
-    kept on a second, hidden sheet and referenced by range — an inline list
-    formula is capped near 255 characters, which the full carrier set blows
-    past. When no choices are available (offline, empty cache) the column is
-    left as free text.
+    ``package_choices`` populates a data-validation list on the
+    ``predefined_package`` column. ``carrier_dropdown`` does the same for the
+    ``carrier`` column (labels like "RoyalMailV3 — Royal Mail V3").
+    ``service_ref`` writes a visible reference sheet mapping carrier → service
+    code → human-readable name, since a flat dropdown of thousands of services
+    is unusable.
     """
     from openpyxl import Workbook
     from openpyxl.utils import get_column_letter
@@ -188,6 +230,16 @@ def write_xlsx_template(path: str, package_choices: Optional[list[str]] = None) 
     # was not. A list nobody can mistype removes the whole class.
     add_dropdown("Countries", "to_country", COUNTRY_CHOICES)
     add_dropdown("OriginCountries", "customs_origin_country", COUNTRY_CHOICES)
+    add_dropdown("Carriers", "carrier", carrier_dropdown or [])
+
+    if service_ref:
+        ref_ws = wb.create_sheet("Service Reference")
+        ref_ws.append(["carrier", "service", "description"])
+        for carrier_code, svc_code, readable in service_ref:
+            ref_ws.append([carrier_code, svc_code, readable])
+        ref_ws.freeze_panes = "A2"
+        for col in ref_ws.columns:
+            ref_ws.column_dimensions[col[0].column_letter].width = 30
 
     wb.save(path)
 
@@ -288,6 +340,28 @@ def _validate_row(line_number: int, fields: dict, from_country: Optional[str] = 
             error = _number_error("customs_value", value, positive=True)
             if error:
                 errors.append(error)
+
+    # Per-row carrier and service: reduce dropdown labels to bare codes (like
+    # countries), then validate that both or neither are present and that the
+    # values name something the catalogue recognises.
+    for col in ("carrier", "service"):
+        if fields.get(col):
+            fields[col] = carrier_code_from_choice(fields[col])
+    row_carrier = fields.get("carrier", "")
+    row_service = fields.get("service", "")
+    if row_carrier and not row_service:
+        errors.append(_row_error("service_required_with_carrier", "service"))
+    elif row_service and not row_carrier:
+        errors.append(_row_error("carrier_required_with_service", "carrier"))
+    try:
+        if row_carrier and not carrier_is_known(row_carrier):
+            errors.append(_row_error("unknown_carrier", "carrier"))
+        if row_carrier and row_service:
+            known = service_levels_for_carrier(row_carrier)
+            if known and not any(s.name == row_service for s in known):
+                errors.append(_row_error("unknown_service", "service"))
+    except Exception:
+        pass
 
     # A predefined package brings its own dimensions, so length/width/height
     # are only required when no package is named. When they are supplied either
