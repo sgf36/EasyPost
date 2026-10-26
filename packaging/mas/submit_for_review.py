@@ -25,6 +25,7 @@ import time
 
 import requests
 from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 
 API = "https://api.appstoreconnect.apple.com/v1"
@@ -49,7 +50,7 @@ def _make_token(key_id: str, issuer_id: str, key_pem: bytes) -> str:
 
     key = load_pem_private_key(key_pem, password=None)
     der_sig = key.sign(segments.encode(), ec.ECDSA(hashes.SHA256()))
-    r, s = ec.utils.decode_dss_signature(der_sig)
+    r, s = decode_dss_signature(der_sig)
     raw_sig = r.to_bytes(32, "big") + s.to_bytes(32, "big")
     return segments + "." + _b64(raw_sig)
 
