@@ -506,6 +506,42 @@ jobs:
           name: EasyPostDesktop-${{ matrix.os }}
           path: dist/*
 
+      # Submit the MSIX to the Microsoft Store via Partner Center API.
+      # Mirrors the MAS auto-submit step on macOS: creates a new submission
+      # (cloned from the last published), uploads the signed MSIX, sets the
+      # "What's New" text across all listing locales, and commits for
+      # certification. Gated on PARTNER_CENTER_CLIENT_SECRET — until those
+      # secrets exist this is a no-op. Never on a pull request: the step
+      # would push a branch build into the Store's certification queue.
+      # See CI-STORE-SUBMISSION-SETUP.md for the one-time setup.
+      - name: Submit MSIX to Microsoft Store
+        if: matrix.os == 'windows-latest' && env.HAS_STORE_CREDS == 'true' && github.event_name != 'pull_request'
+        shell: bash
+        timeout-minutes: 15
+        env:
+          HAS_STORE_CREDS: ${{ secrets.PARTNER_CENTER_CLIENT_SECRET != '' }}
+          PARTNER_CENTER_TENANT_ID: ${{ secrets.PARTNER_CENTER_TENANT_ID }}
+          PARTNER_CENTER_CLIENT_ID: ${{ secrets.PARTNER_CENTER_CLIENT_ID }}
+          PARTNER_CENTER_CLIENT_SECRET: ${{ secrets.PARTNER_CENTER_CLIENT_SECRET }}
+          PARTNER_CENTER_APP_ID: ${{ secrets.PARTNER_CENTER_APP_ID }}
+        run: |
+          set -euo pipefail
+          APP_VERSION="$(python -c 'import re,pathlib; print(re.search(r"APP_VERSION\s*=\s*\"([^\"]+)\"", pathlib.Path("app/config.py").read_text()).group(1))')"
+
+          WHATS_NEW="$(python -c "
+          import pathlib, re
+          notes = pathlib.Path('store_assets/RELEASE-NOTES-' + '$APP_VERSION' + '.md').read_text()
+          m = re.search(r'## Copy for the store listings.*?((?:^>.*\n?)+)', notes, re.DOTALL | re.MULTILINE)
+          if not m:
+              raise SystemExit('No store-listing copy found in RELEASE-NOTES-$APP_VERSION.md')
+          print(re.sub(r'^> ?', '', m.group(1), flags=re.MULTILINE).strip())
+          ")"
+
+          python packaging/submit_to_store.py \
+            --msix dist/EasyPostDesktop.msix \
+            --version "$APP_VERSION" \
+            --whats-new "$WHATS_NEW"
+
   # Store screenshots, rendered by CI rather than captured by hand on a rented
   # Mac. The macOS leg produces genuinely Mac-looking assets — real system
   # fonts, real control metrics, real window chrome — because it runs on a

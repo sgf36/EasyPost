@@ -64,19 +64,34 @@ class ASCClient:
             "Content-Type": "application/json",
         })
 
+    @staticmethod
+    def _raise(r: requests.Response) -> None:
+        """raise_for_status with Apple's error details printed first."""
+        if r.ok:
+            return
+        try:
+            body = r.json()
+            for err in body.get("errors", []):
+                code = err.get("code", "?")
+                detail = err.get("detail", err.get("title", ""))
+                print(f"  ASC error [{r.status_code}] {code}: {detail}")
+        except Exception:
+            print(f"  ASC error [{r.status_code}]: {r.text[:500]}")
+        r.raise_for_status()
+
     def get(self, path: str, **params) -> dict:
         r = self._session.get(f"{API}{path}", params=params, timeout=30)
-        r.raise_for_status()
+        self._raise(r)
         return r.json()
 
     def post(self, path: str, body: dict) -> dict:
         r = self._session.post(f"{API}{path}", json=body, timeout=30)
-        r.raise_for_status()
+        self._raise(r)
         return r.json()
 
     def patch(self, path: str, body: dict) -> dict:
         r = self._session.patch(f"{API}{path}", json=body, timeout=30)
-        r.raise_for_status()
+        self._raise(r)
         return r.json()
 
 
@@ -217,6 +232,12 @@ def submit_for_review(client: ASCClient, version_id: str) -> None:
     except requests.HTTPError as e:
         if e.response is not None and e.response.status_code == 409:
             print("  Already submitted (409 Conflict) — nothing to do.")
+        elif e.response is not None and e.response.status_code == 403:
+            print("  HINT: 403 usually means the API key role is 'Developer'")
+            print("        but 'App Manager' or 'Admin' is required to submit.")
+            print("        Check App Store Connect → Users and Access →")
+            print("        Integrations → Keys → edit the key's role.")
+            raise
         else:
             raise
 
