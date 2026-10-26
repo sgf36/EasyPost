@@ -42,6 +42,7 @@ from app.services.batches import (
     batch_label_urls,
     bought_shipment_ids,
     buy_batch,
+    carrier_choices,
     create_batch,
     generate_batch_label,
     parse_import,
@@ -52,6 +53,7 @@ from app.services.batches import (
     revalidate,
     save_batch_locally,
     record_batch_shipments,
+    service_reference_rows,
     write_csv_template,
     write_xlsx_template,
 )
@@ -462,7 +464,16 @@ class BatchView(QWidget):
         # must not touch a widget.
         carrier = self._service_picker.current_carrier()
         self._pending_task = run_async(
-            lambda: (write_xlsx_template(path, predefined_package_choices(carrier)), path)[1], self
+            lambda: (
+                write_xlsx_template(
+                    path,
+                    predefined_package_choices(carrier),
+                    carrier_dropdown=carrier_choices(),
+                    service_ref=service_reference_rows(),
+                ),
+                path,
+            )[1],
+            self,
         )
         self._pending_task.succeeded.connect(
             lambda saved: QMessageBox.information(

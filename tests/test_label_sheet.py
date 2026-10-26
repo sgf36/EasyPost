@@ -185,3 +185,46 @@ def test_an_absurd_dpi_is_ignored_rather_than_making_a_page_measured_in_feet():
 def test_no_labels_is_an_error_not_an_empty_pdf():
     with pytest.raises(ValueError):
         ls.compose_label_pages([])
+
+
+# ---------------------------------------------------------------------------
+# Envelope templates
+# ---------------------------------------------------------------------------
+
+_ENVELOPE_KEYS = [k for k in ls.TEMPLATES if k.startswith("envelope_")]
+
+
+def test_envelope_templates_exist():
+    assert len(_ENVELOPE_KEYS) >= 6
+
+
+@pytest.mark.parametrize("key", _ENVELOPE_KEYS)
+def test_envelope_template_is_one_per_page(key):
+    t = ls.get_template(key)
+    assert t.cols == 1 and t.rows == 1
+    assert t.per_page == 1
+
+
+@pytest.mark.parametrize("key", _ENVELOPE_KEYS)
+def test_envelope_template_usable_on_both_printers(key):
+    t = ls.get_template(key)
+    assert len(ls.usable_positions(t, "laser")) == 1
+    assert len(ls.usable_positions(t, "inkjet")) == 1
+
+
+def test_envelope_compose_produces_pdf():
+    t = ls.get_template("envelope_dl")
+    pdf = ls.compose_sheets([_png()], t)
+    assert pdf.startswith(b"%PDF")
+
+
+def test_envelope_page_count_equals_label_count():
+    t = ls.get_template("envelope_c5")
+    assert ls.page_count(1, t) == 1
+    assert ls.page_count(5, t) == 5
+
+
+def test_envelope_compose_multiple_labels():
+    t = ls.get_template("envelope_no10")
+    pdf = ls.compose_sheets([_png() for _ in range(3)], t)
+    assert pdf.startswith(b"%PDF")

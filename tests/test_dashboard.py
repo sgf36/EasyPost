@@ -259,7 +259,9 @@ def test_the_page_shows_readable_values_not_api_codes(qapp):
     from app.ui.views.dashboard_view import DashboardView
 
     _seed("test", suffix="T")
-    with _mode("test"):
+    with _mode("test"), \
+         patch("app.ui.views.dashboard_view.load_summary",
+               side_effect=lambda: load_summary(now=NOW)):
         view = DashboardView()
 
     assert view._empty_panel.isHidden() and not view._content.isHidden()
@@ -286,7 +288,9 @@ def test_the_page_fits_the_smallest_store_window(qapp, monkeypatch, locale):
 
     monkeypatch.setattr(app.i18n, "current_locale", lambda: locale)
     _seed("test", suffix="T")
-    with _mode("test"):
+    with _mode("test"), \
+         patch("app.ui.views.dashboard_view.load_summary",
+               side_effect=lambda: load_summary(now=NOW)):
         view = DashboardView()
     assert view.minimumSizeHint().width() <= 1440 - 196
 
